@@ -157,6 +157,7 @@
   <ItemGroup>
     <ClInclude Include="..\src\Catch\Catch.hpp" />
     <ClInclude Include="..\src\Vec3.h" />
+    <ClInclude Include="..\src\VecN.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -21,5 +21,8 @@
     <ClInclude Include="..\src\Catch\Catch.hpp">
       <Filter>Catch</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\VecN.h">
+      <Filter>Math</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

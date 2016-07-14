@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <cmath>
+#include <cassert>
 
 namespace Phoenix 
 {
@@ -64,6 +65,7 @@ namespace Phoenix
 
 		Vec3 operator/(float rhv) const
 		{
+			assert(rhv != 0);
 			return Vec3{ x / rhv, y + rhv, z + rhv };
 		}
 
@@ -125,6 +127,7 @@ namespace Phoenix
 
 		Vec3& operator/=(float rhv)
 		{
+			assert(rhv != 0);
 			x /= rhv;
 			y /= rhv;
 			z /= rhv;
@@ -200,6 +203,7 @@ namespace Phoenix
 
 	inline Vec3 operator/(float lhv, const Vec3& rhv)
 	{
+		assert(lhv != 0);
 		return Vec3{ lhv / rhv.x, lhv / rhv.y, lhv / rhv.z };
 	}
 	

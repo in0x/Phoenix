@@ -1,2 +1,9 @@
 ﻿  main.cpp
-  Phoenix.vcxproj -> C:\Users\Philipp\Documents\Phoenix\vs2015\x64\Debug\Phoenix.exe
+c:\users\philipp\documents\phoenix\src\vecn.h(31): error C2662: 'int Phoenix::Vec<3>::size(void)': cannot convert 'this' pointer from 'const Phoenix::Vec<3>' to 'Phoenix::Vec<3> &'
+  c:\users\philipp\documents\phoenix\src\vecn.h(31): note: Conversion loses qualifiers
+  c:\users\philipp\documents\phoenix\src\vecn.h(30): note: while compiling class template member function 'Phoenix::Vec<3> Phoenix::Vec<3>::operator +(const Phoenix::Vec<3> &) const'
+  c:\users\philipp\documents\phoenix\src\main.cpp(18): note: see reference to function template instantiation 'Phoenix::Vec<3> Phoenix::Vec<3>::operator +(const Phoenix::Vec<3> &) const' being compiled
+  c:\users\philipp\documents\phoenix\src\main.cpp(15): note: see reference to class template instantiation 'Phoenix::Vec<3>' being compiled
+c:\users\philipp\documents\phoenix\src\vecn.h(33): error C2678: binary '[': no operator found which takes a left-hand operand of type 'const Phoenix::Vec<3>' (or there is no acceptable conversion)
+  c:\users\philipp\documents\phoenix\src\vecn.h(23): note: could be 'float &Phoenix::Vec<3>::operator [](int)'
+  c:\users\philipp\documents\phoenix\src\vecn.h(33): note: while trying to match the argument list '(const Phoenix::Vec<3>, int)'
