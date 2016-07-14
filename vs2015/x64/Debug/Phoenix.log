@@ -1,6 +1,2 @@
 ﻿  main.cpp
-c:\users\philipp\documents\phoenix\src\vec3.h(128): warning C4552: '+': operator has no effect; expected operator with side-effect
-  Vec3.cpp
-c:\users\philipp\documents\phoenix\src\vec3.h(128): warning C4552: '+': operator has no effect; expected operator with side-effect
-  Generating Code...
   Phoenix.vcxproj -> C:\Users\Philipp\Documents\Phoenix\vs2015\x64\Debug\Phoenix.exe
