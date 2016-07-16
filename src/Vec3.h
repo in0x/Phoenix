@@ -23,50 +23,9 @@ namespace Phoenix
 		{
 		}
 
-		float& operator[] (int i) 
+		float& operator[] (int i)  
 		{
 			return *(&x + i);
-		}
-
-		Vec3 operator+(const Vec3& rhv) const
-		{
-			return Vec3{ x + rhv.x, y + rhv.y, z + rhv.z };
-		}
-
-		Vec3 operator-(const Vec3& rhv) const
-		{
-			return Vec3{ x - rhv.x, y - rhv.y, z - rhv.z };
-		}
-
-		Vec3 operator*(const Vec3& rhv) const
-		{
-			return Vec3{ x * rhv.x, y * rhv.y, z * rhv.z };
-		}
-
-		Vec3 operator/(const Vec3& rhv) const
-		{
-			return Vec3{ x / rhv.x, y + rhv.y, z + rhv.z };
-		}
-
-		Vec3 operator+(float rhv) const
-		{
-			return Vec3{ x + rhv, y + rhv, z + rhv };
-		}
-
-		Vec3 operator-(float rhv) const
-		{
-			return Vec3{ x - rhv, y - rhv, z - rhv };
-		}
-
-		Vec3 operator*(float rhv) const
-		{
-			return Vec3{ x * rhv, y * rhv, z * rhv };
-		}
-
-		Vec3 operator/(float rhv) const
-		{
-			assert(rhv != 0);
-			return Vec3{ x / rhv, y + rhv, z + rhv };
 		}
 
 		Vec3& operator+=(const Vec3& rhv) 
@@ -186,38 +145,79 @@ namespace Phoenix
 		Vec3 reflect(const Vec3& rhv) const;
 	};
 
-	inline Vec3 operator+(float lhv, const Vec3& rhv)
+	inline const Vec3 operator+(Vec3 lhv, const Vec3& rhv) 
+	{
+		lhv += rhv;
+		return lhv;
+	}
+
+	inline const Vec3 operator-(Vec3 lhv, const Vec3& rhv)
+	{
+		lhv -= rhv;
+		return lhv;
+	}
+	
+	inline const Vec3 operator*(Vec3 lhv, const Vec3& rhv)
+	{
+		lhv *= rhv;
+		return lhv;
+	}
+	
+	inline const Vec3 operator/(Vec3 lhv, const Vec3& rhv)
+	{
+		lhv /= rhv;
+		return lhv;
+	}
+
+	inline const Vec3 operator+(const Vec3& lhv, float rhv)
+	{
+		return Vec3{ lhv.x + rhv, lhv.y + rhv, lhv.z + rhv };
+	}
+	
+	inline const Vec3 operator-(const Vec3& lhv, float rhv)
+	{
+		return Vec3{ lhv.x - rhv, lhv.y - rhv, lhv.z - rhv };
+	}
+	
+	inline const Vec3 operator*(const Vec3& lhv, float rhv)
+	{
+		return Vec3{ lhv.x * rhv, lhv.y * rhv, lhv.z * rhv };
+	}
+	
+	inline const Vec3 operator/(const Vec3& lhv, float rhv)
+	{
+		return Vec3{ lhv.x / rhv, lhv.y / rhv, lhv.z / rhv };
+	}
+
+	inline const Vec3 operator+(float lhv, const Vec3& rhv)
 	{
 		return Vec3{ lhv + rhv.x, lhv + rhv.y, lhv + rhv.z };
 	}
-	
-	inline Vec3 operator-(float lhv, const Vec3& rhv)
+
+	inline const Vec3 operator-(float lhv, const Vec3& rhv)
 	{
 		return Vec3{ lhv - rhv.x, lhv - rhv.y, lhv - rhv.z };
 	}
-	
-	inline Vec3 operator*(float lhv, const Vec3& rhv)
+
+	inline const Vec3 operator*(float lhv, const Vec3& rhv)
 	{
-		return Vec3{ lhv * rhv.x, lhv * rhv.y, lhv * rhv .z};
+		return Vec3{ lhv * rhv.x, lhv * rhv.y, lhv * rhv.z };
 	}
 
-	inline Vec3 operator/(float lhv, const Vec3& rhv)
+	inline const Vec3 operator/(float lhv, const Vec3& rhv)
 	{
-		assert(lhv != 0);
 		return Vec3{ lhv / rhv.x, lhv / rhv.y, lhv / rhv.z };
 	}
-	
+
 	inline Vec3 Vec3::reflect(const Vec3& rhv) const
 	{
 		return 2.f * rhv.dot(*this) * (*this) - rhv;
 	}
-
 
 	inline std::ostream& operator<<(std::ostream& out, const Phoenix::Vec3& vec)
 	{
 		out << "( " << vec.x << " | " << vec.y << " | " << vec.z << " )";
 		return out;
 	}
-
 }
 
