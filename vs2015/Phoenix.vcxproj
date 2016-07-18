@@ -152,11 +152,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\main.cpp" />
-    <ClCompile Include="..\src\Vec3.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Catch\Catch.hpp" />
+    <ClInclude Include="..\src\Matrix4.h" />
+    <ClInclude Include="..\src\Vec2.h" />
     <ClInclude Include="..\src\Vec3.h" />
+    <ClInclude Include="..\src\Vec4.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

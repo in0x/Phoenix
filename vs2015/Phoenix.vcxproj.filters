@@ -2,9 +2,6 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="..\src\main.cpp" />
-    <ClCompile Include="..\src\Vec3.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Math">
@@ -20,6 +17,15 @@
     </ClInclude>
     <ClInclude Include="..\src\Catch\Catch.hpp">
       <Filter>Catch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Vec2.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Vec4.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Matrix4.h">
+      <Filter>Math</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
