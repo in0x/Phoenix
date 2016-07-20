@@ -30,6 +30,11 @@ namespace Phoenix
 			return *(&x + i);
 		}
 
+		const float& operator[](int i) const
+		{
+			return *(&x + i);
+		}
+
 		Vec2& operator+=(const Vec2& rhv)
 		{
 			x += rhv.x;
