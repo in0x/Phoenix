@@ -37,5 +37,19 @@ namespace Phoenix
 			m_data[3][3] = m33;
 		}
 
+		float& operator()(int row, int col)
+		{
+			return m_data[row][col];
+		}
+
+		const float& operator()(int row, int col) const
+		{
+			return m_data[row][col];
+		}
 	};
+
+	inline Matrix4 operator+(Matrix4 lhv, const Matrix4& rhv)
+	{
+		return Matrix4{};
+	}
 }
