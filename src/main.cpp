@@ -1,7 +1,9 @@
-#include "Vec3.h"
-#include "Matrix4.h"
 #include <cassert>
 
+#include "Vec3.h"
+#include "Matrix4.h"
+
+// Check Game Coding Complete for info on WinMainLoop
 int main()
 {
 	Phoenix::Vec3 a{ 1,0,0 };
@@ -10,7 +12,6 @@ int main()
 	assert(a.dot(b) == 0);
 	assert(Phoenix::Vec3( 0,1,0 ).reflect(Phoenix::Vec3(0.5, 0.5, 0)) == Phoenix::Vec3(-0.5, 0.5, 0));
 	
-	Phoenix::Matrix4 mat{};
-
+	std::cout << Phoenix::Matrix4::unit() * Phoenix::Matrix4::unit() << std::endl;
 	return 0;
 }

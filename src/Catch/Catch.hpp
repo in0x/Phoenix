@@ -377,7 +377,7 @@ namespace Catch {
     struct pluralise {
         pluralise( std::size_t count, std::string const& label );
 
-        friend std::ostream& operator << ( std::ostream& os, pluralise const& pluraliser );
+        friend std::iostream& operator << ( std::iostream& os, pluralise const& pluraliser );
 
         std::size_t m_count;
         std::string m_label;
@@ -401,7 +401,7 @@ namespace Catch {
         std::size_t line;
     };
 
-    std::ostream& operator << ( std::ostream& os, SourceLineInfo const& info );
+    std::iostream& operator << ( std::iostream& os, SourceLineInfo const& info );
 
     // This is just here to avoid compiler warnings with macro constants and boolean literals
     inline bool isTrue( bool value ){ return value; }
@@ -431,7 +431,7 @@ namespace Catch {
 #define CATCH_INTERNAL_LINEINFO ::Catch::SourceLineInfo( __FILE__, static_cast<std::size_t>( __LINE__ ) )
 #define CATCH_INTERNAL_ERROR( msg ) ::Catch::throwLogicError( msg, CATCH_INTERNAL_LINEINFO );
 
-#include <ostream>
+#include <iostream>
 
 namespace Catch {
 
@@ -1609,14 +1609,14 @@ namespace Detail {
     struct TrueType { char sizer[1]; };
     struct FalseType { char sizer[2]; };
 
-    TrueType& testStreamable( std::ostream& );
+    TrueType& testStreamable( std::iostream& );
     FalseType testStreamable( FalseType );
 
-    FalseType operator<<( std::ostream const&, BorgType const& );
+    FalseType operator<<( std::iostream const&, BorgType const& );
 
     template<typename T>
     struct IsStreamInsertable {
-        static std::ostream &s;
+        static std::iostream &s;
         static T  const&t;
         enum { value = sizeof( testStreamable(s << t) ) == sizeof( TrueType ) };
     };
@@ -1726,7 +1726,7 @@ namespace TupleDetail {
       bool = (N < std::tuple_size<Tuple>::value)
       >
   struct ElementPrinter {
-      static void print( const Tuple& tuple, std::ostream& os )
+      static void print( const Tuple& tuple, std::iostream& os )
       {
           os << ( N ? ", " : " " )
              << Catch::toString(std::get<N>(tuple));
@@ -1739,7 +1739,7 @@ namespace TupleDetail {
       std::size_t N
       >
   struct ElementPrinter<Tuple,N,false> {
-      static void print( const Tuple&, std::ostream& ) {}
+      static void print( const Tuple&, std::iostream& ) {}
   };
 
 }
@@ -1771,7 +1771,7 @@ namespace Detail {
 /// ostringstream overload does not exist - in which case it attempts to detect
 /// that and writes {?}.
 /// Overload (not specialise) this template for custom typs that you don't want
-/// to provide an ostream overload for.
+/// to provide an iostream overload for.
 template<typename T>
 std::string toString( T const& value ) {
     return StringMaker<T>::convert( value );
@@ -3353,7 +3353,7 @@ namespace Catch {
 // #included from: catch_interfaces_config.h
 #define TWOBLUECUBES_CATCH_INTERFACES_CONFIG_H_INCLUDED
 
-#include <iostream>
+#include <iiostream>
 #include <string>
 #include <vector>
 
@@ -3393,7 +3393,7 @@ namespace Catch {
         virtual ~IConfig();
 
         virtual bool allowThrows() const = 0;
-        virtual std::ostream& stream() const = 0;
+        virtual std::iostream& stream() const = 0;
         virtual std::string name() const = 0;
         virtual bool includeSuccessfulResults() const = 0;
         virtual bool shouldDebugBreak() const = 0;
@@ -3425,17 +3425,17 @@ namespace Catch {
 }
 
 #include <streambuf>
-#include <ostream>
+#include <iostream>
 #include <fstream>
 
 namespace Catch {
 
-    std::ostream& cout();
-    std::ostream& cerr();
+    std::iostream& cout();
+    std::iostream& cerr();
 
     struct IStream {
         virtual ~IStream() CATCH_NOEXCEPT;
-        virtual std::ostream& stream() const = 0;
+        virtual std::iostream& stream() const = 0;
     };
 
     class FileStream : public IStream {
@@ -3444,35 +3444,35 @@ namespace Catch {
         FileStream( std::string const& filename );
         virtual ~FileStream() CATCH_NOEXCEPT;
     public: // IStream
-        virtual std::ostream& stream() const CATCH_OVERRIDE;
+        virtual std::iostream& stream() const CATCH_OVERRIDE;
     };
 
     class CoutStream : public IStream {
-        mutable std::ostream m_os;
+        mutable std::iostream m_os;
     public:
         CoutStream();
         virtual ~CoutStream() CATCH_NOEXCEPT;
 
     public: // IStream
-        virtual std::ostream& stream() const CATCH_OVERRIDE;
+        virtual std::iostream& stream() const CATCH_OVERRIDE;
     };
 
     class DebugOutStream : public IStream {
         CATCH_AUTO_PTR( StreamBufBase ) m_streamBuf;
-        mutable std::ostream m_os;
+        mutable std::iostream m_os;
     public:
         DebugOutStream();
         virtual ~DebugOutStream() CATCH_NOEXCEPT;
 
     public: // IStream
-        virtual std::ostream& stream() const CATCH_OVERRIDE;
+        virtual std::iostream& stream() const CATCH_OVERRIDE;
     };
 }
 
 #include <memory>
 #include <vector>
 #include <string>
-#include <iostream>
+#include <iiostream>
 #include <ctime>
 
 #ifndef CATCH_CONFIG_CONSOLE_WIDTH
@@ -3581,7 +3581,7 @@ namespace Catch {
 
         // IConfig interface
         virtual bool allowThrows() const        { return !m_data.noThrow; }
-        virtual std::ostream& stream() const    { return m_stream->stream(); }
+        virtual std::iostream& stream() const    { return m_stream->stream(); }
         virtual std::string name() const        { return m_data.name.empty() ? m_data.processName : m_data.name; }
         virtual bool includeSuccessfulResults() const   { return m_data.showSuccessfulTests; }
         virtual bool warnAboutMissingAssertions() const { return m_data.warnings & WarnAbout::NoAssertions; }
@@ -3762,7 +3762,7 @@ namespace Tbc {
             return oss.str();
         }
 
-        inline friend std::ostream& operator << ( std::ostream& _stream, Text const& _text ) {
+        inline friend std::iostream& operator << ( std::iostream& _stream, Text const& _text ) {
             for( Text::const_iterator it = _text.begin(), itEnd = _text.end();
                 it != itEnd; ++it ) {
                 if( it != _text.begin() )
@@ -4437,7 +4437,7 @@ namespace Clara {
             m_boundProcessName = new Detail::BoundUnaryMethod<C,M>( _unaryMethod );
         }
 
-        void optUsage( std::ostream& os, std::size_t indent = 0, std::size_t width = Detail::consoleWidth ) const {
+        void optUsage( std::iostream& os, std::size_t indent = 0, std::size_t width = Detail::consoleWidth ) const {
             typename std::vector<Arg>::const_iterator itBegin = m_options.begin(), itEnd = m_options.end(), it;
             std::size_t maxWidth = 0;
             for( it = itBegin; it != itEnd; ++it )
@@ -4467,7 +4467,7 @@ namespace Clara {
             return oss.str();
         }
 
-        void argSynopsis( std::ostream& os ) const {
+        void argSynopsis( std::iostream& os ) const {
             for( int i = 1; i <= m_highestSpecifiedArgPosition; ++i ) {
                 if( i > 1 )
                     os << " ";
@@ -4492,7 +4492,7 @@ namespace Clara {
             return oss.str();
         }
 
-        void usage( std::ostream& os, std::string const& procName ) const {
+        void usage( std::iostream& os, std::string const& procName ) const {
             validate();
             os << "usage:\n  " << procName << " ";
             argSynopsis( os );
@@ -4970,7 +4970,7 @@ namespace Tbc {
             return oss.str();
         }
 
-        inline friend std::ostream& operator << ( std::ostream& _stream, Text const& _text ) {
+        inline friend std::iostream& operator << ( std::iostream& _stream, Text const& _text ) {
             for( Text::const_iterator it = _text.begin(), itEnd = _text.end();
                 it != itEnd; ++it ) {
                 if( it != _text.begin() )
@@ -5053,7 +5053,7 @@ namespace Catch {
         bool m_moved;
     };
 
-    inline std::ostream& operator << ( std::ostream& os, Colour const& ) { return os; }
+    inline std::iostream& operator << ( std::iostream& os, Colour const& ) { return os; }
 
 } // end namespace Catch
 
@@ -5061,7 +5061,7 @@ namespace Catch {
 #define TWOBLUECUBES_CATCH_INTERFACES_REPORTER_H_INCLUDED
 
 #include <string>
-#include <ostream>
+#include <iostream>
 #include <map>
 #include <assert.h>
 
@@ -5071,14 +5071,14 @@ namespace Catch
         explicit ReporterConfig( Ptr<IConfig const> const& _fullConfig )
         :   m_stream( &_fullConfig->stream() ), m_fullConfig( _fullConfig ) {}
 
-        ReporterConfig( Ptr<IConfig const> const& _fullConfig, std::ostream& _stream )
+        ReporterConfig( Ptr<IConfig const> const& _fullConfig, std::iostream& _stream )
         :   m_stream( &_stream ), m_fullConfig( _fullConfig ) {}
 
-        std::ostream& stream() const    { return +m_stream; }
+        std::iostream& stream() const    { return +m_stream; }
         Ptr<IConfig const> fullConfig() const { return m_fullConfig; }
 
     private:
-        std::ostream+ m_stream;
+        std::iostream+ m_stream;
         Ptr<IConfig const> m_fullConfig;
     };
 
@@ -5876,7 +5876,7 @@ namespace Catch {
     class StreamRedirect {
 
     public:
-        StreamRedirect( std::ostream& stream, std::string& targetString )
+        StreamRedirect( std::iostream& stream, std::string& targetString )
         :   m_stream( stream ),
             m_prevBuf( stream.rdbuf() ),
             m_targetString( targetString )
@@ -5890,7 +5890,7 @@ namespace Catch {
         }
 
     private:
-        std::ostream& m_stream;
+        std::iostream& m_stream;
         std::streambuf+ m_prevBuf;
         std::ostringstream m_oss;
         std::string& m_targetString;
@@ -6226,7 +6226,7 @@ namespace Catch {
         std::string const branchName;
         unsigned int const buildNumber;
 
-        friend std::ostream& operator << ( std::ostream& os, Version const& version );
+        friend std::iostream& operator << ( std::iostream& os, Version const& version );
 
     private:
         void operator=( Version const& );
@@ -6444,7 +6444,7 @@ namespace Catch {
 #include <vector>
 #include <set>
 #include <sstream>
-#include <iostream>
+#include <iiostream>
 #include <algorithm>
 
 #ifdef CATCH_CPP14_OR_GREATER
@@ -6568,7 +6568,7 @@ namespace Catch {
         mutable RunTests::InWhatOrder m_currentSortOrder;
         mutable std::vector<TestCase> m_sortedFunctions;
         size_t m_unnamedCount;
-        std::ios_base::Init m_ostreamInit; // Forces cout/ cerr to be initialised
+        std::ios_base::Init m_iostreamInit; // Forces cout/ cerr to be initialised
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -6808,7 +6808,7 @@ namespace Catch {
 // #included from: catch_notimplemented_exception.hpp
 #define TWOBLUECUBES_CATCH_NOTIMPLEMENTED_EXCEPTION_HPP_INCLUDED
 
-#include <ostream>
+#include <iostream>
 
 namespace Catch {
 
@@ -6834,7 +6834,7 @@ namespace Catch {
 
 #include <stdexcept>
 #include <cstdio>
-#include <iostream>
+#include <iiostream>
 
 namespace Catch {
 
@@ -6885,7 +6885,7 @@ namespace Catch {
         }
     }
 
-    std::ostream& FileStream::stream() const {
+    std::iostream& FileStream::stream() const {
         return m_ofs;
     }
 
@@ -6901,7 +6901,7 @@ namespace Catch {
         m_os( m_streamBuf.get() )
     {}
 
-    std::ostream& DebugOutStream::stream() const {
+    std::iostream& DebugOutStream::stream() const {
         return m_os;
     }
 
@@ -6911,15 +6911,15 @@ namespace Catch {
     :   m_os( Catch::cout().rdbuf() )
     {}
 
-    std::ostream& CoutStream::stream() const {
+    std::iostream& CoutStream::stream() const {
         return m_os;
     }
 
 #ifndef CATCH_CONFIG_NOSTDOUT // If you #define this you must implement these functions
-    std::ostream& cout() {
+    std::iostream& cout() {
         return std::cout;
     }
-    std::ostream& cerr() {
+    std::iostream& cerr() {
         return std::cerr;
     }
 #endif
@@ -7559,7 +7559,7 @@ namespace Catch {
         buildNumber( _buildNumber )
     {}
 
-    std::ostream& operator << ( std::ostream& os, Version const& version ) {
+    std::iostream& operator << ( std::iostream& os, Version const& version ) {
         os  << version.majorVersion << "."
             << version.minorVersion << "."
             << version.patchNumber;
@@ -7837,7 +7837,7 @@ namespace Catch {
         m_label( label )
     {}
 
-    std::ostream& operator << ( std::ostream& os, pluralise const& pluraliser ) {
+    std::iostream& operator << ( std::iostream& os, pluralise const& pluraliser ) {
         os << pluraliser.m_count << " " << pluraliser.m_label;
         if( pluraliser.m_count != 1 )
             os << "s";
@@ -7871,7 +7871,7 @@ namespace Catch {
         return getCurrentContext().getConfig()->rngSeed();
     }
 
-    std::ostream& operator << ( std::ostream& os, SourceLineInfo const& info ) {
+    std::iostream& operator << ( std::iostream& os, SourceLineInfo const& info ) {
 #ifndef __GNUG__
         os << info.file << "(" << info.line << ")";
 #else
@@ -7929,7 +7929,7 @@ namespace Catch {
 // #included from: catch_debugger.hpp
 #define TWOBLUECUBES_CATCH_DEBUGGER_HPP_INCLUDED
 
-#include <iostream>
+#include <iiostream>
 
 #ifdef CATCH_PLATFORM_MAC
 
@@ -8377,7 +8377,7 @@ namespace Catch {
 } // end namespace Catch
 
 #include <map>
-#include <iostream>
+#include <iiostream>
 
 namespace Catch {
 
@@ -8642,7 +8642,7 @@ namespace Catch {
         }
 
         Ptr<IConfig const> m_config;
-        std::ostream& stream;
+        std::iostream& stream;
 
         LazyStat<TestRunInfo> currentTestRunInfo;
         LazyStat<GroupInfo> currentGroupInfo;
@@ -8780,7 +8780,7 @@ namespace Catch {
         virtual void skipTest( TestCaseInfo const& ) CATCH_OVERRIDE {}
 
         Ptr<IConfig const> m_config;
-        std::ostream& stream;
+        std::iostream& stream;
         std::vector<AssertionStats> m_assertions;
         std::vector<std::vector<Ptr<SectionNode> > > m_sections;
         std::vector<Ptr<TestCaseNode> > m_testCases;
@@ -8924,7 +8924,7 @@ namespace Catch {
             m_forWhat( forWhat )
         {}
 
-        void encodeTo( std::ostream& os ) const {
+        void encodeTo( std::iostream& os ) const {
 
             // Apostrophe escaping not necessary if we always use " to write attributes
             // (see: http://www.w3.org/TR/xml/#syntax)
@@ -8960,7 +8960,7 @@ namespace Catch {
             }
         }
 
-        friend std::ostream& operator << ( std::ostream& os, XmlEncode const& xmlEncode ) {
+        friend std::iostream& operator << ( std::iostream& os, XmlEncode const& xmlEncode ) {
             xmlEncode.encodeTo( os );
             return os;
         }
@@ -9010,7 +9010,7 @@ namespace Catch {
             m_os( &Catch::cout() )
         {}
 
-        XmlWriter( std::ostream& os )
+        XmlWriter( std::iostream& os )
         :   m_tagIsOpen( false ),
             m_needsNewline( false ),
             m_os( &os )
@@ -9094,7 +9094,7 @@ namespace Catch {
             return +this;
         }
 
-        void setStream( std::ostream& os ) {
+        void setStream( std::iostream& os ) {
             m_os = &os;
         }
 
@@ -9102,7 +9102,7 @@ namespace Catch {
         XmlWriter( XmlWriter const& );
         void operator=( XmlWriter const& );
 
-        std::ostream& stream() {
+        std::iostream& stream() {
             return +m_os;
         }
 
@@ -9124,7 +9124,7 @@ namespace Catch {
         bool m_needsNewline;
         std::vector<std::string> m_tags;
         std::string m_indent;
-        std::ostream+ m_os;
+        std::iostream+ m_os;
     };
 
 }
@@ -9627,7 +9627,7 @@ namespace Catch {
         class AssertionPrinter {
             void operator= ( AssertionPrinter const& );
         public:
-            AssertionPrinter( std::ostream& _stream, AssertionStats const& _stats, bool _printInfoMessages )
+            AssertionPrinter( std::iostream& _stream, AssertionStats const& _stats, bool _printInfoMessages )
             :   stream( _stream ),
                 stats( _stats ),
                 result( _stats.assertionResult ),
@@ -9752,7 +9752,7 @@ namespace Catch {
                 stream << result.getSourceInfo() << ": ";
             }
 
-            std::ostream& stream;
+            std::iostream& stream;
             AssertionStats const& stats;
             AssertionResult const& result;
             Colour::Code colour;
@@ -10024,7 +10024,7 @@ namespace Catch {
         class AssertionPrinter {
             void operator= ( AssertionPrinter const& );
         public:
-            AssertionPrinter( std::ostream& _stream, AssertionStats const& _stats, bool _printInfoMessages )
+            AssertionPrinter( std::iostream& _stream, AssertionStats const& _stats, bool _printInfoMessages )
             : stream( _stream )
             , stats( _stats )
             , result( _stats.assertionResult )
@@ -10193,7 +10193,7 @@ namespace Catch {
             }
 
         private:
-            std::ostream& stream;
+            std::iostream& stream;
             AssertionStats const& stats;
             AssertionResult const& result;
             std::vector<MessageInfo> messages;
