@@ -13,5 +13,9 @@ int main()
 	assert(Phoenix::Vec3( 0,1,0 ).reflect(Phoenix::Vec3(0.5, 0.5, 0)) == Phoenix::Vec3(-0.5, 0.5, 0));
 	
 	std::cout << Phoenix::Matrix4::unit() * Phoenix::Matrix4::unit() << std::endl;
+
+	int* i = new int();
+	*i = 5;
+
 	return 0;
 }

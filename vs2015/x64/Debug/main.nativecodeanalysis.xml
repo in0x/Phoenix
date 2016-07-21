@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DEFECTS>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
+      <FILENAME>vec3.h</FILENAME>
+      <LINE>33</LINE>
+      <COLUMN>3</COLUMN>
+    </SFA>
+    <DEFECTCODE>26481</DEFECTCODE>
+    <DESCRIPTION>Don't use pointer arithmetic. Use span instead. (bounds.1: http://go.microsoft.com/fwlink/p/?LinkID=620413)</DESCRIPTION>
+    <FUNCTION>Phoenix::Vec3::[]</FUNCTION>
+    <DECORATED>??AVec3@Phoenix@@QEAAAEAMH@Z</DECORATED>
+    <FUNCLINE>31</FUNCLINE>
+    <PATH />
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
+      <FILENAME>vec3.h</FILENAME>
+      <LINE>38</LINE>
+      <COLUMN>3</COLUMN>
+    </SFA>
+    <DEFECTCODE>26481</DEFECTCODE>
+    <DESCRIPTION>Don't use pointer arithmetic. Use span instead. (bounds.1: http://go.microsoft.com/fwlink/p/?LinkID=620413)</DESCRIPTION>
+    <FUNCTION>Phoenix::Vec3::[]</FUNCTION>
+    <DECORATED>??AVec3@Phoenix@@QEBAAEBMH@Z</DECORATED>
+    <FUNCLINE>36</FUNCLINE>
+    <PATH />
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
+      <FILENAME>vec3.h</FILENAME>
+      <LINE>143</LINE>
+      <COLUMN>3</COLUMN>
+    </SFA>
+    <DEFECTCODE>26493</DEFECTCODE>
+    <DESCRIPTION>Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)</DESCRIPTION>
+    <FUNCTION>Phoenix::Vec3::cross</FUNCTION>
+    <DECORATED>?cross@Vec3@Phoenix@@QEBA?AV12@AEBV12@@Z</DECORATED>
+    <FUNCLINE>140</FUNCLINE>
+    <PATH />
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
+      <FILENAME>vec3.h</FILENAME>
+      <LINE>143</LINE>
+      <COLUMN>3</COLUMN>
+    </SFA>
+    <DEFECTCODE>26493</DEFECTCODE>
+    <DESCRIPTION>Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)</DESCRIPTION>
+    <FUNCTION>Phoenix::Vec3::cross</FUNCTION>
+    <DECORATED>?cross@Vec3@Phoenix@@QEBA?AV12@AEBV12@@Z</DECORATED>
+    <FUNCLINE>140</FUNCLINE>
+    <PATH />
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
+      <FILENAME>vec3.h</FILENAME>
+      <LINE>143</LINE>
+      <COLUMN>3</COLUMN>
+    </SFA>
+    <DEFECTCODE>26493</DEFECTCODE>
+    <DESCRIPTION>Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)</DESCRIPTION>
+    <FUNCTION>Phoenix::Vec3::cross</FUNCTION>
+    <DECORATED>?cross@Vec3@Phoenix@@QEBA?AV12@AEBV12@@Z</DECORATED>
+    <FUNCLINE>140</FUNCLINE>
+    <PATH />
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
+      <FILENAME>vec3.h</FILENAME>
+      <LINE>184</LINE>
+      <COLUMN>13</COLUMN>
+    </SFA>
+    <DEFECTCODE>26493</DEFECTCODE>
+    <DESCRIPTION>Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)</DESCRIPTION>
+    <FUNCTION>Phoenix::+</FUNCTION>
+    <DECORATED>??HPhoenix@@YA?BVVec3@0@AEBV10@M@Z</DECORATED>
+    <FUNCLINE>182</FUNCLINE>
+    <PATH />
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
+      <FILENAME>vec3.h</FILENAME>
+      <LINE>184</LINE>
+      <COLUMN>13</COLUMN>
+    </SFA>
+    <DEFECTCODE>26493</DEFECTCODE>
+    <DESCRIPTION>Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)</DESCRIPTION>
+    <FUNCTION>Phoenix::+</FUNCTION>
+    <DECORATED>??HPhoenix@@YA?BVVec3@0@AEBV10@M@Z</DECORATED>
+    <FUNCLINE>182</FUNCLINE>
+    <PATH />
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
+      <FILENAME>vec3.h</FILENAME>
+      <LINE>184</LINE>
+      <COLUMN>13</COLUMN>
+    </SFA>
+    <DEFECTCODE>26493</DEFECTCODE>
+    <DESCRIPTION>Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)</DESCRIPTION>
+    <FUNCTION>Phoenix::+</FUNCTION>
+    <DECORATED>??HPhoenix@@YA?BVVec3@0@AEBV10@M@Z</DECORATED>
+    <FUNCLINE>182</FUNCLINE>
+    <PATH />
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
+      <FILENAME>vec3.h</FILENAME>
+      <LINE>189</LINE>
+      <COLUMN>13</COLUMN>
+    </SFA>
+    <DEFECTCODE>26493</DEFECTCODE>
+    <DESCRIPTION>Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)</DESCRIPTION>
+    <FUNCTION>Phoenix::-</FUNCTION>
+    <DECORATED>??GPhoenix@@YA?BVVec3@0@AEBV10@M@Z</DECORATED>
+    <FUNCLINE>187</FUNCLINE>
+    <PATH />
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
+      <FILENAME>vec3.h</FILENAME>
+      <LINE>189</LINE>
+      <COLUMN>13</COLUMN>
+    </SFA>
+    <DEFECTCODE>26493</DEFECTCODE>
+    <DESCRIPTION>Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)</DESCRIPTION>
+    <FUNCTION>Phoenix::-</FUNCTION>
+    <DECORATED>??GPhoenix@@YA?BVVec3@0@AEBV10@M@Z</DECORATED>
+    <FUNCLINE>187</FUNCLINE>
+    <PATH />
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
+      <FILENAME>vec3.h</FILENAME>
+      <LINE>189</LINE>
+      <COLUMN>13</COLUMN>
+    </SFA>
+    <DEFECTCODE>26493</DEFECTCODE>
+    <DESCRIPTION>Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)</DESCRIPTION>
+    <FUNCTION>Phoenix::-</FUNCTION>
+    <DECORATED>??GPhoenix@@YA?BVVec3@0@AEBV10@M@Z</DECORATED>
+    <FUNCLINE>187</FUNCLINE>
+    <PATH />
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
+      <FILENAME>vec3.h</FILENAME>
+      <LINE>194</LINE>
+      <COLUMN>13</COLUMN>
+    </SFA>
+    <DEFECTCODE>26493</DEFECTCODE>
+    <DESCRIPTION>Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)</DESCRIPTION>
+    <FUNCTION>Phoenix::*</FUNCTION>
+    <DECORATED>??DPhoenix@@YA?BVVec3@0@AEBV10@M@Z</DECORATED>
+    <FUNCLINE>192</FUNCLINE>
+    <PATH />
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
+      <FILENAME>vec3.h</FILENAME>
+      <LINE>194</LINE>
+      <COLUMN>13</COLUMN>
+    </SFA>
+    <DEFECTCODE>26493</DEFECTCODE>
+    <DESCRIPTION>Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)</DESCRIPTION>
+    <FUNCTION>Phoenix::*</FUNCTION>
+    <DECORATED>??DPhoenix@@YA?BVVec3@0@AEBV10@M@Z</DECORATED>
+    <FUNCLINE>192</FUNCLINE>
+    <PATH />
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
+      <FILENAME>vec3.h</FILENAME>
+      <LINE>194</LINE>
+      <COLUMN>13</COLUMN>
+    </SFA>
+    <DEFECTCODE>26493</DEFECTCODE>
+    <DESCRIPTION>Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)</DESCRIPTION>
+    <FUNCTION>Phoenix::*</FUNCTION>
+    <DECORATED>??DPhoenix@@YA?BVVec3@0@AEBV10@M@Z</DECORATED>
+    <FUNCLINE>192</FUNCLINE>
+    <PATH />
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
+      <FILENAME>vec3.h</FILENAME>
+      <LINE>199</LINE>
+      <COLUMN>13</COLUMN>
+    </SFA>
+    <DEFECTCODE>26493</DEFECTCODE>
+    <DESCRIPTION>Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)</DESCRIPTION>
+    <FUNCTION>Phoenix::/</FUNCTION>
+    <DECORATED>??KPhoenix@@YA?BVVec3@0@AEBV10@M@Z</DECORATED>
+    <FUNCLINE>197</FUNCLINE>
+    <PATH />
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
+      <FILENAME>vec3.h</FILENAME>
+      <LINE>199</LINE>
+      <COLUMN>13</COLUMN>
+    </SFA>
+    <DEFECTCODE>26493</DEFECTCODE>
+    <DESCRIPTION>Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)</DESCRIPTION>
+    <FUNCTION>Phoenix::/</FUNCTION>
+    <DECORATED>??KPhoenix@@YA?BVVec3@0@AEBV10@M@Z</DECORATED>
+    <FUNCLINE>197</FUNCLINE>
+    <PATH />
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
+      <FILENAME>vec3.h</FILENAME>
+      <LINE>199</LINE>
+      <COLUMN>13</COLUMN>
+    </SFA>
+    <DEFECTCODE>26493</DEFECTCODE>
+    <DESCRIPTION>Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)</DESCRIPTION>
+    <FUNCTION>Phoenix::/</FUNCTION>
+    <DECORATED>??KPhoenix@@YA?BVVec3@0@AEBV10@M@Z</DECORATED>
+    <FUNCLINE>197</FUNCLINE>
+    <PATH />
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
+      <FILENAME>main.cpp</FILENAME>
+      <LINE>18</LINE>
+      <COLUMN>4</COLUMN>
+    </SFA>
+    <DEFECTCODE>28182</DEFECTCODE>
+    <DESCRIPTION>Dereferencing NULL pointer. 'i' contains the same NULL value as 'Temp_value_#9115' did. </DESCRIPTION>
+    <FUNCTION>main</FUNCTION>
+    <DECORATED>main</DECORATED>
+    <FUNCLINE>7</FUNCLINE>
+    <PROBABILITY>1</PROBABILITY>
+    <RANK>3</RANK>
+    <CATEGORY>
+      <RULECATEGORY>mspft</RULECATEGORY>
+    </CATEGORY>
+    <PATH>
+      <SFA>
+        <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
+        <FILENAME>main.cpp</FILENAME>
+        <LINE>9</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
+        <FILENAME>main.cpp</FILENAME>
+        <LINE>10</LINE>
+        <COLUMN>15</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
+        <FILENAME>main.cpp</FILENAME>
+        <LINE>12</LINE>
+        <COLUMN>1</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
+        <FILENAME>main.cpp</FILENAME>
+        <LINE>13</LINE>
+        <COLUMN>1</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
+        <FILENAME>main.cpp</FILENAME>
+        <LINE>15</LINE>
+        <COLUMN>66</COLUMN>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
+        <FILENAME>main.cpp</FILENAME>
+        <LINE>17</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>1</ID>
+          <KIND>declaration</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>'i' may be NULL</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+      <SFA>
+        <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
+        <FILENAME>main.cpp</FILENAME>
+        <LINE>18</LINE>
+        <COLUMN>4</COLUMN>
+        <KEYEVENT>
+          <ID>2</ID>
+          <KIND>usage</KIND>
+          <IMPORTANCE>Essential</IMPORTANCE>
+          <MESSAGE>'i' is dereferenced, but may still be NULL</MESSAGE>
+        </KEYEVENT>
+      </SFA>
+    </PATH>
+  </DEFECT>
+</DEFECTS>

@@ -1,2 +1,10 @@
 ﻿  main.cpp
   Phoenix.vcxproj -> C:\Users\Philipp\Documents\Phoenix\vs2015\x64\Debug\Phoenix.exe
+c:\users\philipp\documents\phoenix\src\vec3.h(33): warning C26481: Don't use pointer arithmetic. Use span instead. (bounds.1: http://go.microsoft.com/fwlink/p/?LinkID=620413)
+c:\users\philipp\documents\phoenix\src\vec3.h(38): warning C26481: Don't use pointer arithmetic. Use span instead. (bounds.1: http://go.microsoft.com/fwlink/p/?LinkID=620413)
+c:\users\philipp\documents\phoenix\src\vec3.h(143): warning C26493: Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)
+c:\users\philipp\documents\phoenix\src\vec3.h(184): warning C26493: Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)
+c:\users\philipp\documents\phoenix\src\vec3.h(189): warning C26493: Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)
+c:\users\philipp\documents\phoenix\src\vec3.h(194): warning C26493: Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)
+c:\users\philipp\documents\phoenix\src\vec3.h(199): warning C26493: Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)
+c:\users\philipp\documents\phoenix\src\main.cpp(18): warning C28182: Dereferencing NULL pointer. 'i' contains the same NULL value as 'Temp_value_#9115' did. 
