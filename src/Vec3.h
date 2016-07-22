@@ -28,6 +28,8 @@ namespace Phoenix
 			, z(_z)
 		{}
 
+		// Raw pointer arithmetic is against the Core Guidelines, but this is really neat.
+		// I should figure out a way to do this more safely. This is also relies on int being 32-bit.
 		float& operator[] (int i)  
 		{
 			return *(&x + i);

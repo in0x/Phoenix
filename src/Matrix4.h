@@ -28,21 +28,21 @@ namespace Phoenix
 			m_data[3][0] = m30; m_data[3][1] = m31; m_data[3][2] = m32; m_data[3][3] = m33;
 		}
 
-		float& operator()(int row, int col)
+		float& operator()(std::size_t row, std::size_t col)
 		{
 			return m_data[row][col];
 		}
 
-		const float& operator()(int row, int col) const
+		const float& operator()(std::size_t row, std::size_t col) const
 		{
 			return m_data[row][col];
 		}
 
 		Matrix4& operator+=(const Matrix4& rhv)
 		{
-			for (int row = 0; row < m_data.size(); row++)
+			for (std::size_t row = 0; row < m_data.size(); row++)
 			{
-				for (int col = 0; col < m_data[row].size(); col++)
+				for (std::size_t col = 0; col < m_data[row].size(); col++)
 				{
 					m_data[row][col] += rhv(row, col);
 				}
@@ -53,9 +53,9 @@ namespace Phoenix
 
 		Matrix4& operator-=(const Matrix4& rhv)
 		{
-			for (int row = 0; row < m_data.size(); row++)
+			for (std::size_t row = 0; row < m_data.size(); row++)
 			{
-				for (int col = 0; col < m_data[row].size(); col++)
+				for (std::size_t col = 0; col < m_data[row].size(); col++)
 				{
 					m_data[row][col] -= rhv(row, col);
 				}
@@ -89,23 +89,15 @@ namespace Phoenix
 			return *this;
 		}
 
-		void transpose()
-		{
-		
-		}
+		float determinant() const;
 
-		void invert()
-		{
-		
-		}
+		Matrix4 adjoint() const;
 
-		static Matrix4 unit()
-		{
-			return Matrix4 { 1, 0, 0, 0,
-							 0, 1, 0, 0,
-							 0, 0, 1, 0,
-							 0, 0, 0, 1 };
-		}
+		Matrix4 transpose() const;
+
+		Matrix4 inverse() const;
+
+		static Matrix4 identity();
 	};
 
 	inline Matrix4 operator+(Matrix4 lhv, const Matrix4& rhv)

@@ -6,16 +6,19 @@
 // Check Game Coding Complete for info on WinMainLoop
 int main()
 {
-	Phoenix::Vec3 a{ 1,0,0 };
-	Phoenix::Vec3 b{ 0,1,0 };
+	using namespace Phoenix;
+
+	Vec3 a{ 1,0,0 };
+	Vec3 b{ 0,1,0 };
 
 	assert(a.dot(b) == 0);
-	assert(Phoenix::Vec3( 0,1,0 ).reflect(Phoenix::Vec3(0.5, 0.5, 0)) == Phoenix::Vec3(-0.5, 0.5, 0));
+	assert(Vec3( 0,1,0 ).reflect(Vec3(0.5, 0.5, 0)) == Vec3(-0.5, 0.5, 0));
 	
-	std::cout << Phoenix::Matrix4::unit() * Phoenix::Matrix4::unit() << std::endl;
-
-	int* i = new int();
-	*i = 5;
+	std::cout << Matrix4::identity() * Matrix4::identity() << std::endl;
+	std::cout << Matrix4{ 1, 2, 3, 4,
+									5, 6, 7, 8,
+									1, 2, 3, 4,
+									5, 6, 7, 8}.transpose() << std::endl;
 
 	return 0;
 }
