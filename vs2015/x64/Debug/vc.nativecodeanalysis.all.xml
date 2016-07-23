@@ -92,14 +92,14 @@
   </DEFECT><DEFECT>
     <SFA>
       <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
-      <FILENAME>matrix4.h</FILENAME>
-      <LINE>121</LINE>
-      <COLUMN>17</COLUMN>
+      <FILENAME>matrix4.cpp</FILENAME>
+      <LINE>7</LINE>
+      <COLUMN>16</COLUMN>
     </SFA>
     <DEFECTCODE>26493</DEFECTCODE>
     <DESCRIPTION>Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)</DESCRIPTION>
-    <FUNCTION>Phoenix::transpose</FUNCTION>
-    <DECORATED>?transpose@Phoenix@@YA?AVMatrix4@1@AEBV21@@Z</DECORATED>
-    <FUNCLINE>119</FUNCLINE>
+    <FUNCTION>Phoenix::Matrix4::transpose</FUNCTION>
+    <DECORATED>?transpose@Matrix4@Phoenix@@QEBA?AV12@XZ</DECORATED>
+    <FUNCLINE>5</FUNCLINE>
     <PATH />
   </DEFECT></DEFECTS>

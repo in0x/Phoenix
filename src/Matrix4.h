@@ -88,16 +88,28 @@ namespace Phoenix
 
 			return *this;
 		}
+		
+		bool operator==(const Matrix4& rhv)
+		{
+			return (m_data[0][0] == rhv(0, 0) && m_data[0][1] == rhv(0, 1) && m_data[0][2] == rhv(0, 2) && m_data[0][3] == rhv(0, 3) &&
+					m_data[1][0] == rhv(1, 0) && m_data[1][1] == rhv(1, 1) && m_data[1][2] == rhv(1, 2) && m_data[1][3] == rhv(1, 3) &&
+					m_data[2][0] == rhv(2, 0) && m_data[2][1] == rhv(2, 1) && m_data[2][2] == rhv(2, 2) && m_data[2][3] == rhv(2, 3) &&
+					m_data[3][0] == rhv(3, 0) && m_data[3][1] == rhv(3, 1) && m_data[3][2] == rhv(3, 2) && m_data[3][3] == rhv(3, 3));
+		}
 
 		float determinant() const;
-
-		Matrix4 adjoint() const;
 
 		Matrix4 transpose() const;
 
 		Matrix4 inverse() const;
 
 		static Matrix4 identity();
+
+	private:
+
+		float minor(int row0, int row1, int row2, int col0, int col1, int col2) const;
+		
+		Matrix4 adjoint() const;		
 	};
 
 	inline Matrix4 operator+(Matrix4 lhv, const Matrix4& rhv)

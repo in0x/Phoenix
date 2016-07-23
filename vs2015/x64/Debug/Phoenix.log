@@ -1,4 +1,7 @@
 ﻿  main.cpp
+  Matrix4.cpp
+  Running Code Analysis for C/C++...
+  Generating Code...
   Phoenix.vcxproj -> C:\Users\Philipp\Documents\Phoenix\vs2015\x64\Debug\Phoenix.exe
 c:\users\philipp\documents\phoenix\src\vec3.h(35): warning C26481: Don't use pointer arithmetic. Use span instead. (bounds.1: http://go.microsoft.com/fwlink/p/?LinkID=620413)
 c:\users\philipp\documents\phoenix\src\vec3.h(40): warning C26481: Don't use pointer arithmetic. Use span instead. (bounds.1: http://go.microsoft.com/fwlink/p/?LinkID=620413)
@@ -7,4 +10,4 @@ c:\users\philipp\documents\phoenix\src\vec3.h(186): warning C26493: Don't use C-
 c:\users\philipp\documents\phoenix\src\vec3.h(191): warning C26493: Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)
 c:\users\philipp\documents\phoenix\src\vec3.h(196): warning C26493: Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)
 c:\users\philipp\documents\phoenix\src\vec3.h(201): warning C26493: Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)
-c:\users\philipp\documents\phoenix\src\matrix4.h(121): warning C26493: Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)
+c:\users\philipp\documents\phoenix\src\matrix4.cpp(7): warning C26493: Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)

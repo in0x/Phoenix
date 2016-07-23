@@ -3,239 +3,225 @@
   <DEFECT>
     <SFA>
       <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
-      <FILENAME>vec3.h</FILENAME>
-      <LINE>35</LINE>
-      <COLUMN>3</COLUMN>
-    </SFA>
-    <DEFECTCODE>26481</DEFECTCODE>
-    <DESCRIPTION>Don't use pointer arithmetic. Use span instead. (bounds.1: http://go.microsoft.com/fwlink/p/?LinkID=620413)</DESCRIPTION>
-    <FUNCTION>Phoenix::Vec3::[]</FUNCTION>
-    <DECORATED>??AVec3@Phoenix@@QEAAAEAMH@Z</DECORATED>
-    <FUNCLINE>33</FUNCLINE>
-    <PATH />
-  </DEFECT>
-  <DEFECT>
-    <SFA>
-      <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
-      <FILENAME>vec3.h</FILENAME>
-      <LINE>40</LINE>
-      <COLUMN>3</COLUMN>
-    </SFA>
-    <DEFECTCODE>26481</DEFECTCODE>
-    <DESCRIPTION>Don't use pointer arithmetic. Use span instead. (bounds.1: http://go.microsoft.com/fwlink/p/?LinkID=620413)</DESCRIPTION>
-    <FUNCTION>Phoenix::Vec3::[]</FUNCTION>
-    <DECORATED>??AVec3@Phoenix@@QEBAAEBMH@Z</DECORATED>
-    <FUNCLINE>38</FUNCLINE>
-    <PATH />
-  </DEFECT>
-  <DEFECT>
-    <SFA>
-      <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
-      <FILENAME>vec3.h</FILENAME>
-      <LINE>145</LINE>
-      <COLUMN>3</COLUMN>
+      <FILENAME>matrix4.cpp</FILENAME>
+      <LINE>7</LINE>
+      <COLUMN>16</COLUMN>
     </SFA>
     <DEFECTCODE>26493</DEFECTCODE>
     <DESCRIPTION>Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)</DESCRIPTION>
-    <FUNCTION>Phoenix::Vec3::cross</FUNCTION>
-    <DECORATED>?cross@Vec3@Phoenix@@QEBA?AV12@AEBV12@@Z</DECORATED>
-    <FUNCLINE>142</FUNCLINE>
+    <FUNCTION>Phoenix::Matrix4::transpose</FUNCTION>
+    <DECORATED>?transpose@Matrix4@Phoenix@@QEBA?AV12@XZ</DECORATED>
+    <FUNCLINE>5</FUNCLINE>
     <PATH />
   </DEFECT>
   <DEFECT>
     <SFA>
       <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
-      <FILENAME>vec3.h</FILENAME>
-      <LINE>145</LINE>
-      <COLUMN>3</COLUMN>
+      <FILENAME>matrix4.cpp</FILENAME>
+      <LINE>7</LINE>
+      <COLUMN>16</COLUMN>
     </SFA>
     <DEFECTCODE>26493</DEFECTCODE>
     <DESCRIPTION>Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)</DESCRIPTION>
-    <FUNCTION>Phoenix::Vec3::cross</FUNCTION>
-    <DECORATED>?cross@Vec3@Phoenix@@QEBA?AV12@AEBV12@@Z</DECORATED>
-    <FUNCLINE>142</FUNCLINE>
+    <FUNCTION>Phoenix::Matrix4::transpose</FUNCTION>
+    <DECORATED>?transpose@Matrix4@Phoenix@@QEBA?AV12@XZ</DECORATED>
+    <FUNCLINE>5</FUNCLINE>
     <PATH />
   </DEFECT>
   <DEFECT>
     <SFA>
       <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
-      <FILENAME>vec3.h</FILENAME>
-      <LINE>145</LINE>
-      <COLUMN>3</COLUMN>
+      <FILENAME>matrix4.cpp</FILENAME>
+      <LINE>7</LINE>
+      <COLUMN>16</COLUMN>
     </SFA>
     <DEFECTCODE>26493</DEFECTCODE>
     <DESCRIPTION>Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)</DESCRIPTION>
-    <FUNCTION>Phoenix::Vec3::cross</FUNCTION>
-    <DECORATED>?cross@Vec3@Phoenix@@QEBA?AV12@AEBV12@@Z</DECORATED>
-    <FUNCLINE>142</FUNCLINE>
+    <FUNCTION>Phoenix::Matrix4::transpose</FUNCTION>
+    <DECORATED>?transpose@Matrix4@Phoenix@@QEBA?AV12@XZ</DECORATED>
+    <FUNCLINE>5</FUNCLINE>
     <PATH />
   </DEFECT>
   <DEFECT>
     <SFA>
       <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
-      <FILENAME>vec3.h</FILENAME>
-      <LINE>186</LINE>
-      <COLUMN>13</COLUMN>
+      <FILENAME>matrix4.cpp</FILENAME>
+      <LINE>7</LINE>
+      <COLUMN>16</COLUMN>
     </SFA>
     <DEFECTCODE>26493</DEFECTCODE>
     <DESCRIPTION>Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)</DESCRIPTION>
-    <FUNCTION>Phoenix::+</FUNCTION>
-    <DECORATED>??HPhoenix@@YA?BVVec3@0@AEBV10@M@Z</DECORATED>
-    <FUNCLINE>184</FUNCLINE>
+    <FUNCTION>Phoenix::Matrix4::transpose</FUNCTION>
+    <DECORATED>?transpose@Matrix4@Phoenix@@QEBA?AV12@XZ</DECORATED>
+    <FUNCLINE>5</FUNCLINE>
     <PATH />
   </DEFECT>
   <DEFECT>
     <SFA>
       <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
-      <FILENAME>vec3.h</FILENAME>
-      <LINE>186</LINE>
-      <COLUMN>13</COLUMN>
+      <FILENAME>matrix4.cpp</FILENAME>
+      <LINE>7</LINE>
+      <COLUMN>16</COLUMN>
     </SFA>
     <DEFECTCODE>26493</DEFECTCODE>
     <DESCRIPTION>Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)</DESCRIPTION>
-    <FUNCTION>Phoenix::+</FUNCTION>
-    <DECORATED>??HPhoenix@@YA?BVVec3@0@AEBV10@M@Z</DECORATED>
-    <FUNCLINE>184</FUNCLINE>
+    <FUNCTION>Phoenix::Matrix4::transpose</FUNCTION>
+    <DECORATED>?transpose@Matrix4@Phoenix@@QEBA?AV12@XZ</DECORATED>
+    <FUNCLINE>5</FUNCLINE>
     <PATH />
   </DEFECT>
   <DEFECT>
     <SFA>
       <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
-      <FILENAME>vec3.h</FILENAME>
-      <LINE>186</LINE>
-      <COLUMN>13</COLUMN>
+      <FILENAME>matrix4.cpp</FILENAME>
+      <LINE>7</LINE>
+      <COLUMN>16</COLUMN>
     </SFA>
     <DEFECTCODE>26493</DEFECTCODE>
     <DESCRIPTION>Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)</DESCRIPTION>
-    <FUNCTION>Phoenix::+</FUNCTION>
-    <DECORATED>??HPhoenix@@YA?BVVec3@0@AEBV10@M@Z</DECORATED>
-    <FUNCLINE>184</FUNCLINE>
+    <FUNCTION>Phoenix::Matrix4::transpose</FUNCTION>
+    <DECORATED>?transpose@Matrix4@Phoenix@@QEBA?AV12@XZ</DECORATED>
+    <FUNCLINE>5</FUNCLINE>
     <PATH />
   </DEFECT>
   <DEFECT>
     <SFA>
       <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
-      <FILENAME>vec3.h</FILENAME>
-      <LINE>191</LINE>
-      <COLUMN>13</COLUMN>
+      <FILENAME>matrix4.cpp</FILENAME>
+      <LINE>7</LINE>
+      <COLUMN>16</COLUMN>
     </SFA>
     <DEFECTCODE>26493</DEFECTCODE>
     <DESCRIPTION>Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)</DESCRIPTION>
-    <FUNCTION>Phoenix::-</FUNCTION>
-    <DECORATED>??GPhoenix@@YA?BVVec3@0@AEBV10@M@Z</DECORATED>
-    <FUNCLINE>189</FUNCLINE>
+    <FUNCTION>Phoenix::Matrix4::transpose</FUNCTION>
+    <DECORATED>?transpose@Matrix4@Phoenix@@QEBA?AV12@XZ</DECORATED>
+    <FUNCLINE>5</FUNCLINE>
     <PATH />
   </DEFECT>
   <DEFECT>
     <SFA>
       <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
-      <FILENAME>vec3.h</FILENAME>
-      <LINE>191</LINE>
-      <COLUMN>13</COLUMN>
+      <FILENAME>matrix4.cpp</FILENAME>
+      <LINE>7</LINE>
+      <COLUMN>16</COLUMN>
     </SFA>
     <DEFECTCODE>26493</DEFECTCODE>
     <DESCRIPTION>Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)</DESCRIPTION>
-    <FUNCTION>Phoenix::-</FUNCTION>
-    <DECORATED>??GPhoenix@@YA?BVVec3@0@AEBV10@M@Z</DECORATED>
-    <FUNCLINE>189</FUNCLINE>
+    <FUNCTION>Phoenix::Matrix4::transpose</FUNCTION>
+    <DECORATED>?transpose@Matrix4@Phoenix@@QEBA?AV12@XZ</DECORATED>
+    <FUNCLINE>5</FUNCLINE>
     <PATH />
   </DEFECT>
   <DEFECT>
     <SFA>
       <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
-      <FILENAME>vec3.h</FILENAME>
-      <LINE>191</LINE>
-      <COLUMN>13</COLUMN>
+      <FILENAME>matrix4.cpp</FILENAME>
+      <LINE>7</LINE>
+      <COLUMN>16</COLUMN>
     </SFA>
     <DEFECTCODE>26493</DEFECTCODE>
     <DESCRIPTION>Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)</DESCRIPTION>
-    <FUNCTION>Phoenix::-</FUNCTION>
-    <DECORATED>??GPhoenix@@YA?BVVec3@0@AEBV10@M@Z</DECORATED>
-    <FUNCLINE>189</FUNCLINE>
+    <FUNCTION>Phoenix::Matrix4::transpose</FUNCTION>
+    <DECORATED>?transpose@Matrix4@Phoenix@@QEBA?AV12@XZ</DECORATED>
+    <FUNCLINE>5</FUNCLINE>
     <PATH />
   </DEFECT>
   <DEFECT>
     <SFA>
       <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
-      <FILENAME>vec3.h</FILENAME>
-      <LINE>196</LINE>
-      <COLUMN>13</COLUMN>
+      <FILENAME>matrix4.cpp</FILENAME>
+      <LINE>7</LINE>
+      <COLUMN>16</COLUMN>
     </SFA>
     <DEFECTCODE>26493</DEFECTCODE>
     <DESCRIPTION>Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)</DESCRIPTION>
-    <FUNCTION>Phoenix::*</FUNCTION>
-    <DECORATED>??DPhoenix@@YA?BVVec3@0@AEBV10@M@Z</DECORATED>
-    <FUNCLINE>194</FUNCLINE>
+    <FUNCTION>Phoenix::Matrix4::transpose</FUNCTION>
+    <DECORATED>?transpose@Matrix4@Phoenix@@QEBA?AV12@XZ</DECORATED>
+    <FUNCLINE>5</FUNCLINE>
     <PATH />
   </DEFECT>
   <DEFECT>
     <SFA>
       <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
-      <FILENAME>vec3.h</FILENAME>
-      <LINE>196</LINE>
-      <COLUMN>13</COLUMN>
+      <FILENAME>matrix4.cpp</FILENAME>
+      <LINE>7</LINE>
+      <COLUMN>16</COLUMN>
     </SFA>
     <DEFECTCODE>26493</DEFECTCODE>
     <DESCRIPTION>Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)</DESCRIPTION>
-    <FUNCTION>Phoenix::*</FUNCTION>
-    <DECORATED>??DPhoenix@@YA?BVVec3@0@AEBV10@M@Z</DECORATED>
-    <FUNCLINE>194</FUNCLINE>
+    <FUNCTION>Phoenix::Matrix4::transpose</FUNCTION>
+    <DECORATED>?transpose@Matrix4@Phoenix@@QEBA?AV12@XZ</DECORATED>
+    <FUNCLINE>5</FUNCLINE>
     <PATH />
   </DEFECT>
   <DEFECT>
     <SFA>
       <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
-      <FILENAME>vec3.h</FILENAME>
-      <LINE>196</LINE>
-      <COLUMN>13</COLUMN>
+      <FILENAME>matrix4.cpp</FILENAME>
+      <LINE>7</LINE>
+      <COLUMN>16</COLUMN>
     </SFA>
     <DEFECTCODE>26493</DEFECTCODE>
     <DESCRIPTION>Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)</DESCRIPTION>
-    <FUNCTION>Phoenix::*</FUNCTION>
-    <DECORATED>??DPhoenix@@YA?BVVec3@0@AEBV10@M@Z</DECORATED>
-    <FUNCLINE>194</FUNCLINE>
+    <FUNCTION>Phoenix::Matrix4::transpose</FUNCTION>
+    <DECORATED>?transpose@Matrix4@Phoenix@@QEBA?AV12@XZ</DECORATED>
+    <FUNCLINE>5</FUNCLINE>
     <PATH />
   </DEFECT>
   <DEFECT>
     <SFA>
       <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
-      <FILENAME>vec3.h</FILENAME>
-      <LINE>201</LINE>
-      <COLUMN>13</COLUMN>
+      <FILENAME>matrix4.cpp</FILENAME>
+      <LINE>7</LINE>
+      <COLUMN>16</COLUMN>
     </SFA>
     <DEFECTCODE>26493</DEFECTCODE>
     <DESCRIPTION>Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)</DESCRIPTION>
-    <FUNCTION>Phoenix::/</FUNCTION>
-    <DECORATED>??KPhoenix@@YA?BVVec3@0@AEBV10@M@Z</DECORATED>
-    <FUNCLINE>199</FUNCLINE>
+    <FUNCTION>Phoenix::Matrix4::transpose</FUNCTION>
+    <DECORATED>?transpose@Matrix4@Phoenix@@QEBA?AV12@XZ</DECORATED>
+    <FUNCLINE>5</FUNCLINE>
     <PATH />
   </DEFECT>
   <DEFECT>
     <SFA>
       <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
-      <FILENAME>vec3.h</FILENAME>
-      <LINE>201</LINE>
-      <COLUMN>13</COLUMN>
+      <FILENAME>matrix4.cpp</FILENAME>
+      <LINE>7</LINE>
+      <COLUMN>16</COLUMN>
     </SFA>
     <DEFECTCODE>26493</DEFECTCODE>
     <DESCRIPTION>Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)</DESCRIPTION>
-    <FUNCTION>Phoenix::/</FUNCTION>
-    <DECORATED>??KPhoenix@@YA?BVVec3@0@AEBV10@M@Z</DECORATED>
-    <FUNCLINE>199</FUNCLINE>
+    <FUNCTION>Phoenix::Matrix4::transpose</FUNCTION>
+    <DECORATED>?transpose@Matrix4@Phoenix@@QEBA?AV12@XZ</DECORATED>
+    <FUNCLINE>5</FUNCLINE>
     <PATH />
   </DEFECT>
   <DEFECT>
     <SFA>
       <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
-      <FILENAME>vec3.h</FILENAME>
-      <LINE>201</LINE>
-      <COLUMN>13</COLUMN>
+      <FILENAME>matrix4.cpp</FILENAME>
+      <LINE>7</LINE>
+      <COLUMN>16</COLUMN>
     </SFA>
     <DEFECTCODE>26493</DEFECTCODE>
     <DESCRIPTION>Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)</DESCRIPTION>
-    <FUNCTION>Phoenix::/</FUNCTION>
-    <DECORATED>??KPhoenix@@YA?BVVec3@0@AEBV10@M@Z</DECORATED>
-    <FUNCLINE>199</FUNCLINE>
+    <FUNCTION>Phoenix::Matrix4::transpose</FUNCTION>
+    <DECORATED>?transpose@Matrix4@Phoenix@@QEBA?AV12@XZ</DECORATED>
+    <FUNCLINE>5</FUNCLINE>
+    <PATH />
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
+      <FILENAME>matrix4.cpp</FILENAME>
+      <LINE>7</LINE>
+      <COLUMN>16</COLUMN>
+    </SFA>
+    <DEFECTCODE>26493</DEFECTCODE>
+    <DESCRIPTION>Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)</DESCRIPTION>
+    <FUNCTION>Phoenix::Matrix4::transpose</FUNCTION>
+    <DECORATED>?transpose@Matrix4@Phoenix@@QEBA?AV12@XZ</DECORATED>
+    <FUNCLINE>5</FUNCLINE>
     <PATH />
   </DEFECT>
 </DEFECTS>
