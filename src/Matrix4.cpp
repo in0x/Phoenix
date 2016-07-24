@@ -27,14 +27,22 @@ namespace Phoenix
 			   m_data[0][3] * minor(1, 2, 3, 0, 1, 2);
 	}
 
+	// Classical adjoint is transpose of matrix of cofactors
 	Matrix4 Matrix4::adjoint() const
 	{
-		return Matrix4{};
+		return Matrix4
+		{
+			  minor(1, 2, 3, 1, 2, 3), -minor(0, 2, 3, 1, 2, 3),  minor(0, 1, 3, 1, 2, 3), -minor(0, 1, 2, 1, 2, 3),
+			 -minor(1, 2, 3, 0, 2, 3),  minor(0, 2, 3, 0, 2, 3), -minor(0, 1, 3, 0, 2, 3),  minor(0, 1, 2, 0, 2, 3),	
+			  minor(1, 2, 3, 0, 1, 3), -minor(0, 2, 3, 0, 1, 3),  minor(0, 1, 3, 0, 1, 3), -minor(0, 1, 2, 0, 1, 3),
+			 -minor(1, 2, 3, 0, 1, 2),  minor(0, 2, 3, 0, 1, 2), -minor(0, 1, 3, 0, 1, 2),  minor(0, 1, 2, 0, 1, 2)
+		};
 	}
 
 	Matrix4 Matrix4::inverse() const
 	{
-		return Matrix4{};
+		// Need to assert that determinant is non-0
+		return adjoint() / determinant();
 	}
 
 	Matrix4 Matrix4::identity()

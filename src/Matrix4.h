@@ -17,6 +17,17 @@ namespace Phoenix
 			: m_data(MatrixData{})
 		{}
 
+		Matrix4(float f)
+		{
+			for (auto& row : m_data)
+			{
+				for (auto& el : row)
+				{
+					el = f;
+				}
+			}
+		}
+
 		Matrix4(float m00, float m01, float m02, float m03,
 				float m10, float m11, float m12, float m13,
 				float m20, float m21, float m22, float m23,
@@ -88,6 +99,54 @@ namespace Phoenix
 
 			return *this;
 		}
+
+		inline Matrix4& operator+=(float f)
+		{
+			for (auto& row : m_data)
+			{
+				for (auto& el : row)
+				{
+					el += f;
+				}
+			}
+			return *this;
+		}
+
+		inline Matrix4& operator-=(float f)
+		{
+			for (auto& row : m_data)
+			{
+				for (auto& el : row)
+				{
+					el -= f;
+				}
+			}
+			return *this;
+		}
+
+		inline Matrix4& operator*=(float f)
+		{
+			for (auto& row : m_data)
+			{
+				for (auto& el : row)
+				{
+					el *= f;
+				}
+			}
+			return *this;
+		}
+
+		inline Matrix4& operator/=(float f)
+		{
+			for (auto& row : m_data)
+			{
+				for (auto& el : row)
+				{
+					el /= f;
+				}
+			}
+			return *this;
+		}
 		
 		bool operator==(const Matrix4& rhv)
 		{
@@ -127,6 +186,30 @@ namespace Phoenix
 	inline Matrix4 operator*(Matrix4 lhv, const Matrix4& rhv)
 	{
 		lhv *= rhv;
+		return lhv;
+	}
+
+	inline Matrix4 operator+(Matrix4 lhv, float f)
+	{
+		lhv += f;
+		return lhv;
+	}
+
+	inline Matrix4 operator-(Matrix4 lhv, float f)
+	{
+		lhv -= f;
+		return lhv;
+	}
+
+	inline Matrix4 operator*(Matrix4 lhv, float f)
+	{
+		lhv *= f;
+		return lhv;
+	}
+
+	inline Matrix4 operator/(Matrix4 lhv, float f)
+	{
+		lhv /= f;
 		return lhv;
 	}
 

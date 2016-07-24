@@ -1,13 +1,18 @@
 ﻿  main.cpp
+  Running Code Analysis for C/C++...
+  Generating Code...
+  Compiling...
   Matrix4.cpp
   Running Code Analysis for C/C++...
   Generating Code...
-  Phoenix.vcxproj -> C:\Users\Philipp\Documents\Phoenix\vs2015\x64\Debug\Phoenix.exe
-c:\users\philipp\documents\phoenix\src\vec3.h(35): warning C26481: Don't use pointer arithmetic. Use span instead. (bounds.1: http://go.microsoft.com/fwlink/p/?LinkID=620413)
-c:\users\philipp\documents\phoenix\src\vec3.h(40): warning C26481: Don't use pointer arithmetic. Use span instead. (bounds.1: http://go.microsoft.com/fwlink/p/?LinkID=620413)
-c:\users\philipp\documents\phoenix\src\vec3.h(145): warning C26493: Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)
-c:\users\philipp\documents\phoenix\src\vec3.h(186): warning C26493: Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)
-c:\users\philipp\documents\phoenix\src\vec3.h(191): warning C26493: Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)
-c:\users\philipp\documents\phoenix\src\vec3.h(196): warning C26493: Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)
-c:\users\philipp\documents\phoenix\src\vec3.h(201): warning C26493: Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)
-c:\users\philipp\documents\phoenix\src\matrix4.cpp(7): warning C26493: Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)
+  Phoenix.vcxproj -> C:\Users\Philipp\Desktop\Phoenix\vs2015\x64\Debug\Phoenix.exe
+c:\users\philipp\desktop\phoenix\src\vec3.h(35): warning C26481: Don't use pointer arithmetic. Use span instead. (bounds.1: http://go.microsoft.com/fwlink/p/?LinkID=620413)
+c:\users\philipp\desktop\phoenix\src\vec3.h(40): warning C26481: Don't use pointer arithmetic. Use span instead. (bounds.1: http://go.microsoft.com/fwlink/p/?LinkID=620413)
+c:\users\philipp\desktop\phoenix\src\vec3.h(145): warning C26493: Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)
+c:\users\philipp\desktop\phoenix\src\vec3.h(186): warning C26493: Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)
+c:\users\philipp\desktop\phoenix\src\vec3.h(191): warning C26493: Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)
+c:\users\philipp\desktop\phoenix\src\vec3.h(196): warning C26493: Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)
+c:\users\philipp\desktop\phoenix\src\vec3.h(201): warning C26493: Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)
+c:\users\philipp\desktop\phoenix\src\matrix4.h(20): warning C26495: Variable 'Phoenix::Matrix4::m_data' is uninitialized. Always initialize a member variable. (type.6: http://go.microsoft.com/fwlink/p/?LinkID=620422)
+c:\users\philipp\desktop\phoenix\src\matrix4.cpp(7): warning C26493: Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)
+c:\users\philipp\desktop\phoenix\src\matrix4.cpp(34): warning C26493: Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)
