@@ -19,10 +19,7 @@ int main()
 					8, 5, 6, 2,
 					21, 4, 3, 21, 
 					2, 1, 12, 48).determinant() == 20172);
-	
-	std::cout << Matrix4::identity().inverse() << std::endl;
-
-	//assert(Matrix4::identity().inverse() == Matrix4::identity());
+	assert(Matrix4::identity().inverse() == Matrix4::identity());
 
 	return 0;
 }
