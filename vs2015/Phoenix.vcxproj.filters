@@ -30,6 +30,9 @@
     <ClInclude Include="..\src\Matrix4.h">
       <Filter>Math</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Quaternion.h">
+      <Filter>Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

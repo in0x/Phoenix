@@ -3,7 +3,7 @@
 #include <cmath>
 #include <cassert>
 
-namespace Phoenix 
+namespace Phoenix::Math
 {
 	class Vec3
 	{
@@ -206,7 +206,7 @@ namespace Phoenix
 		return 2.f * rhv.dot(*this) * (*this) - rhv;
 	}
 
-	inline std::ostream& operator<<(std::ostream& out, const Phoenix::Vec3& vec)
+	inline std::ostream& operator<<(std::ostream& out, const Vec3& vec)
 	{
 		out << "( " << vec.x << " | " << vec.y << " | " << vec.z << " )";
 		return out;

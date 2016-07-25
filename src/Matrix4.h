@@ -2,7 +2,7 @@
 #include <array>
 #include <iostream>
 
-namespace Phoenix
+namespace Phoenix::Math
 {
 	class Matrix4
 	{

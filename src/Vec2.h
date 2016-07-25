@@ -3,7 +3,7 @@
 #include <cmath>
 #include <cassert>
 
-namespace Phoenix
+namespace Phoenix::Math
 {
 	class Vec2
 	{

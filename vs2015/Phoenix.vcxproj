@@ -112,6 +112,7 @@
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
       <EnablePREfast>true</EnablePREfast>
+      <AdditionalOptions>/std:c++latest %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -161,6 +162,7 @@
   <ItemGroup>
     <ClInclude Include="..\src\Catch\Catch.hpp" />
     <ClInclude Include="..\src\Matrix4.h" />
+    <ClInclude Include="..\src\Quaternion.h" />
     <ClInclude Include="..\src\Vec2.h" />
     <ClInclude Include="..\src\Vec3.h" />
     <ClInclude Include="..\src\Vec4.h" />

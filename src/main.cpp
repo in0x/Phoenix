@@ -6,8 +6,8 @@
 // Check Game Coding Complete for info on WinMainLoop
 int main()
 {
-	using namespace Phoenix;
-
+	using namespace Phoenix::Math;
+	
 	Vec3 a{ 1,0,0 };
 	Vec3 b{ 0,1,0 };
 

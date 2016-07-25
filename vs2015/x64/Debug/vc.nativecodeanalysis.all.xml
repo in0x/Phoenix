@@ -7,10 +7,10 @@
     </SFA>
     <DEFECTCODE>26481</DEFECTCODE>
     <DESCRIPTION>Don't use pointer arithmetic. Use span instead. (bounds.1: http://go.microsoft.com/fwlink/p/?LinkID=620413)</DESCRIPTION>
-    <FUNCTION>Phoenix::Vec3::[]</FUNCTION>
-    <DECORATED>??AVec3@Phoenix@@QEAAAEAMH@Z</DECORATED>
+    <FUNCTION>Phoenix::Math::Vec3::[]</FUNCTION>
+    <DECORATED>??AVec3@Math@Phoenix@@QEAAAEAMH@Z</DECORATED>
     <FUNCLINE>33</FUNCLINE>
-    <PATH />
+    <PATH></PATH>
   </DEFECT><DEFECT>
     <SFA>
       <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
@@ -20,10 +20,10 @@
     </SFA>
     <DEFECTCODE>26481</DEFECTCODE>
     <DESCRIPTION>Don't use pointer arithmetic. Use span instead. (bounds.1: http://go.microsoft.com/fwlink/p/?LinkID=620413)</DESCRIPTION>
-    <FUNCTION>Phoenix::Vec3::[]</FUNCTION>
-    <DECORATED>??AVec3@Phoenix@@QEBAAEBMH@Z</DECORATED>
+    <FUNCTION>Phoenix::Math::Vec3::[]</FUNCTION>
+    <DECORATED>??AVec3@Math@Phoenix@@QEBAAEBMH@Z</DECORATED>
     <FUNCLINE>38</FUNCLINE>
-    <PATH />
+    <PATH></PATH>
   </DEFECT><DEFECT>
     <SFA>
       <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
@@ -33,10 +33,10 @@
     </SFA>
     <DEFECTCODE>26493</DEFECTCODE>
     <DESCRIPTION>Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)</DESCRIPTION>
-    <FUNCTION>Phoenix::Vec3::cross</FUNCTION>
-    <DECORATED>?cross@Vec3@Phoenix@@QEBA?AV12@AEBV12@@Z</DECORATED>
+    <FUNCTION>Phoenix::Math::Vec3::cross</FUNCTION>
+    <DECORATED>?cross@Vec3@Math@Phoenix@@QEBA?AV123@AEBV123@@Z</DECORATED>
     <FUNCLINE>142</FUNCLINE>
-    <PATH />
+    <PATH></PATH>
   </DEFECT><DEFECT>
     <SFA>
       <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
@@ -46,10 +46,10 @@
     </SFA>
     <DEFECTCODE>26493</DEFECTCODE>
     <DESCRIPTION>Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)</DESCRIPTION>
-    <FUNCTION>Phoenix::+</FUNCTION>
-    <DECORATED>??HPhoenix@@YA?BVVec3@0@AEBV10@M@Z</DECORATED>
+    <FUNCTION>Phoenix::Math::+</FUNCTION>
+    <DECORATED>??HMath@Phoenix@@YA?BVVec3@01@AEBV201@M@Z</DECORATED>
     <FUNCLINE>184</FUNCLINE>
-    <PATH />
+    <PATH></PATH>
   </DEFECT><DEFECT>
     <SFA>
       <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
@@ -59,10 +59,10 @@
     </SFA>
     <DEFECTCODE>26493</DEFECTCODE>
     <DESCRIPTION>Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)</DESCRIPTION>
-    <FUNCTION>Phoenix::-</FUNCTION>
-    <DECORATED>??GPhoenix@@YA?BVVec3@0@AEBV10@M@Z</DECORATED>
+    <FUNCTION>Phoenix::Math::-</FUNCTION>
+    <DECORATED>??GMath@Phoenix@@YA?BVVec3@01@AEBV201@M@Z</DECORATED>
     <FUNCLINE>189</FUNCLINE>
-    <PATH />
+    <PATH></PATH>
   </DEFECT><DEFECT>
     <SFA>
       <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
@@ -72,10 +72,10 @@
     </SFA>
     <DEFECTCODE>26493</DEFECTCODE>
     <DESCRIPTION>Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)</DESCRIPTION>
-    <FUNCTION>Phoenix::*</FUNCTION>
-    <DECORATED>??DPhoenix@@YA?BVVec3@0@AEBV10@M@Z</DECORATED>
+    <FUNCTION>Phoenix::Math::*</FUNCTION>
+    <DECORATED>??DMath@Phoenix@@YA?BVVec3@01@AEBV201@M@Z</DECORATED>
     <FUNCLINE>194</FUNCLINE>
-    <PATH />
+    <PATH></PATH>
   </DEFECT><DEFECT>
     <SFA>
       <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
@@ -85,10 +85,10 @@
     </SFA>
     <DEFECTCODE>26493</DEFECTCODE>
     <DESCRIPTION>Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)</DESCRIPTION>
-    <FUNCTION>Phoenix::/</FUNCTION>
-    <DECORATED>??KPhoenix@@YA?BVVec3@0@AEBV10@M@Z</DECORATED>
+    <FUNCTION>Phoenix::Math::/</FUNCTION>
+    <DECORATED>??KMath@Phoenix@@YA?BVVec3@01@AEBV201@M@Z</DECORATED>
     <FUNCLINE>199</FUNCLINE>
-    <PATH />
+    <PATH></PATH>
   </DEFECT><DEFECT>
     <SFA>
       <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
@@ -97,11 +97,11 @@
       <COLUMN>2</COLUMN>
     </SFA>
     <DEFECTCODE>26495</DEFECTCODE>
-    <DESCRIPTION>Variable 'Phoenix::Matrix4::m_data' is uninitialized. Always initialize a member variable. (type.6: http://go.microsoft.com/fwlink/p/?LinkID=620422)</DESCRIPTION>
-    <FUNCTION>Phoenix::Matrix4::{ctor}</FUNCTION>
-    <DECORATED>??0Matrix4@Phoenix@@QEAA@M@Z</DECORATED>
+    <DESCRIPTION>Variable 'Phoenix::Math::Matrix4::m_data' is uninitialized. Always initialize a member variable. (type.6: http://go.microsoft.com/fwlink/p/?LinkID=620422)</DESCRIPTION>
+    <FUNCTION>Phoenix::Math::Matrix4::{ctor}</FUNCTION>
+    <DECORATED>??0Matrix4@Math@Phoenix@@QEAA@M@Z</DECORATED>
     <FUNCLINE>20</FUNCLINE>
-    <PATH />
+    <PATH></PATH>
   </DEFECT><DEFECT>
     <SFA>
       <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
@@ -111,10 +111,10 @@
     </SFA>
     <DEFECTCODE>26493</DEFECTCODE>
     <DESCRIPTION>Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)</DESCRIPTION>
-    <FUNCTION>Phoenix::Matrix4::transpose</FUNCTION>
-    <DECORATED>?transpose@Matrix4@Phoenix@@QEBA?AV12@XZ</DECORATED>
+    <FUNCTION>Phoenix::Math::Matrix4::transpose</FUNCTION>
+    <DECORATED>?transpose@Matrix4@Math@Phoenix@@QEBA?AV123@XZ</DECORATED>
     <FUNCLINE>5</FUNCLINE>
-    <PATH />
+    <PATH></PATH>
   </DEFECT><DEFECT>
     <SFA>
       <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
@@ -124,8 +124,8 @@
     </SFA>
     <DEFECTCODE>26493</DEFECTCODE>
     <DESCRIPTION>Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)</DESCRIPTION>
-    <FUNCTION>Phoenix::Matrix4::adjoint</FUNCTION>
-    <DECORATED>?adjoint@Matrix4@Phoenix@@AEBA?AV12@XZ</DECORATED>
+    <FUNCTION>Phoenix::Math::Matrix4::adjoint</FUNCTION>
+    <DECORATED>?adjoint@Matrix4@Math@Phoenix@@AEBA?AV123@XZ</DECORATED>
     <FUNCLINE>31</FUNCLINE>
-    <PATH />
+    <PATH></PATH>
   </DEFECT></DEFECTS>

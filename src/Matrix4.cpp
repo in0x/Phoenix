@@ -1,6 +1,6 @@
 #include "Matrix4.h"
 
-namespace Phoenix
+namespace Phoenix::Math
 {
 	Matrix4 Matrix4::transpose() const
 	{
