@@ -178,7 +178,7 @@ namespace Phoenix::Math
 
 	Matrix4 Matrix4::rotation(const Quaternion& rotate)
 	{
-	
+		return Matrix4{};
 	}
 
 	Matrix4 Matrix4::identity()

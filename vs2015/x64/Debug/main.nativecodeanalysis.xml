@@ -242,14 +242,14 @@
     <SFA>
       <FILEPATH>c:\users\philipp\documents\phoenix\src\</FILEPATH>
       <FILENAME>matrix4.h</FILENAME>
-      <LINE>20</LINE>
+      <LINE>25</LINE>
       <COLUMN>2</COLUMN>
     </SFA>
     <DEFECTCODE>26495</DEFECTCODE>
     <DESCRIPTION>Variable 'Phoenix::Math::Matrix4::m_data' is uninitialized. Always initialize a member variable. (type.6: http://go.microsoft.com/fwlink/p/?LinkID=620422)</DESCRIPTION>
     <FUNCTION>Phoenix::Math::Matrix4::{ctor}</FUNCTION>
     <DECORATED>??0Matrix4@Math@Phoenix@@QEAA@M@Z</DECORATED>
-    <FUNCLINE>20</FUNCLINE>
+    <FUNCLINE>25</FUNCLINE>
     <PATH></PATH>
   </DEFECT>
 </DEFECTS>

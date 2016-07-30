@@ -1,7 +1,4 @@
 ﻿  Matrix4.cpp
-  main.cpp
-  Running Code Analysis for C/C++...
-  Generating Code...
   Phoenix.vcxproj -> C:\Users\Philipp\Documents\Phoenix\vs2015\x64\Debug\Phoenix.exe
   Phoenix.vcxproj -> C:\Users\Philipp\Documents\Phoenix\vs2015\x64\Debug\Phoenix.pdb (Full PDB)
 c:\users\philipp\documents\phoenix\src\vec3.h(35): warning C26481: Don't use pointer arithmetic. Use span instead. (bounds.1: http://go.microsoft.com/fwlink/p/?LinkID=620413)
@@ -11,6 +8,8 @@ c:\users\philipp\documents\phoenix\src\vec3.h(186): warning C26493: Don't use C-
 c:\users\philipp\documents\phoenix\src\vec3.h(191): warning C26493: Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)
 c:\users\philipp\documents\phoenix\src\vec3.h(196): warning C26493: Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)
 c:\users\philipp\documents\phoenix\src\vec3.h(201): warning C26493: Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)
-c:\users\philipp\documents\phoenix\src\matrix4.h(20): warning C26495: Variable 'Phoenix::Math::Matrix4::m_data' is uninitialized. Always initialize a member variable. (type.6: http://go.microsoft.com/fwlink/p/?LinkID=620422)
-c:\users\philipp\documents\phoenix\src\matrix4.cpp(7): warning C26493: Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)
-c:\users\philipp\documents\phoenix\src\matrix4.cpp(34): warning C26493: Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)
+c:\users\philipp\documents\phoenix\src\matrix4.h(25): warning C26495: Variable 'Phoenix::Math::Matrix4::m_data' is uninitialized. Always initialize a member variable. (type.6: http://go.microsoft.com/fwlink/p/?LinkID=620422)
+c:\users\philipp\documents\phoenix\src\matrix4.cpp(116): warning C26493: Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)
+c:\users\philipp\documents\phoenix\src\matrix4.cpp(143): warning C26493: Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)
+c:\users\philipp\documents\phoenix\src\matrix4.cpp(160): warning C26493: Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)
+c:\users\philipp\documents\phoenix\src\matrix4.cpp(171): warning C26493: Don't use C-style casts that would perform a static_cast downcast, const_cast, or reinterpret_cast. (type.4: http://go.microsoft.com/fwlink/p/?LinkID=620420)
