@@ -21,5 +21,17 @@ int main()
 					2, 1, 12, 48).determinant() == 20172);
 	assert(Matrix4::identity().inverse() == Matrix4::identity());
 
+
+	Matrix4 orig{ 1, 2, 3, 4,
+				  5, 6, 7, 8,
+				  1, 2, 3, 4,
+				  5, 6, 7, 8 };
+
+	Matrix4 copy = orig;
+	copy.transposeSelf();
+
+	std::cout << orig << '\n' << std::endl;
+	std::cout << copy << std::endl;
+
 	return 0;
 }

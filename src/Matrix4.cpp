@@ -111,12 +111,26 @@ namespace Phoenix::Math
 			m_data[3][0] == rhv(3, 0) && m_data[3][1] == rhv(3, 1) && m_data[3][2] == rhv(3, 2) && m_data[3][3] == rhv(3, 3));
 	}
 
+	Matrix4& Matrix4::transposeSelf()
+	{
+		float temp;
+		for (int i = 0; i < 4; i++)
+		{
+			for (int j = i + 1; j < 4; j++)
+			{
+				temp = m_data[i][j];
+				m_data[i][j] = m_data[j][i];
+				m_data[j][i] = temp;
+			}
+		}
+		return *this;
+	}
+
 	Matrix4 Matrix4::transpose() const
 	{
-		return Matrix4{ m_data[0][0], m_data[1][0], m_data[2][0], m_data[3][0],
-						m_data[0][1], m_data[1][1], m_data[2][1], m_data[3][1],
-						m_data[0][2], m_data[1][2], m_data[2][2], m_data[3][2],
-						m_data[0][3], m_data[1][3], m_data[2][3], m_data[3][3] };
+		Matrix4 transp = *this;
+		transp.transposeSelf();
+		return transp;
 	}
 
 	// Calculate minor from 3x3 sub matrix 

@@ -66,7 +66,9 @@ namespace Phoenix::Math
 		bool operator==(const Matrix4& rhv);
 
 		float determinant() const;
+		Matrix4& transposeSelf();
 		Matrix4 transpose() const;
+		Matrix4& inverseSelf();
 		Matrix4 inverse() const;
 
 		static Matrix4 scale(float x, float y, float z);
