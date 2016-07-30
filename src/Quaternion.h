@@ -2,5 +2,7 @@
 
 namespace Phoenix::Math
 {
-	class Quaternion;
+	class Quaternion
+	{
+	};
 }

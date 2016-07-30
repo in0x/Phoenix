@@ -4,6 +4,8 @@
 
 namespace Phoenix::Math
 {
+	class Quaternion;
+
 	class Matrix4
 	{
 	private:
@@ -11,6 +13,9 @@ namespace Phoenix::Math
 		// bit more digging on std::array memory layout
 		using MatrixData = std::array<std::array<float, 4>, 4>;
 		MatrixData m_data;
+
+		float minor(int row0, int row1, int row2, int col0, int col1, int col2) const;
+		Matrix4 adjoint() const;
 
 	public:
 		Matrix4()
@@ -49,126 +54,26 @@ namespace Phoenix::Math
 			return m_data[row][col];
 		}
 
-		Matrix4& operator+=(const Matrix4& rhv)
-		{
-			for (std::size_t row = 0; row < m_data.size(); row++)
-			{
-				for (std::size_t col = 0; col < m_data[row].size(); col++)
-				{
-					m_data[row][col] += rhv(row, col);
-				}
-			}
-
-			return *this;
-		}
-
-		Matrix4& operator-=(const Matrix4& rhv)
-		{
-			for (std::size_t row = 0; row < m_data.size(); row++)
-			{
-				for (std::size_t col = 0; col < m_data[row].size(); col++)
-				{
-					m_data[row][col] -= rhv(row, col);
-				}
-			}
-
-			return *this;
-		}
-
-		Matrix4& operator*=(const Matrix4& rhv)
-		{
-			m_data[0][0] = m_data[0][0] * rhv(0, 0) + m_data[0][1] * rhv(1, 0) + m_data[0][2] * rhv(2, 0) + m_data[0][3] * rhv(3, 0);
-			m_data[0][1] = m_data[0][0] * rhv(0, 1) + m_data[0][1] * rhv(1, 1) + m_data[0][2] * rhv(2, 1) + m_data[0][3] * rhv(3, 1);
-			m_data[0][2] = m_data[0][0] * rhv(0, 2) + m_data[0][1] * rhv(1, 2) + m_data[0][2] * rhv(2, 2) + m_data[0][3] * rhv(3, 2);
-			m_data[0][3] = m_data[0][0] * rhv(0, 3) + m_data[0][1] * rhv(1, 3) + m_data[0][2] * rhv(2, 3) + m_data[0][3] * rhv(3, 3);
-
-			m_data[1][0] = m_data[1][0] * rhv(0, 0) + m_data[1][1] * rhv(1, 0) + m_data[1][2] * rhv(2, 0) + m_data[1][3] * rhv(3, 0);
-			m_data[1][1] = m_data[1][0] * rhv(0, 1) + m_data[1][1] * rhv(1, 1) + m_data[1][2] * rhv(2, 1) + m_data[1][3] * rhv(3, 1);
-			m_data[1][2] = m_data[1][0] * rhv(0, 2) + m_data[1][1] * rhv(1, 2) + m_data[1][2] * rhv(2, 2) + m_data[1][3] * rhv(3, 2);
-			m_data[1][3] = m_data[1][0] * rhv(0, 3) + m_data[1][1] * rhv(1, 3) + m_data[1][2] * rhv(2, 3) + m_data[1][3] * rhv(3, 3);
-
-			m_data[2][0] = m_data[2][0] * rhv(0, 0) + m_data[2][1] * rhv(1, 0) + m_data[2][2] * rhv(2, 0) + m_data[2][3] * rhv(3, 0);
-			m_data[2][1] = m_data[2][0] * rhv(0, 1) + m_data[2][1] * rhv(1, 1) + m_data[2][2] * rhv(2, 1) + m_data[2][3] * rhv(3, 1);
-			m_data[2][2] = m_data[2][0] * rhv(0, 2) + m_data[2][1] * rhv(1, 2) + m_data[2][2] * rhv(2, 2) + m_data[2][3] * rhv(3, 2);
-			m_data[2][3] = m_data[2][0] * rhv(0, 3) + m_data[2][1] * rhv(1, 3) + m_data[2][2] * rhv(2, 3) + m_data[2][3] * rhv(3, 3);
-
-			m_data[3][0] = m_data[3][0] * rhv(0, 0) + m_data[3][1] * rhv(1, 0) + m_data[3][2] * rhv(2, 0) + m_data[3][3] * rhv(3, 0);
-			m_data[3][1] = m_data[3][0] * rhv(0, 1) + m_data[3][1] * rhv(1, 1) + m_data[3][2] * rhv(2, 1) + m_data[3][3] * rhv(3, 1);
-			m_data[3][2] = m_data[3][0] * rhv(0, 2) + m_data[3][1] * rhv(1, 2) + m_data[3][2] * rhv(2, 2) + m_data[3][3] * rhv(3, 2);
-			m_data[3][3] = m_data[3][0] * rhv(0, 3) + m_data[3][1] * rhv(1, 3) + m_data[3][2] * rhv(2, 3) + m_data[3][3] * rhv(3, 3);
-
-			return *this;
-		}
-
-		inline Matrix4& operator+=(float f)
-		{
-			for (auto& row : m_data)
-			{
-				for (auto& el : row)
-				{
-					el += f;
-				}
-			}
-			return *this;
-		}
-
-		inline Matrix4& operator-=(float f)
-		{
-			for (auto& row : m_data)
-			{
-				for (auto& el : row)
-				{
-					el -= f;
-				}
-			}
-			return *this;
-		}
-
-		inline Matrix4& operator*=(float f)
-		{
-			for (auto& row : m_data)
-			{
-				for (auto& el : row)
-				{
-					el *= f;
-				}
-			}
-			return *this;
-		}
-
-		inline Matrix4& operator/=(float f)
-		{
-			for (auto& row : m_data)
-			{
-				for (auto& el : row)
-				{
-					el /= f;
-				}
-			}
-			return *this;
-		}
+		Matrix4& operator+=(const Matrix4& rhv);
+		Matrix4& operator-=(const Matrix4& rhv);
+		Matrix4& operator*=(const Matrix4& rhv);
 		
-		bool operator==(const Matrix4& rhv)
-		{
-			return (m_data[0][0] == rhv(0, 0) && m_data[0][1] == rhv(0, 1) && m_data[0][2] == rhv(0, 2) && m_data[0][3] == rhv(0, 3) &&
-					m_data[1][0] == rhv(1, 0) && m_data[1][1] == rhv(1, 1) && m_data[1][2] == rhv(1, 2) && m_data[1][3] == rhv(1, 3) &&
-					m_data[2][0] == rhv(2, 0) && m_data[2][1] == rhv(2, 1) && m_data[2][2] == rhv(2, 2) && m_data[2][3] == rhv(2, 3) &&
-					m_data[3][0] == rhv(3, 0) && m_data[3][1] == rhv(3, 1) && m_data[3][2] == rhv(3, 2) && m_data[3][3] == rhv(3, 3));
-		}
+		Matrix4& operator+=(float f);
+		Matrix4& operator-=(float f);
+		Matrix4& operator*=(float f);
+		Matrix4& operator/=(float f);
+			
+		bool operator==(const Matrix4& rhv);
 
 		float determinant() const;
-
 		Matrix4 transpose() const;
-
 		Matrix4 inverse() const;
 
-		static Matrix4 identity();
+		static Matrix4 scale(float x, float y, float z);
+		static Matrix4 translation(float x, float y, float z);
+		static Matrix4 rotation(const Quaternion& rotate);
 
-	private:
-
-		float minor(int row0, int row1, int row2, int col0, int col1, int col2) const;
-		
-		Matrix4 adjoint() const;		
+		static Matrix4 identity();	
 	};
 
 	inline Matrix4 operator+(Matrix4 lhv, const Matrix4& rhv)

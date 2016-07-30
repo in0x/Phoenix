@@ -206,7 +206,7 @@ namespace Phoenix::Math
 		return 2.f * rhv.dot(*this) * (*this) - rhv;
 	}
 
-	inline std::ostream& operator<<(std::ostream& out, const Phoenix::Vec4& vec)
+	inline std::ostream& operator<<(std::ostream& out, const Vec4& vec)
 	{
 		out << "( " << vec.x << " | " << vec.y << " | " << vec.z << " | " << vec.w << " )";
 		return out;
