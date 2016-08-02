@@ -1,4 +1,6 @@
 #include "Matrix4.hpp"
+#include "Vec3.hpp"
+#include "Vec4.hpp"
 
 namespace Phoenix::Math
 {
@@ -200,4 +202,15 @@ namespace Phoenix::Math
 						0, 0, 1, 0,
 						0, 0, 0, 1 };
 	}
+
+	Vec3 operator*(const Matrix4& lhv, Vec3 rhv)
+	{
+		return rhv;
+	}
+
+	Vec4 operator*(const Matrix4& lhv, Vec4 rhv)
+	{
+		return rhv;
+	}
+
 }

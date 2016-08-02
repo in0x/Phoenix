@@ -5,6 +5,8 @@
 namespace Phoenix::Math
 {
 	class Quaternion;
+	class Vec4;
+	class Vec3;
 
 	class Matrix4
 	{
@@ -62,7 +64,7 @@ namespace Phoenix::Math
 		Matrix4& operator-=(float f);
 		Matrix4& operator*=(float f);
 		Matrix4& operator/=(float f);
-			
+
 		bool operator==(const Matrix4& rhv);
 
 		float determinant() const;
@@ -119,6 +121,9 @@ namespace Phoenix::Math
 		lhv /= f;
 		return lhv;
 	}
+
+	Vec4 operator*(const Matrix4& lhv, Vec4 rhv);
+	Vec3 operator*(const Matrix4& lhv, Vec3 rhv);
 
 	inline std::ostream& operator<<(std::ostream& out, const Matrix4& mat4)
 	{
