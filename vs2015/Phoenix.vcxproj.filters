@@ -15,22 +15,22 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\Vec3.h">
-      <Filter>Math</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Catch\Catch.hpp">
       <Filter>Catch</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Vec2.h">
+    <ClInclude Include="..\src\Matrix4.hpp">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Vec4.h">
+    <ClInclude Include="..\src\Quaternion.hpp">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Matrix4.h">
+    <ClInclude Include="..\src\Vec2.hpp">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Quaternion.h">
+    <ClInclude Include="..\src\Vec3.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Vec4.hpp">
       <Filter>Math</Filter>
     </ClInclude>
   </ItemGroup>

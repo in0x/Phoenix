@@ -163,11 +163,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Catch\Catch.hpp" />
-    <ClInclude Include="..\src\Matrix4.h" />
-    <ClInclude Include="..\src\Quaternion.h" />
-    <ClInclude Include="..\src\Vec2.h" />
-    <ClInclude Include="..\src\Vec3.h" />
-    <ClInclude Include="..\src\Vec4.h" />
+    <ClInclude Include="..\src\Matrix4.hpp" />
+    <ClInclude Include="..\src\Quaternion.hpp" />
+    <ClInclude Include="..\src\Vec2.hpp" />
+    <ClInclude Include="..\src\Vec3.hpp" />
+    <ClInclude Include="..\src\Vec4.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

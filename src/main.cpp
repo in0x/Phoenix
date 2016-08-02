@@ -1,7 +1,7 @@
 #include <cassert>
 
-#include "Vec3.h"
-#include "Matrix4.h"
+#include "Vec3.hpp"
+#include "Matrix4.hpp"
 
 // Check Game Coding Complete for info on WinMainLoop
 int main()

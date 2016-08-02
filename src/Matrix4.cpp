@@ -1,6 +1,4 @@
-#include "Matrix4.h"
-
-#include "Quaternion.h"
+#include "Matrix4.hpp"
 
 namespace Phoenix::Math
 {
