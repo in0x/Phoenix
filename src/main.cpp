@@ -8,7 +8,7 @@ int main()
 {
 	using namespace Phoenix::Math;
 	
-	Vec3 a{ 1,0,0 };
+	/*Vec3 a{ 1,0,0 };
 	Vec3 b{ 0,1,0 };
 
 	assert(a.dot(b) == 0);
@@ -21,8 +21,27 @@ int main()
 					2, 1, 12, 48).determinant() == 20172);
 	assert(Matrix4::identity().inverse() == Matrix4::identity());
 
+*/
+	//assert(Matrix4::identity() * Matrix4::identity() == Matrix4::identity());
 
-	Matrix4 orig{ 1, 2, 3, 4,
+	Matrix4 a { 1,4,2,3,
+				2,5,2,1,
+				2,5,8,1,
+				9,1,4,7};
+
+	Matrix4 b { 0,1,2,0,
+				5,7,0,9,
+				3,4,2,6,
+				1,9,7,6};
+
+	assert((a * b) == Matrix4(29, 64, 27, 66,
+							32, 54, 15, 63,
+							50, 78, 27, 99,
+							24, 95, 75, 75));
+
+
+
+	/*Matrix4 orig{ 1, 2, 3, 4,
 				  5, 6, 7, 8,
 				  1, 2, 3, 4,
 				  5, 6, 7, 8 };
@@ -31,7 +50,7 @@ int main()
 	copy.transposeSelf();
 
 	std::cout << orig << '\n' << std::endl;
-	std::cout << copy << std::endl;
+	std::cout << copy << std::endl;*/
 
 	return 0;
 }

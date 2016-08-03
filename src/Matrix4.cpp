@@ -6,11 +6,13 @@ namespace Phoenix::Math
 {
 	Matrix4& Matrix4::operator+=(const Matrix4& rhv)
 	{
+		Matrix4& lhv = *this;
+
 		for (std::size_t row = 0; row < m_data.size(); row++)
 		{
 			for (std::size_t col = 0; col < m_data[row].size(); col++)
 			{
-				m_data[row][col] += rhv(row, col);
+				lhv(row, col) += rhv(row, col);
 			}
 		}
 
@@ -19,11 +21,13 @@ namespace Phoenix::Math
 
 	Matrix4& Matrix4::operator-=(const Matrix4& rhv)
 	{
+		Matrix4& lhv = *this;
+
 		for (std::size_t row = 0; row < m_data.size(); row++)
 		{
 			for (std::size_t col = 0; col < m_data[row].size(); col++)
 			{
-				m_data[row][col] -= rhv(row, col);
+				lhv(row, col) -= rhv(row, col);
 			}
 		}
 
@@ -32,26 +36,18 @@ namespace Phoenix::Math
 
 	Matrix4& Matrix4::operator*=(const Matrix4& rhv)
 	{
-		m_data[0][0] = m_data[0][0] * rhv(0, 0) + m_data[0][1] * rhv(1, 0) + m_data[0][2] * rhv(2, 0) + m_data[0][3] * rhv(3, 0);
-		m_data[0][1] = m_data[0][0] * rhv(0, 1) + m_data[0][1] * rhv(1, 1) + m_data[0][2] * rhv(2, 1) + m_data[0][3] * rhv(3, 1);
-		m_data[0][2] = m_data[0][0] * rhv(0, 2) + m_data[0][1] * rhv(1, 2) + m_data[0][2] * rhv(2, 2) + m_data[0][3] * rhv(3, 2);
-		m_data[0][3] = m_data[0][0] * rhv(0, 3) + m_data[0][1] * rhv(1, 3) + m_data[0][2] * rhv(2, 3) + m_data[0][3] * rhv(3, 3);
+		Matrix4 dest{};
+		Matrix4& lhv = *this;
+		
+		for (int i = 0; i < 4; i++)
+		{
+			for (int j = 0; j < 4; j++)
+			{
+				dest(i,j) = lhv(i, 0) * rhv(0, j) + lhv(i, 1) * rhv(1, j) + lhv(i, 2) * rhv(2, j) + lhv(i, 3) * rhv(3, j);
+			}
+		}
 
-		m_data[1][0] = m_data[1][0] * rhv(0, 0) + m_data[1][1] * rhv(1, 0) + m_data[1][2] * rhv(2, 0) + m_data[1][3] * rhv(3, 0);
-		m_data[1][1] = m_data[1][0] * rhv(0, 1) + m_data[1][1] * rhv(1, 1) + m_data[1][2] * rhv(2, 1) + m_data[1][3] * rhv(3, 1);
-		m_data[1][2] = m_data[1][0] * rhv(0, 2) + m_data[1][1] * rhv(1, 2) + m_data[1][2] * rhv(2, 2) + m_data[1][3] * rhv(3, 2);
-		m_data[1][3] = m_data[1][0] * rhv(0, 3) + m_data[1][1] * rhv(1, 3) + m_data[1][2] * rhv(2, 3) + m_data[1][3] * rhv(3, 3);
-
-		m_data[2][0] = m_data[2][0] * rhv(0, 0) + m_data[2][1] * rhv(1, 0) + m_data[2][2] * rhv(2, 0) + m_data[2][3] * rhv(3, 0);
-		m_data[2][1] = m_data[2][0] * rhv(0, 1) + m_data[2][1] * rhv(1, 1) + m_data[2][2] * rhv(2, 1) + m_data[2][3] * rhv(3, 1);
-		m_data[2][2] = m_data[2][0] * rhv(0, 2) + m_data[2][1] * rhv(1, 2) + m_data[2][2] * rhv(2, 2) + m_data[2][3] * rhv(3, 2);
-		m_data[2][3] = m_data[2][0] * rhv(0, 3) + m_data[2][1] * rhv(1, 3) + m_data[2][2] * rhv(2, 3) + m_data[2][3] * rhv(3, 3);
-
-		m_data[3][0] = m_data[3][0] * rhv(0, 0) + m_data[3][1] * rhv(1, 0) + m_data[3][2] * rhv(2, 0) + m_data[3][3] * rhv(3, 0);
-		m_data[3][1] = m_data[3][0] * rhv(0, 1) + m_data[3][1] * rhv(1, 1) + m_data[3][2] * rhv(2, 1) + m_data[3][3] * rhv(3, 1);
-		m_data[3][2] = m_data[3][0] * rhv(0, 2) + m_data[3][1] * rhv(1, 2) + m_data[3][2] * rhv(2, 2) + m_data[3][3] * rhv(3, 2);
-		m_data[3][3] = m_data[3][0] * rhv(0, 3) + m_data[3][1] * rhv(1, 3) + m_data[3][2] * rhv(2, 3) + m_data[3][3] * rhv(3, 3);
-
+		*this = dest;
 		return *this;
 	}
 
@@ -105,15 +101,25 @@ namespace Phoenix::Math
 
 	bool Matrix4::operator==(const Matrix4& rhv)
 	{
-		return (m_data[0][0] == rhv(0, 0) && m_data[0][1] == rhv(0, 1) && m_data[0][2] == rhv(0, 2) && m_data[0][3] == rhv(0, 3) &&
-			m_data[1][0] == rhv(1, 0) && m_data[1][1] == rhv(1, 1) && m_data[1][2] == rhv(1, 2) && m_data[1][3] == rhv(1, 3) &&
-			m_data[2][0] == rhv(2, 0) && m_data[2][1] == rhv(2, 1) && m_data[2][2] == rhv(2, 2) && m_data[2][3] == rhv(2, 3) &&
-			m_data[3][0] == rhv(3, 0) && m_data[3][1] == rhv(3, 1) && m_data[3][2] == rhv(3, 2) && m_data[3][3] == rhv(3, 3));
+		Matrix4& lhv = *this;
+		auto N = m_data.size();
+
+		for (int i = 0; i < N; i++)
+		{
+			for (int j = 0; j < N; j++)
+			{
+				if (lhv(i, j) != rhv(i, j))
+				{
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 
 	Matrix4& Matrix4::transposeSelf()
 	{
-		float temp;
+		float temp = 0;
 		for (int i = 0; i < 4; i++)
 		{
 			for (int j = i + 1; j < 4; j++)
