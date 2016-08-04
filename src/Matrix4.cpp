@@ -142,9 +142,10 @@ namespace Phoenix::Math
 	// Calculate minor from 3x3 sub matrix 
 	float Matrix4::minor(int row0, int row1, int row2, int col0, int col1, int col2) const
 	{
-		return m_data[row0][col0] * (m_data[row1][col1] * m_data[row2][col2] - m_data[row1][col2] * m_data[row2][col1]) -
-			   m_data[row0][col1] * (m_data[row1][col0] * m_data[row2][col2] - m_data[row1][col2] * m_data[row2][col0]) +
-			   m_data[row0][col2] * (m_data[row1][col0] * m_data[row2][col1] - m_data[row1][col1] * m_data[row2][col0]);
+		const Matrix4& data = *this;
+		return data(row0,col0) * (data(row1,col1) * data(row2,col2) - data(row1,col2) * data(row2,col1)) -
+			   data(row0,col1) * (data(row1,col0) * data(row2,col2) - data(row1,col2) * data(row2,col0)) +
+			   data(row0,col2) * (data(row1,col0) * data(row2,col1) - data(row1,col1) * data(row2,col0));
 	}
 
 	// Calculate determinant recursively by getting minor for topmost row
