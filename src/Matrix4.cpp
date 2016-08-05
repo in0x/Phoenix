@@ -167,6 +167,9 @@ namespace Phoenix::Math
 	}
 
 	// Calculate minor from 3x3 sub matrix 
+	// Passing the indices of the 3 rows and columns which make up the minor matrix allows us
+	// to easily calculate the minor without having to figure out the omitted row and column
+	// ourselfs.
 	float Matrix4::minor(int row0, int row1, int row2, int col0, int col1, int col2) const
 	{
 		const Matrix4& data = *this;
@@ -176,6 +179,10 @@ namespace Phoenix::Math
 	}
 
 	// Calculate determinant recursively by getting minor for topmost row
+	// We choose the topmost row to be omitted, calculate the 3x3 minor submatrix
+	// for each element in the topmost row created by omitting the row and column that
+	// the current element is in and sum up using the (-1 ^ i + j) pattern to create the
+	// cofactors.
 	float Matrix4::determinant() const
 	{
 		const Matrix4& self = *this;
