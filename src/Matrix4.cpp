@@ -120,13 +120,14 @@ namespace Phoenix::Math
 	Matrix4& Matrix4::transposeSelf()
 	{
 		float temp = 0;
+		Matrix4& self = *this;
 		for (int i = 0; i < 4; i++)
 		{
 			for (int j = i + 1; j < 4; j++)
 			{
-				temp = m_data[i][j];
-				m_data[i][j] = m_data[j][i];
-				m_data[j][i] = temp;
+				temp = self(i,j);
+				self(i,j) = self(j,i);
+				self(j,i) = temp;
 			}
 		}
 		return *this;
@@ -151,10 +152,11 @@ namespace Phoenix::Math
 	// Calculate determinant recursively by getting minor for topmost row
 	float Matrix4::determinant() const
 	{
-		return m_data[0][0] * minor(1, 2, 3, 1, 2, 3) -
-			   m_data[0][1] * minor(1, 2, 3, 0, 2, 3) +
-			   m_data[0][2] * minor(1, 2, 3, 0, 1, 3) -
-			   m_data[0][3] * minor(1, 2, 3, 0, 1, 2);
+		const Matrix4& self = *this;
+		return self(0,0) * minor(1, 2, 3, 1, 2, 3) -
+			   self(0,1) * minor(1, 2, 3, 0, 2, 3) +
+			   self(0,2) * minor(1, 2, 3, 0, 1, 3) -
+			   self(0,3) * minor(1, 2, 3, 0, 1, 2);
 	}
 
 	// Classical adjoint is transpose of matrix of cofactors
