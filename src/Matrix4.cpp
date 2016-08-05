@@ -1,6 +1,6 @@
 #include "Matrix4.hpp"
-#include "Vec3.hpp"
 #include "Vec4.hpp"
+#include "Vec3.hpp"
 
 namespace Phoenix::Math
 {
@@ -51,13 +51,31 @@ namespace Phoenix::Math
 		return *this;
 	}
 
-	/*Vec4 Matrix4::operator*(Vec4 rhv)
+	Vec4 Matrix4::operator*(Vec4 rhv) const
 	{
+		Vec4 dest{};
+		const Matrix4& lhv = *this;
+
+		for (int i = 0; i < lhv.rows(); i++)
+		{
+			dest[i] += lhv(i, 0) * rhv[0] + lhv(i, 1) * rhv[1] + lhv(i, 2) * rhv[2] + lhv(i, 3) * rhv[3];
+		}
+
+		return dest;
 	}
 	
-	Vec3 Matrix4::operator*(Vec3 rhv)
+	Vec3 Matrix4::operator*(Vec3 rhv) const
 	{
-	}*/
+		Vec4 temp{ rhv.x, rhv.y, rhv.z, 0 };
+		const Matrix4& lhv = *this;
+
+		temp *= lhv;
+		
+		rhv.x = temp.x;
+		rhv.y = temp.y;
+		rhv.z = temp.z;
+		return rhv;
+	}
 
 	Matrix4& Matrix4::operator+=(float f)
 	{

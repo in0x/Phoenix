@@ -82,8 +82,8 @@ namespace Phoenix::Math
 		Matrix4& operator-=(const Matrix4& rhv);
 		Matrix4& operator*=(const Matrix4& rhv);
 		
-		Vec4 operator*(Vec4 rhv);
-		Vec3 operator*(Vec3 rhv);
+		Vec4 operator*(Vec4 rhv) const;
+		Vec3 operator*(Vec3 rhv) const;
 
 		Matrix4& operator+=(float f);
 		Matrix4& operator-=(float f);
@@ -146,9 +146,6 @@ namespace Phoenix::Math
 		lhv /= f;
 		return lhv;
 	}
-
-	Vec4 operator*(const Matrix4& lhv, Vec4 rhv);
-	Vec3 operator*(const Matrix4& lhv, Vec3 rhv);
 
 	inline std::ostream& operator<<(std::ostream& out, const Matrix4& mat4)
 	{

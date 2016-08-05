@@ -5,6 +5,8 @@
 
 namespace Phoenix::Math
 {
+	class Matrix4;
+
 	class Vec4
 	{
 	public:
@@ -45,6 +47,8 @@ namespace Phoenix::Math
 		Vec4& operator-=(const Vec4& rhv);
 		Vec4& operator*=(const Vec4& rhv);
 		Vec4& operator/=(const Vec4& rhv);
+
+		Vec4& operator*=(const Matrix4& rhv);
 
 		Vec4& operator+=(float rhv);
 		Vec4& operator-=(float rhv);

@@ -1,6 +1,7 @@
 #include <cassert>
 
 #include "Vec3.hpp"
+#include "Vec4.hpp"
 #include "Matrix4.hpp"
 
 // Check Game Coding Complete for info on WinMainLoop
@@ -38,6 +39,13 @@ int main()
 							50, 78, 27, 99,
 							24, 95, 75, 75));
 
+	Matrix4 mult{ 1, 2, 3, 4,
+				  1, 1, 1, 1,
+				  2, 1, 3, 4,
+	 			  1, 1, 1, 1 };
+
+	assert((Vec4(1, 1, 1, 1) *= mult) == Vec4(10, 4, 10, 4));
+	assert((Vec3(1, 1, 1) *= mult) == Vec3(6, 3, 6));
 
 	return 0;
 }

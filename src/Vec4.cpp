@@ -1,4 +1,5 @@
 #include "Vec4.hpp"
+#include "Matrix4.hpp"
 
 namespace Phoenix::Math
 {
@@ -35,6 +36,12 @@ namespace Phoenix::Math
 		y /= rhv.y;
 		z /= rhv.z;
 		w /= rhv.w;
+		return *this;
+	}
+
+	Vec4& Vec4::operator*=(const Matrix4& rhv)
+	{
+		*this = rhv * (*this);
 		return *this;
 	}
 
