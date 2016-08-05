@@ -39,17 +39,5 @@ int main()
 							24, 95, 75, 75));
 
 
-
-	Matrix4 orig{ 1, 2, 3, 4,
-				  5, 6, 7, 8,
-				  1, 2, 3, 4,
-				  5, 6, 7, 8 };
-
-	Matrix4 copy = orig;
-	copy.transposeSelf();
-
-	std::cout << orig << '\n' << std::endl;
-	std::cout << copy << std::endl;
-
 	return 0;
 }
