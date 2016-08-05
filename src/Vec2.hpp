@@ -102,7 +102,7 @@ namespace Phoenix::Math
 		return Vec2{ lhv.x / rhv, lhv.y / rhv };
 	}
 
-	inline std::ostream& operator<<(std::ostream& out, const Phoenix::Vec2& vec)
+	inline std::ostream& operator<<(std::ostream& out, const Vec2& vec)
 	{
 		out << "( " << vec.x << " | " << vec.y << " | " << " )";
 		return out;
