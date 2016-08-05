@@ -8,9 +8,9 @@ namespace Phoenix::Math
 	{
 		Matrix4& lhv = *this;
 
-		for (std::size_t row = 0; row < m_data.size(); row++)
+		for (std::size_t row = 0; row < rows(); row++)
 		{
-			for (std::size_t col = 0; col < m_data[row].size(); col++)
+			for (std::size_t col = 0; col < columns(); col++)
 			{
 				lhv(row, col) += rhv(row, col);
 			}
@@ -23,9 +23,9 @@ namespace Phoenix::Math
 	{
 		Matrix4& lhv = *this;
 
-		for (std::size_t row = 0; row < m_data.size(); row++)
+		for (std::size_t row = 0; row < rows(); row++)
 		{
-			for (std::size_t col = 0; col < m_data[row].size(); col++)
+			for (std::size_t col = 0; col < columns(); col++)
 			{
 				lhv(row, col) -= rhv(row, col);
 			}
@@ -50,6 +50,14 @@ namespace Phoenix::Math
 		*this = dest;
 		return *this;
 	}
+
+	/*Vec4 Matrix4::operator*(Vec4 rhv)
+	{
+	}
+	
+	Vec3 Matrix4::operator*(Vec3 rhv)
+	{
+	}*/
 
 	Matrix4& Matrix4::operator+=(float f)
 	{
@@ -102,7 +110,7 @@ namespace Phoenix::Math
 	bool Matrix4::operator==(const Matrix4& rhv)
 	{
 		Matrix4& lhv = *this;
-		auto N = m_data.size();
+		auto N = rows();
 
 		for (int i = 0; i < N; i++)
 		{
@@ -121,9 +129,9 @@ namespace Phoenix::Math
 	{
 		float temp = 0;
 		Matrix4& self = *this;
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < rows(); i++)
 		{
-			for (int j = i + 1; j < 4; j++)
+			for (int j = i + 1; j < columns(); j++)
 			{
 				temp = self(i,j);
 				self(i,j) = self(j,i);
@@ -175,6 +183,12 @@ namespace Phoenix::Math
 	{
 		// Need to assert that determinant is non-0
 		return adjoint() / determinant();
+	}
+
+	Matrix4& Matrix4::inverseSelf()
+	{
+		*this = inverse();
+		return *this;
 	}
 
 	Matrix4 Matrix4::scale(float x, float y, float z)

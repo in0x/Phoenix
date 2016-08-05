@@ -34,6 +34,20 @@ namespace Phoenix::Math
 			m_data[3][0] = m03; m_data[3][1] = m13; m_data[3][2] = m23; m_data[3][3] = m33;
 		}
 
+		// Returns the number of columns in this matrix.
+		// Useful for porting matrix-vector interactions
+		// easily between different sizes.
+		int columns() const
+		{
+			return m_data.size();
+		}
+
+		// Returns the number of rows in this matrix.
+		int rows() const
+		{
+			return m_data[0].size();
+		}
+
 		float& operator()(std::size_t row, std::size_t col)
 		{
 			return m_data[col][row];
@@ -44,10 +58,33 @@ namespace Phoenix::Math
 			return m_data[col][row];
 		}
 
+		decltype(auto) begin()
+		{
+			return m_data.begin();
+		}
+
+		decltype(auto) end()
+		{
+			return m_data.end();
+		}
+
+		decltype(auto) begin() const
+		{
+			return m_data.begin();
+		}
+
+		decltype(auto) end() const
+		{
+			return m_data.end();
+		}
+
 		Matrix4& operator+=(const Matrix4& rhv);
 		Matrix4& operator-=(const Matrix4& rhv);
 		Matrix4& operator*=(const Matrix4& rhv);
 		
+		Vec4 operator*(Vec4 rhv);
+		Vec3 operator*(Vec3 rhv);
+
 		Matrix4& operator+=(float f);
 		Matrix4& operator-=(float f);
 		Matrix4& operator*=(float f);
