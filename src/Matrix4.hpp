@@ -103,6 +103,9 @@ namespace Phoenix::Math
 		static Matrix4 rotation(const Quaternion& rotate);
 
 		static Matrix4 identity();	
+		static Matrix4 view(const Vec4& cameraPos);
+		static Matrix4 perspective();
+		static Matrix4 ortho();
 	};
 
 	inline Matrix4 operator+(Matrix4 lhv, const Matrix4& rhv)
