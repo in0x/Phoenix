@@ -15,18 +15,13 @@ namespace Phoenix::Math
 			, y(0.f)
 		{}
 
-		Vec2(float f)
-			: x(f)
-			, y(f)
-		{}
-
 		Vec2(float _x, float _y)
 			: x(_x)
 			, y(_y)
 		{}
 
 		// Sets out of bounds index to 0.
-		float& operator[] (int i)
+		float& operator()(int i)
 		{
 			if (i > 1)
 			{
@@ -36,7 +31,7 @@ namespace Phoenix::Math
 		}
 
 		// Sets out of bounds index to 0.
-		const float& operator[](int i) const
+		const float& operator()(int i) const
 		{
 			if (i > 1)
 			{
@@ -105,6 +100,11 @@ namespace Phoenix::Math
 	inline const Vec2 operator*(const Vec2& lhv, float rhv)
 	{
 		return Vec2{ lhv.x * rhv, lhv.y * rhv };
+	}
+
+	inline const Vec2 operator*(float lhv, const Vec2 rhv)
+	{
+		return lhv * rhv;
 	}
 
 	inline const Vec2 operator/(const Vec2& lhv, float rhv)

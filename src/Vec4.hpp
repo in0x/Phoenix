@@ -19,13 +19,6 @@ namespace Phoenix::Math
 			, w(0.f)
 		{}
 
-		Vec4(float f)
-			: x(f)
-			, y(f)
-			, z(f)
-			, w(f)
-		{}
-
 		Vec4(float _x, float _y, float _z, float _w)
 			: x(_x)
 			, y(_y)
@@ -34,7 +27,7 @@ namespace Phoenix::Math
 		{}
 
 		// Sets out of bounds index to 0.
-		float& operator[] (int i)
+		float& operator()(int i)
 		{
 			if (i > 3)
 			{
@@ -44,7 +37,7 @@ namespace Phoenix::Math
 		}
 
 		// Sets out of bounds index to 0.
-		const float& operator[](int i) const
+		const float& operator()(int i) const
 		{
 			if (i > 3)
 			{
@@ -117,6 +110,11 @@ namespace Phoenix::Math
 	inline const Vec4 operator*(const Vec4& lhv, float rhv)
 	{
 		return Vec4{ lhv.x * rhv, lhv.y * rhv, lhv.z * rhv, lhv.w * rhv };
+	}
+
+	inline const Vec4 operator*(float lhv, const Vec4& rhv)
+	{
+		return lhv * rhv;
 	}
 
 	inline const Vec4 operator/(const Vec4& lhv, float rhv)

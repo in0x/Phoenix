@@ -84,7 +84,7 @@ namespace Phoenix::Math
 
 		for (int i = 0; i < lhv.rows(); i++)
 		{
-			dest[i] += lhv(i, 0) * rhv[0] + lhv(i, 1) * rhv[1] + lhv(i, 2) * rhv[2] + lhv(i, 3) * rhv[3];
+			dest(i) += lhv(i, 0) * rhv(0) + lhv(i, 1) * rhv(1) + lhv(i, 2) * rhv(2) + lhv(i, 3) * rhv(3);
 		}
 
 		return dest;

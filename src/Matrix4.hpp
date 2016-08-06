@@ -37,13 +37,13 @@ namespace Phoenix::Math
 		// Returns the number of columns in this matrix.
 		// Useful for porting matrix-vector interactions
 		// easily between different sizes.
-		int columns() const
+		std::size_t columns() const
 		{
 			return m_data.size();
 		}
 
 		// Returns the number of rows in this matrix.
-		int rows() const
+		std::size_t rows() const
 		{
 			return m_data[0].size();
 		}
