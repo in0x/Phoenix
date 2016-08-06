@@ -4,6 +4,32 @@
 
 namespace Phoenix::Math
 {
+	float& Matrix4::operator()(std::size_t row, std::size_t col)
+	{
+		if (row > 3)
+		{
+			row = 0;
+		}
+		if (col > 3)
+		{
+			col = 0;
+		}
+		return m_data[col][row];
+	}
+
+	const float& Matrix4::operator()(std::size_t row, std::size_t col) const
+	{
+		if (row > 3)
+		{
+			row = 0;
+		}
+		if (col > 3)
+		{
+			col = 0;
+		}
+		return m_data[col][row];
+	}
+
 	Matrix4& Matrix4::operator+=(const Matrix4& rhv)
 	{
 		Matrix4& lhv = *this;

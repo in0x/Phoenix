@@ -30,13 +30,23 @@ namespace Phoenix::Math
 			, z(_z)
 		{}
 
-		float& operator[] (int i)  
+		// Sets out of bounds index to 0.
+		float& operator[] (int i)
 		{
+			if (i > 2)
+			{
+				i = 0;
+			}
 			return *(&x + i);
 		}
 
+		// Sets out of bounds index to 0.
 		const float& operator[](int i) const
 		{
+			if (i > 2)
+			{
+				i = 0;
+			}
 			return *(&x + i);
 		}
 

@@ -48,15 +48,13 @@ namespace Phoenix::Math
 			return m_data[0].size();
 		}
 
-		float& operator()(std::size_t row, std::size_t col)
-		{
-			return m_data[col][row];
-		}
+		// Sets out of bounds indices to 0. Accesing (4,2)
+		// would for example return (0,2).
+		float& operator()(std::size_t row, std::size_t col);
 
-		const float& operator()(std::size_t row, std::size_t col) const
-		{
-			return m_data[col][row];
-		}
+		// Sets out of bounds indices to 0. Accesing (4,2)
+		// would for example return (0,2).
+		const float& operator()(std::size_t row, std::size_t col) const;
 
 		decltype(auto) begin()
 		{
