@@ -1,3 +1,4 @@
-This is my private engine project that I'm working on currently. Codename Phoenix because it sounds cool.
+<img src="https://github.com/in0x/Phoenix/blob/master/doc/2000px-Phi.png" alt="Phi-nix" width="50px" heigh="50px"/>
+Phoenix 
 
 Issue Tracker: [Here](https://trello.com/b/exs4s9YZ/phoenix-engine)
