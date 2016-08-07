@@ -5,10 +5,16 @@
 
 namespace Phoenix::Math
 {
-	// Constructs a ViewMatrix
+	enum class ProjectionType
+	{
+		PERSPECTIVE,
+		ORTHO
+	};
+
 	Matrix4 lookAtRH(Vec3& cameraPos, Vec3& target, Vec3& up);
+	Matrix4 projectionRH(float yFOV, float aspect, float near, float far, ProjectionType type);
 
-	Matrix4 perspective(float horizontalFOV, float aspectRatio, float near, float far);
-
-	Matrix4 ortho();
+	constexpr float pi();
+	float degrees(float angleRad);
+	float radians(float angleDeg);
 }

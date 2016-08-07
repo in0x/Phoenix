@@ -1,9 +1,10 @@
 #pragma once
 #include "phiMath.h"
+#include <cmath>
 
 namespace Phoenix::Math
 {
-	// Using right-handed coordinates
+	// Currently only supporting OpenGL
 
 	Matrix4 lookAtRH(Vec3& cameraPos, Vec3& target, Vec3& up)
 	{
@@ -25,13 +26,44 @@ namespace Phoenix::Math
 		};
 	}
 
-	Matrix4 perspective(float horizontalFOV, float aspectRatio, float near, float far)
+	Matrix4 projectionRH(float yFOV, float aspect, float near, float far, ProjectionType type)
 	{
-		return Matrix4{};
+		float xFOV = yFOV / aspect;
+		float zoomX = 1.f / std::tan(xFOV / 2.f);
+		float zoomY = 1.f / std::tan(yFOV / 2.f);
+
+		if (type == ProjectionType::PERSPECTIVE)
+		{
+			return Matrix4 {
+				zoomX, 0, 0, 0,
+				0, zoomY, 0, 0,
+				0, 0, -((far + near) / (far - near)), ((-2.f * near * far) / (far - near)),
+				0, 0, -1, 0
+			};
+		}
+		else
+		{
+			return Matrix4 {
+				zoomX, 0, 0, 0,
+				0, zoomY, 0, 0,
+				0, 0, -(2.f / (far - near)), -((far + near) / (far - near)),
+				0, 0, 0, 1
+			};
+		}
 	}
 
-	Matrix4 ortho()
+	constexpr float pi()
 	{
-		return Matrix4{};
+		return 3.1415926535897932384626433832795;
+	}
+
+	float degrees(float angleRad)
+	{
+		return angleRad * (180.f / pi());
+	}
+	
+	float radians(float angleDeg)
+	{
+		return angleDeg * (pi() / 180.f);
 	}
 }
