@@ -17,11 +17,11 @@ namespace Phoenix::Math
 
 	float& Matrix4::operator()(std::size_t row, std::size_t col)
 	{
-		if (row > 3)
+		if (row > 3 || row < 0)
 		{
 			row = 0;
 		}
-		if (col > 3)
+		if (col > 3 || row < 0)
 		{
 			col = 0;
 		}
@@ -30,11 +30,11 @@ namespace Phoenix::Math
 
 	const float& Matrix4::operator()(std::size_t row, std::size_t col) const
 	{
-		if (row > 3)
+		if (row > 3 || row < 0)
 		{
 			row = 0;
 		}
-		if (col > 3)
+		if (col > 3 || row < 0)
 		{
 			col = 0;
 		}

@@ -23,7 +23,7 @@ namespace Phoenix::Math
 		// Sets out of bounds index to 0.
 		float& operator()(int i)
 		{
-			if (i > 1)
+			if (i > 1 || i < 0)
 			{
 				i = 0;
 			}
@@ -33,7 +33,7 @@ namespace Phoenix::Math
 		// Sets out of bounds index to 0.
 		const float& operator()(int i) const
 		{
-			if (i > 1)
+			if (i > 1 || i < 0)
 			{
 				i = 0;
 			}
