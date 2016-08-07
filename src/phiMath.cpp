@@ -5,13 +5,13 @@ namespace Phoenix::Math
 {
 	// Using right-handed coordinates
 
-	Matrix4 lookAt(Vec3& cameraPos, Vec3& target, Vec3& up)
+	Matrix4 lookAtRH(Vec3& cameraPos, Vec3& target, Vec3& up)
 	{
 		// Construct basis vectors
 		Vec3 zAxis = (cameraPos - target).normalize();
-		Vec3 xAxis = up.cross(zAxis).normalize();
+		Vec3 xAxis = up.cross(zAxis).normalize();	
 		Vec3 yAxis = zAxis.cross(xAxis);
-
+		
 		// Concatenate new orientation and translation
 		// Taking the dot of basis vector and translation component
 		// has the same result as constructing a translation matrix

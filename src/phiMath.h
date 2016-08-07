@@ -6,7 +6,7 @@
 namespace Phoenix::Math
 {
 	// Constructs a ViewMatrix
-	Matrix4 lookAt(Vec3& cameraPos, Vec3& target, Vec3& up);
+	Matrix4 lookAtRH(Vec3& cameraPos, Vec3& target, Vec3& up);
 
 	Matrix4 perspective(float horizontalFOV, float aspectRatio, float near, float far);
 
