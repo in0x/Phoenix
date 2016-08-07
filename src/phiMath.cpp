@@ -7,15 +7,21 @@ namespace Phoenix::Math
 
 	Matrix4 lookAt(Vec3& cameraPos, Vec3& target, Vec3& up)
 	{
+		// Construct basis vectors
 		Vec3 zAxis = (cameraPos - target).normalize();
 		Vec3 xAxis = up.cross(zAxis).normalize();
 		Vec3 yAxis = zAxis.cross(xAxis);
 
+		// Concatenate new orientation and translation
+		// Taking the dot of basis vector and translation component
+		// has the same result as constructing a translation matrix
+		// using -cameraPos and multiplying it with the orientation 
+		// single column matrix multipl. == dot
 		return Matrix4 {
-			xAxis.x, yAxis.x, zAxis.x, 0,
-			xAxis.y, yAxis.y, zAxis.y, 0,
-			xAxis.z, yAxis.z, zAxis.z, 0,
-			-(xAxis.dot(cameraPos)), -(yAxis.dot(cameraPos)), -(zAxis.dot(cameraPos)), 1
+			xAxis.x, xAxis.y, xAxis.z, -(xAxis.dot(cameraPos)),
+			yAxis.x, yAxis.y, yAxis.z, -(yAxis.dot(cameraPos)),
+			zAxis.x, zAxis.y, zAxis.z, -(zAxis.dot(cameraPos)),
+			0,		 0,		  0,		1
 		};
 	}
 
