@@ -1,8 +1,6 @@
 #include <cassert>
 
-#include "Vec3.hpp"
-#include "Vec4.hpp"
-#include "Matrix4.hpp"
+#include "phiMath.h"
 
 // Check Game Coding Complete for info on WinMainLoop
 int main()
@@ -46,6 +44,8 @@ int main()
 
 	assert((Vec4(1, 1, 1, 1) *= mult) == Vec4(10, 4, 10, 4));
 	assert((Vec3(1, 1, 1) *= mult) == Vec3(6, 3, 6));
+	
+	std::cout << lookAt(Vec3{ 0, 0, 2 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 }) << std::endl;
 
 	return 0;
 }

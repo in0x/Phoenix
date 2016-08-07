@@ -5,7 +5,10 @@
 
 namespace Phoenix::Math
 {
-	Matrix4 view(const Vec3& cameraPos, const Vec3& lookAt, const Vec3& up);
+	// Constructs a ViewMatrix
+	Matrix4 lookAt(Vec3& cameraPos, Vec3& target, Vec3& up);
+
 	Matrix4 perspective(float horizontalFOV, float aspectRatio, float near, float far);
+
 	Matrix4 ortho();
 }

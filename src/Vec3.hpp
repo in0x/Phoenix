@@ -71,51 +71,51 @@ namespace Phoenix::Math
 		Vec3 reflect(const Vec3& rhv) const;
 	};
 
-	inline const Vec3 operator+(Vec3 lhv, const Vec3& rhv) 
+	inline Vec3 operator+(Vec3 lhv, const Vec3& rhv) 
 	{
 		lhv += rhv;
 		return lhv;
 	}
 
-	inline const Vec3 operator-(Vec3 lhv, const Vec3& rhv)
+	inline Vec3 operator-(Vec3 lhv, const Vec3& rhv)
 	{
 		lhv -= rhv;
 		return lhv;
 	}
 	
-	inline const Vec3 operator*(Vec3 lhv, const Vec3& rhv)
+	inline Vec3 operator*(Vec3 lhv, const Vec3& rhv)
 	{
 		lhv *= rhv;
 		return lhv;
 	}
 	
-	inline const Vec3 operator/(Vec3 lhv, const Vec3& rhv)
+	inline Vec3 operator/(Vec3 lhv, const Vec3& rhv)
 	{
 		lhv /= rhv;
 		return lhv;
 	}
 
-	inline const Vec3 operator+(const Vec3& lhv, float rhv)
+	inline Vec3 operator+(const Vec3& lhv, float rhv)
 	{
 		return Vec3{ lhv.x + rhv, lhv.y + rhv, lhv.z + rhv };
 	}
 	
-	inline const Vec3 operator-(const Vec3& lhv, float rhv)
+	inline Vec3 operator-(const Vec3& lhv, float rhv)
 	{
 		return Vec3{ lhv.x - rhv, lhv.y - rhv, lhv.z - rhv };
 	}
 	
-	inline const Vec3 operator*(const Vec3& lhv, float rhv)
+	inline Vec3 operator*(const Vec3& lhv, float rhv)
 	{
 		return Vec3{ lhv.x * rhv, lhv.y * rhv, lhv.z * rhv };
 	}
 
-	inline const Vec3 operator*(float lhv, const Vec3& rhv)
+	inline Vec3 operator*(float lhv, const Vec3& rhv)
 	{
 		return rhv * lhv;
 	}
 	
-	inline const Vec3 operator/(const Vec3& lhv, float rhv)
+	inline Vec3 operator/(const Vec3& lhv, float rhv)
 	{
 		return Vec3{ lhv.x / rhv, lhv.y / rhv, lhv.z / rhv };
 	}
