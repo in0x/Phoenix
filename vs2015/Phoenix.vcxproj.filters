@@ -5,6 +5,21 @@
     <ClCompile Include="..\src\Matrix4.cpp">
       <Filter>Math</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Vec4.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Vec3.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Vec2.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\phiMath.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Matrix3.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Math">
@@ -34,6 +49,12 @@
       <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="..\src\phiMath.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Matrix3.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\MatrixData.hpp">
       <Filter>Math</Filter>
     </ClInclude>
   </ItemGroup>

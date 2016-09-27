@@ -1,26 +1,26 @@
 #pragma once
 #include <array>
 #include <iostream>
+#include "MatrixData.hpp"
 
 namespace Phoenix::Math
 {
 	class Quaternion;
 	class Vec4;
 	class Vec3;
-
+	
 	// Column-major 4x4 matrix.
 	class Matrix4
 	{
 	private:
-		using MatrixData = std::array<std::array<float, 4>, 4>;
-		MatrixData m_data;
+		MatrixData<4> m_data;
 
 		float minor(int row0, int row1, int row2, int col0, int col1, int col2) const;
 		Matrix4 adjoint() const;
 
 	public:
 		Matrix4()
-			: m_data(MatrixData{})
+			: m_data(MatrixData<4>{})
 		{}
 
 		Matrix4(float m00, float m01, float m02, float m03,

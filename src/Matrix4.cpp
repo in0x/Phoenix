@@ -76,6 +76,8 @@ namespace Phoenix::Math
 		Matrix4 dest{};
 		Matrix4& lhv = *this;
 		
+		// Transposing the other matrix will improve cache-miss rate.
+
 		for (int i = 0; i < 4; i++)
 		{
 			for (int j = 0; j < 4; j++)

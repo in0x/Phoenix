@@ -1,6 +1,6 @@
 #include <cassert>
 
-#include "phiMath.h"
+#include "phiMath.hpp"
 
 // Check Game Coding Complete for info on WinMainLoop
 int main()

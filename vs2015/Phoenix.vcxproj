@@ -79,7 +79,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <CodeAnalysisRuleSet>C:\Program Files (x86)\Microsoft Visual Studio 14.0\Team Tools\Static Analysis Tools\Rule Sets\NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
     <OutDir>$(SolutionDir)\..\bin\$(Platform)\$(Configuration)</OutDir>
     <IntDir>\..\tmp\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
@@ -113,7 +113,7 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
-      <EnablePREfast>true</EnablePREfast>
+      <EnablePREfast>false</EnablePREfast>
       <AdditionalOptions>/std:c++latest %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -159,11 +159,18 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\main.cpp" />
+    <ClCompile Include="..\src\Matrix3.cpp" />
     <ClCompile Include="..\src\Matrix4.cpp" />
+    <ClCompile Include="..\src\phiMath.cpp" />
+    <ClCompile Include="..\src\Vec2.cpp" />
+    <ClCompile Include="..\src\Vec3.cpp" />
+    <ClCompile Include="..\src\Vec4.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Catch\Catch.hpp" />
+    <ClInclude Include="..\src\Matrix3.hpp" />
     <ClInclude Include="..\src\Matrix4.hpp" />
+    <ClInclude Include="..\src\MatrixData.hpp" />
     <ClInclude Include="..\src\phiMath.hpp" />
     <ClInclude Include="..\src\Quaternion.hpp" />
     <ClInclude Include="..\src\Vec2.hpp" />
