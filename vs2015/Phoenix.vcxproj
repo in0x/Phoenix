@@ -164,6 +164,7 @@
   <ItemGroup>
     <ClInclude Include="..\src\Catch\Catch.hpp" />
     <ClInclude Include="..\src\Matrix4.hpp" />
+    <ClInclude Include="..\src\phiMath.hpp" />
     <ClInclude Include="..\src\Quaternion.hpp" />
     <ClInclude Include="..\src\Vec2.hpp" />
     <ClInclude Include="..\src\Vec3.hpp" />

@@ -1,5 +1,5 @@
 #pragma once
-#include "phiMath.h"
+#include "phiMath.hpp"
 #include <cmath>
 
 namespace Phoenix::Math

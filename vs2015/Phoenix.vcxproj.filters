@@ -33,6 +33,9 @@
     <ClInclude Include="..\src\Vec4.hpp">
       <Filter>Math</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\phiMath.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
