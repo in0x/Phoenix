@@ -57,6 +57,12 @@
     <ClInclude Include="..\src\MatrixData.hpp">
       <Filter>Math</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\MathTests.hpp">
+      <Filter>Catch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Rotation.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

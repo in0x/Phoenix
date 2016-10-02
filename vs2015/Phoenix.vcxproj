@@ -167,12 +167,14 @@
     <ClCompile Include="..\src\Vec4.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\MathTests.hpp" />
     <ClInclude Include="..\src\Catch\Catch.hpp" />
     <ClInclude Include="..\src\Matrix3.hpp" />
     <ClInclude Include="..\src\Matrix4.hpp" />
     <ClInclude Include="..\src\MatrixData.hpp" />
     <ClInclude Include="..\src\phiMath.hpp" />
     <ClInclude Include="..\src\Quaternion.hpp" />
+    <ClInclude Include="..\src\Rotation.hpp" />
     <ClInclude Include="..\src\Vec2.hpp" />
     <ClInclude Include="..\src\Vec3.hpp" />
     <ClInclude Include="..\src\Vec4.hpp" />
