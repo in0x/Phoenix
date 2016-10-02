@@ -1,5 +1,5 @@
 #pragma once
-#include <array>
+
 #include <iostream>
 #include "MatrixData.hpp"
 
@@ -8,7 +8,7 @@ namespace Phoenix::Math
 	class Quaternion;
 	class Vec4;
 	class Vec3;
-	
+
 	// Column-major 4x4 matrix.
 	class Matrix4
 	{

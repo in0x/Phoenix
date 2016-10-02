@@ -1,4 +1,5 @@
 #include "Matrix4.hpp"
+#include <cassert>
 #include "Vec4.hpp"
 #include "Vec3.hpp"
 
@@ -17,11 +18,11 @@ namespace Phoenix::Math
 
 	float& Matrix4::operator()(std::size_t row, std::size_t col)
 	{
-		if (row > 3 || row < 0)
+		if (row >= m_data.size() || row < 0)
 		{
 			row = 0;
 		}
-		if (col > 3 || row < 0)
+		if (col >= m_data.size() || row < 0)
 		{
 			col = 0;
 		}
@@ -30,11 +31,11 @@ namespace Phoenix::Math
 
 	const float& Matrix4::operator()(std::size_t row, std::size_t col) const
 	{
-		if (row > 3 || row < 0)
+		if (row >= m_data.size() || row < 0)
 		{
 			row = 0;
 		}
-		if (col > 3 || row < 0)
+		if (col >= m_data.size() || row < 0)
 		{
 			col = 0;
 		}
@@ -78,9 +79,9 @@ namespace Phoenix::Math
 		
 		// Transposing the other matrix will improve cache-miss rate.
 
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i <= m_data.size(); i++)
 		{
-			for (int j = 0; j < 4; j++)
+			for (int j = 0; j <= m_data.size(); j++)
 			{
 				dest(i,j) = lhv(i, 0) * rhv(0, j) + lhv(i, 1) * rhv(1, j) + lhv(i, 2) * rhv(2, j) + lhv(i, 3) * rhv(3, j);
 			}
@@ -211,10 +212,10 @@ namespace Phoenix::Math
 	// ourselfs.
 	float Matrix4::minor(int row0, int row1, int row2, int col0, int col1, int col2) const
 	{
-		const Matrix4& data = *this;
-		return data(row0,col0) * (data(row1,col1) * data(row2,col2) - data(row1,col2) * data(row2,col1)) -
-			   data(row0,col1) * (data(row1,col0) * data(row2,col2) - data(row1,col2) * data(row2,col0)) +
-			   data(row0,col2) * (data(row1,col0) * data(row2,col1) - data(row1,col1) * data(row2,col0));
+		const Matrix4& self = *this;
+		return self(row0,col0) * (self(row1,col1) * self(row2,col2) - self(row1,col2) * self(row2,col1)) -
+			   self(row0,col1) * (self(row1,col0) * self(row2,col2) - self(row1,col2) * self(row2,col0)) +
+			   self(row0,col2) * (self(row1,col0) * self(row2,col1) - self(row1,col1) * self(row2,col0));
 	}
 
 	// Calculate determinant recursively by getting minor for topmost row
@@ -245,8 +246,9 @@ namespace Phoenix::Math
 
 	Matrix4 Matrix4::inverse() const
 	{
-		// Need to assert that determinant is non-0
-		return adjoint() / determinant();
+		float det = determinant();
+		assert(det);
+		return adjoint() / det;
 	}
 
 	Matrix4& Matrix4::inverseSelf()
