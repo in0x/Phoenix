@@ -246,7 +246,7 @@ namespace Phoenix::Math
 
 	Matrix4 Matrix4::inverse() const
 	{
-		float det = determinant();
+		auto det = determinant();
 		assert(det);
 		return adjoint() / det;
 	}

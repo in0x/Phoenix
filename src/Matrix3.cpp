@@ -195,7 +195,7 @@ namespace Phoenix::Math
 	float Matrix3::minor(int row0, int row1, int col0, int col1) const
 	{
 		const Matrix3& self = *this;
-		return self(0, 0) * self(1, 1) - self(1, 0) * self(0, 1);
+		return self(row0, col0) * self(row1, col1) - self(row1, col0) * self(row0, col1);
 	}
 
 	// Calculate determinant recursively by getting minor for topmost row
@@ -214,18 +214,17 @@ namespace Phoenix::Math
 	// Classical adjoint is transpose of matrix of cofactors
 	Matrix3 Matrix3::adjoint() const
 	{
-		// Need to transpose
 		return Matrix3
 		{
-			minor(1,2,1,2), - minor(1,2,0,2), + minor(1,2,0,1),
-		   -minor(0,2,1,2), + minor(0,2,0,2), - minor(0,2,0,1),
-		   +minor(0,1,1,2), - minor(0,1,0,2), + minor(0,1,0,1),
+			minor(1,2,1,2), -minor(0,2,1,2),  minor(0,1,1,2),
+		   -minor(1,2,0,2),  minor(0,2,0,2), -minor(0,1,0,2),
+			minor(1,2,0,1), -minor(0,2,0,1),  minor(0,1,0,1)
 		};
 	}
 
 	Matrix3 Matrix3::inverse() const
 	{
-		float det = determinant();
+		auto det = determinant();
 		assert(det);
 		return adjoint() / det;
 	}
