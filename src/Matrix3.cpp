@@ -2,9 +2,9 @@
 
 #include "Vec3.hpp"
 
-namespace Phoenix::Math
+namespace phoenix::math
 {
-	Matrix3::Matrix3(float m00, float m01, float m02, 
+	matrix3::matrix3(float m00, float m01, float m02, 
 					 float m10, float m11, float m12,
 					 float m20, float m21, float m22)
 	{
@@ -13,7 +13,11 @@ namespace Phoenix::Math
 		m_data[2][0] = m02; m_data[2][1] = m12; m_data[2][2] = m22;
 	}
 
-	float& Matrix3::operator()(std::size_t row, std::size_t col)
+	matrix3::matrix3(const quaternion& rotation)
+	{
+	}
+
+	float& matrix3::operator()(std::size_t row, std::size_t col)
 	{
 		if (row >= m_data.size() || row < 0)
 		{
@@ -26,7 +30,7 @@ namespace Phoenix::Math
 		return m_data[col][row];
 	}
 
-	const float& Matrix3::operator()(std::size_t row, std::size_t col) const
+	const float& matrix3::operator()(std::size_t row, std::size_t col) const
 	{
 		if (row >= m_data.size() || row < 0)
 		{
@@ -39,9 +43,9 @@ namespace Phoenix::Math
 		return m_data[col][row];
 	}
 
-	Matrix3& Matrix3::operator+=(const Matrix3& rhv)
+	matrix3& matrix3::operator+=(const matrix3& rhv)
 	{
-		Matrix3& lhv = *this;
+		matrix3& lhv = *this;
 
 		for (std::size_t row = 0; row < rows(); row++)
 		{
@@ -54,9 +58,9 @@ namespace Phoenix::Math
 		return *this;
 	}
 
-	Matrix3& Matrix3::operator-=(const Matrix3& rhv)
+	matrix3& matrix3::operator-=(const matrix3& rhv)
 	{
-		Matrix3& lhv = *this;
+		matrix3& lhv = *this;
 
 		for (std::size_t row = 0; row < rows(); row++)
 		{
@@ -69,10 +73,10 @@ namespace Phoenix::Math
 		return *this;
 	}
 
-	Matrix3& Matrix3::operator*=(const Matrix3& rhv)
+	matrix3& matrix3::operator*=(const matrix3& rhv)
 	{
-		Matrix3 dest{};
-		Matrix3& lhv = *this;
+		matrix3 dest{};
+		matrix3& lhv = *this;
 
 		for (int i = 0; i <= m_data.size(); i++)
 		{
@@ -86,10 +90,10 @@ namespace Phoenix::Math
 		return *this;
 	}
 
-	Vec3 Matrix3::operator*(Vec3 rhv) const
+	vec3 matrix3::operator*(vec3 rhv) const
 	{
-		Vec3 dest{};
-		const Matrix3& lhv = *this;
+		vec3 dest{};
+		const matrix3& lhv = *this;
 
 		for (int i = 0; i < lhv.rows(); i++)
 		{
@@ -99,7 +103,7 @@ namespace Phoenix::Math
 		return dest;
 	}
 
-	Matrix3& Matrix3::operator+=(float f)
+	matrix3& matrix3::operator+=(float f)
 	{
 		for (auto& row : m_data)
 		{
@@ -111,7 +115,7 @@ namespace Phoenix::Math
 		return *this;
 	}
 
-	Matrix3& Matrix3::operator-=(float f)
+	matrix3& matrix3::operator-=(float f)
 	{
 		for (auto& row : m_data)
 		{
@@ -123,7 +127,7 @@ namespace Phoenix::Math
 		return *this;
 	}
 
-	Matrix3& Matrix3::operator*=(float f)
+	matrix3& matrix3::operator*=(float f)
 	{
 		for (auto& row : m_data)
 		{
@@ -135,7 +139,7 @@ namespace Phoenix::Math
 		return *this;
 	}
 
-	Matrix3& Matrix3::operator/=(float f)
+	matrix3& matrix3::operator/=(float f)
 	{
 		for (auto& row : m_data)
 		{
@@ -147,9 +151,9 @@ namespace Phoenix::Math
 		return *this;
 	}
 
-	bool Matrix3::operator==(const Matrix3& rhv)
+	bool matrix3::operator==(const matrix3& rhv)
 	{
-		Matrix3& lhv = *this;
+		matrix3& lhv = *this;
 		auto N = rows();
 
 		for (int i = 0; i < N; i++)
@@ -165,10 +169,10 @@ namespace Phoenix::Math
 		return true;
 	}
 
-	Matrix3& Matrix3::transposeSelf()
+	matrix3& matrix3::transposeSelf()
 	{
 		float temp = 0;
-		Matrix3& self = *this;
+		matrix3& self = *this;
 		for (int i = 0; i < rows(); i++)
 		{
 			for (int j = i + 1; j < columns(); j++)
@@ -181,9 +185,9 @@ namespace Phoenix::Math
 		return *this;
 	}
 
-	Matrix3 Matrix3::transpose() const
+	matrix3 matrix3::transpose() const
 	{
-		Matrix3 transp = *this;
+		matrix3 transp = *this;
 		transp.transposeSelf();
 		return transp;
 	}
@@ -192,9 +196,9 @@ namespace Phoenix::Math
 	// Passing the indices of the 2 rows and columns which make up the minor matrix allows us
 	// to easily calculate the minor without having to figure out the omitted row and column
 	// ourselfs.
-	float Matrix3::minor(int row0, int row1, int col0, int col1) const
+	float matrix3::minor(int row0, int row1, int col0, int col1) const
 	{
-		const Matrix3& self = *this;
+		const matrix3& self = *this;
 		return self(row0, col0) * self(row1, col1) - self(row1, col0) * self(row0, col1);
 	}
 
@@ -203,18 +207,18 @@ namespace Phoenix::Math
 	// for each element in the topmost row created by omitting the row and column that
 	// the current element is in and sum up using the (-1 ^ i + j) pattern to create the
 	// cofactors.
-	float Matrix3::determinant() const
+	float matrix3::determinant() const
 	{
-		const Matrix3& self = *this;
+		const matrix3& self = *this;
 		return self(0, 0) * minor(1, 2, 1, 2) -
 			   self(0, 1) * minor(1, 2, 0, 2) +
 			   self(0, 2) * minor(1, 2, 0, 1);
 	}
 
 	// Classical adjoint is transpose of matrix of cofactors
-	Matrix3 Matrix3::adjoint() const
+	matrix3 matrix3::adjoint() const
 	{
-		return Matrix3
+		return matrix3
 		{
 			minor(1,2,1,2), -minor(0,2,1,2),  minor(0,1,1,2),
 		   -minor(1,2,0,2),  minor(0,2,0,2), -minor(0,1,0,2),
@@ -222,37 +226,37 @@ namespace Phoenix::Math
 		};
 	}
 
-	Matrix3 Matrix3::inverse() const
+	matrix3 matrix3::inverse() const
 	{
 		auto det = determinant();
 		assert(det);
 		return adjoint() / det;
 	}
 
-	Matrix3& Matrix3::inverseSelf()
+	matrix3& matrix3::inverseSelf()
 	{
 		*this = inverse();
 		return *this;
 	}
 
-	Matrix3 Matrix3::fromQuaternion(const Quaternion& rotate)
+	matrix3 matrix3::fromQuaternion(const quaternion& rotate)
 	{
-		return Matrix3{};
+		return matrix3{};
 	}
 
-	Matrix3 Matrix3::fromEulerAngles(float x, float y, float z)
+	matrix3 matrix3::fromEulerAngles(float x, float y, float z)
 	{
-		return Matrix3{};
+		return matrix3{};
 	}
 
-	Matrix3 Matrix3::identity()
+	matrix3 matrix3::identity()
 	{
-		return Matrix3{ 1, 0, 0,
+		return matrix3{ 1, 0, 0,
 						0, 1, 0,
 						0, 0, 1 };
 	}
 
-	Vec3 operator*(const Matrix3& lhv, Vec3 rhv)
+	vec3 operator*(const matrix3& lhv, vec3 rhv)
 	{
 		return rhv;
 	}

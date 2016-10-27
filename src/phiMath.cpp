@@ -2,23 +2,23 @@
 #include "phiMath.hpp"
 #include <cmath>
 
-namespace Phoenix::Math
+namespace phoenix::math
 {
 	// Currently only supporting OpenGL
 
-	Matrix4 lookAtRH(Vec3& cameraPos, Vec3& target, Vec3& up)
+	matrix4 lookAtRH(vec3& cameraPos, vec3& target, vec3& up)
 	{
 		// Construct basis vectors
-		Vec3 zAxis = (cameraPos - target).normalize();
-		Vec3 xAxis = up.cross(zAxis).normalize();	
-		Vec3 yAxis = zAxis.cross(xAxis);
+		vec3 zAxis = (cameraPos - target).normalize();
+		vec3 xAxis = up.cross(zAxis).normalize();	
+		vec3 yAxis = zAxis.cross(xAxis);
 		
 		// Concatenate new orientation and translation
 		// Taking the dot of basis vector and translation component
 		// has the same result as constructing a translation matrix
 		// using -cameraPos and multiplying it with the orientation 
 		// single column matrix multipl. == dot
-		return Matrix4 {
+		return matrix4 {
 			xAxis.x, xAxis.y, xAxis.z, -(xAxis.dot(cameraPos)),
 			yAxis.x, yAxis.y, yAxis.z, -(yAxis.dot(cameraPos)),
 			zAxis.x, zAxis.y, zAxis.z, -(zAxis.dot(cameraPos)),
@@ -26,7 +26,7 @@ namespace Phoenix::Math
 		};
 	}
 
-	Matrix4 projectionRH(float yFOV, float aspect, float near, float far, ProjectionType type)
+	matrix4 projectionRH(float yFOV, float aspect, float near, float far, ProjectionType type)
 	{
 		float xFOV = yFOV / aspect;
 		float zoomX = 1.f / std::tan(xFOV / 2.f);
@@ -34,7 +34,7 @@ namespace Phoenix::Math
 
 		if (type == ProjectionType::PERSPECTIVE)
 		{
-			return Matrix4 {
+			return matrix4 {
 				zoomX, 0, 0, 0,
 				0, zoomY, 0, 0,
 				0, 0, -((far + near) / (far - near)), ((-2.f * near * far) / (far - near)),
@@ -43,7 +43,7 @@ namespace Phoenix::Math
 		}
 		else
 		{
-			return Matrix4 {
+			return matrix4 {
 				zoomX, 0, 0, 0,
 				0, zoomY, 0, 0,
 				0, 0, -(2.f / (far - near)), -((far + near) / (far - near)),

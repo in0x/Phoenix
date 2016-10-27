@@ -1,8 +1,8 @@
 #pragma once
 #include <array>
 
-namespace Phoenix::Math
+namespace phoenix::math
 {
 	template<size_t N>
-	using MatrixData = std::array<std::array<float, N>, N>;
+	using matrixData = std::array<std::array<float, N>, N>;
 }

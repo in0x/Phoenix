@@ -12,7 +12,7 @@ namespace Phoenix::Math
 		ORTHO
 	};
 
-	Matrix4 lookAtRH(Vec3& cameraPos, Vec3& target, Vec3& up);
+	Matrix4 lookAtRH(vec3& cameraPos, vec3& target, vec3& up);
 	Matrix4 projectionRH(float yFOV, float aspect, float near, float far, ProjectionType type);
 
 	constexpr float pi();

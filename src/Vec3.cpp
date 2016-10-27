@@ -3,7 +3,7 @@
 
 namespace Phoenix::Math
 {
-	Vec3& Vec3::operator+=(const Vec3& rhv)
+	vec3& vec3::operator+=(const vec3& rhv)
 	{
 		x += rhv.x;
 		y += rhv.y;
@@ -11,7 +11,7 @@ namespace Phoenix::Math
 		return *this;
 	}
 
-	Vec3& Vec3::operator-=(const Vec3& rhv)
+	vec3& vec3::operator-=(const vec3& rhv)
 	{
 		x -= rhv.x;
 		y -= rhv.y;
@@ -19,7 +19,7 @@ namespace Phoenix::Math
 		return *this;
 	}
 
-	Vec3& Vec3::operator*=(const Vec3& rhv)
+	vec3& vec3::operator*=(const vec3& rhv)
 	{
 		x *= rhv.x;
 		y *= rhv.y;
@@ -27,7 +27,7 @@ namespace Phoenix::Math
 		return *this;
 	}
 
-	Vec3& Vec3::operator/=(const Vec3& rhv)
+	vec3& vec3::operator/=(const vec3& rhv)
 	{
 		x /= rhv.x;
 		y /= rhv.y;
@@ -36,13 +36,13 @@ namespace Phoenix::Math
 	}
 
 
-	Vec3& Vec3::operator*=(const Matrix4& rhv)
+	vec3& vec3::operator*=(const Matrix4& rhv)
 	{
 		*this = rhv * (*this);
 		return *this;
 	}
 
-	Vec3& Vec3::operator+=(float rhv)
+	vec3& vec3::operator+=(float rhv)
 	{
 		x += rhv;
 		y += rhv;
@@ -50,7 +50,7 @@ namespace Phoenix::Math
 		return *this;
 	}
 
-	Vec3& Vec3::operator-=(float rhv)
+	vec3& vec3::operator-=(float rhv)
 	{
 		x -= rhv;
 		y -= rhv;
@@ -58,7 +58,7 @@ namespace Phoenix::Math
 		return *this;
 	}
 
-	Vec3& Vec3::operator*=(float rhv)
+	vec3& vec3::operator*=(float rhv)
 	{
 		x *= rhv;
 		y *= rhv;
@@ -66,7 +66,7 @@ namespace Phoenix::Math
 		return *this;
 	}
 
-	Vec3& Vec3::operator/=(float rhv)
+	vec3& vec3::operator/=(float rhv)
 	{
 		assert(rhv != 0);
 		x /= rhv;
@@ -75,32 +75,32 @@ namespace Phoenix::Math
 		return *this;
 	}
 
-	bool Vec3::operator==(const Vec3& rhv) const
+	bool vec3::operator==(const vec3& rhv) const
 	{
 		return x == rhv.x && y == rhv.y && z == rhv.z;
 	}
 
-	float Vec3::length() const
+	float vec3::length() const
 	{
 		return std::sqrt(x * x + y * y + z * z);
 	}
 
-	float Vec3::length2() const
+	float vec3::length2() const
 	{
 		return x * x + y * y + z * z;
 	}
 
-	float Vec3::distance(const Vec3& rhv) const
+	float vec3::distance(const vec3& rhv) const
 	{
 		return std::sqrt((x * rhv.x) * (x * rhv.x) - (y * rhv.y) * (y * rhv.y) - (z * rhv.z) * (z * rhv.z));
 	}
 
-	float Vec3::distance2(const Vec3& rhv) const
+	float vec3::distance2(const vec3& rhv) const
 	{
 		return (x * rhv.x) * (x * rhv.x) - (y * rhv.y) * (y * rhv.y) - (z * rhv.z) * (z * rhv.z);
 	}
 
-	Vec3& Vec3::normalize()
+	vec3& vec3::normalize()
 	{
 		float len = length();
 		x /= len;
@@ -109,9 +109,9 @@ namespace Phoenix::Math
 		return *this;
 	}
 
-	Vec3 Vec3::cross(const Vec3& rhv) const
+	vec3 vec3::cross(const vec3& rhv) const
 	{
-		return Vec3
+		return vec3
 		{
 			y * rhv.z - z * rhv.y,
 			z * rhv.x - x * rhv.z,
@@ -119,12 +119,12 @@ namespace Phoenix::Math
 		};
 	}
 
-	float Vec3::dot(const Vec3& rhv) const
+	float vec3::dot(const vec3& rhv) const
 	{
 		return x * rhv.x + y * rhv.y + z * rhv.z;
 	}
 
-	Vec3 Vec3::reflect(const Vec3& rhv) const
+	vec3 vec3::reflect(const vec3& rhv) const
 	{
 		return 2.f * rhv.dot(*this) * (*this) - rhv;
 	}

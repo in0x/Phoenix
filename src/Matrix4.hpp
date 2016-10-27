@@ -3,27 +3,27 @@
 #include <iostream>
 #include "MatrixData.hpp"
 
-namespace Phoenix::Math
+namespace phoenix::math
 {
-	class Quaternion;
+	class quaternion;
 	class Vec4;
-	class Vec3;
+	class vec3;
 
 	// Column-major 4x4 matrix.
-	class Matrix4
+	class matrix4
 	{
 	private:
-		MatrixData<4> m_data;
+		matrixData<4> m_data;
 
 		float minor(int row0, int row1, int row2, int col0, int col1, int col2) const;
-		Matrix4 adjoint() const;
+		matrix4 adjoint() const;
 
 	public:
-		Matrix4()
-			: m_data(MatrixData<4>{})
+		matrix4()
+			: m_data(matrixData<4>{})
 		{}
 
-		Matrix4(float m00, float m01, float m02, float m03,
+		matrix4(float m00, float m01, float m02, float m03,
 				float m10, float m11, float m12, float m13,
 				float m20, float m21, float m22, float m23,
 				float m30, float m31, float m32, float m33);
@@ -72,76 +72,76 @@ namespace Phoenix::Math
 			return m_data.end();
 		}
 
-		Matrix4& operator+=(const Matrix4& rhv);
-		Matrix4& operator-=(const Matrix4& rhv);
-		Matrix4& operator*=(const Matrix4& rhv);
+		matrix4& operator+=(const matrix4& rhv);
+		matrix4& operator-=(const matrix4& rhv);
+		matrix4& operator*=(const matrix4& rhv);
 		
 		Vec4 operator*(Vec4 rhv) const;
-		Vec3 operator*(Vec3 rhv) const;
+		vec3 operator*(vec3 rhv) const;
 
-		Matrix4& operator+=(float f);
-		Matrix4& operator-=(float f);
-		Matrix4& operator*=(float f);
-		Matrix4& operator/=(float f);
+		matrix4& operator+=(float f);
+		matrix4& operator-=(float f);
+		matrix4& operator*=(float f);
+		matrix4& operator/=(float f);
 
-		bool operator==(const Matrix4& rhv);
+		bool operator==(const matrix4& rhv);
 
 		float determinant() const;
-		Matrix4& transposeSelf();
-		Matrix4 transpose() const;
-		Matrix4& inverseSelf();
-		Matrix4 inverse() const;
+		matrix4& transposeSelf();
+		matrix4 transpose() const;
+		matrix4& inverseSelf();
+		matrix4 inverse() const;
 
-		static Matrix4 scale(float x, float y, float z);
-		static Matrix4 translation(float x, float y, float z);
-		static Matrix4 rotation(const Quaternion& rotate);
+		static matrix4 scale(float x, float y, float z);
+		static matrix4 translation(float x, float y, float z);
+		static matrix4 rotation(const quaternion& rotate);
 
-		static Matrix4 identity();
+		static matrix4 identity();
 	};
 
-	inline Matrix4 operator+(Matrix4 lhv, const Matrix4& rhv)
+	inline matrix4 operator+(matrix4 lhv, const matrix4& rhv)
 	{
 		lhv += rhv;
 		return lhv;
 	}
 
-	inline Matrix4 operator-(Matrix4 lhv, const Matrix4& rhv)
+	inline matrix4 operator-(matrix4 lhv, const matrix4& rhv)
 	{
 		lhv -= rhv;
 		return lhv;
 	}
 
-	inline Matrix4 operator*(Matrix4 lhv, const Matrix4& rhv)
+	inline matrix4 operator*(matrix4 lhv, const matrix4& rhv)
 	{
 		lhv *= rhv;
 		return lhv;
 	}
 
-	inline Matrix4 operator+(Matrix4 lhv, float f)
+	inline matrix4 operator+(matrix4 lhv, float f)
 	{
 		lhv += f;
 		return lhv;
 	}
 
-	inline Matrix4 operator-(Matrix4 lhv, float f)
+	inline matrix4 operator-(matrix4 lhv, float f)
 	{
 		lhv -= f;
 		return lhv;
 	}
 
-	inline Matrix4 operator*(Matrix4 lhv, float f)
+	inline matrix4 operator*(matrix4 lhv, float f)
 	{
 		lhv *= f;
 		return lhv;
 	}
 
-	inline Matrix4 operator/(Matrix4 lhv, float f)
+	inline matrix4 operator/(matrix4 lhv, float f)
 	{
 		lhv /= f;
 		return lhv;
 	}
 
-	inline std::ostream& operator<<(std::ostream& out, const Matrix4& mat4)
+	inline std::ostream& operator<<(std::ostream& out, const matrix4& mat4)
 	{
 		std::cout << mat4(0, 0) << " " << mat4(0, 1) << " " << mat4(0, 2) << " " << mat4(0, 3) << "\n"
 			  	  << mat4(1, 0) << " " << mat4(1, 1) << " " << mat4(1, 2) << " " << mat4(1, 3) << "\n"

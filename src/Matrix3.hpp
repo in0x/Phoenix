@@ -3,24 +3,26 @@
 #include <iostream>
 #include "MatrixData.hpp"
 
-namespace Phoenix::Math
+namespace phoenix::math
 {
-	class Quaternion;
-	class Vec3;
+	class quaternion;
+	class vec3;
 
-	class Matrix3
+	class matrix3
 	{
 	private:
-		MatrixData<3> m_data;	
+		matrixData<3> m_data;	
 		float minor(int row0, int row1, int col0, int col1) const;
-		Matrix3 adjoint() const;
+		matrix3 adjoint() const;
 
 	public:
-		Matrix3()
-			: m_data(MatrixData<3>{})
+		matrix3()
+			: m_data(matrixData<3>{})
 		{}
 
-		Matrix3(float m00, float m01, float m02,
+		matrix3(const quaternion& rotation);
+
+		matrix3(float m00, float m01, float m02,
 				float m10, float m11, float m12, 
 				float m20, float m21, float m22);
 
@@ -58,74 +60,74 @@ namespace Phoenix::Math
 			return m_data.end();
 		}
 
-		Matrix3& operator+=(const Matrix3& rhv);
-		Matrix3& operator-=(const Matrix3& rhv);
-		Matrix3& operator*=(const Matrix3& rhv);
+		matrix3& operator+=(const matrix3& rhv);
+		matrix3& operator-=(const matrix3& rhv);
+		matrix3& operator*=(const matrix3& rhv);
 
-		Vec3 operator*(Vec3 rhv) const;
+		vec3 operator*(vec3 rhv) const;
 
-		Matrix3& operator+=(float f);
-		Matrix3& operator-=(float f);
-		Matrix3& operator*=(float f);
-		Matrix3& operator/=(float f);
+		matrix3& operator+=(float f);
+		matrix3& operator-=(float f);
+		matrix3& operator*=(float f);
+		matrix3& operator/=(float f);
 
-		bool operator==(const Matrix3& rhv);
+		bool operator==(const matrix3& rhv);
 
 		float determinant() const;
-		Matrix3& transposeSelf();
-		Matrix3 transpose() const;
-		Matrix3& inverseSelf();
-		Matrix3 inverse() const;
+		matrix3& transposeSelf();
+		matrix3 transpose() const;
+		matrix3& inverseSelf();
+		matrix3 inverse() const;
 
-		static Matrix3 fromQuaternion(const Quaternion& rotate);
-		static Matrix3 fromEulerAngles(float x, float y, float z);
+		static matrix3 fromQuaternion(const quaternion& rotate);
+		static matrix3 fromEulerAngles(float x, float y, float z);
 
-		static Matrix3 identity();
+		static matrix3 identity();
 	};
 
-	inline Matrix3 operator+(Matrix3 lhv, const Matrix3& rhv)
+	inline matrix3 operator+(matrix3 lhv, const matrix3& rhv)
 	{
 		lhv += rhv;
 		return lhv;
 	}
 
-	inline Matrix3 operator-(Matrix3 lhv, const Matrix3& rhv)
+	inline matrix3 operator-(matrix3 lhv, const matrix3& rhv)
 	{
 		lhv -= rhv;
 		return lhv;
 	}
 
-	inline Matrix3 operator*(Matrix3 lhv, const Matrix3& rhv)
+	inline matrix3 operator*(matrix3 lhv, const matrix3& rhv)
 	{
 		lhv *= rhv;
 		return lhv;
 	}
 
-	inline Matrix3 operator+(Matrix3 lhv, float f)
+	inline matrix3 operator+(matrix3 lhv, float f)
 	{
 		lhv += f;
 		return lhv;
 	}
 
-	inline Matrix3 operator-(Matrix3 lhv, float f)
+	inline matrix3 operator-(matrix3 lhv, float f)
 	{
 		lhv -= f;
 		return lhv;
 	}
 
-	inline Matrix3 operator*(Matrix3 lhv, float f)
+	inline matrix3 operator*(matrix3 lhv, float f)
 	{
 		lhv *= f;
 		return lhv;
 	}
 
-	inline Matrix3 operator/(Matrix3 lhv, float f)
+	inline matrix3 operator/(matrix3 lhv, float f)
 	{
 		lhv /= f;
 		return lhv;
 	}
 
-	inline std::ostream& operator<<(std::ostream& out, const Matrix3& mat3)
+	inline std::ostream& operator<<(std::ostream& out, const matrix3& mat3)
 	{
 		std::cout << mat3(0, 0) << " " << mat3(0, 1) << " " << mat3(0, 2) << "\n"
 			<< mat3(1, 0) << " " << mat3(1, 1) << " " << mat3(1, 2) << "\n"

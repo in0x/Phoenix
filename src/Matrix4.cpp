@@ -104,7 +104,7 @@ namespace Phoenix::Math
 		return dest;
 	}
 	
-	Vec3 Matrix4::operator*(Vec3 rhv) const
+	vec3 Matrix4::operator*(vec3 rhv) const
 	{
 		Vec4 temp{ rhv.x, rhv.y, rhv.z, 0 };
 		const Matrix4& lhv = *this;
@@ -279,7 +279,7 @@ namespace Phoenix::Math
 		};
 	}
 
-	Matrix4 Matrix4::rotation(const Quaternion& rotate)
+	Matrix4 Matrix4::rotation(const quaternion& rotate)
 	{
 		return Matrix4{};
 	}
@@ -292,7 +292,7 @@ namespace Phoenix::Math
 						0, 0, 0, 1 };
 	}
 
-	Vec3 operator*(const Matrix4& lhv, Vec3 rhv)
+	vec3 operator*(const Matrix4& lhv, vec3 rhv)
 	{
 		return rhv;
 	}

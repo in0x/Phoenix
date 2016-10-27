@@ -1,4 +1,4 @@
-namespace Phoenix::Math
+namespace phoenix::math
 {
 	//class Matrix3;
 	//class Quaternion;
