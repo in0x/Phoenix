@@ -44,6 +44,11 @@ namespace Phoenix::Math
 			return *(&x + i);
 		}
 
+		Vec3 operator -() const
+		{
+			return{ -x, -y, -z };
+		}
+
 		Vec3& operator+=(const Vec3& rhv);
 		Vec3& operator-=(const Vec3& rhv);
 		Vec3& operator*=(const Vec3& rhv);

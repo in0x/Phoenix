@@ -40,6 +40,11 @@ namespace Phoenix::Math
 			return *(&x + i);
 		}
 
+		Vec2 operator -() const
+		{
+			return{ -x, -y };
+		}
+
 		Vec2& operator+=(const Vec2& rhv);
 		Vec2& operator-=(const Vec2& rhv);
 		Vec2& operator*=(const Vec2& rhv);
