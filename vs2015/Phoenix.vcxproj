@@ -158,21 +158,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\main.cpp" />
-    <ClCompile Include="..\src\Matrix3.cpp" />
-    <ClCompile Include="..\src\Matrix4.cpp" />
-    <ClCompile Include="..\src\phiMath.cpp" />
-    <ClCompile Include="..\src\Vec2.cpp" />
-    <ClCompile Include="..\src\Vec3.cpp" />
-    <ClCompile Include="..\src\Vec4.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\src\MathTests.hpp" />
     <ClInclude Include="..\src\Catch\Catch.hpp" />
+    <ClInclude Include="..\src\Catch\MathTests.hpp" />
     <ClInclude Include="..\src\Matrix3.hpp" />
     <ClInclude Include="..\src\Matrix4.hpp" />
     <ClInclude Include="..\src\MatrixData.hpp" />
-    <ClInclude Include="..\src\phiMath.hpp" />
+    <ClInclude Include="..\src\PhiMath.hpp" />
     <ClInclude Include="..\src\Quaternion.hpp" />
     <ClInclude Include="..\src\Rotation.hpp" />
     <ClInclude Include="..\src\Vec2.hpp" />
@@ -181,6 +172,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\Main.cpp" />
+    <ClCompile Include="..\src\Matrix3.cpp" />
+    <ClCompile Include="..\src\Matrix4.cpp" />
+    <ClCompile Include="..\src\PhiMath.cpp" />
+    <ClCompile Include="..\src\Quaternion.cpp" />
+    <ClCompile Include="..\src\Vec2.cpp" />
+    <ClCompile Include="..\src\Vec3.cpp" />
+    <ClCompile Include="..\src\Vec4.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

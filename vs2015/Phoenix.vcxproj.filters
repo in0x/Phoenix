@@ -1,27 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="..\src\main.cpp" />
-    <ClCompile Include="..\src\Matrix4.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Vec4.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Vec3.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Vec2.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\phiMath.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Matrix3.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
     <Filter Include="Math">
       <UniqueIdentifier>{93fb33b3-26a9-4b14-8940-3ebe72eb4647}</UniqueIdentifier>
     </Filter>
@@ -33,10 +12,28 @@
     <ClInclude Include="..\src\Catch\Catch.hpp">
       <Filter>Catch</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Catch\MathTests.hpp">
+      <Filter>Catch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Vec4.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Matrix3.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\Matrix4.hpp">
       <Filter>Math</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\MatrixData.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\PhiMath.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\Quaternion.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Rotation.hpp">
       <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Vec2.hpp">
@@ -45,26 +42,32 @@
     <ClInclude Include="..\src\Vec3.hpp">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Vec4.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\phiMath.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Matrix3.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MatrixData.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MathTests.hpp">
-      <Filter>Catch</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Rotation.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\Matrix3.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Matrix4.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\PhiMath.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Vec2.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Vec3.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Vec4.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Main.cpp" />
+    <ClCompile Include="..\src\Quaternion.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
