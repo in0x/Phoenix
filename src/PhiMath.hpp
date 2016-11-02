@@ -5,6 +5,7 @@
 #include "Vec4.hpp"
 #include "Matrix3.hpp"
 #include "Matrix4.hpp"
+#include "Quaternion.hpp"
 
 namespace Phoenix::Math
 {

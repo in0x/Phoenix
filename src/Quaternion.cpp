@@ -9,8 +9,8 @@
 namespace Phoenix::Math
 {
 	Quaternion::Quaternion(float w, const Vec3& v)
-		: m_angle(w)
-		, m_axis(v)
+		: w(w)
+		, v(v)
 	{}
 
 	Quaternion Quaternion::fromExpMap(float theta, const Vec3& n)
@@ -30,24 +30,28 @@ namespace Phoenix::Math
 
 	Quaternion& Quaternion::operator*=(const Quaternion& rhv)
 	{
+		w   = w * rhv.w - v.x * rhv.v.x - v.y * rhv.v.y - v.z * rhv.v.z;
+		v.x = w * rhv.v.x + v.x * rhv.w + v.y * rhv.v.z + v.z * rhv.v.y;
+		v.y = w * rhv.v.y + v.x * rhv.v.z + v.y * rhv.w + v.z * rhv.v.x;
+		v.z = w * rhv.v.z + v.x * rhv.v.y + v.y * rhv.v.x + v.z * rhv.w;
 		return *this;
 	}
 
 	Quaternion& Quaternion::operator*=(float rhv)
 	{
-		m_angle *= rhv;
-		m_axis *= rhv;
+		w *= rhv;
+		v *= rhv;
 		return *this;
 	}
 
 	float Quaternion::magnitude()
 	{
-		return std::sqrtf(m_angle * m_angle + m_axis.length());
+		return std::sqrtf(w * w + v.length());
 	}
 
 	void Quaternion::conjugateSelf()
 	{
-		m_axis = -m_axis;
+		v = -v;
 	}
 
 	Quaternion Quaternion::conjugate() const
@@ -61,8 +65,8 @@ namespace Phoenix::Math
 	{
 		conjugateSelf();
 		auto mag = magnitude();
-		m_angle /= mag;
-		m_axis /= mag;
+		w /= mag;
+		v /= mag;
 	}
 
 	Quaternion Quaternion::inverse() const
@@ -71,6 +75,12 @@ namespace Phoenix::Math
 		inverted.inverseSelf();
 		return inverted;
 	}
+
+	float Quaternion::dot(const Quaternion& rhv) const
+	{
+		return w * rhv.w + v.x * rhv.v.x + v.y * rhv.v.y + v.z * rhv.v.z;
+	}
+
 
 	Quaternion operator*(Quaternion lhv, float rhv)
 	{
@@ -84,8 +94,44 @@ namespace Phoenix::Math
 		return lhv;
 	}
 
-	Quaternion slerp(const Quaternion& a, const Quaternion& b, float t)
+	// Geometric interpretation of Slerp (interpolation over points on 4D hypersphere)
+	Quaternion slerp(Quaternion a, const Quaternion& b, float t)
 	{
-		return{ 0, Vec3{0,0,0} };
+		float cosOmega = a.dot(b);
+
+		// If dot product is negative, we invert to calculate the
+		// smaller of the two possible rotations.
+		if (cosOmega < 0.f)
+		{
+			a.w = -a.w;
+			a.v = -a.v;
+		}
+
+		float k0, k1;
+
+		// If dot is close to 0, the two quaternions represent very close
+		// orientations, so we just use lerp.
+		if (cosOmega > 0.9999f)
+		{
+			k0 = 1.f - t;
+			k1 = t;
+		}
+		else
+		{
+			// use pythagorean identity to to get sinOmega
+			float sinOmega = std::sqrt(1.f - cosOmega * cosOmega);
+
+			float omega = std::atan2(sinOmega, cosOmega);
+
+			k0 = std::sin((1.f - t) * omega) / omega;
+			k1 = std::sin(t * omega) / omega;
+		}
+
+		a.w = a.w * k0 + b.w * k1;
+		a.v.x = a.v.x * k0 + b.v.x * k1;
+		a.v.y = a.v.y * k0 + b.v.y * k1;
+		a.v.z = a.v.z * k0 + b.v.z * k1;
+
+		return a;
 	}
 }

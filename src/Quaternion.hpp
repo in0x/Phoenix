@@ -6,11 +6,10 @@ namespace Phoenix::Math
 {	
 	class Quaternion
 	{
-	private:
-		float m_angle;
-		Vec3 m_axis;
-
 	public:		
+		float w;
+		Vec3 v;
+		
 		Quaternion(float w, const Vec3& v);
 
 		static Quaternion fromExpMap(float theta, const Vec3& n);
@@ -29,6 +28,8 @@ namespace Phoenix::Math
 
 		void inverseSelf();
 		Quaternion inverse() const;
+
+		float dot(const Quaternion& rhv) const;
 	};
 
 	Quaternion operator*(Quaternion lhv, float rhv);
