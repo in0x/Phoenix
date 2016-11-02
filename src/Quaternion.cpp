@@ -8,50 +8,80 @@
 
 namespace Phoenix::Math
 {
-	Quaternion::Quaternion(float w, const Vec3& v)
+	Quaternion::Quaternion(float w, float x, float y, float z)
 		: w(w)
-		, v(v)
-	{}
+		, x(x)
+		, y(y)
+		, z(z)
+	{
+		normalize();
+	}
 
 	Quaternion Quaternion::fromExpMap(float theta, const Vec3& n)
 	{
-		return Quaternion{ std::cos(theta / 2.f), Vec3{std::sin(n.x / 2.f), std::sin(n.y / 2.f) , std::sin(n.z / 2.f) } };
+		auto quat = Quaternion{ std::cosf(theta / 2.f), std::sinf(n.x / 2.f), std::sinf(n.y / 2.f) , std::sinf(n.z / 2.f) };
+		quat.normalize();
+		return quat;
 	}
 
 	Quaternion Quaternion::fromEulerAngles(const Vec3& angles)
 	{
-		return{ 0, Vec3{0,0,0} };
+		return{ 0, 0, 0, 0 };
 	}
 
-	Matrix4 Quaternion::toMatrix4()
+	Matrix4 Quaternion::toMatrix4() const
 	{
 		return{};
 	}
 
 	Quaternion& Quaternion::operator*=(const Quaternion& rhv)
 	{
-		w   = w * rhv.w - v.x * rhv.v.x - v.y * rhv.v.y - v.z * rhv.v.z;
-		v.x = w * rhv.v.x + v.x * rhv.w + v.y * rhv.v.z + v.z * rhv.v.y;
-		v.y = w * rhv.v.y + v.x * rhv.v.z + v.y * rhv.w + v.z * rhv.v.x;
-		v.z = w * rhv.v.z + v.x * rhv.v.y + v.y * rhv.v.x + v.z * rhv.w;
+		w = w * rhv.w - x * rhv.x - y * rhv.y - z * rhv.z;
+		x = w * rhv.x + x * rhv.w + y * rhv.z + z * rhv.y;
+		y = w * rhv.y + x * rhv.z + y * rhv.w + z * rhv.x;
+		z = w * rhv.z + x * rhv.y + y * rhv.x + z * rhv.w;
+
+		normalize();
+
 		return *this;
 	}
 
 	Quaternion& Quaternion::operator*=(float rhv)
 	{
 		w *= rhv;
-		v *= rhv;
+		x *= rhv;
+		y *= rhv;
+		z += rhv;
+
+		normalize();
+
 		return *this;
+	}
+
+	float Quaternion::magnitude2()
+	{
+		return w * w + x * x + y * y + z * z;
 	}
 
 	float Quaternion::magnitude()
 	{
-		return std::sqrtf(w * w + v.length());
+		return std::sqrtf(magnitude2());
+	}
+
+	void Quaternion::normalize()
+	{
+		auto invMag = 1.f / magnitude();
+		w *= invMag;
+		x *= invMag;
+		y *= invMag;
+		z *= invMag;
 	}
 
 	void Quaternion::conjugateSelf()
 	{
-		v = -v;
+		x = -x;
+		y = -y;
+		z = -z;
 	}
 
 	Quaternion Quaternion::conjugate() const
@@ -64,9 +94,7 @@ namespace Phoenix::Math
 	void Quaternion::inverseSelf()
 	{
 		conjugateSelf();
-		auto mag = magnitude();
-		w /= mag;
-		v /= mag;
+		normalize();
 	}
 
 	Quaternion Quaternion::inverse() const
@@ -78,7 +106,7 @@ namespace Phoenix::Math
 
 	float Quaternion::dot(const Quaternion& rhv) const
 	{
-		return w * rhv.w + v.x * rhv.v.x + v.y * rhv.v.y + v.z * rhv.v.z;
+		return w * rhv.w + x * rhv.x + y * rhv.y + z * rhv.z;
 	}
 
 
@@ -104,7 +132,9 @@ namespace Phoenix::Math
 		if (cosOmega < 0.f)
 		{
 			a.w = -a.w;
-			a.v = -a.v;
+			a.x = -a.x;
+			a.y = -a.y;
+			a.z = -a.z;
 		}
 
 		float k0, k1;
@@ -119,18 +149,18 @@ namespace Phoenix::Math
 		else
 		{
 			// use pythagorean identity to to get sinOmega
-			float sinOmega = std::sqrt(1.f - cosOmega * cosOmega);
+			float sinOmega = std::sqrtf(1.f - cosOmega * cosOmega);
 
-			float omega = std::atan2(sinOmega, cosOmega);
+			float omega = std::atan2f(sinOmega, cosOmega);
 
-			k0 = std::sin((1.f - t) * omega) / omega;
-			k1 = std::sin(t * omega) / omega;
+			k0 = std::sinf((1.f - t) * omega) / omega;
+			k1 = std::sinf(t * omega) / omega;
 		}
 
 		a.w = a.w * k0 + b.w * k1;
-		a.v.x = a.v.x * k0 + b.v.x * k1;
-		a.v.y = a.v.y * k0 + b.v.y * k1;
-		a.v.z = a.v.z * k0 + b.v.z * k1;
+		a.x = a.x * k0 + b.x * k1;
+		a.y = a.y * k0 + b.y * k1;
+		a.z = a.z * k0 + b.z * k1;
 
 		return a;
 	}

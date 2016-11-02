@@ -21,9 +21,9 @@ namespace Phoenix::Tests
 		assert(Matrix4::identity().transpose() == Matrix4::identity());
 		assert(Matrix4::identity().determinant() == 1.f);
 		assert(Matrix4(4, 5, 3, 7,
-					   8, 5, 6, 2,
-					   21, 4, 3, 21,
-					   2, 1, 12, 48).determinant() == 20172);
+			8, 5, 6, 2,
+			21, 4, 3, 21,
+			2, 1, 12, 48).determinant() == 20172);
 		assert(Matrix4::identity().inverse() == Matrix4::identity());
 
 		assert(Matrix4::identity() * Matrix4::identity() == Matrix4::identity());
@@ -39,9 +39,9 @@ namespace Phoenix::Tests
 					  1,9,7,6 };
 
 		assert((matA * matB) == Matrix4(29, 64, 27, 66,
-										32, 54, 15, 63,
-										50, 78, 27, 99,
-										24, 95, 75, 75));
+			32, 54, 15, 63,
+			50, 78, 27, 99,
+			24, 95, 75, 75));
 
 		Matrix4 mult{ 1, 2, 3, 4,
 					  1, 1, 1, 1,
@@ -55,9 +55,12 @@ namespace Phoenix::Tests
 		std::cout << projectionRH(90.f, 1920.f / 1080.f, 0.5f, 20.f, ProjectionType::PERSPECTIVE) << std::endl;
 
 		float det = Matrix3(3, 1, 2,
-							4, -1, 2,
-							9, 2, 3).determinant();
+			4, -1, 2,
+			9, 2, 3).determinant();
 
 		assert(det == 19.f);
+
+		Quaternion quat{ 4, 2, 3, 1 };
+		assert(quat.magnitude() == 1.f);
 	}
 }

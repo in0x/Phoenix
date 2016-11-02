@@ -21,4 +21,5 @@ namespace Phoenix::Math
 	constexpr float pi();
 	float degrees(float angleRad);
 	float radians(float angleDeg);
+	float fastInvSqrt(float x);
 }

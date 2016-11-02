@@ -53,7 +53,7 @@ namespace Phoenix::Math
 
 	constexpr float pi()
 	{
-		return 3.1415926535897932384626433832795;
+		return 3.1415926535897932384626433832795f;
 	}
 
 	float degrees(float angleRad)
@@ -64,5 +64,16 @@ namespace Phoenix::Math
 	float radians(float angleDeg)
 	{
 		return angleDeg * (pi() / 180.f);
+	}
+
+	// Uses the fast inverse sqrt trick also used in Quake3.
+	float fastInvSqrt(float x)
+	{
+        float xhalf = 0.5f * x;
+        int i = *(int*)&x;            // store floating-point bits in integer
+        i = 0x5f3759df - (i >> 1);    // initial guess for Newton's method
+        x = *(float*)&i;              // convert new bits into float
+        x = x*(1.5f - xhalf*x*x);     // One round of Newton's method
+        return x;
 	}
 }
