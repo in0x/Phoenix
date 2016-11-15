@@ -37,7 +37,7 @@ namespace Phoenix::Math
 		}
 
 		// Sets out of bounds index to 0.
-		const float& operator()(int i) const
+		float operator()(int i) const
 		{
 			if (i > 3 || i < 0)
 			{
