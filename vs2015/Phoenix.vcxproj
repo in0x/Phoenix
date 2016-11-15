@@ -160,6 +160,7 @@
   <ItemGroup>
     <ClInclude Include="..\src\Catch\Catch.hpp" />
     <ClInclude Include="..\src\Catch\MathTests.hpp" />
+    <ClInclude Include="..\src\EulerAngles.hpp" />
     <ClInclude Include="..\src\Matrix3.hpp" />
     <ClInclude Include="..\src\Matrix4.hpp" />
     <ClInclude Include="..\src\MatrixData.hpp" />
