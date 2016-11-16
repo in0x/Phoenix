@@ -17,3 +17,4 @@ tmp
 *.db
 /tmp
 /bin
+vs2015/Phoenix.VC.db
