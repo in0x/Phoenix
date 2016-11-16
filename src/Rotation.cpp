@@ -6,7 +6,9 @@
 
 namespace Phoenix::Math
 {
-	// http://www.flipcode.com/documents/matrfaq.html#Q36
+	// Basically, we directly concatenate the 3 matrices for
+	// yaw, pitch and roll, saving us a lot of superflous operations
+	// that 3 seperate matrices would entail.
 	Matrix3 eulerToMat3(const Vec3& vec)
 	{
 		auto x = radians(vec.x);
@@ -28,7 +30,6 @@ namespace Phoenix::Math
 		};
 	}
 
-	// http://www.flipcode.com/documents/matrfaq.html#Q37
 	Vec3 mat3ToEuler(const Matrix3& mat)
 	{
 		float x, y, z;
@@ -36,26 +37,28 @@ namespace Phoenix::Math
 		y = -std::asin(mat(0, 2));
 		auto C = std::cos(y);
 
-		if (std::abs(C) > 0.005f) 
+		if (std::abs(C) > 0.005f) // Account for floating point inaccuracy
 		{
-			auto trX = mat(2,2) / C;         
-			auto trY = -mat(1,2) / C;
+			auto A = mat(2,2) / C;         
+			auto B = -mat(1,2) / C;
 
-			x = std::atan2(trY, trX);
-			
-			trX = mat(0,0) / C;            
-			trY = -mat(0,1) / C;
+			// tanx = sinx / cosx
+			x = std::atan2(B, A);
+	
+			auto E = mat(0,0) / C;            
+			auto F = -mat(0,1) / C;
 
-			z = std::atan2(trY, trX);
+			z = std::atan2(F, E);
 		}
 		else // Gimball Lock
 		{
 			x = 0;
+			
+			// D is 1
+			auto BEAF = mat(1,1);                
+			auto AEBF = mat(1,0);
 
-			auto trX = mat(1,1);                
-			auto trY = mat(1,0);
-
-			z = std::atan2(trY, trX);
+			z = std::atan2(AEBF, BEAF);
 		}
 
 		return Vec3{ degrees(x), degrees(y), degrees(z) };

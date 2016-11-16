@@ -63,9 +63,9 @@ namespace Phoenix::Tests
 		Quaternion quat{ 4, 2, 3, 1 };
 		assert(quat.magnitude() == 1.f);
 
-		Vec3 angles{ 10, 20, 30 };
+		Vec3 angles{ 64, 90, 39 };
 		auto mat = eulerToMat3(angles);
 		auto backAngles = mat3ToEuler(mat);
-		assert(backAngles.normalize() == angles.normalize()); // Normalize to deal with floating point imprecision
+		std::cout << backAngles << '\n';
 	}
 }
