@@ -2,7 +2,7 @@
 #include "Vec3.hpp"
 #include "Matrix3.hpp"
 #include "Quaternion.hpp"
-#include "PhiMath.hpp"
+#include "Common.hpp"
 
 namespace Phoenix::Math
 {

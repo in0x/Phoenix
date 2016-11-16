@@ -27,9 +27,6 @@
     <ClInclude Include="..\src\MatrixData.hpp">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\PhiMath.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Quaternion.hpp">
       <Filter>Math</Filter>
     </ClInclude>
@@ -42,6 +39,15 @@
     <ClInclude Include="..\src\Vec3.hpp">
       <Filter>Math</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Plane.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Ray.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Common.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -51,9 +57,6 @@
       <Filter>Math</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Matrix4.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\PhiMath.cpp">
       <Filter>Math</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Vec2.cpp">
@@ -70,6 +73,9 @@
       <Filter>Math</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Rotation.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Common.cpp">
       <Filter>Math</Filter>
     </ClCompile>
   </ItemGroup>
