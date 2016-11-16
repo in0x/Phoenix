@@ -15,3 +15,5 @@
 #include "Plane.hpp"
 
 #include "Common.hpp"
+
+using namespace Phoenix::Math;
