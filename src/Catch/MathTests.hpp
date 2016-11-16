@@ -51,8 +51,8 @@ namespace Phoenix::Tests
 		assert((Vec4(1, 1, 1, 1) *= mult) == Vec4(10, 4, 10, 4));
 		assert((Vec3(1, 1, 1) *= mult) == Vec3(6, 3, 6));
 
-		//std::cout << lookAtRH(Vec3{ 0,0,2 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 }) << std::endl;
-		std::cout << projectionRH(90.f, 1920.f / 1080.f, 0.5f, 20.f, ProjectionType::PERSPECTIVE) << std::endl;
+		std::cout << lookAtRH(Vec3{ 0,0,2 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 }) << '\n';
+		std::cout << projectionRH(90.f, 1920.f / 1080.f, 0.5f, 20.f, ProjectionType::PERSPECTIVE) << '\n';
 
 		float det = Matrix3(3, 1, 2,
 			4, -1, 2,
@@ -62,5 +62,10 @@ namespace Phoenix::Tests
 
 		Quaternion quat{ 4, 2, 3, 1 };
 		assert(quat.magnitude() == 1.f);
+
+		Vec3 angles{ 10, 20, 30 };
+		auto mat = eulerToMat3(angles);
+		auto backAngles = mat3ToEuler(mat);
+		assert(backAngles.normalize() == angles.normalize()); // Normalize to deal with floating point imprecision
 	}
 }
