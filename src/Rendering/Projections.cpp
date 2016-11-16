@@ -1,6 +1,6 @@
 #include "Projections.hpp"
 
-namespace Phoenix::Render
+namespace Phoenix::Rendering
 {
 	// Currently only supporting OpenGL
 	Matrix4 lookAtRH(Vec3& cameraPos, Vec3& target, Vec3& up)

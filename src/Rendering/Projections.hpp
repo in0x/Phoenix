@@ -1,7 +1,7 @@
 #pragma once
 #include "../Math/PhiMath.hpp"
 
-namespace Phoenix::Render
+namespace Phoenix::Rendering
 {
 	enum class ProjectionType
 	{
