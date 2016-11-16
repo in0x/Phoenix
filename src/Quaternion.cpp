@@ -19,7 +19,7 @@ namespace Phoenix::Math
 
 	Quaternion Quaternion::fromExpMap(float theta, const Vec3& n)
 	{
-		auto quat = Quaternion{ std::cosf(theta / 2.f), std::sinf(n.x / 2.f), std::sinf(n.y / 2.f) , std::sinf(n.z / 2.f) };
+		auto quat = Quaternion{ std::cos(theta / 2.f), std::sin(n.x / 2.f), std::sin(n.y / 2.f) , std::sin(n.z / 2.f) };
 		quat.normalize();
 		return quat;
 	}
@@ -65,7 +65,7 @@ namespace Phoenix::Math
 
 	float Quaternion::magnitude()
 	{
-		return std::sqrtf(magnitude2());
+		return std::sqrt(magnitude2());
 	}
 
 	void Quaternion::normalize()
@@ -149,12 +149,12 @@ namespace Phoenix::Math
 		else
 		{
 			// use pythagorean identity to to get sinOmega
-			float sinOmega = std::sqrtf(1.f - cosOmega * cosOmega);
+			float sinOmega = std::sqrt(1.f - cosOmega * cosOmega);
 
-			float omega = std::atan2f(sinOmega, cosOmega);
+			float omega = std::atan2(sinOmega, cosOmega);
 
-			k0 = std::sinf((1.f - t) * omega) / omega;
-			k1 = std::sinf(t * omega) / omega;
+			k0 = std::sin((1.f - t) * omega) / omega;
+			k1 = std::sin(t * omega) / omega;
 		}
 
 		a.w = a.w * k0 + b.w * k1;
