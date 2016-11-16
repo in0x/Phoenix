@@ -66,16 +66,62 @@ namespace Phoenix::Math
 
 	Vec3 quatToEuler(const Quaternion& quat)
 	{
-		return {};
+		float heading, pitch, bank;
+
+		float sqw = quat.w*quat.w;
+		float sqx = quat.x*quat.x;
+		float sqy = quat.y*quat.y;
+		float sqz = quat.z*quat.z;
+		float unit = sqx + sqy + sqz + sqw; // allows this to work on non-normalized quats.
+		float test = quat.x*quat.y + quat.z*quat.w;
+
+		if (test > 0.499f * unit) // Gimbal lock looking up.
+		{
+			heading = 2.f * atan2(quat.x, quat.w);
+			pitch = pi() / 2.f;
+			bank = 0.f;
+		}
+		else if (test < -0.499f * unit) // Gimbal lock looking down.
+		{ 
+			heading = -2.f * atan2(quat.x, quat.w);
+			pitch = -pi() / 2.f;
+			bank = 0.f;
+		}
+		else
+		{
+			heading = atan2(2.f * quat.y*quat.w - 2.f * quat.x*quat.z, sqx - sqy - sqz + sqw);
+			pitch = asin(2.f * test / unit);
+			bank = atan2(2.f * quat.x*quat.w - 2.f * quat.y*quat.z, -sqx + sqy - sqz + sqw);
+		}
+
+		return Vec3{ degrees(heading), degrees(pitch), degrees(bank) };
 	}
 
-	Quaternion eulerToQuat(const Vec3& vec)
+	// http://www.euclideanspace.com/maths/geometry/rotations/conversions/eulerToQuaternion/index.htm
+	Quaternion eulerToQuat(const Vec3& vec) 
 	{
-		return{1,1,1,1};
+		auto x = radians(vec.x);
+		auto y = radians(vec.y);
+		auto z = radians(vec.z);
+
+		float c1 = std::cos(y / 2);
+		float s1 = std::sin(y / 2);
+		float c2 = std::cos(x / 2);
+		float s2 = std::sin(x / 2);
+		float c3 = std::cos(z / 2);
+		float s3 = std::sin(z / 2);
+		float c1c2 = c1*c2;
+		float s1s2 = s1*s2;
+
+		return Quaternion{ c1c2*c3 - s1s2*s3 , c1c2*s3 + s1s2*c3, s1*c2*c3 + c1*s2*s3, c1*s2*c3 - s1*c2*s3 };
 	}
 
 	Matrix3 quatToMat3(const Quaternion& quat)
 	{
-		return{};
+		return Matrix3{
+			1 - 2*quat.y*quat.y - 2*quat.z*quat.z, 2*quat.x*quat.y + 2*quat.w*quat.z, 2*quat.x*quat.z - 2*quat.w*quat.y,
+			2*quat.x*quat.y - 2*quat.w*quat.z, 1 - 2*quat.x*quat.x - 2*quat.z*quat.z, 2*quat.y*quat.z + 2*quat.w*quat.x,
+			2*quat.x*quat.z + 2*quat.w*quat.y, 2*quat.y*quat.z - 2*quat.w*quat.x, 1 - 2*quat.x*quat.x - 2*quat.y*quat.y
+		};
 	}
 }

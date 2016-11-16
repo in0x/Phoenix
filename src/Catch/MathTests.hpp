@@ -66,5 +66,9 @@ namespace Phoenix::Tests
 
 		auto backAngles = mat3ToEuler(mat);
 		std::cout << backAngles << '\n';
+
+		quat = eulerToQuat(angles);
+		auto qAngles = quatToEuler(quat);
+		std::cout << qAngles;
 	}
 }
