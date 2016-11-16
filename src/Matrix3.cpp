@@ -1,5 +1,5 @@
 #include "Matrix3.hpp"
-
+#include "Matrix4.hpp"
 #include "Vec3.hpp"
 
 namespace Phoenix::Math
@@ -11,10 +11,6 @@ namespace Phoenix::Math
 		m_data[0][0] = m00; m_data[0][1] = m10; m_data[0][2] = m20;
 		m_data[1][0] = m01; m_data[1][1] = m11; m_data[1][2] = m21;
 		m_data[2][0] = m02; m_data[2][1] = m12; m_data[2][2] = m22;
-	}
-
-	Matrix3::Matrix3(const Quaternion& rotation)
-	{
 	}
 
 	float& Matrix3::operator()(std::size_t row, std::size_t col)
@@ -239,14 +235,15 @@ namespace Phoenix::Math
 		return *this;
 	}
 
-	Matrix3 Matrix3::fromQuaternion(const Quaternion& rotate)
+	Matrix4 Matrix3::asMatrix4() const
 	{
-		return Matrix3{};
-	}
-
-	Matrix3 Matrix3::fromEulerAngles(float x, float y, float z)
-	{
-		return Matrix3{};
+		const Matrix3& self = *this;
+		return Matrix4 {
+			self(0,0), self(0,1), self(0,2), 0,
+			self(1,0), self(1,1), self(1,2), 0,
+			self(2,0), self(2,1), self(2,2), 0,
+			0,		   0,		  0,		 1
+		};
 	}
 
 	Matrix3 Matrix3::identity()

@@ -1,5 +1,6 @@
 #include <cassert>
 #include "Matrix4.hpp"
+#include "Matrix3.hpp"
 #include "Vec4.hpp"
 #include "Vec3.hpp"
 
@@ -257,6 +258,17 @@ namespace Phoenix::Math
 		return *this;
 	}
 
+	Matrix3 Matrix4::asMatrix3() const
+	{
+		const Matrix4& self = *this;
+
+		return Matrix3 {
+			self(0,0), self(0,1), self(0,2),
+			self(1,0), self(1,1), self(1,2),
+			self(2,0), self(2,1), self(2,2)
+		};
+	}
+
 	Matrix4 Matrix4::scale(float x, float y, float z)
 	{
 		return Matrix4 
@@ -277,11 +289,6 @@ namespace Phoenix::Math
 			0, 0, 0, z,
 			0, 0, 0, 1
 		};
-	}
-
-	Matrix4 Matrix4::rotation(const Quaternion& rotate)
-	{
-		return Matrix4{};
 	}
 
 	Matrix4 Matrix4::identity()

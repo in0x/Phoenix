@@ -6,6 +6,7 @@
 namespace Phoenix::Math
 {
 	class Quaternion;
+	class Matrix3;
 	class Vec4;
 	class Vec3;
 
@@ -92,10 +93,11 @@ namespace Phoenix::Math
 		Matrix4& inverseSelf();
 		Matrix4 inverse() const;
 
+		Matrix3 asMatrix3() const;
+
 		static Matrix4 scale(float x, float y, float z);
 		static Matrix4 translation(float x, float y, float z);
-		static Matrix4 rotation(const Quaternion& rotate);
-
+		
 		static Matrix4 identity();
 	};
 

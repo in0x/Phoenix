@@ -5,6 +5,7 @@
 
 namespace Phoenix::Math
 {
+	class Matrix4;
 	class Quaternion;
 	class Vec3;
 
@@ -19,8 +20,6 @@ namespace Phoenix::Math
 		Matrix3()
 			: m_data(MatrixData<3>{})
 		{}
-
-		Matrix3(const Quaternion& rotation);
 
 		Matrix3(float m00, float m01, float m02,
 				float m10, float m11, float m12, 
@@ -79,8 +78,7 @@ namespace Phoenix::Math
 		Matrix3& inverseSelf();
 		Matrix3 inverse() const;
 
-		static Matrix3 fromQuaternion(const Quaternion& rotate);
-		static Matrix3 fromEulerAngles(float x, float y, float z);
+		Matrix4 asMatrix4() const;
 
 		static Matrix3 identity();
 	};
