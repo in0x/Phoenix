@@ -160,7 +160,6 @@
   <ItemGroup>
     <ClInclude Include="..\src\Catch\Catch.hpp" />
     <ClInclude Include="..\src\Catch\MathTests.hpp" />
-    <ClInclude Include="..\src\EulerAngles.hpp" />
     <ClInclude Include="..\src\Matrix3.hpp" />
     <ClInclude Include="..\src\Matrix4.hpp" />
     <ClInclude Include="..\src\MatrixData.hpp" />
@@ -180,6 +179,7 @@
     <ClCompile Include="..\src\Matrix4.cpp" />
     <ClCompile Include="..\src\PhiMath.cpp" />
     <ClCompile Include="..\src\Quaternion.cpp" />
+    <ClCompile Include="..\src\Rotation.cpp" />
     <ClCompile Include="..\src\Vec2.cpp" />
     <ClCompile Include="..\src\Vec3.cpp" />
     <ClCompile Include="..\src\Vec4.cpp" />

@@ -42,9 +42,6 @@
     <ClInclude Include="..\src\Vec3.hpp">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\EulerAngles.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -70,6 +67,9 @@
     </ClCompile>
     <ClCompile Include="..\src\Main.cpp" />
     <ClCompile Include="..\src\Quaternion.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Rotation.cpp">
       <Filter>Math</Filter>
     </ClCompile>
   </ItemGroup>
