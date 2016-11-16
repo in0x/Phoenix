@@ -3,6 +3,6 @@
 
 namespace Phoenix::Math
 {
-	template<size_t N>
+	template<std::size_t N>
 	using MatrixData = std::array<std::array<float, N>, N>;
 }
