@@ -1,4 +1,5 @@
 #include "Vec2.hpp"
+#include "Common.hpp"
 
 namespace Phoenix::Math
 {
@@ -61,7 +62,7 @@ namespace Phoenix::Math
 
 	bool Vec2::operator==(const Vec2& rhv) const
 	{
-		return x == rhv.x && y == rhv.y;
+		return (std::abs(x - rhv.x) <= FLT_CMP_TOLERANCE) && (std::abs(y - rhv.y) <= FLT_CMP_TOLERANCE);
 	}
 
 	float Vec2::length() const

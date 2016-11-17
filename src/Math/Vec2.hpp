@@ -107,9 +107,10 @@ namespace Phoenix::Math
 		return Vec2{ lhv.x * rhv, lhv.y * rhv };
 	}
 
-	inline const Vec2 operator*(float lhv, const Vec2 rhv)
+	inline const Vec2 operator*(float lhv, Vec2 rhv)
 	{
-		return lhv * rhv;
+		rhv *= lhv;
+		return rhv;
 	}
 
 	inline const Vec2 operator/(const Vec2& lhv, float rhv)

@@ -27,8 +27,8 @@ namespace Phoenix::Math
 		Matrix4 toMatrix4() const;
 
 		Quaternion& operator*=(const Quaternion& rhv);
-		
 		Quaternion& operator*=(float rhv);
+		bool operator==(const Quaternion& rhv) const;
 		
 		float magnitude2();
 		float magnitude();

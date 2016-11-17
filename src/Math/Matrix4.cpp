@@ -1,5 +1,6 @@
-#include <cassert>
 #include "Matrix4.hpp"
+#include <cassert>
+#include "Common.hpp"
 #include "Matrix3.hpp"
 #include "Vec4.hpp"
 #include "Vec3.hpp"
@@ -175,7 +176,7 @@ namespace Phoenix::Math
 		{
 			for (int j = 0; j < N; j++)
 			{
-				if (lhv(i, j) != rhv(i, j))
+				if (std::abs(lhv(i, j) - rhv(i, j)) > FLT_CMP_TOLERANCE)
 				{
 					return false;
 				}

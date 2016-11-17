@@ -1,12 +1,14 @@
 #include <cassert>
 
-#include "PhiMath.hpp"
+#include "../Math/PhiMath.hpp"
+#include "../Rendering/Projections.hpp"
 
 namespace Phoenix::Tests
 {
 	static void BasicMathTest()
 	{
 		using namespace Math;
+		using namespace Rendering;
 
 		Vec3 a{ 1,0,0 };
 		Vec3 b{ 0,1,0 };
@@ -69,6 +71,6 @@ namespace Phoenix::Tests
 
 		quat = eulerToQuat(angles);
 		auto qAngles = quatToEuler(quat);
-		std::cout << qAngles;
+		assert(angles == qAngles);
 	}
 }

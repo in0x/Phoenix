@@ -2,6 +2,8 @@
 
 namespace Phoenix::Math
 {
+	const float FLT_CMP_TOLERANCE = 1.0e-4f;
+
 	constexpr float pi()
 	{
 		return 3.1415926535897932384626433832795f;

@@ -1,4 +1,5 @@
 #include "Vec4.hpp"
+#include "Common.hpp"
 #include "Matrix4.hpp"
 
 namespace Phoenix::Math
@@ -94,7 +95,8 @@ namespace Phoenix::Math
 
 	bool Vec4::operator==(const Vec4& rhv) const
 	{
-		return x == rhv.x && y == rhv.y && z == rhv.z && w == rhv.w;
+		return (std::abs(x - rhv.x) <= FLT_CMP_TOLERANCE) && (std::abs(y - rhv.y) <= FLT_CMP_TOLERANCE)
+			&& (std::abs(z - rhv.z) <= FLT_CMP_TOLERANCE) && (std::abs(w - rhv.w) <= FLT_CMP_TOLERANCE);
 	}
 
 	float Vec4::length() const

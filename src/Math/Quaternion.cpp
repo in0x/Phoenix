@@ -1,8 +1,6 @@
-#pragma once
-
-#include <cmath>
-
 #include "Quaternion.hpp"              
+#include "Common.hpp"
+#include <cmath>
 #include "Vec3.hpp"
 #include "Matrix4.hpp"
 
@@ -56,6 +54,12 @@ namespace Phoenix::Math
 		normalize();
 
 		return *this;
+	}
+
+	bool Quaternion::operator==(const Quaternion & rhv) const
+	{
+		return (std::abs(w - rhv.w) <= FLT_CMP_TOLERANCE) && (std::abs(x - rhv.x) <= FLT_CMP_TOLERANCE)
+			&& (std::abs(y - rhv.y) <= FLT_CMP_TOLERANCE) && (std::abs(z - rhv.z) <= FLT_CMP_TOLERANCE);
 	}
 
 	float Quaternion::magnitude2()
