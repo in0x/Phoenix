@@ -4,6 +4,7 @@
 #include "Matrix3.hpp"
 #include "Vec4.hpp"
 #include "Vec3.hpp"
+#include "EulerAngles.hpp"
 
 namespace Phoenix::Math
 {	
@@ -269,6 +270,15 @@ namespace Phoenix::Math
 			self(2,0), self(2,1), self(2,2)
 		};
 	}
+
+	// You should only call this if the matrix contains only 
+	// a rotation. Matrices containing other transforms
+	// are not guaranteed to return the correct orientation.
+	EulerAngles Matrix4::asEulerAngles() const
+	{
+		return asMatrix3().asEulerAngles();
+	}
+
 
 	Matrix4 Matrix4::scale(float x, float y, float z)
 	{

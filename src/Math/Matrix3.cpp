@@ -2,6 +2,8 @@
 #include "Common.hpp"
 #include "Matrix4.hpp"
 #include "Vec3.hpp"
+#include "EulerAngles.hpp"
+#include "Quaternion.hpp"
 
 namespace Phoenix::Math
 {
@@ -244,6 +246,77 @@ namespace Phoenix::Math
 			self(1,0), self(1,1), self(1,2), 0,
 			self(2,0), self(2,1), self(2,2), 0,
 			0,		   0,		  0,		 1
+		};
+	}
+
+	// You should only call this if the matrix contains only 
+	// a rotation. Matrices containing other transforms
+	// are not guaranteed to return the correct orientation.
+	EulerAngles Matrix3::asEulerAngles() const
+	{
+		float x, y, z;
+		const Matrix3& self = *this;
+
+		y = -std::asin(self(0, 2));
+		auto C = std::cos(y);
+
+		if (std::abs(C) > 0.005f) // Account for floating point inaccuracy
+		{
+			auto A = self(2, 2) / C;
+			auto B = -self(1, 2) / C;
+
+			// tanx = sinx / cosx
+			x = std::atan2(B, A);
+
+			auto E = self(0, 0) / C;
+			auto F = -self(0, 1) / C;
+
+			z = std::atan2(F, E);
+		}
+		else // Gimball Lock
+		{
+			x = 0;
+
+			// D is 1
+			auto BEAF = self(1, 1);
+			auto AEBF = self(1, 0);
+
+			z = std::atan2(AEBF, BEAF);
+		}
+
+		return EulerAngles{ degrees(x), degrees(y), degrees(z) };
+	}
+
+	// Basically, we directly concatenate the 3 matrices for
+	// yaw, pitch and roll, saving us a lot of superflous operations
+	// that 3 seperate matrices would entail.
+	Matrix3 Matrix3::fromEulerAngles(const EulerAngles& angles)
+	{
+		auto x = radians(angles.x);
+		auto y = radians(angles.y);
+		auto z = radians(angles.z);
+
+		float A = std::cos(x);
+		float B = std::sin(x);
+		float C = std::cos(y);
+		float D = std::sin(y);
+		float E = std::cos(z);
+		float F = std::sin(z);
+
+		return Matrix3
+		{
+			C*E,         -C*F,         -D,
+			-B*D*E + A*F,  B*D*F + A*E, -B*C,
+			A*D*E + B*F, -A*D*F + B*E,  A*C
+		};
+	}
+
+	Matrix3 Matrix3::fromQuaternion(const Quaternion& quat)
+	{
+		return Matrix3{
+			1 - 2 * quat.y*quat.y - 2 * quat.z*quat.z, 2 * quat.x*quat.y + 2 * quat.w*quat.z, 2 * quat.x*quat.z - 2 * quat.w*quat.y,
+			2 * quat.x*quat.y - 2 * quat.w*quat.z, 1 - 2 * quat.x*quat.x - 2 * quat.z*quat.z, 2 * quat.y*quat.z + 2 * quat.w*quat.x,
+			2 * quat.x*quat.z + 2 * quat.w*quat.y, 2 * quat.y*quat.z - 2 * quat.w*quat.x, 1 - 2 * quat.x*quat.x - 2 * quat.y*quat.y
 		};
 	}
 

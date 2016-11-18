@@ -94,6 +94,7 @@ namespace Phoenix::Math
 		Matrix4 inverse() const;
 
 		Matrix3 asMatrix3() const;
+		EulerAngles asEulerAngles() const;
 
 		static Matrix4 scale(float x, float y, float z);
 		static Matrix4 translation(float x, float y, float z);

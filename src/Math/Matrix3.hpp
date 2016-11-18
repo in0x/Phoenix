@@ -8,6 +8,7 @@ namespace Phoenix::Math
 	class Matrix4;
 	class Quaternion;
 	class Vec3;
+	class EulerAngles;
 
 	class Matrix3
 	{
@@ -79,6 +80,10 @@ namespace Phoenix::Math
 		Matrix3 inverse() const;
 
 		Matrix4 asMatrix4() const;
+		EulerAngles asEulerAngles() const;
+
+		static Matrix3 fromEulerAngles(const EulerAngles& angles);
+		static Matrix3 fromQuaternion(const Quaternion& quat);
 
 		static Matrix3 identity();
 	};

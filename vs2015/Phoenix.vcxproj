@@ -161,6 +161,7 @@
     <ClInclude Include="..\src\Catch\Catch.hpp" />
     <ClInclude Include="..\src\Catch\MathTests.hpp" />
     <ClInclude Include="..\src\Math\Common.hpp" />
+    <ClInclude Include="..\src\Math\EulerAngles.hpp" />
     <ClInclude Include="..\src\Math\Matrix3.hpp" />
     <ClInclude Include="..\src\Math\Matrix4.hpp" />
     <ClInclude Include="..\src\Math\MatrixData.hpp" />
@@ -168,7 +169,6 @@
     <ClInclude Include="..\src\Math\Plane.hpp" />
     <ClInclude Include="..\src\Math\Quaternion.hpp" />
     <ClInclude Include="..\src\Math\Ray.hpp" />
-    <ClInclude Include="..\src\Math\Rotation.hpp" />
     <ClInclude Include="..\src\Math\Vec2.hpp" />
     <ClInclude Include="..\src\Math\Vec3.hpp" />
     <ClInclude Include="..\src\Math\Vec4.hpp" />
@@ -183,7 +183,6 @@
     <ClCompile Include="..\src\Math\Matrix3.cpp" />
     <ClCompile Include="..\src\Math\Matrix4.cpp" />
     <ClCompile Include="..\src\Math\Quaternion.cpp" />
-    <ClCompile Include="..\src\Math\Rotation.cpp" />
     <ClCompile Include="..\src\Math\Vec2.cpp" />
     <ClCompile Include="..\src\Math\Vec3.cpp" />
     <ClCompile Include="..\src\Math\Vec4.cpp" />

@@ -42,9 +42,6 @@
     <ClInclude Include="..\src\Math\Ray.hpp">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Math\Rotation.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Math\Vec2.hpp">
       <Filter>Math</Filter>
     </ClInclude>
@@ -56,6 +53,9 @@
     </ClInclude>
     <ClInclude Include="..\src\Rendering\Projections.hpp">
       <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Math\EulerAngles.hpp">
+      <Filter>Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -73,9 +73,6 @@
       <Filter>Math</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Math\Quaternion.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Math\Rotation.cpp">
       <Filter>Math</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Math\Vec2.cpp">

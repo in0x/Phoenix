@@ -6,6 +6,7 @@ namespace Phoenix::Math
 {	
 	class Vec3;
 	class Matrix4;
+	class EulerAngles;
 
 	// A unit-length quaternion used to represent rotations.
 	class Quaternion
@@ -40,6 +41,10 @@ namespace Phoenix::Math
 		Quaternion inverse() const;
 
 		float dot(const Quaternion& rhv) const;
+
+		EulerAngles asEulerAngles() const;
+
+		static Quaternion fromEulerAngles(const EulerAngles& angles);
 	};
 
 	Quaternion operator*(Quaternion lhv, float rhv);

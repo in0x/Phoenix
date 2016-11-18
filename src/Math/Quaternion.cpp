@@ -3,6 +3,7 @@
 #include <cmath>
 #include "Vec3.hpp"
 #include "Matrix4.hpp"
+#include "EulerAngles.hpp"
 
 namespace Phoenix::Math
 {
@@ -111,6 +112,58 @@ namespace Phoenix::Math
 	float Quaternion::dot(const Quaternion& rhv) const
 	{
 		return w * rhv.w + x * rhv.x + y * rhv.y + z * rhv.z;
+	}
+
+	EulerAngles Quaternion::asEulerAngles() const
+	{
+		float angleX, angleY, AngleZ;
+
+		float sqw = w*w;
+		float sqx = x*x;
+		float sqy = y*y;
+		float sqz = z*z;
+		float unit = sqx + sqy + sqz + sqw; // allows this to work on non-normalized quats.
+		float test = x*y + z*w;
+
+		if (test > 0.499f * unit) // Gimbal lock looking up.
+		{
+			angleX = 2.f * atan2(x, w);
+			angleY = pi() / 2.f;
+			AngleZ = 0.f;
+		}
+		else if (test < -0.499f * unit) // Gimbal lock looking down.
+		{
+			angleX = -2.f * atan2(x, w);
+			angleY = -pi() / 2.f;
+			AngleZ = 0.f;
+		}
+		else
+		{
+			angleX = atan2(2.f * y*w - 2.f * x*z, sqx - sqy - sqz + sqw);
+			angleY = asin(2.f * test / unit);
+			AngleZ = atan2(2.f * x*w - 2.f * y*z, -sqx + sqy - sqz + sqw);
+		}
+
+		return EulerAngles{ degrees(angleX), degrees(angleY), degrees(AngleZ) };
+	}
+	
+	// http://www.euclideanspace.com/maths/geometry/rotations/conversions/eulerToQuaternion/index.htm
+	Quaternion Quaternion::fromEulerAngles(const EulerAngles& angles)
+	{
+		auto x = radians(angles.x);
+		auto y = radians(angles.y);
+		auto z = radians(angles.z);
+
+		float c1 = std::cos(y / 2);
+		float s1 = std::sin(y / 2);
+		float c2 = std::cos(x / 2);
+		float s2 = std::sin(x / 2);
+		float c3 = std::cos(z / 2);
+		float s3 = std::sin(z / 2);
+		float c1c2 = c1*c2;
+		float s1s2 = s1*s2;
+
+		return Quaternion{ c1c2*c3 - s1s2*s3 , c1c2*s3 + s1s2*c3, s1*c2*c3 + c1*s2*s3, c1*s2*c3 - s1*c2*s3 };
 	}
 
 

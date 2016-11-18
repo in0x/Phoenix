@@ -9,8 +9,6 @@
 
 #include "Quaternion.hpp"
 
-#include "Rotation.hpp"
-
 #include "Ray.hpp"
 #include "Plane.hpp"
 
