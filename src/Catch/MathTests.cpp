@@ -7,6 +7,8 @@ namespace Phoenix::Tests
 {
 	void MathTests::RunMathTests()
 	{
+		Vec3Tests();
+		Matrix4Tests();
 		PlaneTests();
 	}
 
@@ -14,11 +16,43 @@ namespace Phoenix::Tests
 	{
 		using namespace Rendering;
 
+		std::cout << lookAtRH(Vec3{ 0,0,2 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 }) << '\n';
+		std::cout << projectionRH(90.f, 1920.f / 1080.f, 0.5f, 20.f, ProjectionType::PERSPECTIVE) << '\n';
+
+		float det = Matrix3(3, 1, 2,
+			4, -1, 2,
+			9, 2, 3).determinant();
+
+		assert(det == 19.f);
+
+		Quaternion quat{ 4, 2, 3, 1 };
+		assert(quat.magnitude() == 1.f);
+		/*
+		Vec3 angles{ 64, 81, 39 };
+		auto mat = eulerToMat3(angles);
+
+		auto mat4 = mat.asMatrix4();
+		mat = mat4.asMatrix3();
+
+		auto backAngles = mat3ToEuler(mat);
+		std::cout << backAngles << '\n';
+
+		quat = eulerToQuat(angles);
+		auto qAngles = quatToEuler(quat);
+		assert(angles == qAngles);*/
+	}
+
+	void MathTests::Vec3Tests()
+	{
 		Vec3 a{ 1,0,0 };
 		Vec3 b{ 0,1,0 };
 
 		assert(a.dot(b) == 0);
 		assert(Vec3(0, 1, 0).reflect(Vec3(0.5, 0.5, 0)) == Vec3(-0.5, 0.5, 0));
+	}
+
+	void MathTests::Matrix4Tests()
+	{
 		assert(Matrix4::identity().transpose() == Matrix4::identity());
 		assert(Matrix4::identity().determinant() == 1.f);
 		assert(Matrix4(4, 5, 3, 7,
@@ -51,38 +85,27 @@ namespace Phoenix::Tests
 
 		assert((Vec4(1, 1, 1, 1) *= mult) == Vec4(10, 4, 10, 4));
 		assert((Vec3(1, 1, 1) *= mult) == Vec3(6, 3, 6));
-
-		std::cout << lookAtRH(Vec3{ 0,0,2 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 }) << '\n';
-		std::cout << projectionRH(90.f, 1920.f / 1080.f, 0.5f, 20.f, ProjectionType::PERSPECTIVE) << '\n';
-
-		float det = Matrix3(3, 1, 2,
-			4, -1, 2,
-			9, 2, 3).determinant();
-
-		assert(det == 19.f);
-
-		Quaternion quat{ 4, 2, 3, 1 };
-		assert(quat.magnitude() == 1.f);
-		/*
-		Vec3 angles{ 64, 81, 39 };
-		auto mat = eulerToMat3(angles);
-
-		auto mat4 = mat.asMatrix4();
-		mat = mat4.asMatrix3();
-
-		auto backAngles = mat3ToEuler(mat);
-		std::cout << backAngles << '\n';
-
-		quat = eulerToQuat(angles);
-		auto qAngles = quatToEuler(quat);
-		assert(angles == qAngles);*/
 	}
 
 	void MathTests::PlaneTests()
 	{
-		Plane p1{ { 0,0,0 },{ 1,0,0 },{ 0,1,0 } };
+		Plane p1{ { 0,0,0 }, { 0,0,1 },{ 1,0,0 } };
 
 		assert(p1.getSideOn({ 0, 0, 0 }) == Plane::Side::ON);
-		assert(false);
+		assert(p1.getSideOn({ 0, 1, 0 }) == Plane::Side::FRONT);
+		assert(p1.getSideOn({ 0,-1, 0 }) == Plane::Side::BACK);
+
+		assert(p1.distance({ 0, 0, 0 }) == 0);
+		assert(std::abs(p1.distance({ 0, 10, 0 })) == 10);
+
+		Plane p2{ { 0,0,0 },{ 1,0,0 },{ 0,1,0 } };
+
+		assert(p2.getSideOn({ 0, 0, 0 }) == Plane::Side::ON);
+		assert(p2.getSideOn({ 0, 0, 1 }) == Plane::Side::FRONT);
+		assert(p2.getSideOn({ 0, 0,-1 }) == Plane::Side::BACK);
+
+		assert(p2.distance({ 0, 0, 0 }) == 0);
+		assert(std::abs(p2.distance({ 0, 10, 0 })) == 0);
+		assert(std::abs(p2.distance({ 0, 0, 10 })) == 10);
 	}
 }
