@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-namespace Phoenix::Math
+namespace Phoenix
 {	
 	class Vec3;
 	class Matrix4;
@@ -11,10 +11,6 @@ namespace Phoenix::Math
 	// A unit-length quaternion used to represent rotations.
 	class Quaternion
 	{
-	private:
-		
-		void normalize();
-
 	public: 
 		float w;
 		float x;
@@ -33,6 +29,7 @@ namespace Phoenix::Math
 		
 		float magnitude2();
 		float magnitude();
+		void normalize();
 
 		void conjugateSelf();
 		Quaternion conjugate() const;

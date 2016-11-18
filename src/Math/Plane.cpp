@@ -1,7 +1,7 @@
 #include "Plane.hpp"
 #include "Common.hpp"
 
-namespace Phoenix::Math
+namespace Phoenix
 {
 	Plane::Plane(const Vec3& _n, float _d)
 		: n(_n)
@@ -27,19 +27,33 @@ namespace Phoenix::Math
 
 	std::pair<bool, Vec3> Plane::intersect(const Ray& ray) const
 	{
-	
+		return{ false, {0,0,0} };
 	}
 
 	bool Plane::intersect(const Plane& other) const
 	{
-	}
-
-	Plane::Side Plane::getSide(const Vec3& point) const
-	{
+		return false;
 	}
 
 	float Plane::distance(const Vec3& point) const
 	{
+		return n.dot(point) - d;
+	}
+
+	Plane::Side Plane::getSideOn(const Vec3& point) const
+	{
+		auto dist = distance(point);
+		
+		if (dist < 0.f)
+		{
+			return Side::BACK;
+		}
+		else if (dist > 0.f)
+		{
+			return Side::FRONT;
+		}
+
+		return Side::ON;
 	}
 
 	void Plane::normalize()
@@ -49,8 +63,8 @@ namespace Phoenix::Math
 		if (nLen > FLT_CMP_TOLERANCE)
 		{
 			auto invNLen = 1.f / nLen;
-			n /= nLen;
-			d /= nLen;
+			n *= nLen;
+			d *= nLen;
 		}
 	}
 }

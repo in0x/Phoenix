@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Phoenix::Math
+namespace Phoenix
 {
 	const float FLT_CMP_TOLERANCE = 1.0e-4f;
 

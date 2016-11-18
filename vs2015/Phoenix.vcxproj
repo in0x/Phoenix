@@ -178,11 +178,14 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\Catch\MathTests.cpp" />
     <ClCompile Include="..\src\Main.cpp" />
     <ClCompile Include="..\src\Math\Common.cpp" />
     <ClCompile Include="..\src\Math\Matrix3.cpp" />
     <ClCompile Include="..\src\Math\Matrix4.cpp" />
+    <ClCompile Include="..\src\Math\Plane.cpp" />
     <ClCompile Include="..\src\Math\Quaternion.cpp" />
+    <ClCompile Include="..\src\Math\Ray.cpp" />
     <ClCompile Include="..\src\Math\Vec2.cpp" />
     <ClCompile Include="..\src\Math\Vec3.cpp" />
     <ClCompile Include="..\src\Math\Vec4.cpp" />

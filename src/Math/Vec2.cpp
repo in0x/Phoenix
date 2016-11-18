@@ -1,7 +1,7 @@
 #include "Vec2.hpp"
 #include "Common.hpp"
 
-namespace Phoenix::Math
+namespace Phoenix
 {
 	Vec2& Vec2::operator+=(const Vec2& rhv)
 	{

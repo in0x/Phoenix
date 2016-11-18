@@ -3,7 +3,7 @@
 #include "Vec3.hpp"
 #include "Ray.hpp"
 
-namespace Phoenix::Math
+namespace Phoenix
 {
 	// Implicit representation of plane using normal vector
 	// and dot between normal and point on plane. Other point
@@ -32,7 +32,7 @@ namespace Phoenix::Math
 
 		bool intersect(const Plane& other) const;
 
-		Side getSide(const Vec3& point) const;
+		Side getSideOn(const Vec3& point) const;
 
 		float distance(const Vec3& point) const;
 

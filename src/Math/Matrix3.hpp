@@ -3,7 +3,7 @@
 #include <iostream>
 #include "MatrixData.hpp"
 
-namespace Phoenix::Math
+namespace Phoenix
 {
 	class Matrix4;
 	class Quaternion;

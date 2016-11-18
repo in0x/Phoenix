@@ -7,7 +7,7 @@ using namespace Phoenix;
 // Check Game Coding Complete for info on WinMainLoop
 int main()
 {
-	Tests::BasicMathTest();
+	Tests::MathTests::RunMathTests();
 
 	return 0;
 }

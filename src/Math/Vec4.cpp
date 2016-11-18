@@ -2,7 +2,7 @@
 #include "Common.hpp"
 #include "Matrix4.hpp"
 
-namespace Phoenix::Math
+namespace Phoenix
 {
 	Vec4& Vec4::operator+=(const Vec4& rhv)
 	{

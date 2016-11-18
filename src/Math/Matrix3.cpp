@@ -5,7 +5,7 @@
 #include "EulerAngles.hpp"
 #include "Quaternion.hpp"
 
-namespace Phoenix::Math
+namespace Phoenix
 {
 	Matrix3::Matrix3(float m00, float m01, float m02, 
 					 float m10, float m11, float m12,

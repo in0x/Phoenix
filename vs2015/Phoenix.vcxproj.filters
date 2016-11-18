@@ -15,9 +15,6 @@
     <ClInclude Include="..\src\Catch\Catch.hpp">
       <Filter>Catch</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Catch\MathTests.hpp">
-      <Filter>Catch</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Math\Common.hpp">
       <Filter>Math</Filter>
     </ClInclude>
@@ -57,6 +54,9 @@
     <ClInclude Include="..\src\Math\EulerAngles.hpp">
       <Filter>Math</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Catch\MathTests.hpp">
+      <Filter>Catch</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -86,6 +86,15 @@
     </ClCompile>
     <ClCompile Include="..\src\Rendering\Projections.cpp">
       <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Math\Ray.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Math\Plane.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Catch\MathTests.cpp">
+      <Filter>Catch</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -6,12 +6,12 @@
 #include "Vec3.hpp"
 #include "EulerAngles.hpp"
 
-namespace Phoenix::Math
-{	
+namespace Phoenix
+{
 	Matrix4::Matrix4(float m00, float m01, float m02, float m03,
-					 float m10, float m11, float m12, float m13,
-					 float m20, float m21, float m22, float m23,
-					 float m30, float m31, float m32, float m33)
+		float m10, float m11, float m12, float m13,
+		float m20, float m21, float m22, float m23,
+		float m30, float m31, float m32, float m33)
 	{
 		m_data[0][0] = m00; m_data[0][1] = m10; m_data[0][2] = m20; m_data[0][3] = m30;
 		m_data[1][0] = m01; m_data[1][1] = m11; m_data[1][2] = m21; m_data[1][3] = m31;
@@ -79,14 +79,14 @@ namespace Phoenix::Math
 	{
 		Matrix4 dest{};
 		Matrix4& lhv = *this;
-		
+
 		// Transposing the other matrix will improve cache-miss rate.
 
 		for (int i = 0; i <= m_data.size(); i++)
 		{
 			for (int j = 0; j <= m_data.size(); j++)
 			{
-				dest(i,j) = lhv(i, 0) * rhv(0, j) + lhv(i, 1) * rhv(1, j) + lhv(i, 2) * rhv(2, j) + lhv(i, 3) * rhv(3, j);
+				dest(i, j) = lhv(i, 0) * rhv(0, j) + lhv(i, 1) * rhv(1, j) + lhv(i, 2) * rhv(2, j) + lhv(i, 3) * rhv(3, j);
 			}
 		}
 
@@ -106,14 +106,14 @@ namespace Phoenix::Math
 
 		return dest;
 	}
-	
+
 	Vec3 Matrix4::operator*(Vec3 rhv) const
 	{
 		Vec4 temp{ rhv.x, rhv.y, rhv.z, 0 };
 		const Matrix4& lhv = *this;
 
 		temp *= lhv;
-		
+
 		rhv.x = temp.x;
 		rhv.y = temp.y;
 		rhv.z = temp.z;
@@ -194,9 +194,9 @@ namespace Phoenix::Math
 		{
 			for (int j = i + 1; j < columns(); j++)
 			{
-				temp = self(i,j);
-				self(i,j) = self(j,i);
-				self(j,i) = temp;
+				temp = self(i, j);
+				self(i, j) = self(j, i);
+				self(j, i) = temp;
 			}
 		}
 		return *this;
@@ -216,9 +216,9 @@ namespace Phoenix::Math
 	float Matrix4::minor(int row0, int row1, int row2, int col0, int col1, int col2) const
 	{
 		const Matrix4& self = *this;
-		return self(row0,col0) * (self(row1,col1) * self(row2,col2) - self(row1,col2) * self(row2,col1)) -
-			   self(row0,col1) * (self(row1,col0) * self(row2,col2) - self(row1,col2) * self(row2,col0)) +
-			   self(row0,col2) * (self(row1,col0) * self(row2,col1) - self(row1,col1) * self(row2,col0));
+		return self(row0, col0) * (self(row1, col1) * self(row2, col2) - self(row1, col2) * self(row2, col1)) -
+			self(row0, col1) * (self(row1, col0) * self(row2, col2) - self(row1, col2) * self(row2, col0)) +
+			self(row0, col2) * (self(row1, col0) * self(row2, col1) - self(row1, col1) * self(row2, col0));
 	}
 
 	// Calculate determinant recursively by getting minor for topmost row
@@ -229,10 +229,10 @@ namespace Phoenix::Math
 	float Matrix4::determinant() const
 	{
 		const Matrix4& self = *this;
-		return self(0,0) * minor(1, 2, 3, 1, 2, 3) -
-			   self(0,1) * minor(1, 2, 3, 0, 2, 3) +
-			   self(0,2) * minor(1, 2, 3, 0, 1, 3) -
-			   self(0,3) * minor(1, 2, 3, 0, 1, 2);
+		return self(0, 0) * minor(1, 2, 3, 1, 2, 3) -
+			self(0, 1) * minor(1, 2, 3, 0, 2, 3) +
+			self(0, 2) * minor(1, 2, 3, 0, 1, 3) -
+			self(0, 3) * minor(1, 2, 3, 0, 1, 2);
 	}
 
 	// Classical adjoint is transpose of matrix of cofactors
@@ -241,7 +241,7 @@ namespace Phoenix::Math
 		return Matrix4
 		{
 			  minor(1, 2, 3, 1, 2, 3), -minor(0, 2, 3, 1, 2, 3),  minor(0, 1, 3, 1, 2, 3), -minor(0, 1, 2, 1, 2, 3),
-			 -minor(1, 2, 3, 0, 2, 3),  minor(0, 2, 3, 0, 2, 3), -minor(0, 1, 3, 0, 2, 3),  minor(0, 1, 2, 0, 2, 3),	
+			 -minor(1, 2, 3, 0, 2, 3),  minor(0, 2, 3, 0, 2, 3), -minor(0, 1, 3, 0, 2, 3),  minor(0, 1, 2, 0, 2, 3),
 			  minor(1, 2, 3, 0, 1, 3), -minor(0, 2, 3, 0, 1, 3),  minor(0, 1, 3, 0, 1, 3), -minor(0, 1, 2, 0, 1, 3),
 			 -minor(1, 2, 3, 0, 1, 2),  minor(0, 2, 3, 0, 1, 2), -minor(0, 1, 3, 0, 1, 2),  minor(0, 1, 2, 0, 1, 2)
 		};
@@ -264,7 +264,7 @@ namespace Phoenix::Math
 	{
 		const Matrix4& self = *this;
 
-		return Matrix3 {
+		return Matrix3{
 			self(0,0), self(0,1), self(0,2),
 			self(1,0), self(1,1), self(1,2),
 			self(2,0), self(2,1), self(2,2)
@@ -282,7 +282,7 @@ namespace Phoenix::Math
 
 	Matrix4 Matrix4::scale(float x, float y, float z)
 	{
-		return Matrix4 
+		return Matrix4
 		{
 			x, 0, 0, 0,
 			0, y, 0, 0,
@@ -319,5 +319,4 @@ namespace Phoenix::Math
 	{
 		return rhv;
 	}
-
 }

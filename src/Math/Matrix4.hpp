@@ -3,12 +3,13 @@
 #include <iostream>
 #include "MatrixData.hpp"
 
-namespace Phoenix::Math
-{
+namespace Phoenix {
+
 	class Quaternion;
 	class Matrix3;
 	class Vec4;
 	class Vec3;
+	class EulerAngles;
 
 	// Column-major 4x4 matrix.
 	class Matrix4
@@ -25,9 +26,9 @@ namespace Phoenix::Math
 		{}
 
 		Matrix4(float m00, float m01, float m02, float m03,
-				float m10, float m11, float m12, float m13,
-				float m20, float m21, float m22, float m23,
-				float m30, float m31, float m32, float m33);
+			float m10, float m11, float m12, float m13,
+			float m20, float m21, float m22, float m23,
+			float m30, float m31, float m32, float m33);
 
 		// Returns the number of columns in this matrix.
 		// Useful for porting matrix-vector interactions
@@ -76,7 +77,7 @@ namespace Phoenix::Math
 		Matrix4& operator+=(const Matrix4& rhv);
 		Matrix4& operator-=(const Matrix4& rhv);
 		Matrix4& operator*=(const Matrix4& rhv);
-		
+
 		Vec4 operator*(Vec4 rhv) const;
 		Vec3 operator*(Vec3 rhv) const;
 
@@ -98,7 +99,7 @@ namespace Phoenix::Math
 
 		static Matrix4 scale(float x, float y, float z);
 		static Matrix4 translation(float x, float y, float z);
-		
+
 		static Matrix4 identity();
 	};
 
@@ -147,9 +148,9 @@ namespace Phoenix::Math
 	inline std::ostream& operator<<(std::ostream& out, const Matrix4& mat4)
 	{
 		std::cout << mat4(0, 0) << " " << mat4(0, 1) << " " << mat4(0, 2) << " " << mat4(0, 3) << "\n"
-			  	  << mat4(1, 0) << " " << mat4(1, 1) << " " << mat4(1, 2) << " " << mat4(1, 3) << "\n"
-				  << mat4(2, 0) << " " << mat4(2, 1) << " " << mat4(2, 2) << " " << mat4(2, 3) << "\n"
-				  << mat4(3, 0) << " " << mat4(3, 1) << " " << mat4(3, 2) << " " << mat4(3, 3);
+			<< mat4(1, 0) << " " << mat4(1, 1) << " " << mat4(1, 2) << " " << mat4(1, 3) << "\n"
+			<< mat4(2, 0) << " " << mat4(2, 1) << " " << mat4(2, 2) << " " << mat4(2, 3) << "\n"
+			<< mat4(3, 0) << " " << mat4(3, 1) << " " << mat4(3, 2) << " " << mat4(3, 3);
 		return out;
 	}
 }

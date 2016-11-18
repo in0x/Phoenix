@@ -8,10 +8,9 @@
 #include "Matrix4.hpp"
 
 #include "Quaternion.hpp"
+#include "EulerAngles.hpp"
 
 #include "Ray.hpp"
 #include "Plane.hpp"
 
 #include "Common.hpp"
-
-using namespace Phoenix::Math;

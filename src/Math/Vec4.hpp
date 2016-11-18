@@ -3,7 +3,7 @@
 #include <cmath>
 #include <cassert>
 
-namespace Phoenix::Math
+namespace Phoenix
 {
 	class Matrix4;
 

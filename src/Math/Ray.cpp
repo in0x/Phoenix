@@ -1,6 +1,6 @@
 #include "Ray.hpp"
 
-namespace Phoenix::Math
+namespace Phoenix
 {
 	Ray::Ray(const Vec3& position, const Vec3& direction)
 		: m_origin(position)

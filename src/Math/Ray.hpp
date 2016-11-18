@@ -2,7 +2,7 @@
 
 #include "Vec3.hpp"
 
-namespace Phoenix::Math
+namespace Phoenix
 {
 	class Ray
 	{

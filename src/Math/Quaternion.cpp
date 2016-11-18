@@ -5,7 +5,7 @@
 #include "Matrix4.hpp"
 #include "EulerAngles.hpp"
 
-namespace Phoenix::Math
+namespace Phoenix
 {
 	Quaternion::Quaternion(float w, float x, float y, float z)
 		: w(w)
@@ -144,22 +144,22 @@ namespace Phoenix::Math
 			AngleZ = atan2(2.f * x*w - 2.f * y*z, -sqx + sqy - sqz + sqw);
 		}
 
-		return EulerAngles{ degrees(angleX), degrees(angleY), degrees(AngleZ) };
+		return EulerAngles{ degrees(angleX), degrees(angleY), degrees(AngleZ)  };
 	}
 	
 	// http://www.euclideanspace.com/maths/geometry/rotations/conversions/eulerToQuaternion/index.htm
 	Quaternion Quaternion::fromEulerAngles(const EulerAngles& angles)
 	{
-		auto x = radians(angles.x);
-		auto y = radians(angles.y);
-		auto z = radians(angles.z);
+		auto xAngle = radians(angles.x);
+		auto yAngle = radians(angles.y);
+		auto zAngle = radians(angles.z);
 
-		float c1 = std::cos(y / 2);
-		float s1 = std::sin(y / 2);
-		float c2 = std::cos(x / 2);
-		float s2 = std::sin(x / 2);
-		float c3 = std::cos(z / 2);
-		float s3 = std::sin(z / 2);
+		float c1 = std::cos(yAngle / 2.f);
+		float s1 = std::sin(yAngle / 2.f);
+		float c2 = std::cos(xAngle / 2.f);
+		float s2 = std::sin(xAngle / 2.f);
+		float c3 = std::cos(zAngle / 2.f);
+		float s3 = std::sin(zAngle / 2.f);
 		float c1c2 = c1*c2;
 		float s1s2 = s1*s2;
 
