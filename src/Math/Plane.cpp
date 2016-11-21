@@ -1,5 +1,7 @@
 #include "Plane.hpp"
 #include "Common.hpp"
+#include "Ray.hpp"
+#include "Vec3.hpp"
 
 namespace Phoenix
 {
@@ -22,22 +24,37 @@ namespace Phoenix
 
 		n = edge1.cross(edge2);
 		n.normalize();
-		d = n.dot(p0);
+		d = -n.dot(p0);
 	}
 
-	std::pair<bool, Vec3> Plane::intersect(const Ray& ray) const
+	std::pair<bool, Point3D> Plane::intersect(const Ray& ray) const
 	{
-		return{ false, {0,0,0} };
+		float fv = dot(ray.direction);
+
+		if (std::abs(fv) > FLT_EPSILON)
+		{
+			return{ true, ray.origin - ray.direction * (dot(ray.origin) / fv) };
+		}
+		return{ false, Point3D{} };
 	}
 
 	bool Plane::intersect(const Plane& other) const
 	{
-		return false;
+	}
+
+	float Plane::dot(const Vec3& dir) const
+	{
+		return n.dot(dir);
+	}
+
+	float Plane::dot(const Point3D& point) const
+	{
+		return n.dot(point.position) + d;
 	}
 
 	float Plane::distance(const Vec3& point) const
 	{
-		return n.dot(point) - d;
+		return dot(point);
 	}
 
 	Plane::Side Plane::getSideOn(const Vec3& point) const
@@ -45,26 +62,23 @@ namespace Phoenix
 		auto dist = distance(point);
 		
 		if (dist < 0.f)
-		{
 			return Side::BACK;
-		}
 		else if (dist > 0.f)
-		{
 			return Side::FRONT;
-		}
-
+		
 		return Side::ON;
 	}
 
-	void Plane::normalize()
+	Vec3 Plane::reflect(const Vec3& point) const
 	{
-		auto nLen = n.length();
+		return point - 2.f * dot(point) * n;
+	}
 
-		if (nLen > FLT_CMP_TOLERANCE)
-		{
-			auto invNLen = 1.f / nLen;
-			n *= nLen;
-			d *= nLen;
-		}
+	void Plane::normalize()
+	{	
+		auto invNLen = 1.f / n.length();
+		n *= invNLen;
+		d *= invNLen;
+		
 	}
 }

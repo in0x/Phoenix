@@ -57,6 +57,9 @@
     <ClInclude Include="..\src\Catch\MathTests.hpp">
       <Filter>Catch</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Math\Point3D.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

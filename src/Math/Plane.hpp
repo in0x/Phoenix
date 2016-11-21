@@ -1,10 +1,12 @@
 #pragma once
 
 #include "Vec3.hpp"
-#include "Ray.hpp"
 
 namespace Phoenix
 {
+	class Ray;
+	class Point3D;
+
 	// Implicit representation of plane using normal vector
 	// and dot between normal and point on plane. Other point
 	// can be discarded since d = dot(n, p) is constant for all 
@@ -27,15 +29,17 @@ namespace Phoenix
 		Plane(const Plane& other);
 		Plane(const Vec3& p0, const Vec3& p1, const Vec3& p2);
 
-		// Returns if ray intersects plane and if yes, where.
-		std::pair<bool, Vec3> intersect(const Ray& ray) const;
-
-		bool intersect(const Plane& other) const;
+		void normalize();
+		float dot(const Vec3& dir) const;
+		float dot(const Point3D& point) const;
 
 		Side getSideOn(const Vec3& point) const;
-
 		float distance(const Vec3& point) const;
+		Vec3 reflect(const Vec3& point) const;
 
-		void normalize();
+		// Returns if ray intersects plane and if yes, where.
+		std::pair<bool, Point3D> intersect(const Ray& ray) const;
+
+		bool intersect(const Plane& other) const;
 	};
 }

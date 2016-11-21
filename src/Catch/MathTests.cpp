@@ -89,7 +89,7 @@ namespace Phoenix::Tests
 
 	void MathTests::PlaneTests()
 	{
-		Plane p1{ { 0,0,0 }, { 0,0,1 },{ 1,0,0 } };
+		Plane p1{ { 0,0,0 }, { 0,0,1 }, { 1,0,0 } };
 
 		assert(p1.getSideOn({ 0, 0, 0 }) == Plane::Side::ON);
 		assert(p1.getSideOn({ 0, 1, 0 }) == Plane::Side::FRONT);
@@ -98,7 +98,9 @@ namespace Phoenix::Tests
 		assert(p1.distance({ 0, 0, 0 }) == 0);
 		assert(std::abs(p1.distance({ 0, 10, 0 })) == 10);
 
-		Plane p2{ { 0,0,0 },{ 1,0,0 },{ 0,1,0 } };
+		assert(p1.reflect({ 1, 1, 0 }) == Vec3( 1,-1,0 ));
+
+		Plane p2{ { 0,0,0 }, { 1,0,0 }, { 0,1,0 } };
 
 		assert(p2.getSideOn({ 0, 0, 0 }) == Plane::Side::ON);
 		assert(p2.getSideOn({ 0, 0, 1 }) == Plane::Side::FRONT);

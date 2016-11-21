@@ -167,6 +167,7 @@
     <ClInclude Include="..\src\Math\MatrixData.hpp" />
     <ClInclude Include="..\src\Math\PhiMath.hpp" />
     <ClInclude Include="..\src\Math\Plane.hpp" />
+    <ClInclude Include="..\src\Math\Point3D.hpp" />
     <ClInclude Include="..\src\Math\Quaternion.hpp" />
     <ClInclude Include="..\src\Math\Ray.hpp" />
     <ClInclude Include="..\src\Math\Vec2.hpp" />
