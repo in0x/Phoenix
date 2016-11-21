@@ -2,16 +2,16 @@
 
 namespace Phoenix
 {
-	Ray::Ray(const Vec3& position, const Vec3& direction)
-		: m_origin(position)
-		, m_direction(direction)
+	Ray::Ray(const Point3D& _origin, const Vec3& _direction)
+		: origin(_origin)
+		, direction(_direction)
 	{
-		m_direction.normalize();
+		direction.normalize();
 	}
 
 
-	Vec3 Ray::pointAt(float t) const
+	Point3D Ray::pointAt(float t) const
 	{
-		return m_origin + (m_direction * t);
+		return origin + (direction * t);
 	}
 }

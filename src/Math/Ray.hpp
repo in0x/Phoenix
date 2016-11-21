@@ -1,18 +1,18 @@
 #pragma once
 
 #include "Vec3.hpp"
+#include "Point3D.hpp"
 
 namespace Phoenix
 {
 	class Ray
 	{
-	private:
-		Vec3 m_origin;
-		Vec3 m_direction;
-
 	public:
-		Ray(const Vec3& position, const Vec3& direction);
+		Point3D origin;
+		Vec3 direction;
+		
+		Ray(const Point3D& _origin, const Vec3& _direction);
 
-		Vec3 pointAt(float t) const;
+		Point3D pointAt(float t) const;
 	};
 }
