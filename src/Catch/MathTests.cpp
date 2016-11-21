@@ -110,6 +110,6 @@ namespace Phoenix::Tests
 		assert(std::abs(p2.distance({ 0, 10, 0 })) == 0);
 		assert(std::abs(p2.distance({ 0, 0, 10 })) == 10);
 
-		assert(p2.intersect(Ray{ {0,0,-1}, {0,0,1} }).first == true);
+		assert(p2.intersect(Ray{ {0,1,-1}, {0,0,1} }).first == true);
 	}
 }

@@ -37,8 +37,7 @@ namespace Phoenix
 		float distance(const Vec3& point) const;
 		Vec3 reflect(const Vec3& point) const;
 
-		// Returns if ray intersects plane and if yes, where.
-		std::pair<bool, Point3D> intersect(const Ray& ray) const;
+		std::pair<bool, float> intersect(const Ray& ray) const;
 
 		bool intersect(const Plane& other) const;
 	};

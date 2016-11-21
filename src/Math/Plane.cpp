@@ -23,18 +23,32 @@ namespace Phoenix
 
 		n = edge1.cross(edge2);
 		n.normalize();
-		d = -n.dot(p0);
+		d = n.dot(p0);
 	}
-
-	std::pair<bool, Point3D> Plane::intersect(const Ray& ray) const
+	
+	// Returns if ray intersects plane at positive t and if yes, at which t.
+	// The point of intersection can be gotten via ray.pointAt(t).
+	std::pair<bool, float> Plane::intersect(const Ray& ray) const
 	{
-		float fv = dot(ray.direction);
-
-		if (std::abs(fv) > std::numeric_limits<float>::epsilon())
+		float denom = n.dot(ray.direction);
+		if (std::abs(denom) < std::numeric_limits<float>::epsilon()) // Parallel.
 		{
-			return{ true, ray.origin - ray.direction * (dot(ray.origin) / fv) };
+			return{ false, 0.f };
 		}
-		return{ false, Point3D{} };
+		else
+		{
+			float nom = dot(ray.origin) - 2*d;
+			float t = -(nom / denom);
+
+			if (t > 0.0f)
+			{
+				return std::pair<bool, float>(true, t);
+			}
+			else
+			{
+				return std::pair<bool, float>(false, t);
+			}
+		}
 	}
 
 	bool Plane::intersect(const Plane& other) const
