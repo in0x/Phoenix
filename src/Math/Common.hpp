@@ -1,9 +1,9 @@
 #pragma once
+#include <float.h>
+#include <algorithm>
 
 namespace Phoenix
 {
-	const float FLT_CMP_TOLERANCE = 1.0e-4f;
-
 	constexpr float pi()
 	{
 		return 3.1415926535897932384626433832795f;
@@ -20,4 +20,5 @@ namespace Phoenix
 	}
 
 	float fastInvSqrt(float x);
+	bool almostEqualRelative(float a, float b, float maxRelDif = FLT_EPSILON);
 }

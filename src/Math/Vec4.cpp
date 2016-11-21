@@ -95,8 +95,8 @@ namespace Phoenix
 
 	bool Vec4::operator==(const Vec4& rhv) const
 	{
-		return (std::abs(x - rhv.x) <= FLT_CMP_TOLERANCE) && (std::abs(y - rhv.y) <= FLT_CMP_TOLERANCE)
-			&& (std::abs(z - rhv.z) <= FLT_CMP_TOLERANCE) && (std::abs(w - rhv.w) <= FLT_CMP_TOLERANCE);
+		return almostEqualRelative(x, rhv.x) && almostEqualRelative(y, rhv.y) 
+			&& almostEqualRelative(z, rhv.z) && almostEqualRelative(w, rhv.w);
 	}
 
 	float Vec4::length() const

@@ -159,7 +159,7 @@ namespace Phoenix
 		{
 			for (int j = 0; j < N; j++)
 			{
-				if (std::abs(lhv(i, j) - rhv(i, j)) > FLT_CMP_TOLERANCE)
+				if (!almostEqualRelative(lhv(i, j), rhv(i, j)))
 				{
 					return false;
 				}

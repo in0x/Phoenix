@@ -13,4 +13,19 @@ namespace Phoenix
 		return x;
 	}
 
+	// If the absolute difference between two floats is within an a small n% of the
+	// larger of the two numbers, we can consider them to be equal.
+	bool almostEqualRelative(float a, float b, float maxRelDif)
+	{
+		float diff = std::abs(a - b);
+		a = std::abs(a);
+		b = std::abs(b);
+
+		float larger = std::max(a, b);
+
+		if (diff <= larger * maxRelDif)
+			return true;
+
+		return false;
+	}
 }

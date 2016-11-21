@@ -59,8 +59,8 @@ namespace Phoenix
 
 	bool Quaternion::operator==(const Quaternion & rhv) const
 	{
-		return (std::abs(w - rhv.w) <= FLT_CMP_TOLERANCE) && (std::abs(x - rhv.x) <= FLT_CMP_TOLERANCE)
-			&& (std::abs(y - rhv.y) <= FLT_CMP_TOLERANCE) && (std::abs(z - rhv.z) <= FLT_CMP_TOLERANCE);
+		return almostEqualRelative(x, rhv.x) && almostEqualRelative(y, rhv.y)
+			&& almostEqualRelative(z, rhv.z) && almostEqualRelative(w, rhv.w);
 	}
 
 	float Quaternion::magnitude2()
