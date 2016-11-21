@@ -4,8 +4,8 @@
 
 namespace Phoenix
 {
-	class Ray;
 	class Point3D;
+	class Ray;
 
 	// Implicit representation of plane using normal vector
 	// and dot between normal and point on plane. Other point

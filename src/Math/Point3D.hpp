@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Vec3.hpp"
 
 namespace Phoenix
@@ -14,24 +15,17 @@ namespace Phoenix
 		Point3D();
 		Point3D(float x, float y, float z);
 
-		void operator+=(const Vec3& rhv)
-		{
-			position += rhv;
-		}
-
-		void operator-=(const Vec3& rhv)
-		{
-			position -= rhv;
-		}
+		void operator+=(const Vec3& rhv);
+		void operator-=(const Vec3& rhv);
 	};
 
-	Point3D operator+(Point3D lhv, const Vec3& rhv)
+	inline Point3D operator+(Point3D lhv, const Vec3& rhv)
 	{
 		lhv += rhv;
 		return lhv;
 	}
 
-	Point3D operator-(Point3D lhv, const Vec3& rhv)
+	inline Point3D operator-(Point3D lhv, const Vec3& rhv)
 	{
 		lhv -= rhv;
 		return lhv;

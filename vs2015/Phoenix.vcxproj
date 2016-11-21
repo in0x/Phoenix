@@ -185,6 +185,7 @@
     <ClCompile Include="..\src\Math\Matrix3.cpp" />
     <ClCompile Include="..\src\Math\Matrix4.cpp" />
     <ClCompile Include="..\src\Math\Plane.cpp" />
+    <ClCompile Include="..\src\Math\Point3D.cpp" />
     <ClCompile Include="..\src\Math\Quaternion.cpp" />
     <ClCompile Include="..\src\Math\Ray.cpp" />
     <ClCompile Include="..\src\Math\Vec2.cpp" />

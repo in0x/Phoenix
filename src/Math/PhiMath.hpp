@@ -10,6 +10,7 @@
 #include "Quaternion.hpp"
 #include "EulerAngles.hpp"
 
+#include "Point3D.hpp"
 #include "Ray.hpp"
 #include "Plane.hpp"
 

@@ -10,4 +10,14 @@ namespace Phoenix
 		: position(x,y,z)
 	{
 	}
+
+	void Point3D::operator+=(const Vec3& rhv)
+	{
+		position += rhv;
+	}
+
+	void Point3D::operator-=(const Vec3& rhv)
+	{
+		position -= rhv;
+	}
 }

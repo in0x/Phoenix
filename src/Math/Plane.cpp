@@ -1,7 +1,6 @@
 #include "Plane.hpp"
 #include "Common.hpp"
 #include "Ray.hpp"
-#include "Vec3.hpp"
 
 namespace Phoenix
 {
@@ -40,6 +39,7 @@ namespace Phoenix
 
 	bool Plane::intersect(const Plane& other) const
 	{
+		return false;
 	}
 
 	float Plane::dot(const Vec3& dir) const

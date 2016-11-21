@@ -99,5 +99,8 @@
     <ClCompile Include="..\src\Catch\MathTests.cpp">
       <Filter>Catch</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Math\Point3D.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
