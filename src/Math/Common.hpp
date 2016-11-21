@@ -1,6 +1,6 @@
 #pragma once
-#include <float.h>
 #include <algorithm>
+#include <limits>
 
 namespace Phoenix
 {
@@ -20,5 +20,5 @@ namespace Phoenix
 	}
 
 	float fastInvSqrt(float x);
-	bool almostEqualRelative(float a, float b, float maxRelDif = FLT_EPSILON);
+	bool almostEqualRelative(float a, float b, float maxRelDif = std::numeric_limits<float>::epsilon());
 }

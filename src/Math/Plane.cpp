@@ -30,7 +30,7 @@ namespace Phoenix
 	{
 		float fv = dot(ray.direction);
 
-		if (std::abs(fv) > FLT_EPSILON)
+		if (std::abs(fv) > std::numeric_limits<float>::epsilon())
 		{
 			return{ true, ray.origin - ray.direction * (dot(ray.origin) / fv) };
 		}
