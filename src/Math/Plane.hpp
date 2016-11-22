@@ -8,9 +8,9 @@ namespace Phoenix
 	class Ray;
 
 	// Implicit representation of plane using normal vector
-	// and dot between normal and point on plane. Other point
-	// can be discarded since d = dot(n, p) is constant for all 
-	// points on the plane.
+	// and dot between normal and point on plane. d is basically 
+	// the magnitude of how far up or down the normal the plane
+	// lies , i.e. the distance to origin.
 	class Plane
 	{
 	public:
