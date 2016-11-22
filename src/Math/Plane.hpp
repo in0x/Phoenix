@@ -10,7 +10,7 @@ namespace Phoenix
 	// Implicit representation of plane using normal vector
 	// and dot between normal and point on plane. d is basically 
 	// the magnitude of how far up or down the normal the plane
-	// lies , i.e. the distance to origin.
+	// lies , i.e. the distance to the origin.
 	class Plane
 	{
 	public:
@@ -38,7 +38,6 @@ namespace Phoenix
 		Vec3 reflect(const Vec3& point) const;
 
 		std::pair<bool, float> intersect(const Ray& ray) const;
-
-		bool intersect(const Plane& other) const;
+		std::pair<bool, Ray> intersect(const Plane& other) const;
 	};
 }

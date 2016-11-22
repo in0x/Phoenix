@@ -31,7 +31,7 @@ namespace Phoenix
 	std::pair<bool, float> Plane::intersect(const Ray& ray) const
 	{
 		float denom = n.dot(ray.direction);
-		if (std::abs(denom) < std::numeric_limits<float>::epsilon()) // Parallel.
+		if (std::abs(denom) < VERY_SMALL_FLT) // Parallel.
 		{
 			return{ false, 0.f };
 		}
@@ -51,9 +51,21 @@ namespace Phoenix
 		}
 	}
 
-	bool Plane::intersect(const Plane& other) const
+	// Find line (v,p) where the two planes intersect.
+	// If the do, their intersection line is also
+	// returned.
+	std::pair<bool, Ray> Plane::intersect(const Plane& other) const
 	{
-		return false;
+		Vec3 v = n.cross(other.n);
+		float denom = v.dot(v);
+		
+		if (denom > VERY_SMALL_FLT)
+		{
+			auto p = v.cross(other.n) * d + n.cross(v) * other.d / denom;
+			return{ true, {Point3D{p.x, p.y, p.z}, v} };
+		}
+
+		return{ false , {Point3D{}, Vec3{}} };
 	}
 
 	float Plane::dot(const Vec3& dir) const
@@ -63,6 +75,8 @@ namespace Phoenix
 
 	float Plane::dot(const Point3D& point) const
 	{
+		// d is added since a point represents a position,
+		// which is offset from the origin
 		return n.dot(point.position) + d;
 	}
 
@@ -92,7 +106,6 @@ namespace Phoenix
 	{	
 		auto invNLen = 1.f / n.length();
 		n *= invNLen;
-		d *= invNLen;
-		
+		d *= invNLen;	
 	}
 }
