@@ -4,6 +4,8 @@
 
 namespace Phoenix
 {
+	const float VERY_SMALL_FLT = std::numeric_limits<float>::epsilon();
+
 	constexpr float pi()
 	{
 		return 3.1415926535897932384626433832795f;
@@ -20,5 +22,5 @@ namespace Phoenix
 	}
 
 	float fastInvSqrt(float x);
-	bool almostEqualRelative(float a, float b, float maxRelDif = std::numeric_limits<float>::epsilon());
+	bool almostEqualRelative(float a, float b, float maxRelDif = VERY_SMALL_FLT);
 }
