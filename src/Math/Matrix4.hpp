@@ -14,13 +14,9 @@ namespace Phoenix {
 	// Column-major 4x4 matrix.
 	class Matrix4
 	{
-	private:
+	public:
 		MatrixData<4> m_data;
 
-		float minor(int row0, int row1, int row2, int col0, int col1, int col2) const;
-		Matrix4 adjoint() const;
-
-	public:
 		Matrix4()
 			: m_data(MatrixData<4>{})
 		{}
@@ -29,20 +25,6 @@ namespace Phoenix {
 			float m10, float m11, float m12, float m13,
 			float m20, float m21, float m22, float m23,
 			float m30, float m31, float m32, float m33);
-
-		// Returns the number of columns in this matrix.
-		// Useful for porting matrix-vector interactions
-		// easily between different sizes.
-		std::size_t columns() const
-		{
-			return m_data.size();
-		}
-
-		// Returns the number of rows in this matrix.
-		std::size_t rows() const
-		{
-			return m_data[0].size();
-		}
 
 		// Subscript operator
 		float& operator()(std::size_t row, std::size_t col);
@@ -85,8 +67,12 @@ namespace Phoenix {
 		bool operator==(const Matrix4& rhv);
 
 		float determinant() const;
+		float minor(int row0, int row1, int row2, int col0, int col1, int col2) const;
+		Matrix4 adjoint() const;
+
 		Matrix4& transposeSelf();
 		Matrix4 transpose() const;
+
 		Matrix4& inverseSelf();
 		Matrix4 inverse() const;
 
@@ -99,47 +85,13 @@ namespace Phoenix {
 		static Matrix4 identity();
 	};
 
-	inline Matrix4 operator+(Matrix4 lhv, const Matrix4& rhv)
-	{
-		lhv += rhv;
-		return lhv;
-	}
-
-	inline Matrix4 operator-(Matrix4 lhv, const Matrix4& rhv)
-	{
-		lhv -= rhv;
-		return lhv;
-	}
-
-	inline Matrix4 operator*(Matrix4 lhv, const Matrix4& rhv)
-	{
-		lhv *= rhv;
-		return lhv;
-	}
-
-	inline Matrix4 operator+(Matrix4 lhv, float f)
-	{
-		lhv += f;
-		return lhv;
-	}
-
-	inline Matrix4 operator-(Matrix4 lhv, float f)
-	{
-		lhv -= f;
-		return lhv;
-	}
-
-	inline Matrix4 operator*(Matrix4 lhv, float f)
-	{
-		lhv *= f;
-		return lhv;
-	}
-
-	inline Matrix4 operator/(Matrix4 lhv, float f)
-	{
-		lhv /= f;
-		return lhv;
-	}
+	Matrix4 operator+(Matrix4 lhv, const Matrix4& rhv);
+	Matrix4 operator-(Matrix4 lhv, const Matrix4& rhv);
+	Matrix4 operator*(Matrix4 lhv, const Matrix4& rhv);
+	Matrix4 operator+(Matrix4 lhv, float f);
+	Matrix4 operator-(Matrix4 lhv, float f);
+	Matrix4 operator*(Matrix4 lhv, float f);
+	Matrix4 operator/(Matrix4 lhv, float f);
 
 	inline std::ostream& operator<<(std::ostream& out, const Matrix4& mat4)
 	{

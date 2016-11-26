@@ -301,4 +301,46 @@ namespace Phoenix
 	{
 		return rhv;
 	}
+
+	Matrix4 operator+(Matrix4 lhv, const Matrix4& rhv)
+	{
+		lhv += rhv;
+		return lhv;
+	}
+
+	Matrix4 operator-(Matrix4 lhv, const Matrix4& rhv)
+	{
+		lhv -= rhv;
+		return lhv;
+	}
+
+	Matrix4 operator*(Matrix4 lhv, const Matrix4& rhv)
+	{
+		lhv *= rhv;
+		return lhv;
+	}
+
+	Matrix4 operator+(Matrix4 lhv, float f)
+	{
+		lhv += f;
+		return lhv;
+	}
+
+	Matrix4 operator-(Matrix4 lhv, float f)
+	{
+		lhv -= f;
+		return lhv;
+	}
+
+	Matrix4 operator*(Matrix4 lhv, float f)
+	{
+		lhv *= f;
+		return lhv;
+	}
+
+	Matrix4 operator/(Matrix4 lhv, float f)
+	{
+		lhv /= f;
+		return lhv;
+	}
 }

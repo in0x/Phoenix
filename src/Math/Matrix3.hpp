@@ -12,12 +12,9 @@ namespace Phoenix
 
 	class Matrix3
 	{
-	private:
-		MatrixData<3> m_data;	
-		float minor(int row0, int row1, int col0, int col1) const;
-		Matrix3 adjoint() const;
-
 	public:
+		MatrixData<3> m_data;
+
 		Matrix3()
 			: m_data(MatrixData<3>{})
 		{}
@@ -25,16 +22,6 @@ namespace Phoenix
 		Matrix3(float m00, float m01, float m02,
 				float m10, float m11, float m12, 
 				float m20, float m21, float m22);
-
-		std::size_t columns() const
-		{
-			return m_data.size();
-		}
-
-		std::size_t rows() const
-		{
-			return m_data[0].size();
-		}
 
 		float& operator()(std::size_t row, std::size_t col);
 
@@ -74,8 +61,12 @@ namespace Phoenix
 		bool operator==(const Matrix3& rhv);
 
 		float determinant() const;
+		float minor(int row0, int row1, int col0, int col1) const;
+		Matrix3 adjoint() const;
+
 		Matrix3& transposeSelf();
 		Matrix3 transpose() const;
+		
 		Matrix3& inverseSelf();
 		Matrix3 inverse() const;
 
@@ -88,47 +79,13 @@ namespace Phoenix
 		static Matrix3 identity();
 	};
 
-	inline Matrix3 operator+(Matrix3 lhv, const Matrix3& rhv)
-	{
-		lhv += rhv;
-		return lhv;
-	}
-
-	inline Matrix3 operator-(Matrix3 lhv, const Matrix3& rhv)
-	{
-		lhv -= rhv;
-		return lhv;
-	}
-
-	inline Matrix3 operator*(Matrix3 lhv, const Matrix3& rhv)
-	{
-		lhv *= rhv;
-		return lhv;
-	}
-
-	inline Matrix3 operator+(Matrix3 lhv, float f)
-	{
-		lhv += f;
-		return lhv;
-	}
-
-	inline Matrix3 operator-(Matrix3 lhv, float f)
-	{
-		lhv -= f;
-		return lhv;
-	}
-
-	inline Matrix3 operator*(Matrix3 lhv, float f)
-	{
-		lhv *= f;
-		return lhv;
-	}
-
-	inline Matrix3 operator/(Matrix3 lhv, float f)
-	{
-		lhv /= f;
-		return lhv;
-	}
+	Matrix3 operator+(Matrix3 lhv, const Matrix3& rhv);
+	Matrix3 operator-(Matrix3 lhv, const Matrix3& rhv);
+	Matrix3 operator*(Matrix3 lhv, const Matrix3& rhv);
+	Matrix3 operator+(Matrix3 lhv, float f);
+	Matrix3 operator-(Matrix3 lhv, float f);
+	Matrix3 operator*(Matrix3 lhv, float f);
+	Matrix3 operator/(Matrix3 lhv, float f);
 
 	inline std::ostream& operator<<(std::ostream& out, const Matrix3& mat3)
 	{
