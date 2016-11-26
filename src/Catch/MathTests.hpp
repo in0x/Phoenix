@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Phoenix::Tests
+namespace Phoenix::Tests::MathTests
 {
 	/*template<typename Result>
 	void Assert(Result actual, Result expected)
@@ -38,15 +38,9 @@ namespace Phoenix::Tests
 		assert(false);
 	}*/
 
-	class MathTests
-	{
-	public:
-		static void RunMathTests();
-
-	private:
-		static void LegacyTests();
-		static void Vec3Tests();
-		static void Matrix4Tests();
-		static void PlaneTests();
-	};
+	void RunMathTests();
+	void LegacyTests();
+	void Vec3Tests();
+	void Matrix4Tests();
+	void PlaneTests();
 }

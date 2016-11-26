@@ -2,17 +2,29 @@
 #include <cassert>
 #include "../Math/PhiMath.hpp"
 #include "../Rendering/Projections.hpp"
+#include "../Utility/Clock.hpp"
 
-namespace Phoenix::Tests
+namespace Phoenix::Tests::MathTests
 {
-	void MathTests::RunMathTests()
+	void RunMathTests()
 	{
-		Vec3Tests();
+		/*Vec3Tests();
 		Matrix4Tests();
 		PlaneTests();
+		*/
+
+		Clock clock;
+		clock.start();
+
+		for (int i = 0; i < 100000; i++)
+		{
+			Matrix4::identity() * Matrix4::identity();
+		}
+
+		std::cout << "ELAPSED: " << clock.getElapsedS() << "S\n";
 	}
 
-	void MathTests::LegacyTests()
+	void LegacyTests()
 	{
 		using namespace Rendering;
 
@@ -42,7 +54,7 @@ namespace Phoenix::Tests
 		assert(angles == qAngles);*/
 	}
 
-	void MathTests::Vec3Tests()
+	void Vec3Tests()
 	{
 		Vec3 a{ 1,0,0 };
 		Vec3 b{ 0,1,0 };
@@ -51,7 +63,7 @@ namespace Phoenix::Tests
 		assert(Vec3(0, 1, 0).reflect(Vec3(0.5, 0.5, 0)) == Vec3(-0.5, 0.5, 0));
 	}
 
-	void MathTests::Matrix4Tests()
+	void Matrix4Tests()
 	{
 		assert(Matrix4::identity().transpose() == Matrix4::identity());
 		assert(Matrix4::identity().determinant() == 1.f);
@@ -87,7 +99,7 @@ namespace Phoenix::Tests
 		assert((Vec3(1, 1, 1) *= mult) == Vec3(6, 3, 6));
 	}
 
-	void MathTests::PlaneTests()
+	void PlaneTests()
 	{
 		Plane p1{ { 0,0,0 }, { 0,0,1 }, { 1,0,0 } };
 
