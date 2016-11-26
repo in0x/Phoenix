@@ -4,6 +4,8 @@
 
 namespace Phoenix
 {
+	// Small float value used to check for < 0 with tolerance for 
+	// floating point imprecission. 
 	const float VERY_SMALL_FLT = std::numeric_limits<float>::epsilon();
 
 	constexpr float pi()
