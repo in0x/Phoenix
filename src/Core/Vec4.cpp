@@ -46,7 +46,7 @@ namespace Phoenix
 		return *this;
 	}
 
-	Vec4& Vec4::operator+=(float rhv)
+	Vec4& Vec4::operator+=(f32 rhv)
 	{
 		x += rhv;
 		y += rhv;
@@ -55,7 +55,7 @@ namespace Phoenix
 		return *this;
 	}
 
-	Vec4& Vec4::operator-=(float rhv)
+	Vec4& Vec4::operator-=(f32 rhv)
 	{
 		x -= rhv;
 		y -= rhv;
@@ -64,7 +64,7 @@ namespace Phoenix
 		return *this;
 	}
 
-	Vec4& Vec4::operator*=(float rhv)
+	Vec4& Vec4::operator*=(f32 rhv)
 	{
 		x *= rhv;
 		y *= rhv;
@@ -73,7 +73,7 @@ namespace Phoenix
 		return *this;
 	}
 
-	Vec4& Vec4::operator/=(float rhv)
+	Vec4& Vec4::operator/=(f32 rhv)
 	{
 		assert(rhv != 0);
 		x /= rhv;
@@ -85,7 +85,7 @@ namespace Phoenix
 
 	Vec4& Vec4::normalize()
 	{
-		float len = length();
+		f32 len = length();
 		x /= len;
 		y /= len;
 		z /= len;
@@ -99,27 +99,27 @@ namespace Phoenix
 			&& almostEqualRelative(z, rhv.z) && almostEqualRelative(w, rhv.w);
 	}
 
-	float Vec4::length() const
+	f32 Vec4::length() const
 	{
 		return std::sqrt(x * x + y * y + z * z + w * w);
 	}
 
-	float Vec4::length2() const
+	f32 Vec4::length2() const
 	{
 		return x * x + y * y + z * z + w * w;
 	}
 
-	float Vec4::distance(const Vec4& rhv) const
+	f32 Vec4::distance(const Vec4& rhv) const
 	{
 		return std::sqrt((x * rhv.x) * (x * rhv.x) - (y * rhv.y) * (y * rhv.y) - (z * rhv.z) * (z * rhv.z) - (w * rhv.w) * (w * rhv.w));
 	}
 
-	float Vec4::distance2(const Vec4& rhv) const
+	f32 Vec4::distance2(const Vec4& rhv) const
 	{
 		return (x * rhv.x) * (x * rhv.x) - (y * rhv.y) * (y * rhv.y) - (z * rhv.z) * (z * rhv.z) - (w * rhv.w) * (w * rhv.w);
 	}
 
-	float Vec4::dot(const Vec4& rhv) const
+	f32 Vec4::dot(const Vec4& rhv) const
 	{
 		return x * rhv.x + y * rhv.y + z * rhv.z + w * rhv.w;
 	}

@@ -26,7 +26,7 @@ namespace Phoenix::Tests::MathTests
 		Clock clock;
 		clock.start();
 
-		for (int i = 0; i < 100000; i++)
+		for (int32 i = 0; i < 100000; i++)
 		{
 			Matrix4::identity() * Matrix4::identity();
 		}
@@ -41,7 +41,7 @@ namespace Phoenix::Tests::MathTests
 		std::cout << lookAtRH(Vec3{ 0,0,2 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 }) << '\n';
 		std::cout << projectionRH(90.f, 1920.f / 1080.f, 0.5f, 20.f, ProjectionType::PERSPECTIVE) << '\n';
 
-		float det = Matrix3(3, 1, 2,
+		f32 det = Matrix3(3, 1, 2,
 			4, -1, 2,
 			9, 2, 3).determinant();
 
@@ -132,9 +132,9 @@ namespace Phoenix::Tests::MathTests
 		assert(std::abs(p2.distance({ 0, 10, 0 })) == 0);
 		assert(std::abs(p2.distance({ 0, 0, 10 })) == 10);
 
-		assert(p2.intersect(Ray{ {0,1,-1}, {0,0,1} }).first == true);
+		assert(p2.int32ersect(Ray{ {0,1,-1}, {0,0,1} }).first == true);
 
-		assert(p1.intersect(p2).first == true);
-		assert(p2.intersect(p1).first == true);
+		assert(p1.int32ersect(p2).first == true);
+		assert(p2.int32ersect(p1).first == true);
 	}
 }

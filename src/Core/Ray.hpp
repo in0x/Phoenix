@@ -1,5 +1,6 @@
 #pragma once
 
+#include "PhiCoreRequired.hpp"
 #include "Point3D.hpp"
 
 namespace Phoenix
@@ -7,11 +8,11 @@ namespace Phoenix
 	class Ray
 	{
 	public:
-		Point3D origin;
+		Point323D origin;
 		Vec3 direction;
 		
-		Ray(const Point3D& _origin, const Vec3& _direction);
+		Ray(const Point323D& _origin, const Vec3& _direction);
 
-		Point3D pointAt(float t) const;
+		Point323D point32At(f32 t) const;
 	};
 }

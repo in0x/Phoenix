@@ -4,7 +4,7 @@
 
 namespace Phoenix
 {
-	Plane::Plane(const Vec3& _n, float _d)
+	Plane::Plane(const Vec3& _n, f32 _d)
 		: n(_n)
 		, d(_d)
 	{ 
@@ -26,68 +26,68 @@ namespace Phoenix
 		d = n.dot(p0);
 	}
 	
-	// Returns if ray intersects plane at positive t and if yes, at which t.
-	// The point of intersection can be gotten via ray.pointAt(t).
-	std::pair<bool, float> Plane::intersect(const Ray& ray) const
+	// Returns if ray int32ersects plane at positive t and if yes, at which t.
+	// The point32 of int32ersection can be gotten via ray.point32At(t).
+	std::pair<bool, f32> Plane::int32ersect(const Ray& ray) const
 	{
-		float denom = n.dot(ray.direction);
+		f32 denom = n.dot(ray.direction);
 		if (std::abs(denom) < VERY_SMALL_FLT) // Parallel.
 		{
 			return{ false, 0.f };
 		}
 		else
 		{
-			float nom = dot(ray.origin) - 2*d;
-			float t = -(nom / denom);
+			f32 nom = dot(ray.origin) - 2*d;
+			f32 t = -(nom / denom);
 
 			if (t > 0.0f)
 			{
-				return std::pair<bool, float>(true, t);
+				return std::pair<bool, f32>(true, t);
 			}
 			else
 			{
-				return std::pair<bool, float>(false, t);
+				return std::pair<bool, f32>(false, t);
 			}
 		}
 	}
 
-	// Find line (v,p) where the two planes intersect.
-	// If the do, their intersection line is also
+	// Find line (v,p) where the two planes int32ersect.
+	// If the do, their int32ersection line is also
 	// returned.
-	std::pair<bool, Ray> Plane::intersect(const Plane& other) const
+	std::pair<bool, Ray> Plane::int32ersect(const Plane& other) const
 	{
 		Vec3 v = n.cross(other.n);
-		float denom = v.dot(v);
+		f32 denom = v.dot(v);
 		
 		if (denom > VERY_SMALL_FLT)
 		{
 			auto p = v.cross(other.n) * d + n.cross(v) * other.d / denom;
-			return{ true, {Point3D{p.x, p.y, p.z}, v} };
+			return{ true, {Point323D{p.x, p.y, p.z}, v} };
 		}
 
-		return{ false , {Point3D{}, Vec3{}} };
+		return{ false , {Point323D{}, Vec3{}} };
 	}
 
-	float Plane::dot(const Vec3& dir) const
+	f32 Plane::dot(const Vec3& dir) const
 	{
 		return n.dot(dir);
 	}
 
-	float Plane::dot(const Point3D& point) const
+	f32 Plane::dot(const Point323D& point32) const
 	{
-		// d is added since a point represents a position,
+		// d is added since a point32 represents a position,
 		// which is offset from the origin
-		return n.dot(point.position) + d;
+		return n.dot(point32.position) + d;
 	}
 
-	float Plane::distance(const Vec3& point) const
+	f32 Plane::distance(const Vec3& point32) const
 	{
-		return dot(point);
+		return dot(point32);
 	}
 
-	Plane::Side Plane::getSideOn(const Vec3& point) const
+	Plane::Side Plane::getSideOn(const Vec3& point32) const
 	{
-		auto dist = distance(point);
+		auto dist = distance(point32);
 		
 		if (dist < 0.f)
 			return Side::BACK;
@@ -97,9 +97,9 @@ namespace Phoenix
 		return Side::ON;
 	}
 
-	Vec3 Plane::reflect(const Vec3& point) const
+	Vec3 Plane::reflect(const Vec3& point32) const
 	{
-		return point - 2.f * dot(point) * n;
+		return point32 - 2.f * dot(point32) * n;
 	}
 
 	void Plane::normalize()

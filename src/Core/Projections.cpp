@@ -23,11 +23,11 @@ namespace Phoenix::Rendering
 		};
 	}
 
-	Matrix4 projectionRH(float yFOV, float aspect, float near, float far, ProjectionType type)
+	Matrix4 projectionRH(f32 yFOV, f32 aspect, f32 near, f32 far, ProjectionType type)
 	{
-		float xFOV = yFOV / aspect;
-		float zoomX = 1.f / std::tan(xFOV / 2.f);
-		float zoomY = 1.f / std::tan(yFOV / 2.f);
+		f32 xFOV = yFOV / aspect;
+		f32 zoomX = 1.f / std::tan(xFOV / 2.f);
+		f32 zoomY = 1.f / std::tan(yFOV / 2.f);
 
 		if (type == ProjectionType::PERSPECTIVE)
 		{

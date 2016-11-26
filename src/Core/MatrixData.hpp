@@ -1,8 +1,9 @@
 #pragma once
 #include <array>
+#include "PhiCoreRequired.hpp"
 
 namespace Phoenix
 {
-	template<std::size_t N>
-	using MatrixData = std::array<std::array<float, N>, N>;
+	template<int32 N>
+	using MatrixData = std::array<std::array<f32, N>, N>;
 }

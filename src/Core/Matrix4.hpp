@@ -1,5 +1,6 @@
 #pragma once
 
+#include "PhiCoreRequired.hpp"
 #include <iostream>
 #include "MatrixData.hpp"
 
@@ -21,16 +22,16 @@ namespace Phoenix {
 			: m_data(MatrixData<4>{})
 		{}
 
-		Matrix4(float m00, float m01, float m02, float m03,
-			float m10, float m11, float m12, float m13,
-			float m20, float m21, float m22, float m23,
-			float m30, float m31, float m32, float m33);
+		Matrix4(f32 m00, f32 m01, f32 m02, f32 m03,
+			f32 m10, f32 m11, f32 m12, f32 m13,
+			f32 m20, f32 m21, f32 m22, f32 m23,
+			f32 m30, f32 m31, f32 m32, f32 m33);
 
 		// Subscript operator
-		float& operator()(std::size_t row, std::size_t col);
+		f32& operator()(int32 row, int32 col);
 
 		// Subscript operator
-		const float operator()(std::size_t row, std::size_t col) const;
+		const f32 operator()(int32 row, int32 col) const;
 
 		decltype(auto) begin()
 		{
@@ -59,16 +60,16 @@ namespace Phoenix {
 		Vec4 operator*(Vec4 rhv) const;
 		Vec3 operator*(Vec3 rhv) const;
 
-		Matrix4& operator+=(float f);
-		Matrix4& operator-=(float f);
-		Matrix4& operator*=(float f);
-		Matrix4& operator/=(float f);
+		Matrix4& operator+=(f32 f);
+		Matrix4& operator-=(f32 f);
+		Matrix4& operator*=(f32 f);
+		Matrix4& operator/=(f32 f);
 
 		bool operator==(const Matrix4& rhv);
 
-		float determinant() const;
-		float minor(int row0, int row1, int row2, int col0, int col1, int col2) const;
-		Matrix4 adjoint() const;
+		f32 determinant() const;
+		f32 minor(int32 row0, int32 row1, int32 row2, int32 col0, int32 col1, int32 col2) const;
+		Matrix4 adjoint32() const;
 
 		Matrix4& transposeSelf();
 		Matrix4 transpose() const;
@@ -79,8 +80,8 @@ namespace Phoenix {
 		Matrix3 asMatrix3() const;
 		EulerAngles asEulerAngles() const;
 
-		static Matrix4 scale(float x, float y, float z);
-		static Matrix4 translation(float x, float y, float z);
+		static Matrix4 scale(f32 x, f32 y, f32 z);
+		static Matrix4 translation(f32 x, f32 y, f32 z);
 
 		static Matrix4 identity();
 	};
@@ -88,10 +89,10 @@ namespace Phoenix {
 	Matrix4 operator+(Matrix4 lhv, const Matrix4& rhv);
 	Matrix4 operator-(Matrix4 lhv, const Matrix4& rhv);
 	Matrix4 operator*(Matrix4 lhv, const Matrix4& rhv);
-	Matrix4 operator+(Matrix4 lhv, float f);
-	Matrix4 operator-(Matrix4 lhv, float f);
-	Matrix4 operator*(Matrix4 lhv, float f);
-	Matrix4 operator/(Matrix4 lhv, float f);
+	Matrix4 operator+(Matrix4 lhv, f32 f);
+	Matrix4 operator-(Matrix4 lhv, f32 f);
+	Matrix4 operator*(Matrix4 lhv, f32 f);
+	Matrix4 operator/(Matrix4 lhv, f32 f);
 
 	inline std::ostream& operator<<(std::ostream& out, const Matrix4& mat4)
 	{

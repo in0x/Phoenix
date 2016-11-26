@@ -1,4 +1,6 @@
 #pragma once
+
+#include "PhiCoreRequired.hpp"
 #include <iostream>
 #include <cmath>
 #include <cassert>
@@ -10,7 +12,7 @@ namespace Phoenix
 	class Vec4
 	{
 	public:
-		float x, y, z, w;
+		f32 x, y, z, w;
 
 		Vec4()
 			: x(0.f)
@@ -19,19 +21,19 @@ namespace Phoenix
 			, w(0.f)
 		{}
 
-		Vec4(float _x, float _y, float _z, float _w)
+		Vec4(f32 _x, f32 _y, f32 _z, f32 _w)
 			: x(_x)
 			, y(_y)
 			, z(_z)
 			, w (_w)
 		{}
 
-		float& operator()(int i)
+		f32& operator()(int32 i)
 		{
 			return *(&x + i);
 		}
 
-		float operator()(int i) const
+		f32 operator()(int32 i) const
 		{
 			return *(&x + i);
 		}
@@ -48,22 +50,22 @@ namespace Phoenix
 
 		Vec4& operator*=(const Matrix4& rhv);
 
-		Vec4& operator+=(float rhv);
-		Vec4& operator-=(float rhv);
-		Vec4& operator*=(float rhv);
-		Vec4& operator/=(float rhv);
+		Vec4& operator+=(f32 rhv);
+		Vec4& operator-=(f32 rhv);
+		Vec4& operator*=(f32 rhv);
+		Vec4& operator/=(f32 rhv);
 		
 		bool operator==(const Vec4& rhv) const;
 
-		float length() const;
-		float length2() const;
+		f32 length() const;
+		f32 length2() const;
 	
-		float distance(const Vec4& rhv) const;
-		float distance2(const Vec4& rhv) const;
+		f32 distance(const Vec4& rhv) const;
+		f32 distance2(const Vec4& rhv) const;
 
 		Vec4& normalize();
 
-		float dot(const Vec4& rhv) const;
+		f32 dot(const Vec4& rhv) const;
 
 		Vec4 reflect(const Vec4& rhv) const;
 	};
@@ -92,28 +94,28 @@ namespace Phoenix
 		return lhv;
 	}
 
-	inline Vec4 operator+(const Vec4& lhv, float rhv)
+	inline Vec4 operator+(const Vec4& lhv, f32 rhv)
 	{
 		return Vec4{ lhv.x + rhv, lhv.y + rhv, lhv.z + rhv, lhv.w + rhv };
 	}
 
-	inline Vec4 operator-(const Vec4& lhv, float rhv)
+	inline Vec4 operator-(const Vec4& lhv, f32 rhv)
 	{
 		return Vec4{ lhv.x - rhv, lhv.y - rhv, lhv.z - rhv, lhv.w - rhv };
 	}
 
-	inline Vec4 operator*(const Vec4& lhv, float rhv)
+	inline Vec4 operator*(const Vec4& lhv, f32 rhv)
 	{
 		return Vec4{ lhv.x * rhv, lhv.y * rhv, lhv.z * rhv, lhv.w * rhv };
 	}
 
-	inline Vec4 operator*(float lhv, Vec4 rhv)
+	inline Vec4 operator*(f32 lhv, Vec4 rhv)
 	{
 		rhv *= lhv;
 		return rhv;
 	}
 
-	inline Vec4 operator/(const Vec4& lhv, float rhv)
+	inline Vec4 operator/(const Vec4& lhv, f32 rhv)
 	{
 		return Vec4{ lhv.x / rhv, lhv.y / rhv, lhv.z / rhv, lhv.w / rhv };
 	}

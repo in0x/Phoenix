@@ -1,4 +1,6 @@
 #pragma once
+
+#include "PhiCoreRequired.hpp"
 #include <iostream>
 #include <cmath>
 #include <cassert>
@@ -8,24 +10,24 @@ namespace Phoenix
 	class Vec2
 	{
 	public:
-		float x, y;
+		f32 x, y;
 		
 		Vec2()
 			: x(0.f)
 			, y(0.f)
 		{}
 
-		Vec2(float _x, float _y)
+		Vec2(f32 _x, f32 _y)
 			: x(_x)
 			, y(_y)
 		{}
 
-		float& operator()(int i)
+		f32& operator()(int32 i)
 		{
 			return *(&x + i);
 		}
 
-		float operator()(int i) const
+		f32 operator()(int32 i) const
 		{
 			return *(&x + i);
 		}
@@ -40,21 +42,21 @@ namespace Phoenix
 		Vec2& operator*=(const Vec2& rhv);
 		Vec2& operator/=(const Vec2& rhv);
 
-		Vec2& operator+=(float rhv);
-		Vec2& operator-=(float rhv);
-		Vec2& operator*=(float rhv);
-		Vec2& operator/=(float rhv);
+		Vec2& operator+=(f32 rhv);
+		Vec2& operator-=(f32 rhv);
+		Vec2& operator*=(f32 rhv);
+		Vec2& operator/=(f32 rhv);
 
 		bool operator==(const Vec2& rhv) const;
 
-		float length() const;
-		float length2() const;
+		f32 length() const;
+		f32 length2() const;
 
-		float distance(const Vec2& rhv) const;
-		float distance2(const Vec2& rhv) const;
+		f32 distance(const Vec2& rhv) const;
+		f32 distance2(const Vec2& rhv) const;
 
 		Vec2& normalize();
-		float dot(const Vec2& rhv) const;
+		f32 dot(const Vec2& rhv) const;
 		Vec2 reflect(const Vec2& rhv) const;
 	};
 
@@ -82,28 +84,28 @@ namespace Phoenix
 		return lhv;
 	}
 
-	inline const Vec2 operator+(const Vec2& lhv, float rhv)
+	inline const Vec2 operator+(const Vec2& lhv, f32 rhv)
 	{
 		return Vec2{ lhv.x + rhv, lhv.y + rhv };
 	}
 
-	inline const Vec2 operator-(const Vec2& lhv, float rhv)
+	inline const Vec2 operator-(const Vec2& lhv, f32 rhv)
 	{
 		return Vec2{ lhv.x - rhv, lhv.y - rhv };
 	}
 
-	inline const Vec2 operator*(const Vec2& lhv, float rhv)
+	inline const Vec2 operator*(const Vec2& lhv, f32 rhv)
 	{
 		return Vec2{ lhv.x * rhv, lhv.y * rhv };
 	}
 
-	inline const Vec2 operator*(float lhv, Vec2 rhv)
+	inline const Vec2 operator*(f32 lhv, Vec2 rhv)
 	{
 		rhv *= lhv;
 		return rhv;
 	}
 
-	inline const Vec2 operator/(const Vec2& lhv, float rhv)
+	inline const Vec2 operator/(const Vec2& lhv, f32 rhv)
 	{
 		return Vec2{ lhv.x / rhv, lhv.y / rhv };
 	}

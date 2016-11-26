@@ -7,7 +7,7 @@
 
 namespace Phoenix
 {
-	Quaternion::Quaternion(float w, float x, float y, float z)
+	Quaternion::Quaternion(f32 w, f32 x, f32 y, f32 z)
 		: w(w)
 		, x(x)
 		, y(y)
@@ -16,7 +16,7 @@ namespace Phoenix
 		normalize();
 	}
 
-	Quaternion Quaternion::fromExpMap(float theta, const Vec3& n)
+	Quaternion Quaternion::fromExpMap(f32 theta, const Vec3& n)
 	{
 		auto quat = Quaternion{ std::cos(theta / 2.f), std::sin(n.x / 2.f), std::sin(n.y / 2.f) , std::sin(n.z / 2.f) };
 		quat.normalize();
@@ -45,7 +45,7 @@ namespace Phoenix
 		return *this;
 	}
 
-	Quaternion& Quaternion::operator*=(float rhv)
+	Quaternion& Quaternion::operator*=(f32 rhv)
 	{
 		w *= rhv;
 		x *= rhv;
@@ -63,12 +63,12 @@ namespace Phoenix
 			&& almostEqualRelative(z, rhv.z) && almostEqualRelative(w, rhv.w);
 	}
 
-	float Quaternion::magnitude2()
+	f32 Quaternion::magnitude2()
 	{
 		return w * w + x * x + y * y + z * z;
 	}
 
-	float Quaternion::magnitude()
+	f32 Quaternion::magnitude()
 	{
 		return std::sqrt(magnitude2());
 	}
@@ -109,21 +109,21 @@ namespace Phoenix
 		return inverted;
 	}
 
-	float Quaternion::dot(const Quaternion& rhv) const
+	f32 Quaternion::dot(const Quaternion& rhv) const
 	{
 		return w * rhv.w + x * rhv.x + y * rhv.y + z * rhv.z;
 	}
 
 	EulerAngles Quaternion::asEulerAngles() const
 	{
-		float angleX, angleY, AngleZ;
+		f32 angleX, angleY, AngleZ;
 
-		float sqw = w*w;
-		float sqx = x*x;
-		float sqy = y*y;
-		float sqz = z*z;
-		float unit = sqx + sqy + sqz + sqw; // allows this to work on non-normalized quats.
-		float test = x*y + z*w;
+		f32 sqw = w*w;
+		f32 sqx = x*x;
+		f32 sqy = y*y;
+		f32 sqz = z*z;
+		f32 unit = sqx + sqy + sqz + sqw; // allows this to work on non-normalized quats.
+		f32 test = x*y + z*w;
 
 		if (test > 0.499f * unit) // Gimbal lock looking up.
 		{
@@ -154,20 +154,20 @@ namespace Phoenix
 		auto yAngle = radians(angles.y);
 		auto zAngle = radians(angles.z);
 
-		float c1 = std::cos(yAngle / 2.f);
-		float s1 = std::sin(yAngle / 2.f);
-		float c2 = std::cos(xAngle / 2.f);
-		float s2 = std::sin(xAngle / 2.f);
-		float c3 = std::cos(zAngle / 2.f);
-		float s3 = std::sin(zAngle / 2.f);
-		float c1c2 = c1*c2;
-		float s1s2 = s1*s2;
+		f32 c1 = std::cos(yAngle / 2.f);
+		f32 s1 = std::sin(yAngle / 2.f);
+		f32 c2 = std::cos(xAngle / 2.f);
+		f32 s2 = std::sin(xAngle / 2.f);
+		f32 c3 = std::cos(zAngle / 2.f);
+		f32 s3 = std::sin(zAngle / 2.f);
+		f32 c1c2 = c1*c2;
+		f32 s1s2 = s1*s2;
 
 		return Quaternion{ c1c2*c3 - s1s2*s3 , c1c2*s3 + s1s2*c3, s1*c2*c3 + c1*s2*s3, c1*s2*c3 - s1*c2*s3 };
 	}
 
 
-	Quaternion operator*(Quaternion lhv, float rhv)
+	Quaternion operator*(Quaternion lhv, f32 rhv)
 	{
 		lhv *= rhv;
 		return lhv;
@@ -179,10 +179,10 @@ namespace Phoenix
 		return lhv;
 	}
 
-	// Geometric interpretation of Slerp (interpolation over points on 4D hypersphere)
-	Quaternion slerp(Quaternion a, const Quaternion& b, float t)
+	// Geometric int32erpretation of Slerp (int32erpolation over point32s on 4D hypersphere)
+	Quaternion slerp(Quaternion a, const Quaternion& b, f32 t)
 	{
-		float cosOmega = a.dot(b);
+		f32 cosOmega = a.dot(b);
 
 		// If dot product is negative, we invert to calculate the
 		// smaller of the two possible rotations.
@@ -194,7 +194,7 @@ namespace Phoenix
 			a.z = -a.z;
 		}
 
-		float k0, k1;
+		f32 k0, k1;
 
 		// If dot is close to 0, the two quaternions represent very close
 		// orientations, so we just use lerp.
@@ -206,9 +206,9 @@ namespace Phoenix
 		else
 		{
 			// use pythagorean identity to to get sinOmega
-			float sinOmega = std::sqrt(1.f - cosOmega * cosOmega);
+			f32 sinOmega = std::sqrt(1.f - cosOmega * cosOmega);
 
-			float omega = std::atan2(sinOmega, cosOmega);
+			f32 omega = std::atan2(sinOmega, cosOmega);
 
 			k0 = std::sin((1.f - t) * omega) / omega;
 			k1 = std::sin(t * omega) / omega;

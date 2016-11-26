@@ -1,14 +1,15 @@
 #pragma once
 
+#include "PhiCoreRequired.hpp"
 #include "Vec3.hpp"
 
 namespace Phoenix
 {
-	class Point3D;
+	class Point323D;
 	class Ray;
 
 	// Implicit representation of plane using normal vector
-	// and dot between normal and point on plane. d is basically 
+	// and dot between normal and point32 on plane. d is basically 
 	// the magnitude of how far up or down the normal the plane
 	// lies , i.e. the distance to the origin.
 	class Plane
@@ -17,27 +18,27 @@ namespace Phoenix
 		
 		enum class Side
 		{
-			FRONT, // Halfspace toward which normal points
+			FRONT, // Halfspace toward which normal point32s
 			BACK,
 			ON
 		};
 
 		Vec3 n;
-		float d;
+		f32 d;
 
-		Plane(const Vec3& _n, float _d);
+		Plane(const Vec3& _n, f32 _d);
 		Plane(const Plane& other);
 		Plane(const Vec3& p0, const Vec3& p1, const Vec3& p2);
 
 		void normalize();
-		float dot(const Vec3& dir) const;
-		float dot(const Point3D& point) const;
+		f32 dot(const Vec3& dir) const;
+		f32 dot(const Point323D& point32) const;
 
-		Side getSideOn(const Vec3& point) const;
-		float distance(const Vec3& point) const;
-		Vec3 reflect(const Vec3& point) const;
+		Side getSideOn(const Vec3& point32) const;
+		f32 distance(const Vec3& point32) const;
+		Vec3 reflect(const Vec3& point32) const;
 
-		std::pair<bool, float> intersect(const Ray& ray) const;
-		std::pair<bool, Ray> intersect(const Plane& other) const;
+		std::pair<bool, f32> int32ersect(const Ray& ray) const;
+		std::pair<bool, Ray> int32ersect(const Plane& other) const;
 	};
 }

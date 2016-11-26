@@ -43,7 +43,7 @@ namespace Phoenix
 		return *this;
 	}
 
-	Vec3& Vec3::operator+=(float rhv)
+	Vec3& Vec3::operator+=(f32 rhv)
 	{
 		x += rhv;
 		y += rhv;
@@ -51,7 +51,7 @@ namespace Phoenix
 		return *this;
 	}
 
-	Vec3& Vec3::operator-=(float rhv)
+	Vec3& Vec3::operator-=(f32 rhv)
 	{
 		x -= rhv;
 		y -= rhv;
@@ -59,7 +59,7 @@ namespace Phoenix
 		return *this;
 	}
 
-	Vec3& Vec3::operator*=(float rhv)
+	Vec3& Vec3::operator*=(f32 rhv)
 	{
 		x *= rhv;
 		y *= rhv;
@@ -67,7 +67,7 @@ namespace Phoenix
 		return *this;
 	}
 
-	Vec3& Vec3::operator/=(float rhv)
+	Vec3& Vec3::operator/=(f32 rhv)
 	{
 		assert(rhv != 0);
 		x /= rhv;
@@ -82,29 +82,29 @@ namespace Phoenix
 			&& almostEqualRelative(z, rhv.z);
 	}
 
-	float Vec3::length() const
+	f32 Vec3::length() const
 	{
 		return std::sqrt(x * x + y * y + z * z);
 	}
 
-	float Vec3::length2() const
+	f32 Vec3::length2() const
 	{
 		return x * x + y * y + z * z;
 	}
 
-	float Vec3::distance(const Vec3& rhv) const
+	f32 Vec3::distance(const Vec3& rhv) const
 	{
 		return std::sqrt((x * rhv.x) * (x * rhv.x) - (y * rhv.y) * (y * rhv.y) - (z * rhv.z) * (z * rhv.z));
 	}
 
-	float Vec3::distance2(const Vec3& rhv) const
+	f32 Vec3::distance2(const Vec3& rhv) const
 	{
 		return (x * rhv.x) * (x * rhv.x) - (y * rhv.y) * (y * rhv.y) - (z * rhv.z) * (z * rhv.z);
 	}
 
 	Vec3& Vec3::normalize()
 	{
-		float len = length();
+		f32 len = length();
 		x /= len;
 		y /= len;
 		z /= len;
@@ -121,7 +121,7 @@ namespace Phoenix
 		};
 	}
 
-	float Vec3::dot(const Vec3& rhv) const
+	f32 Vec3::dot(const Vec3& rhv) const
 	{
 		return x * rhv.x + y * rhv.y + z * rhv.z;
 	}

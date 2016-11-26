@@ -3,25 +3,25 @@
 namespace Phoenix
 {
 	// Uses the fast inverse sqrt trick also used in Quake3.
-	float fastInvSqrt(float x)
+	f32 fastInvSqrt(f32 x)
 	{
-		float xhalf = 0.5f * x;
-		int i = *(int*)&x;            // store floating-point bits in integer
+		f32 xhalf = 0.5f * x;
+		int32 i = *(int32*)&x;            // store f32ing-point32 bits in int32eger
 		i = 0x5f3759df - (i >> 1);    // initial guess for Newton's method
-		x = *(float*)&i;              // convert new bits into float
+		x = *(f32*)&i;              // convert new bits int32o f32
 		x = x*(1.5f - xhalf*x*x);     // One round of Newton's method
 		return x;
 	}
 
-	// If the absolute difference between two floats is within an a small n% of the
+	// If the absolute difference between two f32s is within an a small n% of the
 	// larger of the two numbers, we can consider them to be equal.
-	bool almostEqualRelative(float a, float b, float maxRelDif)
+	bool almostEqualRelative(f32 a, f32 b, f32 maxRelDif)
 	{
-		float diff = std::abs(a - b);
+		f32 diff = std::abs(a - b);
 		a = std::abs(a);
 		b = std::abs(b);
 
-		float larger = std::max(a, b);
+		f32 larger = std::max(a, b);
 
 		if (diff <= larger * maxRelDif)
 			return true;

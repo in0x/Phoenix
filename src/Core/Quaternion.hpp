@@ -1,5 +1,6 @@
 #pragma once
 
+#include "PhiCoreRequired.hpp"
 #include <iostream>
 
 namespace Phoenix
@@ -12,23 +13,23 @@ namespace Phoenix
 	class Quaternion
 	{
 	public: 
-		float w;
-		float x;
-		float y;
-		float z;
-		Quaternion(float w, float x, float y, float z);
+		f32 w;
+		f32 x;
+		f32 y;
+		f32 z;
+		Quaternion(f32 w, f32 x, f32 y, f32 z);
 
-		static Quaternion fromExpMap(float theta, const Vec3& n);
+		static Quaternion fromExpMap(f32 theta, const Vec3& n);
 		static Quaternion fromEulerAngles(const Vec3& angles);
 
 		Matrix4 toMatrix4() const;
 
 		Quaternion& operator*=(const Quaternion& rhv);
-		Quaternion& operator*=(float rhv);
+		Quaternion& operator*=(f32 rhv);
 		bool operator==(const Quaternion& rhv) const;
 		
-		float magnitude2();
-		float magnitude();
+		f32 magnitude2();
+		f32 magnitude();
 		void normalize();
 
 		void conjugateSelf();
@@ -37,16 +38,16 @@ namespace Phoenix
 		void inverseSelf();
 		Quaternion inverse() const;
 
-		float dot(const Quaternion& rhv) const;
+		f32 dot(const Quaternion& rhv) const;
 
 		EulerAngles asEulerAngles() const;
 
 		static Quaternion fromEulerAngles(const EulerAngles& angles);
 	};
 
-	Quaternion operator*(Quaternion lhv, float rhv);
+	Quaternion operator*(Quaternion lhv, f32 rhv);
 	Quaternion operator*(Quaternion lhv, const Quaternion& rhv);
-	Quaternion slerp(Quaternion a, const Quaternion& b, float t);
+	Quaternion slerp(Quaternion a, const Quaternion& b, f32 t);
 
 	inline std::ostream& operator<<(std::ostream& out, const Quaternion& quat)
 	{

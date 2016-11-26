@@ -2,21 +2,21 @@
 
 namespace Phoenix
 {
-	Point3D::Point3D()
+	Point323D::Point323D()
 	{
 	}
 
-	Point3D::Point3D(float x, float y, float z)
+	Point323D::Point323D(f32 x, f32 y, f32 z)
 		: position(x,y,z)
 	{
 	}
 
-	void Point3D::operator+=(const Vec3& rhv)
+	void Point323D::operator+=(const Vec3& rhv)
 	{
 		position += rhv;
 	}
 
-	void Point3D::operator-=(const Vec3& rhv)
+	void Point323D::operator-=(const Vec3& rhv)
 	{
 		position -= rhv;
 	}

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "PhiCoreRequired.hpp"
+
 namespace Phoenix
 {
 	class Clock
@@ -9,15 +11,15 @@ namespace Phoenix
 		void stop();
 		void restart();
 
-		double getElapsedS();
-		double getElapsedMS();
+		f64 getElapsedS();
+		f64 getElapsedMS();
 
 		bool started();
 
 	private:
-		double m_timeAtStart;
-		int m_bStarted : 1;
+		f64 m_timeAtStart;
+		int32 m_bStarted : 1;
 
-		double getElapsedTime();
+		f64 getElapsedTime();
 	};
 }

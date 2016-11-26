@@ -7,21 +7,21 @@
 
 namespace Phoenix
 {
-	Matrix3::Matrix3(float m00, float m01, float m02, 
-					 float m10, float m11, float m12,
-					 float m20, float m21, float m22)
+	Matrix3::Matrix3(f32 m00, f32 m01, f32 m02, 
+					 f32 m10, f32 m11, f32 m12,
+					 f32 m20, f32 m21, f32 m22)
 	{
 		m_data[0][0] = m00; m_data[0][1] = m10; m_data[0][2] = m20;
 		m_data[1][0] = m01; m_data[1][1] = m11; m_data[1][2] = m21;
 		m_data[2][0] = m02; m_data[2][1] = m12; m_data[2][2] = m22;
 	}
 
-	float& Matrix3::operator()(std::size_t row, std::size_t col)
+	f32& Matrix3::operator()(int32 row, int32 col)
 	{
 		return m_data[col][row];
 	}
 
-	const float Matrix3::operator()(std::size_t row, std::size_t col) const
+	const f32 Matrix3::operator()(int32 row, int32 col) const
 	{
 		return m_data[col][row];
 	}
@@ -30,9 +30,9 @@ namespace Phoenix
 	{
 		Matrix3& lhv = *this;
 
-		for (std::size_t row = 0; row < 3; row++)
+		for (int32 row = 0; row < 3; row++)
 		{
-			for (std::size_t col = 0; col < 3; col++)
+			for (int32 col = 0; col < 3; col++)
 			{
 				lhv(row, col) += rhv(row, col);
 			}
@@ -45,9 +45,9 @@ namespace Phoenix
 	{
 		Matrix3& lhv = *this;
 
-		for (std::size_t row = 0; row < 3; row++)
+		for (int32 row = 0; row < 3; row++)
 		{
-			for (std::size_t col = 0; col < 3; col++)
+			for (int32 col = 0; col < 3; col++)
 			{
 				lhv(row, col) -= rhv(row, col);
 			}
@@ -61,9 +61,9 @@ namespace Phoenix
 		Matrix3 dest{};
 		Matrix3& lhv = *this;
 
-		for (std::size_t row = 0; row < 3; row++)
+		for (int32 row = 0; row < 3; row++)
 		{
-			for (std::size_t col = 0; col < 3; col++)
+			for (int32 col = 0; col < 3; col++)
 			{
 				dest(row, col) = lhv(row, 0) * rhv(0, col) + lhv(row, 1) * rhv(1, col) + lhv(row, 2) * rhv(2, col);
 			}
@@ -78,7 +78,7 @@ namespace Phoenix
 		Vec3 dest{};
 		const Matrix3& lhv = *this;
 
-		for (int i = 0; i < 3; i++)
+		for (int32 i = 0; i < 3; i++)
 		{
 			dest(i) += lhv(i, 0) * rhv(0) + lhv(i, 1) * rhv(1) + lhv(i, 2) * rhv(2);
 		}
@@ -86,7 +86,7 @@ namespace Phoenix
 		return dest;
 	}
 
-	Matrix3& Matrix3::operator+=(float f)
+	Matrix3& Matrix3::operator+=(f32 f)
 	{
 		for (auto& row : m_data)
 		{
@@ -98,7 +98,7 @@ namespace Phoenix
 		return *this;
 	}
 
-	Matrix3& Matrix3::operator-=(float f)
+	Matrix3& Matrix3::operator-=(f32 f)
 	{
 		for (auto& row : m_data)
 		{
@@ -110,7 +110,7 @@ namespace Phoenix
 		return *this;
 	}
 
-	Matrix3& Matrix3::operator*=(float f)
+	Matrix3& Matrix3::operator*=(f32 f)
 	{
 		for (auto& row : m_data)
 		{
@@ -122,7 +122,7 @@ namespace Phoenix
 		return *this;
 	}
 
-	Matrix3& Matrix3::operator/=(float f)
+	Matrix3& Matrix3::operator/=(f32 f)
 	{
 		for (auto& row : m_data)
 		{
@@ -138,9 +138,9 @@ namespace Phoenix
 	{
 		Matrix3& lhv = *this;
 		
-		for (int i = 0; i < 3; i++)
+		for (int32 i = 0; i < 3; i++)
 		{
-			for (int j = 0; j < 3; j++)
+			for (int32 j = 0; j < 3; j++)
 			{
 				if (!almostEqualRelative(lhv(i, j), rhv(i, j)))
 				{
@@ -153,11 +153,11 @@ namespace Phoenix
 
 	Matrix3& Matrix3::transposeSelf()
 	{
-		float temp = 0;
+		f32 temp = 0;
 		Matrix3& self = *this;
-		for (int i = 0; i < 3; i++)
+		for (int32 i = 0; i < 3; i++)
 		{
-			for (int j = i + 1; j < 3; j++)
+			for (int32 j = i + 1; j < 3; j++)
 			{
 				temp = self(i, j);
 				self(i, j) = self(j, i);
@@ -178,7 +178,7 @@ namespace Phoenix
 	// Passing the indices of the 2 rows and columns which make up the minor matrix allows us
 	// to easily calculate the minor without having to figure out the omitted row and column
 	// ourselfs.
-	float Matrix3::minor(int row0, int row1, int col0, int col1) const
+	f32 Matrix3::minor(int32 row0, int32 row1, int32 col0, int32 col1) const
 	{
 		const Matrix3& self = *this;
 		return self(row0, col0) * self(row1, col1) - self(row1, col0) * self(row0, col1);
@@ -189,7 +189,7 @@ namespace Phoenix
 	// for each element in the topmost row created by omitting the row and column that
 	// the current element is in and sum up using the (-1 ^ i + j) pattern to create the
 	// cofactors.
-	float Matrix3::determinant() const
+	f32 Matrix3::determinant() const
 	{
 		const Matrix3& self = *this;
 		return self(0, 0) * minor(1, 2, 1, 2) -
@@ -197,8 +197,8 @@ namespace Phoenix
 			   self(0, 2) * minor(1, 2, 0, 1);
 	}
 
-	// Classical adjoint is transpose of matrix of cofactors
-	Matrix3 Matrix3::adjoint() const
+	// Classical adjoint32 is transpose of matrix of cofactors
+	Matrix3 Matrix3::adjoint32() const
 	{
 		return Matrix3
 		{
@@ -212,7 +212,7 @@ namespace Phoenix
 	{
 		auto det = determinant();
 		assert(det);
-		return adjoint() / det;
+		return adjoint32() / det;
 	}
 
 	Matrix3& Matrix3::inverseSelf()
@@ -237,13 +237,13 @@ namespace Phoenix
 	// are not guaranteed to return the correct orientation.
 	EulerAngles Matrix3::asEulerAngles() const
 	{
-		float x, y, z;
+		f32 x, y, z;
 		const Matrix3& self = *this;
 
 		y = -std::asin(self(0, 2));
 		auto C = std::cos(y);
 
-		if (std::abs(C) > 0.005f) // Account for floating point inaccuracy
+		if (std::abs(C) > 0.005f) // Account for f32ing point32 inaccuracy
 		{
 			auto A = self(2, 2) / C;
 			auto B = -self(1, 2) / C;
@@ -279,12 +279,12 @@ namespace Phoenix
 		auto y = radians(angles.y);
 		auto z = radians(angles.z);
 
-		float A = std::cos(x);
-		float B = std::sin(x);
-		float C = std::cos(y);
-		float D = std::sin(y);
-		float E = std::cos(z);
-		float F = std::sin(z);
+		f32 A = std::cos(x);
+		f32 B = std::sin(x);
+		f32 C = std::cos(y);
+		f32 D = std::sin(y);
+		f32 E = std::cos(z);
+		f32 F = std::sin(z);
 
 		return Matrix3
 		{
@@ -333,25 +333,25 @@ namespace Phoenix
 		return lhv;
 	}
 
-	Matrix3 operator+(Matrix3 lhv, float f)
+	Matrix3 operator+(Matrix3 lhv, f32 f)
 	{
 		lhv += f;
 		return lhv;
 	}
 
-	Matrix3 operator-(Matrix3 lhv, float f)
+	Matrix3 operator-(Matrix3 lhv, f32 f)
 	{
 		lhv -= f;
 		return lhv;
 	}
 
-	Matrix3 operator*(Matrix3 lhv, float f)
+	Matrix3 operator*(Matrix3 lhv, f32 f)
 	{
 		lhv *= f;
 		return lhv;
 	}
 
-	Matrix3 operator/(Matrix3 lhv, float f)
+	Matrix3 operator/(Matrix3 lhv, f32 f)
 	{
 		lhv /= f;
 		return lhv;
