@@ -128,13 +128,13 @@ namespace Phoenix
 		if (test > 0.499f * unit) // Gimbal lock looking up.
 		{
 			angleX = 2.f * atan2(x, w);
-			angleY = pi() / 2.f;
+			angleY = PI / 2.f;
 			AngleZ = 0.f;
 		}
 		else if (test < -0.499f * unit) // Gimbal lock looking down.
 		{
 			angleX = -2.f * atan2(x, w);
-			angleY = -pi() / 2.f;
+			angleY = -PI / 2.f;
 			AngleZ = 0.f;
 		}
 		else

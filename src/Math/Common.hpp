@@ -6,21 +6,18 @@ namespace Phoenix
 {
 	// Small float value used to check for < 0 with tolerance for 
 	// floating point imprecission. 
-	const float VERY_SMALL_FLT = std::numeric_limits<float>::epsilon();
+	constexpr float VERY_SMALL_FLT = std::numeric_limits<float>::epsilon();
 
-	constexpr float pi()
-	{
-		return 3.1415926535897932384626433832795f;
-	}
+	constexpr float PI = 3.1415926535897932384626433832795f;
 
 	constexpr float degrees(float angleRad)
 	{
-		return angleRad * (180.f / pi());
+		return angleRad * (180.f / PI);
 	}
 
 	constexpr float radians(float angleDeg)
 	{
-		return angleDeg * (pi() / 180.f);
+		return angleDeg * (PI / 180.f);
 	}
 
 	float fastInvSqrt(float x);
