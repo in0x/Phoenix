@@ -26,23 +26,13 @@ namespace Phoenix
 			, w (_w)
 		{}
 
-		// Sets out of bounds index to 0.
 		float& operator()(int i)
 		{
-			if (i > 3 || i < 0)
-			{
-				i = 0;
-			}
 			return *(&x + i);
 		}
 
-		// Sets out of bounds index to 0.
 		float operator()(int i) const
 		{
-			if (i > 3 || i < 0)
-			{
-				i = 0;
-			}
 			return *(&x + i);
 		}
 

@@ -38,7 +38,7 @@ namespace Phoenix
 
 		float& operator()(std::size_t row, std::size_t col);
 
-		const float& operator()(std::size_t row, std::size_t col) const;
+		const float operator()(std::size_t row, std::size_t col) const;
 
 		decltype(auto) begin()
 		{

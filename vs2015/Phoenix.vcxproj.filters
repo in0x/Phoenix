@@ -10,6 +10,9 @@
     <Filter Include="Rendering">
       <UniqueIdentifier>{8149717f-c49b-430d-bca2-a5526cb121eb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Utility">
+      <UniqueIdentifier>{37633457-4698-4a0c-9435-4d1efdca354f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Catch\Catch.hpp">
@@ -60,6 +63,9 @@
     <ClInclude Include="..\src\Math\Point3D.hpp">
       <Filter>Math</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Utility\Clock.hpp">
+      <Filter>Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -101,6 +107,9 @@
     </ClCompile>
     <ClCompile Include="..\src\Math\Point3D.cpp">
       <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Utility\Clock.cpp">
+      <Filter>Utility</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

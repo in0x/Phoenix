@@ -9,7 +9,7 @@ namespace Phoenix
 	{
 	public:
 		float x, y;
-
+		
 		Vec2()
 			: x(0.f)
 			, y(0.f)
@@ -20,23 +20,13 @@ namespace Phoenix
 			, y(_y)
 		{}
 
-		// Sets out of bounds index to 0.
 		float& operator()(int i)
 		{
-			if (i > 1 || i < 0)
-			{
-				i = 0;
-			}
 			return *(&x + i);
 		}
 
-		// Sets out of bounds index to 0.
 		float operator()(int i) const
 		{
-			if (i > 1 || i < 0)
-			{
-				i = 0;
-			}
 			return *(&x + i);
 		}
 

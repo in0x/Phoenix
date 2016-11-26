@@ -21,27 +21,11 @@ namespace Phoenix
 
 	float& Matrix4::operator()(std::size_t row, std::size_t col)
 	{
-		if (row >= m_data.size() || row < 0)
-		{
-			row = 0;
-		}
-		if (col >= m_data.size() || row < 0)
-		{
-			col = 0;
-		}
 		return m_data[col][row];
 	}
 
-	const float& Matrix4::operator()(std::size_t row, std::size_t col) const
+	const float Matrix4::operator()(std::size_t row, std::size_t col) const
 	{
-		if (row >= m_data.size() || row < 0)
-		{
-			row = 0;
-		}
-		if (col >= m_data.size() || row < 0)
-		{
-			col = 0;
-		}
 		return m_data[col][row];
 	}
 
@@ -49,9 +33,9 @@ namespace Phoenix
 	{
 		Matrix4& lhv = *this;
 
-		for (std::size_t row = 0; row < rows(); row++)
+		for (std::size_t row = 0; row < 4; row++)
 		{
-			for (std::size_t col = 0; col < columns(); col++)
+			for (std::size_t col = 0; col < 4; col++)
 			{
 				lhv(row, col) += rhv(row, col);
 			}
@@ -64,9 +48,9 @@ namespace Phoenix
 	{
 		Matrix4& lhv = *this;
 
-		for (std::size_t row = 0; row < rows(); row++)
+		for (std::size_t row = 0; row < 4; row++)
 		{
-			for (std::size_t col = 0; col < columns(); col++)
+			for (std::size_t col = 0; col < 4; col++)
 			{
 				lhv(row, col) -= rhv(row, col);
 			}
@@ -80,13 +64,11 @@ namespace Phoenix
 		Matrix4 dest{};
 		Matrix4& lhv = *this;
 
-		// Transposing the other matrix will improve cache-miss rate.
-
-		for (int i = 0; i <= m_data.size(); i++)
+		for (std::size_t row = 0; row < 4; row++)
 		{
-			for (int j = 0; j <= m_data.size(); j++)
+			for (std::size_t col = 0; col < 4; col++)
 			{
-				dest(i, j) = lhv(i, 0) * rhv(0, j) + lhv(i, 1) * rhv(1, j) + lhv(i, 2) * rhv(2, j) + lhv(i, 3) * rhv(3, j);
+				dest(row, col) = lhv(row, 0) * rhv(0, col) + lhv(row, 1) * rhv(1, col) + lhv(row, 2) * rhv(2, col) + lhv(row, 3) * rhv(3, col);
 			}
 		}
 
@@ -99,7 +81,7 @@ namespace Phoenix
 		Vec4 dest{};
 		const Matrix4& lhv = *this;
 
-		for (int i = 0; i < lhv.rows(); i++)
+		for (int i = 0; i < 4; i++)
 		{
 			dest(i) += lhv(i, 0) * rhv(0) + lhv(i, 1) * rhv(1) + lhv(i, 2) * rhv(2) + lhv(i, 3) * rhv(3);
 		}
@@ -171,11 +153,10 @@ namespace Phoenix
 	bool Matrix4::operator==(const Matrix4& rhv)
 	{
 		Matrix4& lhv = *this;
-		auto N = rows();
-
-		for (int i = 0; i < N; i++)
+		
+		for (int i = 0; i < 4; i++)
 		{
-			for (int j = 0; j < N; j++)
+			for (int j = 0; j < 4; j++)
 			{
 				if (!almostEqualRelative(lhv(i, j), rhv(i, j)))
 				{
@@ -190,9 +171,10 @@ namespace Phoenix
 	{
 		float temp = 0;
 		Matrix4& self = *this;
-		for (int i = 0; i < rows(); i++)
+
+		for (int i = 0; i < 4; i++)
 		{
-			for (int j = i + 1; j < columns(); j++)
+			for (int j = i + 1; j < 4; j++)
 			{
 				temp = self(i, j);
 				self(i, j) = self(j, i);

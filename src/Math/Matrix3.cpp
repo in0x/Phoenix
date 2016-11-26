@@ -18,27 +18,11 @@ namespace Phoenix
 
 	float& Matrix3::operator()(std::size_t row, std::size_t col)
 	{
-		if (row >= m_data.size() || row < 0)
-		{
-			row = 0;
-		}
-		if (col >= m_data.size() || row < 0)
-		{
-			col = 0;
-		}
 		return m_data[col][row];
 	}
 
-	const float& Matrix3::operator()(std::size_t row, std::size_t col) const
+	const float Matrix3::operator()(std::size_t row, std::size_t col) const
 	{
-		if (row >= m_data.size() || row < 0)
-		{
-			row = 0;
-		}
-		if (col >= m_data.size() || row < 0)
-		{
-			col = 0;
-		}
 		return m_data[col][row];
 	}
 
@@ -46,9 +30,9 @@ namespace Phoenix
 	{
 		Matrix3& lhv = *this;
 
-		for (std::size_t row = 0; row < rows(); row++)
+		for (std::size_t row = 0; row < 3; row++)
 		{
-			for (std::size_t col = 0; col < columns(); col++)
+			for (std::size_t col = 0; col < 3; col++)
 			{
 				lhv(row, col) += rhv(row, col);
 			}
@@ -61,9 +45,9 @@ namespace Phoenix
 	{
 		Matrix3& lhv = *this;
 
-		for (std::size_t row = 0; row < rows(); row++)
+		for (std::size_t row = 0; row < 3; row++)
 		{
-			for (std::size_t col = 0; col < columns(); col++)
+			for (std::size_t col = 0; col < 3; col++)
 			{
 				lhv(row, col) -= rhv(row, col);
 			}
@@ -77,11 +61,11 @@ namespace Phoenix
 		Matrix3 dest{};
 		Matrix3& lhv = *this;
 
-		for (int i = 0; i <= m_data.size(); i++)
+		for (std::size_t row = 0; row < 3; row++)
 		{
-			for (int j = 0; j <= m_data.size(); j++)
+			for (std::size_t col = 0; col < 3; col++)
 			{
-				dest(i, j) = lhv(i, 0) * rhv(0, j) + lhv(i, 1) * rhv(1, j) + lhv(i, 2) * rhv(2, j);
+				dest(row, col) = lhv(row, 0) * rhv(0, col) + lhv(row, 1) * rhv(1, col) + lhv(row, 2) * rhv(2, col);
 			}
 		}
 
@@ -94,7 +78,7 @@ namespace Phoenix
 		Vec3 dest{};
 		const Matrix3& lhv = *this;
 
-		for (int i = 0; i < lhv.rows(); i++)
+		for (int i = 0; i < 3; i++)
 		{
 			dest(i) += lhv(i, 0) * rhv(0) + lhv(i, 1) * rhv(1) + lhv(i, 2) * rhv(2);
 		}
@@ -153,11 +137,10 @@ namespace Phoenix
 	bool Matrix3::operator==(const Matrix3& rhv)
 	{
 		Matrix3& lhv = *this;
-		auto N = rows();
-
-		for (int i = 0; i < N; i++)
+		
+		for (int i = 0; i < 3; i++)
 		{
-			for (int j = 0; j < N; j++)
+			for (int j = 0; j < 3; j++)
 			{
 				if (!almostEqualRelative(lhv(i, j), rhv(i, j)))
 				{
@@ -172,9 +155,9 @@ namespace Phoenix
 	{
 		float temp = 0;
 		Matrix3& self = *this;
-		for (int i = 0; i < rows(); i++)
+		for (int i = 0; i < 3; i++)
 		{
-			for (int j = i + 1; j < columns(); j++)
+			for (int j = i + 1; j < 3; j++)
 			{
 				temp = self(i, j);
 				self(i, j) = self(j, i);
