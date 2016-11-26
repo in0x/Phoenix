@@ -158,42 +158,42 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\Catch\Catch.hpp" />
-    <ClInclude Include="..\src\Catch\MathTests.hpp" />
-    <ClInclude Include="..\src\Math\Common.hpp" />
-    <ClInclude Include="..\src\Math\EulerAngles.hpp" />
-    <ClInclude Include="..\src\Math\Matrix3.hpp" />
-    <ClInclude Include="..\src\Math\Matrix4.hpp" />
-    <ClInclude Include="..\src\Math\MatrixData.hpp" />
-    <ClInclude Include="..\src\Math\PhiMath.hpp" />
-    <ClInclude Include="..\src\Math\Plane.hpp" />
-    <ClInclude Include="..\src\Math\Point3D.hpp" />
-    <ClInclude Include="..\src\Math\Quaternion.hpp" />
-    <ClInclude Include="..\src\Math\Ray.hpp" />
-    <ClInclude Include="..\src\Math\Vec2.hpp" />
-    <ClInclude Include="..\src\Math\Vec3.hpp" />
-    <ClInclude Include="..\src\Math\Vec4.hpp" />
-    <ClInclude Include="..\src\Rendering\Projections.hpp" />
-    <ClInclude Include="..\src\Utility\Clock.hpp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\Catch\MathTests.cpp" />
+    <ClCompile Include="..\src\Core\Clock.cpp" />
+    <ClCompile Include="..\src\Core\Common.cpp" />
+    <ClCompile Include="..\src\Core\Matrix3.cpp" />
+    <ClCompile Include="..\src\Core\Matrix4.cpp" />
+    <ClCompile Include="..\src\Core\Plane.cpp" />
+    <ClCompile Include="..\src\Core\Point3D.cpp" />
+    <ClCompile Include="..\src\Core\Projections.cpp" />
+    <ClCompile Include="..\src\Core\Quaternion.cpp" />
+    <ClCompile Include="..\src\Core\Ray.cpp" />
+    <ClCompile Include="..\src\Core\Vec2.cpp" />
+    <ClCompile Include="..\src\Core\Vec3.cpp" />
+    <ClCompile Include="..\src\Core\Vec4.cpp" />
     <ClCompile Include="..\src\Main.cpp" />
-    <ClCompile Include="..\src\Math\Common.cpp" />
-    <ClCompile Include="..\src\Math\Matrix3.cpp" />
-    <ClCompile Include="..\src\Math\Matrix4.cpp" />
-    <ClCompile Include="..\src\Math\Plane.cpp" />
-    <ClCompile Include="..\src\Math\Point3D.cpp" />
-    <ClCompile Include="..\src\Math\Quaternion.cpp" />
-    <ClCompile Include="..\src\Math\Ray.cpp" />
-    <ClCompile Include="..\src\Math\Vec2.cpp" />
-    <ClCompile Include="..\src\Math\Vec3.cpp" />
-    <ClCompile Include="..\src\Math\Vec4.cpp" />
-    <ClCompile Include="..\src\Rendering\Projections.cpp" />
-    <ClCompile Include="..\src\Utility\Clock.cpp" />
+    <ClCompile Include="..\src\Tests\MathTests.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\Core\Clock.hpp" />
+    <ClInclude Include="..\src\Core\Common.hpp" />
+    <ClInclude Include="..\src\Core\EulerAngles.hpp" />
+    <ClInclude Include="..\src\Core\Matrix3.hpp" />
+    <ClInclude Include="..\src\Core\Matrix4.hpp" />
+    <ClInclude Include="..\src\Core\MatrixData.hpp" />
+    <ClInclude Include="..\src\Core\PhiCoreRequired.hpp" />
+    <ClInclude Include="..\src\Core\PhiTypes.hpp" />
+    <ClInclude Include="..\src\Core\Plane.hpp" />
+    <ClInclude Include="..\src\Core\Point3D.hpp" />
+    <ClInclude Include="..\src\Core\Projections.hpp" />
+    <ClInclude Include="..\src\Core\Quaternion.hpp" />
+    <ClInclude Include="..\src\Core\Ray.hpp" />
+    <ClInclude Include="..\src\Core\Vec2.hpp" />
+    <ClInclude Include="..\src\Core\Vec3.hpp" />
+    <ClInclude Include="..\src\Core\Vec4.hpp" />
+    <ClInclude Include="..\src\Tests\MathTests.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

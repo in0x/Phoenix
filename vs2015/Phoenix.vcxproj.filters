@@ -1,115 +1,115 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Math">
-      <UniqueIdentifier>{93fb33b3-26a9-4b14-8940-3ebe72eb4647}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Catch">
-      <UniqueIdentifier>{96054404-4acd-447f-a28d-287b03e7e60a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Rendering">
-      <UniqueIdentifier>{8149717f-c49b-430d-bca2-a5526cb121eb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Utility">
-      <UniqueIdentifier>{37633457-4698-4a0c-9435-4d1efdca354f}</UniqueIdentifier>
-    </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\src\Catch\Catch.hpp">
-      <Filter>Catch</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Math\Common.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Math\Matrix3.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Math\Matrix4.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Math\MatrixData.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Math\PhiMath.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Math\Plane.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Math\Quaternion.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Math\Ray.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Math\Vec2.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Math\Vec3.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Math\Vec4.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Rendering\Projections.hpp">
-      <Filter>Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Math\EulerAngles.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Catch\MathTests.hpp">
-      <Filter>Catch</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Math\Point3D.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Utility\Clock.hpp">
-      <Filter>Utility</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Main.cpp" />
-    <ClCompile Include="..\src\Math\Common.cpp">
+    <ClCompile Include="..\src\Core\Matrix3.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Math\Matrix3.cpp">
+    <ClCompile Include="..\src\Core\Matrix4.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Math\Matrix4.cpp">
+    <ClCompile Include="..\src\Core\Plane.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Math\Quaternion.cpp">
+    <ClCompile Include="..\src\Core\Point3D.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Math\Vec2.cpp">
+    <ClCompile Include="..\src\Core\Quaternion.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Math\Vec3.cpp">
+    <ClCompile Include="..\src\Core\Ray.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Math\Vec4.cpp">
+    <ClCompile Include="..\src\Core\Vec2.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Rendering\Projections.cpp">
+    <ClCompile Include="..\src\Core\Vec3.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Core\Vec4.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Core\Clock.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Core\Common.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Core\Projections.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Math\Ray.cpp">
+    <ClCompile Include="..\src\Tests\MathTests.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Math">
+      <UniqueIdentifier>{852bcb78-fe44-49e2-86e7-96e21c68df40}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering">
+      <UniqueIdentifier>{13134ceb-d301-4e12-8969-3c985944659e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{0f67a950-3cee-41d8-8ee7-9a809a633dae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tests">
+      <UniqueIdentifier>{0ea923c1-11cb-4bf6-8108-56cf947966b3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\Core\EulerAngles.hpp">
       <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Math\Plane.cpp">
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Matrix3.hpp">
       <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Catch\MathTests.cpp">
-      <Filter>Catch</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Math\Point3D.cpp">
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Matrix4.hpp">
       <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Utility\Clock.cpp">
-      <Filter>Utility</Filter>
-    </ClCompile>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\MatrixData.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Plane.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Point3D.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Quaternion.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Ray.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Vec2.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Vec3.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Vec4.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Clock.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\PhiCoreRequired.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\PhiTypes.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Common.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Projections.hpp">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Tests\MathTests.hpp">
+      <Filter>Tests</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

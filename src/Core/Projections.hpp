@@ -1,5 +1,8 @@
 #pragma once
-#include "../Math/PhiMath.hpp"
+
+#include "PhiCoreRequired.hpp"
+#include "Vec3.hpp"
+#include "Matrix4.hpp"
 
 namespace Phoenix::Rendering
 {

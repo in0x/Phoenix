@@ -1,6 +1,6 @@
 #include <cassert>
 
-#include "Catch/MathTests.hpp"
+#include "Tests/MathTests.hpp"
 
 using namespace Phoenix;
 

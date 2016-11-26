@@ -107,9 +107,10 @@ namespace Phoenix
 		return Vec4{ lhv.x * rhv, lhv.y * rhv, lhv.z * rhv, lhv.w * rhv };
 	}
 
-	inline Vec4 operator*(float lhv, const Vec4& rhv)
+	inline Vec4 operator*(float lhv, Vec4 rhv)
 	{
-		return lhv * rhv;
+		rhv *= lhv;
+		return rhv;
 	}
 
 	inline Vec4 operator/(const Vec4& lhv, float rhv)
