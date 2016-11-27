@@ -80,8 +80,9 @@
     <LinkIncremental>true</LinkIncremental>
     <CodeAnalysisRuleSet>C:\Program Files (x86)\Microsoft Visual Studio 14.0\Team Tools\Static Analysis Tools\Rule Sets\NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>false</RunCodeAnalysis>
-    <OutDir>$(SolutionDir)\..\bin\$(Platform)\$(Configuration)</OutDir>
+    <OutDir>$(SolutionDir)\..\data\</OutDir>
     <IntDir>\..\tmp\$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)_$(Platform)_$(Configuration)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -176,9 +177,11 @@
     <ClCompile Include="..\src\Tests\MathTests.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\Core\ATK.hpp" />
     <ClInclude Include="..\src\Core\Clock.hpp" />
     <ClInclude Include="..\src\Core\Common.hpp" />
     <ClInclude Include="..\src\Core\EulerAngles.hpp" />
+    <ClInclude Include="..\src\Core\Logger.hpp" />
     <ClInclude Include="..\src\Core\Matrix3.hpp" />
     <ClInclude Include="..\src\Core\Matrix4.hpp" />
     <ClInclude Include="..\src\Core\MatrixData.hpp" />

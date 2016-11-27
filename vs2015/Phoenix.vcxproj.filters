@@ -105,5 +105,11 @@
     <ClInclude Include="..\src\Tests\MathTests.hpp">
       <Filter>Tests</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Core\ATK.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Logger.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
