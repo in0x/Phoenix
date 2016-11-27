@@ -111,6 +111,13 @@ namespace Phoenix
 		return *this;
 	}
 
+	Vec3 Vec3::normalized() const
+	{
+		Vec3 norm{ *this };
+		norm.normalize();
+		return norm;
+	}
+
 	Vec3 Vec3::cross(const Vec3& rhv) const
 	{
 		return Vec3
@@ -126,9 +133,9 @@ namespace Phoenix
 		return x * rhv.x + y * rhv.y + z * rhv.z;
 	}
 
-	Vec3 Vec3::reflect(const Vec3& rhv) const
+	Vec3 Vec3::reflect(const Vec3& toReflect) const
 	{
-		return 2.f * rhv.dot(*this) * (*this) - rhv;
+		Vec3 nNorm = this->normalized();
+		return -2.f * toReflect.dot(nNorm) * nNorm + toReflect;
 	}
-
 }

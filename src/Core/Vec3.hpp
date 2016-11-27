@@ -62,10 +62,11 @@ namespace Phoenix
 		f32 distance2(const Vec3& rhv) const;
 
 		Vec3& normalize();
+		Vec3 Vec3::normalized() const;
 		
 		Vec3 cross(const Vec3& rhv) const;
 		f32 dot(const Vec3& rhv) const;
-		Vec3 reflect(const Vec3& rhv) const;
+		Vec3 reflect(const Vec3& toReflect) const;
 	};
 
 	inline Vec3 operator+(Vec3 lhv, const Vec3& rhv) 
