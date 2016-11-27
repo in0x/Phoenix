@@ -132,9 +132,9 @@ namespace Phoenix::Tests::MathTests
 		assert(std::abs(p2.distance({ 0, 10, 0 })) == 0);
 		assert(std::abs(p2.distance({ 0, 0, 10 })) == 10);
 
-		assert(p2.int32ersect(Ray{ {0,1,-1}, {0,0,1} }).first == true);
+		assert(p2.intersect(Ray{ {0,1,-1}, {0,0,1} }).first == true);
 
-		assert(p1.int32ersect(p2).first == true);
-		assert(p2.int32ersect(p1).first == true);
+		assert(p1.intersect(p2).first == true);
+		assert(p2.intersect(p1).first == true);
 	}
 }

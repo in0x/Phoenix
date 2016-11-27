@@ -5,7 +5,6 @@
 
 namespace Phoenix
 {
-	class Point323D;
 	class Ray;
 
 	// Implicit representation of plane using normal vector
@@ -31,14 +30,13 @@ namespace Phoenix
 		Plane(const Vec3& p0, const Vec3& p1, const Vec3& p2);
 
 		void normalize();
-		f32 dot(const Vec3& dir) const;
-		f32 dot(const Point323D& point32) const;
+		f32 dot(const Vec3& point) const;
 
 		Side getSideOn(const Vec3& point32) const;
 		f32 distance(const Vec3& point32) const;
 		Vec3 reflect(const Vec3& point32) const;
 
-		std::pair<bool, f32> int32ersect(const Ray& ray) const;
-		std::pair<bool, Ray> int32ersect(const Plane& other) const;
+		std::pair<bool, f32> intersect(const Ray& ray) const;
+		std::pair<bool, Ray> intersect(const Plane& other) const;
 	};
 }

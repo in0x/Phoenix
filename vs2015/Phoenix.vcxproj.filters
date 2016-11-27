@@ -14,9 +14,6 @@
     <ClCompile Include="..\src\Core\Plane.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Core\Point3D.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Core\Quaternion.cpp">
       <Filter>Math</Filter>
     </ClCompile>
@@ -73,9 +70,6 @@
       <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Core\Plane.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Core\Point3D.hpp">
       <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Core\Quaternion.hpp">

@@ -1,6 +1,6 @@
-#include "Plane.hpp"
 #include "Common.hpp"
 #include "Ray.hpp"
+#include "Plane.hpp"
 
 namespace Phoenix
 {
@@ -28,7 +28,7 @@ namespace Phoenix
 	
 	// Returns if ray int32ersects plane at positive t and if yes, at which t.
 	// The point32 of int32ersection can be gotten via ray.point32At(t).
-	std::pair<bool, f32> Plane::int32ersect(const Ray& ray) const
+	std::pair<bool, f32> Plane::intersect(const Ray& ray) const
 	{
 		f32 denom = n.dot(ray.direction);
 		if (std::abs(denom) < VERY_SMALL_FLT) // Parallel.
@@ -54,7 +54,7 @@ namespace Phoenix
 	// Find line (v,p) where the two planes int32ersect.
 	// If the do, their int32ersection line is also
 	// returned.
-	std::pair<bool, Ray> Plane::int32ersect(const Plane& other) const
+	std::pair<bool, Ray> Plane::intersect(const Plane& other) const
 	{
 		Vec3 v = n.cross(other.n);
 		f32 denom = v.dot(v);
@@ -62,32 +62,25 @@ namespace Phoenix
 		if (denom > VERY_SMALL_FLT)
 		{
 			auto p = v.cross(other.n) * d + n.cross(v) * other.d / denom;
-			return{ true, {Point323D{p.x, p.y, p.z}, v} };
+			return{ true, {Vec3{p.x, p.y, p.z}, v} };
 		}
 
-		return{ false , {Point323D{}, Vec3{}} };
+		return{ false , {Vec3{}, Vec3{}} };
 	}
 
-	f32 Plane::dot(const Vec3& dir) const
+	f32 Plane::dot(const Vec3& point) const
 	{
-		return n.dot(dir);
+		return n.dot(point) + d;
 	}
 
-	f32 Plane::dot(const Point323D& point32) const
+	f32 Plane::distance(const Vec3& point) const
 	{
-		// d is added since a point32 represents a position,
-		// which is offset from the origin
-		return n.dot(point32.position) + d;
+		return dot(point);
 	}
 
-	f32 Plane::distance(const Vec3& point32) const
+	Plane::Side Plane::getSideOn(const Vec3& point) const
 	{
-		return dot(point32);
-	}
-
-	Plane::Side Plane::getSideOn(const Vec3& point32) const
-	{
-		auto dist = distance(point32);
+		auto dist = distance(point);
 		
 		if (dist < 0.f)
 			return Side::BACK;
@@ -97,9 +90,9 @@ namespace Phoenix
 		return Side::ON;
 	}
 
-	Vec3 Plane::reflect(const Vec3& point32) const
+	Vec3 Plane::reflect(const Vec3& point) const
 	{
-		return point32 - 2.f * dot(point32) * n;
+		return point - 2.f * dot(point) * n;
 	}
 
 	void Plane::normalize()

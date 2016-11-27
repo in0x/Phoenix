@@ -166,7 +166,6 @@
     <ClCompile Include="..\src\Core\Matrix3.cpp" />
     <ClCompile Include="..\src\Core\Matrix4.cpp" />
     <ClCompile Include="..\src\Core\Plane.cpp" />
-    <ClCompile Include="..\src\Core\Point3D.cpp" />
     <ClCompile Include="..\src\Core\Projections.cpp" />
     <ClCompile Include="..\src\Core\Quaternion.cpp" />
     <ClCompile Include="..\src\Core\Ray.cpp" />
@@ -186,7 +185,6 @@
     <ClInclude Include="..\src\Core\PhiCoreRequired.hpp" />
     <ClInclude Include="..\src\Core\PhiTypes.hpp" />
     <ClInclude Include="..\src\Core\Plane.hpp" />
-    <ClInclude Include="..\src\Core\Point3D.hpp" />
     <ClInclude Include="..\src\Core\Projections.hpp" />
     <ClInclude Include="..\src\Core\Quaternion.hpp" />
     <ClInclude Include="..\src\Core\Ray.hpp" />
