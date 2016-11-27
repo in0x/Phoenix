@@ -6,10 +6,10 @@ namespace Phoenix
 	f32 fastInvSqrt(f32 x)
 	{
 		f32 xhalf = 0.5f * x;
-		int32 i = *(int32*)&x;            // store f32ing-point32 bits in int32eger
-		i = 0x5f3759df - (i >> 1);    // initial guess for Newton's method
-		x = *(f32*)&i;              // convert new bits int32o f32
-		x = x*(1.5f - xhalf*x*x);     // One round of Newton's method
+		int32 i = *(int32*)&x;      // store floating-point bits in int32eger
+		i = 0x5f3759df - (i >> 1);  // initial guess for Newton's method
+		x = *(f32*)&i;              // convert new bits into float
+		x = x*(1.5f - xhalf*x*x);   // One round of Newton's method
 		return x;
 	}
 

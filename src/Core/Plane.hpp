@@ -8,7 +8,7 @@ namespace Phoenix
 	class Ray;
 
 	// Implicit representation of plane using normal vector
-	// and dot between normal and point32 on plane. d is basically 
+	// and dot between normal and point on plane. d is basically 
 	// the magnitude of how far up or down the normal the plane
 	// lies , i.e. the distance to the origin.
 	class Plane
@@ -17,7 +17,7 @@ namespace Phoenix
 		
 		enum class Side
 		{
-			FRONT, // Halfspace toward which normal point32s
+			FRONT, // Halfspace toward which normal points
 			BACK,
 			ON
 		};

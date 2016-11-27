@@ -6,7 +6,7 @@
 namespace Phoenix
 {
 	// Small f32 value used to check for < 0 with tolerance for 
-	// f32ing point32 imprecission. 
+	// floating point imprecission. 
 	constexpr f32 VERY_SMALL_FLT = std::numeric_limits<f32>::epsilon();
 
 	constexpr f32 PI = 3.1415926535897932384626433832795f;

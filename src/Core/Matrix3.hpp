@@ -63,7 +63,7 @@ namespace Phoenix
 
 		f32 determinant() const;
 		f32 minor(int32 row0, int32 row1, int32 col0, int32 col1) const;
-		Matrix3 adjoint32() const;
+		Matrix3 adjoint() const;
 
 		Matrix3& transposeSelf();
 		Matrix3 transpose() const;

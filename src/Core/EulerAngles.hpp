@@ -4,7 +4,7 @@
 
 namespace Phoenix
 {
-	// Placeholder int32erface incase the need for a dedicated 
+	// Placeholder interface incase the need for a dedicated 
 	// Euler angles representation arises later (i.e. to limit
 	// the angles to the canonical set).
 	class EulerAngles : public Vec3 

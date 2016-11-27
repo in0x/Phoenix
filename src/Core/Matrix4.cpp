@@ -218,7 +218,7 @@ namespace Phoenix
 	}
 
 	// Classical adjoint32 is transpose of matrix of cofactors
-	Matrix4 Matrix4::adjoint32() const
+	Matrix4 Matrix4::adjoint() const
 	{
 		return Matrix4
 		{
@@ -233,7 +233,7 @@ namespace Phoenix
 	{
 		auto det = determinant();
 		assert(det);
-		return adjoint32() / det;
+		return adjoint() / det;
 	}
 
 	Matrix4& Matrix4::inverseSelf()

@@ -26,8 +26,8 @@ namespace Phoenix
 		d = n.dot(p0);
 	}
 	
-	// Returns if ray int32ersects plane at positive t and if yes, at which t.
-	// The point32 of int32ersection can be gotten via ray.point32At(t).
+	// Returns if ray intersects plane at positive t and if yes, at which t.
+	// The point of intersection can be gotten via ray.pointAt(t).
 	std::pair<bool, f32> Plane::intersect(const Ray& ray) const
 	{
 		f32 denom = n.dot(ray.direction);
@@ -51,8 +51,8 @@ namespace Phoenix
 		}
 	}
 
-	// Find line (v,p) where the two planes int32ersect.
-	// If the do, their int32ersection line is also
+	// Find line (v,p) where the two planes intersect.
+	// If the do, their intersection line is also
 	// returned.
 	std::pair<bool, Ray> Plane::intersect(const Plane& other) const
 	{
