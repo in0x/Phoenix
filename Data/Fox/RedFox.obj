@@ -1,6 +1,6 @@
 # Blender v2.75 (sub 0) OBJ File: 'Red Fox.blend'
 # www.blender.org
-mtllib Red Fox.mtl
+mtllib RedFox.mtl
 o Cylinder
 v -0.012287 0.574287 1.539076
 v -0.011645 0.500682 0.261516
