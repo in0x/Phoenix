@@ -133,8 +133,7 @@ namespace Phoenix
 
 	Vec4 Vec4::reflect(const Vec4& toReflect) const
 	{
-		Vec4 nNorm = this->normalized();
-		return nNorm - 2.f * toReflect.dot(nNorm) + toReflect;
+		return (*this) * 2.f * toReflect.dot(*this) - toReflect;
 	}
 
 	Vec4 operator+(Vec4 lhv, const Vec4& rhv)

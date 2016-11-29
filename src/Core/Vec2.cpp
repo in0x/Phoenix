@@ -107,8 +107,7 @@ namespace Phoenix
 
 	Vec2 Vec2::reflect(const Vec2& toReflect) const
 	{
-		Vec2 nNorm = this->normalized();
-		return nNorm - 2.f * toReflect.dot(nNorm) + toReflect;
+		return (*this) * 2.f * toReflect.dot(*this) - toReflect;
 	}
 
 	Vec2 operator+(Vec2 lhv, const Vec2& rhv)
