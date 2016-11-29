@@ -11,7 +11,7 @@ using namespace Phoenix;
 // Check Game Coding Complete for info on WinMainLoop
 int main()
 {
-	//Tests::MathTests::RunMathTests();
+	Tests::MathTests::RunMathTests();
 
 	char buffer[MAX_PATH];
 	char *answer = _getcwd(buffer, sizeof(buffer));

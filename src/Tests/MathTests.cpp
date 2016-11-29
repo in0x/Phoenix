@@ -18,20 +18,10 @@ namespace Phoenix::Tests::MathTests
 {
 	void RunMathTests()
 	{
-		/*Vec3Tests();
+		LegacyTests();
+		Vec3Tests();
 		Matrix4Tests();
 		PlaneTests();
-		*/
-
-		Clock clock;
-		clock.start();
-
-		for (int32 i = 0; i < 100000; i++)
-		{
-			Matrix4::identity() * Matrix4::identity();
-		}
-
-		std::cout << "ELAPSED: " << clock.getElapsedS() << "S\n";
 	}
 
 	void LegacyTests()
@@ -49,19 +39,19 @@ namespace Phoenix::Tests::MathTests
 
 		Quaternion quat{ 4, 2, 3, 1 };
 		assert(quat.magnitude() == 1.f);
-		/*
-		Vec3 angles{ 64, 81, 39 };
-		auto mat = eulerToMat3(angles);
+		
+		EulerAngles angles{ 64, 81, 39 };
+		auto mat = Matrix3::fromEulerAngles(angles);
 
 		auto mat4 = mat.asMatrix4();
 		mat = mat4.asMatrix3();
 
-		auto backAngles = mat3ToEuler(mat);
+		auto backAngles = mat.asEulerAngles();
 		std::cout << backAngles << '\n';
 
-		quat = eulerToQuat(angles);
-		auto qAngles = quatToEuler(quat);
-		assert(angles == qAngles);*/
+		quat = Quaternion::fromEulerAngles(angles);
+		auto qAngles = quat.asEulerAngles();
+		assert(angles == qAngles);
 	}
 
 	void Vec3Tests()
@@ -69,7 +59,10 @@ namespace Phoenix::Tests::MathTests
 		Vec3 a{ 1,0,0 };
 		Vec3 b{ 0,1,0 };
 
+		assert(a(0) == 1.f);
+
 		assert(a.dot(b) == 0);
+		auto refl = Vec3(0, 1, 0).reflect(Vec3(0.5, 0.5, 0));
 		assert(Vec3(0, 1, 0).reflect(Vec3(0.5, 0.5, 0)) == Vec3(-0.5, 0.5, 0));
 	}
 

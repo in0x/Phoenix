@@ -22,5 +22,5 @@ namespace Phoenix
 	}
 
 	f32 fastInvSqrt(f32 x);
-	bool almostEqualRelative(f32 a, f32 b, f32 maxRelDif = VERY_SMALL_FLT);
+	bool almostEqualRelative(f32 a, f32 b, f32 maxRelDif = 0.001f);
 }
