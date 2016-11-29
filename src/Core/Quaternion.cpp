@@ -144,7 +144,7 @@ namespace Phoenix
 			AngleZ = atan2(2.f * x*w - 2.f * y*z, -sqx + sqy - sqz + sqw);
 		}
 
-		return EulerAngles{ degrees(angleX), degrees(angleY), degrees(AngleZ)  };
+		return EulerAngles{ degrees(angleY), degrees(angleX), degrees(AngleZ)  };
 	}
 	
 	// http://www.euclideanspace.com/maths/geometry/rotations/conversions/eulerToQuaternion/index.htm
