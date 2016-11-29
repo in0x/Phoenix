@@ -93,13 +93,69 @@ namespace Phoenix
 		return *this;
 	}
 
+	Vec2 Vec2::normalized() const
+	{
+		Vec2 norm{ *this };
+		norm.normalize();
+		return norm;
+	}
+
 	f32 Vec2::dot(const Vec2& rhv) const
 	{
 		return x * rhv.x + y * rhv.y;
 	}
 
-	Vec2 Vec2::reflect(const Vec2& rhv) const
+	Vec2 Vec2::reflect(const Vec2& toReflect) const
 	{
-		return 2.f * rhv.dot(*this) * (*this) - rhv;
+		Vec2 nNorm = this->normalized();
+		return nNorm - 2.f * toReflect.dot(nNorm) + toReflect;
+	}
+
+	Vec2 operator+(Vec2 lhv, const Vec2& rhv)
+	{
+		lhv += rhv;
+		return lhv;
+	}
+
+	Vec2 operator-(Vec2 lhv, const Vec2& rhv)
+	{
+		lhv -= rhv;
+		return lhv;
+	}
+
+	Vec2 operator*(Vec2 lhv, const Vec2& rhv)
+	{
+		lhv *= rhv;
+		return lhv;
+	}
+
+	Vec2 operator/(Vec2 lhv, const Vec2& rhv)
+	{
+		lhv /= rhv;
+		return lhv;
+	}
+
+	Vec2 operator+(Vec2 lhv, f32 rhv)
+	{
+		lhv += rhv;
+		return lhv;
+	}
+
+	Vec2 operator-(Vec2 lhv, f32 rhv)
+	{
+		lhv -= rhv;
+		return lhv;
+	}
+
+	Vec2 operator*(Vec2 lhv, f32 rhv)
+	{
+		lhv *= rhv;
+		return lhv;
+	}
+
+	Vec2 operator/(Vec2 lhv, f32 rhv)
+	{
+		lhv /= rhv;
+		return lhv;
 	}
 }

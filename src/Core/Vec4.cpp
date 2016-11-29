@@ -93,6 +93,13 @@ namespace Phoenix
 		return *this;
 	}
 
+	Vec4 Vec4::normalized() const
+	{
+		Vec4 norm{ *this };
+		norm.normalize();
+		return norm;
+	}
+
 	bool Vec4::operator==(const Vec4& rhv) const
 	{
 		return almostEqualRelative(x, rhv.x) && almostEqualRelative(y, rhv.y) 
@@ -124,8 +131,57 @@ namespace Phoenix
 		return x * rhv.x + y * rhv.y + z * rhv.z + w * rhv.w;
 	}
 
-	Vec4 Vec4::reflect(const Vec4& rhv) const
+	Vec4 Vec4::reflect(const Vec4& toReflect) const
 	{
-		return 2.f * rhv.dot(*this) * (*this) - rhv;
+		Vec4 nNorm = this->normalized();
+		return nNorm - 2.f * toReflect.dot(nNorm) + toReflect;
+	}
+
+	Vec4 operator+(Vec4 lhv, const Vec4& rhv)
+	{
+		lhv += rhv;
+		return lhv;
+	}
+
+	Vec4 operator-(Vec4 lhv, const Vec4& rhv)
+	{
+		lhv -= rhv;
+		return lhv;
+	}
+
+	Vec4 operator*(Vec4 lhv, const Vec4& rhv)
+	{
+		lhv *= rhv;
+		return lhv;
+	}
+
+	Vec4 operator/(Vec4 lhv, const Vec4& rhv)
+	{
+		lhv /= rhv;
+		return lhv;
+	}
+
+	Vec4 operator+(Vec4 lhv, f32 rhv)
+	{
+		lhv += rhv;
+		return lhv;
+	}
+
+	Vec4 operator-(Vec4 lhv, f32 rhv)
+	{
+		lhv -= rhv;
+		return lhv;
+	}
+
+	Vec4 operator*(Vec4 lhv, f32 rhv)
+	{
+		lhv *= rhv;
+		return lhv;
+	}
+
+	Vec4 operator/(Vec4 lhv, f32 rhv)
+	{
+		lhv /= rhv;
+		return lhv;
 	}
 }

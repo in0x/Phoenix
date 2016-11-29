@@ -92,7 +92,7 @@ namespace Phoenix
 
 	Vec3 Plane::reflect(const Vec3& point) const
 	{
-		return point - 2.f * dot(point) * n;
+		return point - n * 2.f * dot(point);
 	}
 
 	void Plane::normalize()

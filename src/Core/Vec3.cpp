@@ -136,6 +136,54 @@ namespace Phoenix
 	Vec3 Vec3::reflect(const Vec3& toReflect) const
 	{
 		Vec3 nNorm = this->normalized();
-		return -2.f * toReflect.dot(nNorm) * nNorm + toReflect;
+		return nNorm -2.f * toReflect.dot(nNorm) + toReflect;
+	}
+
+	Vec3 operator+(Vec3 lhv, const Vec3& rhv)
+	{
+		lhv += rhv;
+		return lhv;
+	}
+
+	Vec3 operator-(Vec3 lhv, const Vec3& rhv)
+	{
+		lhv -= rhv;
+		return lhv;
+	}
+
+	Vec3 operator*(Vec3 lhv, const Vec3& rhv)
+	{
+		lhv *= rhv;
+		return lhv;
+	}
+
+	Vec3 operator/(Vec3 lhv, const Vec3& rhv)
+	{
+		lhv /= rhv;
+		return lhv;
+	}
+
+	Vec3 operator+(Vec3 lhv, f32 rhv)
+	{
+		lhv += rhv;
+		return lhv;
+	}
+
+	Vec3 operator-(Vec3 lhv, f32 rhv)
+	{
+		lhv -= rhv;
+		return lhv;
+	}
+
+	Vec3 operator*(Vec3 lhv, f32 rhv)
+	{
+		lhv *= rhv;
+		return lhv;
+	}
+
+	Vec3 operator/(Vec3 lhv, f32 rhv)
+	{
+		lhv /= rhv;
+		return lhv;
 	}
 }

@@ -56,59 +56,20 @@ namespace Phoenix
 		f32 distance2(const Vec2& rhv) const;
 
 		Vec2& normalize();
+		Vec2 normalized() const;
+
 		f32 dot(const Vec2& rhv) const;
 		Vec2 reflect(const Vec2& rhv) const;
 	};
 
-	inline const Vec2 operator+(Vec2 lhv, const Vec2& rhv)
-	{
-		lhv += rhv;
-		return lhv;
-	}
-
-	inline const Vec2 operator-(Vec2 lhv, const Vec2& rhv)
-	{
-		lhv -= rhv;
-		return lhv;
-	}
-
-	inline const Vec2 operator*(Vec2 lhv, const Vec2& rhv)
-	{
-		lhv *= rhv;
-		return lhv;
-	}
-
-	inline const Vec2 operator/(Vec2 lhv, const Vec2& rhv)
-	{
-		lhv /= rhv;
-		return lhv;
-	}
-
-	inline const Vec2 operator+(const Vec2& lhv, f32 rhv)
-	{
-		return Vec2{ lhv.x + rhv, lhv.y + rhv };
-	}
-
-	inline const Vec2 operator-(const Vec2& lhv, f32 rhv)
-	{
-		return Vec2{ lhv.x - rhv, lhv.y - rhv };
-	}
-
-	inline const Vec2 operator*(const Vec2& lhv, f32 rhv)
-	{
-		return Vec2{ lhv.x * rhv, lhv.y * rhv };
-	}
-
-	inline const Vec2 operator*(f32 lhv, Vec2 rhv)
-	{
-		rhv *= lhv;
-		return rhv;
-	}
-
-	inline const Vec2 operator/(const Vec2& lhv, f32 rhv)
-	{
-		return Vec2{ lhv.x / rhv, lhv.y / rhv };
-	}
+	Vec2 operator+(Vec2 lhv, const Vec2& rhv);
+	Vec2 operator-(Vec2 lhv, const Vec2& rhv);
+	Vec2 operator*(Vec2 lhv, const Vec2& rhv);
+	Vec2 operator/(Vec2 lhv, const Vec2& rhv);
+	Vec2 operator+(Vec2 lhv, f32 rhv);
+	Vec2 operator-(Vec2 lhv, f32 rhv);
+	Vec2 operator*(Vec2 lhv, f32 rhv);
+	Vec2 operator/(Vec2 lhv, f32 rhv);
 
 	inline std::ostream& operator<<(std::ostream& out, const Vec2& vec)
 	{
