@@ -14,12 +14,12 @@ int main()
 	Tests::MathTests::RunMathTests();
 
 	char buffer[MAX_PATH];
-	char *answer = _getcwd(buffer, sizeof(buffer));
+	char *pathBuff = _getcwd(buffer, sizeof(buffer));
 	std::string s_cwd;
 
-	if (answer)
+	if (pathBuff)
 	{
-		s_cwd = answer;
+		s_cwd = pathBuff;
 	}
 	std::cout << "CWD: " << s_cwd << "\n";
 

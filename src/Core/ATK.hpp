@@ -98,6 +98,23 @@ namespace Phoenix::ATK
 		std::vector<Material> materials;
 	};
 
+	std::vector<std::string> strSplit(std::string& string, const char* pDelimiter)
+	{
+		int pos = 0;
+		std::string token;
+		std::string delimiter(pDelimiter);
+		std::vector<std::string> elements{};
+
+		while ((pos = string.find(delimiter)) != std::string::npos)
+		{
+			token = string.substr(0, pos);
+			elements.push_back(token);
+			string.erase(0, pos + delimiter.length());
+		}
+
+		return elements;
+	}
+
 	std::unique_ptr<Scene> parseOBJ(const std::string& path)
 	{
 		auto pScene = std::make_unique<Scene>();
@@ -111,7 +128,28 @@ namespace Phoenix::ATK
 			return nullptr;
 		}
 
+		std::string line;
+
+		while (std::getline(file, line))
+		{
+			switch (line[0])
+			{
+			case 'v':
+
+
+			default:
+				break;
+			}
+		}
+
 		return pScene;
+	}
+
+	void parseVertex(std::string& line, Scene* pScene)
+	{
+		auto tokens = strSplit(line, " ");
+
+
 	}
 
 	std::unique_ptr<Material> parseMTL(const std::string& path)
