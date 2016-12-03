@@ -1,0 +1,19 @@
+A collection of links I encounter during my research
+
+http://www.3dkingdoms.com/weekly/weekly.php?a=42
+
+http://stackoverflow.com/questions/32035462/efficient-way-of-matching-entities-to-systems-in-an-entity-component-system
+
+http://gamedev.stackexchange.com/questions/32627/why-is-it-a-bad-idea-to-store-methods-in-entities-and-components-along-with-so
+
+http://gamedev.stackexchange.com/questions/89695/stroring-components-in-arrays-entity-component-system
+
+https://www.reddit.com/r/gamedev/comments/2cvf5y/how_do_loops_work_in_entity_component_system/
+
+https://www.reddit.com/r/gamedev/comments/3nv8uz/implementation_of_a_componentbased_entity_system/
+
+https://www.reddit.com/r/gamedev/comments/1ohro0/c_my_attempt_at_a_component_based_entity_system/
+
+https://blog.molecular-matters.com/2013/07/24/adventures-in-data-oriented-design-part-3c-external-references/
+
+http://www.gamedev.net/page/resources/_/technical/game-programming/implementing-component-entity-systems-r3382
