@@ -14,38 +14,13 @@
 	Links:
 		* http://web.cse.ohio-state.edu/~hwshen/581/Site/Lab3_files/Labhelp_Obj_parser.htm
 
-	OBJ:
-		* # -> Comment
-
-		* mtllib [*.mtl] -> Include an .mtl file containing materials
 
 		* o [*] -> object name (TODO: What is this used for?)
 
-		* g [*] -> group name (TODO: What is this used for?)
+		* g [*] -> group name (TODO: What is this used for?)	
 
-		* usemtl [*] -> start using a material declared in an mtl file
-
-		* s -> Smooth shading (TODO: What is this used for ?)
-
-	MTL:
-		* newmtl -> Define a new Material
-
-		* Ka -> Ambient Color
-
-		* Kd -> Diffuse Color
-
-		* Ks -> Specular Color
-
-		* Illum -> Illumination Type
-			* Can be:
-				* 1: No specular shading
-				* 2: Specular shading
-
-		* Ns: Specular Exponent
-
-		* [d|Tr] -> Transperency (TODO: Are both of these used?)
-
-		* map_Ka -> Name of a Texture map containing RGB values
+		Maybe have a static error struct that we can write errors into? The struct can then always be checked 
+		for errors at any point.
 */
 
 #include "PhiCoreRequired.hpp"
@@ -54,32 +29,32 @@
 #include <vector>
 #include <memory>
 #include <fstream>
-#include <algorithm>
 #include <functional>
+#include <algorithm>
 
 #include "Vec2.hpp"
 #include "Vec3.hpp"
-#include "Vec4.hpp"
 
 namespace Phoenix::ATK
 {
-	struct Material
-	{
-		std::string name;
-		std::string TextureMap;
-		f32 Ambient;
-		f32 Diffuse;
-		f32 Specular;
-		int8 Illum;
-		f32 Shininess;
-		f32 Transperency;
-	};
-
 	struct Face
 	{
 		Vec3 vertexIndices;
 		Vec3 normalIndices;
 		Vec3 uvIndices;
+	};
+
+	struct Material
+	{
+		Vec3 ambient;
+		Vec3 diffuse;
+		Vec3 specular;
+		int8 illum;
+		f32 shininess;
+		f32 transperency;
+		int32 idxFaceFrom;
+		std::string name;
+		std::string textureMap;
 	};
 
 	struct Scene
@@ -89,6 +64,7 @@ namespace Phoenix::ATK
 		std::vector<Vec3> normals;
 		std::vector<Face> faces;
 		std::vector<Material> materials;
+		int bSmoothShading : 1;
 	};
 
 	std::vector<std::string> strSplit(std::string& string, const char* pDelimiter)
@@ -161,7 +137,7 @@ namespace Phoenix::ATK
 
 		if (tokens[2].find("/") == std::string::npos) // f a b c -> Vertex
 		{
-			parser = [pScene](auto token, int idx) 
+			parser = [pScene](auto token, int idx)
 			{
 				pScene->faces.back().vertexIndices(idx) = std::stof(token);
 			};
@@ -181,7 +157,7 @@ namespace Phoenix::ATK
 
 			if (sepCount == 1) // f a/i b/j c/k -> Vertex/Texture
 			{
-				parser = [pScene](auto token, int idx) 
+				parser = [pScene](auto token, int idx)
 				{
 					auto nums = strSplit(token, "/");
 					pScene->faces.back().vertexIndices(idx) = std::stof(std::string{ nums[0] });
@@ -190,7 +166,7 @@ namespace Phoenix::ATK
 			}
 			else // f a/i/u b/j/v c/k/w -> Vertex/Texture/Normal 
 			{
-				parser = [&](auto token, int idx) 
+				parser = [&](auto token, int idx)
 				{
 					auto nums = strSplit(token, "/");
 					pScene->faces.back().vertexIndices(idx) = std::stof(std::string{ nums[0] });
@@ -205,24 +181,93 @@ namespace Phoenix::ATK
 		parser(tokens[3], 2);
 	}
 
-	std::unique_ptr<Material> parseMTL(const std::string& path)
+	std::ifstream openFile(const std::string& path)
 	{
-		return std::make_unique<Material>();
-	}
-
-	std::unique_ptr<Scene> parseOBJ(const std::string& path)
-	{
-		auto pScene = std::make_unique<Scene>();
-
 		std::ifstream file;
 		file.open(path);
 
 		if (!file.good())
 		{
 			Logger::Error("Failed to open OBJ file " + path);
-			return nullptr;
+			return file;
 		}
 
+		return file;
+	}
+
+	// How do we properly signal failure here?
+	void parseMTL(const std::string& path, Scene* pScene)
+	{
+		auto file = openFile(path);
+
+		if (!file)
+			return;
+
+		std::string line;
+
+		auto parseColor = [](auto& tokens) -> Vec3 {
+			if (tokens.size() < 4)
+			{
+				Logger::Error("Cannot parse color, not enough tokens.");
+				assert(false);
+			}
+
+			return Vec3{ std::stof(tokens[1]),
+				std::stof(tokens[2]) ,
+				std::stof(tokens[3]) };
+		};
+
+		Material* mat = nullptr;
+
+		while (std::getline(file, line))
+		{
+			auto tokens = strSplit(line, " ");
+
+			if (tokens[0] == "newmtl")
+			{
+				pScene->materials.push_back(Material{});
+				mat = &pScene->materials.back();
+				mat->name = tokens[1];
+			}
+			else if (tokens[0] == "Ka")
+			{
+				mat->ambient = parseColor(tokens);
+			}
+			else if (tokens[0] == "Kd")
+			{
+				mat->diffuse = parseColor(tokens);
+			}
+			else if (tokens[0] == "Ks")
+			{
+				mat->specular = parseColor(tokens);
+			}
+			else if (tokens[0] == "illum")
+			{
+				mat->illum = std::stof(tokens[1]);
+			}
+			else if (tokens[0] == "Ns")
+			{
+				mat->shininess = std::stof(tokens[1]);
+			}
+			else if (tokens[0] == "d" || tokens[0] == "Tr")
+			{
+				mat->transperency = std::stof(tokens[1]);
+			}
+			else if (tokens[0] == "map_Ka")
+			{
+				mat->textureMap = tokens[1];
+			}
+		}
+	}
+
+	std::unique_ptr<Scene> parseOBJ(const std::string& pathTo, const std::string& name)
+	{
+		auto file = openFile(pathTo + name);
+
+		if (!file)
+			return nullptr;
+
+		auto pScene = std::make_unique<Scene>();
 		Scene* pSceneRaw = pScene.get();
 		std::string line;
 
@@ -245,6 +290,32 @@ namespace Phoenix::ATK
 			else if (tokens[0] == "f")
 			{
 				parseFace(tokens, pSceneRaw);
+			}
+			else if (tokens[0] == "s")
+			{
+				if (tokens[1] == "off")
+					pScene->bSmoothShading = 0;
+				else
+					pScene->bSmoothShading = 1;
+			}
+			else if (tokens[0] == "mtllib")
+			{
+				parseMTL(pathTo + tokens[1], pSceneRaw);
+			}
+			else if (tokens[0] == "usemtl")
+			{
+				auto mat = std::find_if(pScene->materials.begin(), pScene->materials.end(),
+							 [&name = tokens[1]] (const Material& mat) {
+								return mat.name == name; 
+							});
+
+				if (mat != pScene->materials.end())
+				{
+					if (pScene->faces.empty())
+						mat->idxFaceFrom = 0;
+					else
+						mat->idxFaceFrom = pScene->faces.size() - 1;
+				}
 			}
 		}
 

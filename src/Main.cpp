@@ -23,7 +23,7 @@ int main()
 	}
 	std::cout << "CWD: " << s_cwd << "\n";
 
-	auto pScene = ATK::parseOBJ("Fox/RedFox.obj");
+	auto scene = ATK::parseOBJ("Fox/", "RedFox.obj");
 
 	return 0;
 }
