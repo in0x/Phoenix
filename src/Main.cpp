@@ -1,29 +1,22 @@
 #include <cassert>
 
+#include "Core\Engine.hpp"
+
 #include "Tests/MathTests.hpp"
 #include "Core/ATK.hpp"
-
-#include "Windows.h"
-#include <direct.h>
 
 using namespace Phoenix;
 
 // Check Game Coding Complete for info on WinMainLoop
-int main()
+int main(int arc, char** argv)
 {
 	Tests::MathTests::RunMathTests();
-
-	char buffer[MAX_PATH];
-	char *pathBuff = _getcwd(buffer, sizeof(buffer));
-	std::string s_cwd;
-
-	if (pathBuff)
-	{
-		s_cwd = pathBuff;
-	}
-	std::cout << "CWD: " << s_cwd << "\n";
-
 	auto scene = ATK::parseOBJ("Fox/", "RedFox.obj");
+
+	Engine theEngine;
+	theEngine.init();
+	theEngine.update();
+	theEngine.exit();
 
 	return 0;
 }

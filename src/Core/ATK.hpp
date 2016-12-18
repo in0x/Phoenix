@@ -32,8 +32,7 @@
 #include <functional>
 #include <algorithm>
 
-#include "Vec2.hpp"
-#include "Vec3.hpp"
+#include "PhiMath.hpp"
 
 namespace Phoenix::ATK
 {
@@ -49,10 +48,10 @@ namespace Phoenix::ATK
 		Vec3 ambient;
 		Vec3 diffuse;
 		Vec3 specular;
-		int8_t illum;
 		float shininess;
 		float transperency;
 		int idxFaceFrom;
+		int8_t illum;
 		std::string name;
 		std::string textureMap;
 	};

@@ -29,7 +29,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -112,14 +112,15 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>
-      </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <EnablePREfast>false</EnablePREfast>
       <AdditionalOptions>/std:c++latest %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glu32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -162,38 +163,42 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\Core\Clock.cpp" />
-    <ClCompile Include="..\src\Core\Common.cpp" />
-    <ClCompile Include="..\src\Core\Matrix3.cpp" />
-    <ClCompile Include="..\src\Core\Matrix4.cpp" />
-    <ClCompile Include="..\src\Core\Plane.cpp" />
-    <ClCompile Include="..\src\Core\Projections.cpp" />
-    <ClCompile Include="..\src\Core\Quaternion.cpp" />
-    <ClCompile Include="..\src\Core\Ray.cpp" />
-    <ClCompile Include="..\src\Core\Vec2.cpp" />
-    <ClCompile Include="..\src\Core\Vec3.cpp" />
-    <ClCompile Include="..\src\Core\Vec4.cpp" />
-    <ClCompile Include="..\src\Main.cpp" />
-    <ClCompile Include="..\src\Tests\MathTests.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="..\src\Core\ATK.hpp" />
     <ClInclude Include="..\src\Core\Clock.hpp" />
-    <ClInclude Include="..\src\Core\Common.hpp" />
-    <ClInclude Include="..\src\Core\EulerAngles.hpp" />
+    <ClInclude Include="..\src\Core\Engine.hpp" />
     <ClInclude Include="..\src\Core\Logger.hpp" />
-    <ClInclude Include="..\src\Core\Matrix3.hpp" />
-    <ClInclude Include="..\src\Core\Matrix4.hpp" />
-    <ClInclude Include="..\src\Core\MatrixData.hpp" />
+    <ClInclude Include="..\src\Core\Math\Common.hpp" />
+    <ClInclude Include="..\src\Core\Math\EulerAngles.hpp" />
+    <ClInclude Include="..\src\Core\Math\Matrix3.hpp" />
+    <ClInclude Include="..\src\Core\Math\Matrix4.hpp" />
+    <ClInclude Include="..\src\Core\Math\MatrixData.hpp" />
+    <ClInclude Include="..\src\Core\Math\Plane.hpp" />
+    <ClInclude Include="..\src\Core\Math\Quaternion.hpp" />
+    <ClInclude Include="..\src\Core\Math\Ray.hpp" />
+    <ClInclude Include="..\src\Core\Math\Vec2.hpp" />
+    <ClInclude Include="..\src\Core\Math\Vec3.hpp" />
+    <ClInclude Include="..\src\Core\Math\Vec4.hpp" />
     <ClInclude Include="..\src\Core\PhiCoreRequired.hpp" />
-    <ClInclude Include="..\src\Core\Plane.hpp" />
+    <ClInclude Include="..\src\Core\PhiMath.hpp" />
+    <ClInclude Include="..\src\Core\PhiSTL.hpp" />
     <ClInclude Include="..\src\Core\Projections.hpp" />
-    <ClInclude Include="..\src\Core\Quaternion.hpp" />
-    <ClInclude Include="..\src\Core\Ray.hpp" />
-    <ClInclude Include="..\src\Core\Vec2.hpp" />
-    <ClInclude Include="..\src\Core\Vec3.hpp" />
-    <ClInclude Include="..\src\Core\Vec4.hpp" />
     <ClInclude Include="..\src\Tests\MathTests.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\Core\Clock.cpp" />
+    <ClCompile Include="..\src\Core\Engine.cpp" />
+    <ClCompile Include="..\src\Core\Math\Common.cpp" />
+    <ClCompile Include="..\src\Core\Math\Matrix3.cpp" />
+    <ClCompile Include="..\src\Core\Math\Matrix4.cpp" />
+    <ClCompile Include="..\src\Core\Math\Plane.cpp" />
+    <ClCompile Include="..\src\Core\Math\Quaternion.cpp" />
+    <ClCompile Include="..\src\Core\Math\Ray.cpp" />
+    <ClCompile Include="..\src\Core\Math\Vec2.cpp" />
+    <ClCompile Include="..\src\Core\Math\Vec3.cpp" />
+    <ClCompile Include="..\src\Core\Math\Vec4.cpp" />
+    <ClCompile Include="..\src\Core\Projections.cpp" />
+    <ClCompile Include="..\src\Main.cpp" />
+    <ClCompile Include="..\src\Tests\MathTests.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

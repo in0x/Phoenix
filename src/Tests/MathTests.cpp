@@ -1,16 +1,7 @@
 #include "MathTests.hpp"
 #include <cassert>
 
-#include "../Core/Vec2.hpp"
-#include "../Core/Vec3.hpp"
-#include "../Core/Vec4.hpp"
-#include "../Core/Matrix3.hpp"
-#include "../Core/Matrix3.hpp"
-#include "../Core/Quaternion.hpp"
-#include "../Core/EulerAngles.hpp"
-#include "../Core/Ray.hpp"
-#include "../Core/Plane.hpp"
-
+#include "../Core/PhiMath.hpp"
 #include "../Core/Projections.hpp"
 #include "../Core/Clock.hpp"
 
