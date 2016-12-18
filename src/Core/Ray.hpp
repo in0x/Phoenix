@@ -13,6 +13,6 @@ namespace Phoenix
 		
 		Ray(const Vec3& _origin, const Vec3& _direction);
 
-		Vec3 pointAt(f32 t) const;
+		Vec3 pointAt(float t) const;
 	};
 }

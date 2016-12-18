@@ -46,7 +46,7 @@ namespace Phoenix
 		return *this;
 	}
 
-	Vec4& Vec4::operator+=(f32 rhv)
+	Vec4& Vec4::operator+=(float rhv)
 	{
 		x += rhv;
 		y += rhv;
@@ -55,7 +55,7 @@ namespace Phoenix
 		return *this;
 	}
 
-	Vec4& Vec4::operator-=(f32 rhv)
+	Vec4& Vec4::operator-=(float rhv)
 	{
 		x -= rhv;
 		y -= rhv;
@@ -64,7 +64,7 @@ namespace Phoenix
 		return *this;
 	}
 
-	Vec4& Vec4::operator*=(f32 rhv)
+	Vec4& Vec4::operator*=(float rhv)
 	{
 		x *= rhv;
 		y *= rhv;
@@ -73,7 +73,7 @@ namespace Phoenix
 		return *this;
 	}
 
-	Vec4& Vec4::operator/=(f32 rhv)
+	Vec4& Vec4::operator/=(float rhv)
 	{
 		assert(rhv != 0);
 		x /= rhv;
@@ -85,7 +85,7 @@ namespace Phoenix
 
 	Vec4& Vec4::normalize()
 	{
-		f32 len = length();
+		float len = length();
 		x /= len;
 		y /= len;
 		z /= len;
@@ -106,27 +106,27 @@ namespace Phoenix
 			&& almostEqualRelative(z, rhv.z) && almostEqualRelative(w, rhv.w);
 	}
 
-	f32 Vec4::length() const
+	float Vec4::length() const
 	{
 		return std::sqrt(x * x + y * y + z * z + w * w);
 	}
 
-	f32 Vec4::length2() const
+	float Vec4::length2() const
 	{
 		return x * x + y * y + z * z + w * w;
 	}
 
-	f32 Vec4::distance(const Vec4& rhv) const
+	float Vec4::distance(const Vec4& rhv) const
 	{
 		return std::sqrt((x * rhv.x) * (x * rhv.x) - (y * rhv.y) * (y * rhv.y) - (z * rhv.z) * (z * rhv.z) - (w * rhv.w) * (w * rhv.w));
 	}
 
-	f32 Vec4::distance2(const Vec4& rhv) const
+	float Vec4::distance2(const Vec4& rhv) const
 	{
 		return (x * rhv.x) * (x * rhv.x) - (y * rhv.y) * (y * rhv.y) - (z * rhv.z) * (z * rhv.z) - (w * rhv.w) * (w * rhv.w);
 	}
 
-	f32 Vec4::dot(const Vec4& rhv) const
+	float Vec4::dot(const Vec4& rhv) const
 	{
 		return x * rhv.x + y * rhv.y + z * rhv.z + w * rhv.w;
 	}
@@ -160,25 +160,25 @@ namespace Phoenix
 		return lhv;
 	}
 
-	Vec4 operator+(Vec4 lhv, f32 rhv)
+	Vec4 operator+(Vec4 lhv, float rhv)
 	{
 		lhv += rhv;
 		return lhv;
 	}
 
-	Vec4 operator-(Vec4 lhv, f32 rhv)
+	Vec4 operator-(Vec4 lhv, float rhv)
 	{
 		lhv -= rhv;
 		return lhv;
 	}
 
-	Vec4 operator*(Vec4 lhv, f32 rhv)
+	Vec4 operator*(Vec4 lhv, float rhv)
 	{
 		lhv *= rhv;
 		return lhv;
 	}
 
-	Vec4 operator/(Vec4 lhv, f32 rhv)
+	Vec4 operator/(Vec4 lhv, float rhv)
 	{
 		lhv /= rhv;
 		return lhv;

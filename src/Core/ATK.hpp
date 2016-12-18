@@ -49,10 +49,10 @@ namespace Phoenix::ATK
 		Vec3 ambient;
 		Vec3 diffuse;
 		Vec3 specular;
-		int8 illum;
-		f32 shininess;
-		f32 transperency;
-		int32 idxFaceFrom;
+		int8_t illum;
+		float shininess;
+		float transperency;
+		int idxFaceFrom;
 		std::string name;
 		std::string textureMap;
 	};
@@ -64,12 +64,12 @@ namespace Phoenix::ATK
 		std::vector<Vec3> normals;
 		std::vector<Face> faces;
 		std::vector<Material> materials;
-		int32 bSmoothShading : 1;
+		int bSmoothShading : 1;
 	};
 
 	std::vector<std::string> strSplit(std::string& string, const char* pDelimiter)
 	{
-		int32 pos = 0;
+		int pos = 0;
 		std::string token;
 		std::string delimiter(pDelimiter);
 		std::vector<std::string> elements{};
@@ -132,19 +132,19 @@ namespace Phoenix::ATK
 	 */
 	void parseFace(std::vector<std::string>& tokens, Scene* pScene)
 	{
-		std::function<void(std::string&, int32)> parser;
+		std::function<void(std::string&, int)> parser;
 		pScene->faces.push_back(Face{});
 
 		if (tokens[2].find("/") == std::string::npos) // f a b c -> Vertex
 		{
-			parser = [pScene](auto token, int32 idx)
+			parser = [pScene](auto token, int idx)
 			{
 				pScene->faces.back().vertexIndices(idx) = std::stof(token);
 			};
 		}
 		else if (tokens[2].find("//")) // f a//u b//v c//w -> Vertex//Normal
 		{
-			parser = [pScene](auto token, int32 idx)
+			parser = [pScene](auto token, int idx)
 			{
 				auto nums = strSplit(token, "//");
 				pScene->faces.back().vertexIndices(idx) = std::stof(nums[0]);
@@ -157,7 +157,7 @@ namespace Phoenix::ATK
 
 			if (sepCount == 1) // f a/i b/j c/k -> Vertex/Texture
 			{
-				parser = [pScene](auto token, int32 idx)
+				parser = [pScene](auto token, int idx)
 				{
 					auto nums = strSplit(token, "/");
 					pScene->faces.back().vertexIndices(idx) = std::stof(std::string{ nums[0] });
@@ -166,7 +166,7 @@ namespace Phoenix::ATK
 			}
 			else // f a/i/u b/j/v c/k/w -> Vertex/Texture/Normal 
 			{
-				parser = [&](auto token, int32 idx)
+				parser = [&](auto token, int idx)
 				{
 					auto nums = strSplit(token, "/");
 					pScene->faces.back().vertexIndices(idx) = std::stof(std::string{ nums[0] });

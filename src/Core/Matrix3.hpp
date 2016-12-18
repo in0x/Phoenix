@@ -20,13 +20,13 @@ namespace Phoenix
 			: m_data(MatrixData<3>{})
 		{}
 
-		Matrix3(f32 m00, f32 m01, f32 m02,
-				f32 m10, f32 m11, f32 m12, 
-				f32 m20, f32 m21, f32 m22);
+		Matrix3(float m00, float m01, float m02,
+				float m10, float m11, float m12, 
+				float m20, float m21, float m22);
 
-		f32& operator()(int32 row, int32 col);
+		float& operator()(int row, int col);
 
-		const f32 operator()(int32 row, int32 col) const;
+		const float operator()(int row, int col) const;
 
 		decltype(auto) begin()
 		{
@@ -54,15 +54,15 @@ namespace Phoenix
 
 		Vec3 operator*(Vec3 rhv) const;
 
-		Matrix3& operator+=(f32 f);
-		Matrix3& operator-=(f32 f);
-		Matrix3& operator*=(f32 f);
-		Matrix3& operator/=(f32 f);
+		Matrix3& operator+=(float f);
+		Matrix3& operator-=(float f);
+		Matrix3& operator*=(float f);
+		Matrix3& operator/=(float f);
 
 		bool operator==(const Matrix3& rhv);
 
-		f32 determinant() const;
-		f32 minor(int32 row0, int32 row1, int32 col0, int32 col1) const;
+		float determinant() const;
+		float minor(int row0, int row1, int col0, int col1) const;
 		Matrix3 adjoint() const;
 
 		Matrix3& transposeSelf();
@@ -83,10 +83,10 @@ namespace Phoenix
 	Matrix3 operator+(Matrix3 lhv, const Matrix3& rhv);
 	Matrix3 operator-(Matrix3 lhv, const Matrix3& rhv);
 	Matrix3 operator*(Matrix3 lhv, const Matrix3& rhv);
-	Matrix3 operator+(Matrix3 lhv, f32 f);
-	Matrix3 operator-(Matrix3 lhv, f32 f);
-	Matrix3 operator*(Matrix3 lhv, f32 f);
-	Matrix3 operator/(Matrix3 lhv, f32 f);
+	Matrix3 operator+(Matrix3 lhv, float f);
+	Matrix3 operator-(Matrix3 lhv, float f);
+	Matrix3 operator*(Matrix3 lhv, float f);
+	Matrix3 operator/(Matrix3 lhv, float f);
 
 	inline std::ostream& operator<<(std::ostream& out, const Matrix3& mat3)
 	{

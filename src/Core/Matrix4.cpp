@@ -8,10 +8,10 @@
 
 namespace Phoenix
 {
-	Matrix4::Matrix4(f32 m00, f32 m01, f32 m02, f32 m03,
-		f32 m10, f32 m11, f32 m12, f32 m13,
-		f32 m20, f32 m21, f32 m22, f32 m23,
-		f32 m30, f32 m31, f32 m32, f32 m33)
+	Matrix4::Matrix4(float m00, float m01, float m02, float m03,
+		float m10, float m11, float m12, float m13,
+		float m20, float m21, float m22, float m23,
+		float m30, float m31, float m32, float m33)
 	{
 		m_data[0][0] = m00; m_data[0][1] = m10; m_data[0][2] = m20; m_data[0][3] = m30;
 		m_data[1][0] = m01; m_data[1][1] = m11; m_data[1][2] = m21; m_data[1][3] = m31;
@@ -19,12 +19,12 @@ namespace Phoenix
 		m_data[3][0] = m03; m_data[3][1] = m13; m_data[3][2] = m23; m_data[3][3] = m33;
 	}
 
-	f32& Matrix4::operator()(int32 row, int32 col)
+	float& Matrix4::operator()(int row, int col)
 	{
 		return m_data[col][row];
 	}
 
-	const f32 Matrix4::operator()(int32 row, int32 col) const
+	const float Matrix4::operator()(int row, int col) const
 	{
 		return m_data[col][row];
 	}
@@ -33,9 +33,9 @@ namespace Phoenix
 	{
 		Matrix4& lhv = *this;
 
-		for (int32 row = 0; row < 4; row++)
+		for (int row = 0; row < 4; row++)
 		{
-			for (int32 col = 0; col < 4; col++)
+			for (int col = 0; col < 4; col++)
 			{
 				lhv(row, col) += rhv(row, col);
 			}
@@ -48,9 +48,9 @@ namespace Phoenix
 	{
 		Matrix4& lhv = *this;
 
-		for (int32 row = 0; row < 4; row++)
+		for (int row = 0; row < 4; row++)
 		{
-			for (int32 col = 0; col < 4; col++)
+			for (int col = 0; col < 4; col++)
 			{
 				lhv(row, col) -= rhv(row, col);
 			}
@@ -64,9 +64,9 @@ namespace Phoenix
 		Matrix4 dest{};
 		Matrix4& lhv = *this;
 
-		for (int32 row = 0; row < 4; row++)
+		for (int row = 0; row < 4; row++)
 		{
-			for (int32 col = 0; col < 4; col++)
+			for (int col = 0; col < 4; col++)
 			{
 				dest(row, col) = lhv(row, 0) * rhv(0, col) + lhv(row, 1) * rhv(1, col) + lhv(row, 2) * rhv(2, col) + lhv(row, 3) * rhv(3, col);
 			}
@@ -81,7 +81,7 @@ namespace Phoenix
 		Vec4 dest{};
 		const Matrix4& lhv = *this;
 
-		for (int32 i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++)
 		{
 			dest(i) += lhv(i, 0) * rhv(0) + lhv(i, 1) * rhv(1) + lhv(i, 2) * rhv(2) + lhv(i, 3) * rhv(3);
 		}
@@ -102,7 +102,7 @@ namespace Phoenix
 		return rhv;
 	}
 
-	Matrix4& Matrix4::operator+=(f32 f)
+	Matrix4& Matrix4::operator+=(float f)
 	{
 		for (auto& row : m_data)
 		{
@@ -114,7 +114,7 @@ namespace Phoenix
 		return *this;
 	}
 
-	Matrix4& Matrix4::operator-=(f32 f)
+	Matrix4& Matrix4::operator-=(float f)
 	{
 		for (auto& row : m_data)
 		{
@@ -126,7 +126,7 @@ namespace Phoenix
 		return *this;
 	}
 
-	Matrix4& Matrix4::operator*=(f32 f)
+	Matrix4& Matrix4::operator*=(float f)
 	{
 		for (auto& row : m_data)
 		{
@@ -138,7 +138,7 @@ namespace Phoenix
 		return *this;
 	}
 
-	Matrix4& Matrix4::operator/=(f32 f)
+	Matrix4& Matrix4::operator/=(float f)
 	{
 		for (auto& row : m_data)
 		{
@@ -154,9 +154,9 @@ namespace Phoenix
 	{
 		Matrix4& lhv = *this;
 		
-		for (int32 i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++)
 		{
-			for (int32 j = 0; j < 4; j++)
+			for (int j = 0; j < 4; j++)
 			{
 				if (!almostEqualRelative(lhv(i, j), rhv(i, j)))
 				{
@@ -169,12 +169,12 @@ namespace Phoenix
 
 	Matrix4& Matrix4::transposeSelf()
 	{
-		f32 temp = 0;
+		float temp = 0;
 		Matrix4& self = *this;
 
-		for (int32 i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++)
 		{
-			for (int32 j = i + 1; j < 4; j++)
+			for (int j = i + 1; j < 4; j++)
 			{
 				temp = self(i, j);
 				self(i, j) = self(j, i);
@@ -195,7 +195,7 @@ namespace Phoenix
 	// Passing the indices of the 3 rows and columns which make up the minor matrix allows us
 	// to easily calculate the minor without having to figure out the omitted row and column
 	// ourselfs.
-	f32 Matrix4::minor(int32 row0, int32 row1, int32 row2, int32 col0, int32 col1, int32 col2) const
+	float Matrix4::minor(int row0, int row1, int row2, int col0, int col1, int col2) const
 	{
 		const Matrix4& self = *this;
 		return self(row0, col0) * (self(row1, col1) * self(row2, col2) - self(row1, col2) * self(row2, col1)) -
@@ -208,7 +208,7 @@ namespace Phoenix
 	// for each element in the topmost row created by omitting the row and column that
 	// the current element is in and sum up using the (-1 ^ i + j) pattern to create the
 	// cofactors.
-	f32 Matrix4::determinant() const
+	float Matrix4::determinant() const
 	{
 		const Matrix4& self = *this;
 		return self(0, 0) * minor(1, 2, 3, 1, 2, 3) -
@@ -217,7 +217,7 @@ namespace Phoenix
 			self(0, 3) * minor(1, 2, 3, 0, 1, 2);
 	}
 
-	// Classical adjoint32 is transpose of matrix of cofactors
+	// Classical adjoint is transpose of matrix of cofactors
 	Matrix4 Matrix4::adjoint() const
 	{
 		return Matrix4
@@ -262,7 +262,7 @@ namespace Phoenix
 	}
 
 
-	Matrix4 Matrix4::scale(f32 x, f32 y, f32 z)
+	Matrix4 Matrix4::scale(float x, float y, float z)
 	{
 		return Matrix4
 		{
@@ -273,7 +273,7 @@ namespace Phoenix
 		};
 	}
 
-	Matrix4 Matrix4::translation(f32 x, f32 y, f32 z)
+	Matrix4 Matrix4::translation(float x, float y, float z)
 	{
 		return Matrix4
 		{
@@ -320,25 +320,25 @@ namespace Phoenix
 		return lhv;
 	}
 
-	Matrix4 operator+(Matrix4 lhv, f32 f)
+	Matrix4 operator+(Matrix4 lhv, float f)
 	{
 		lhv += f;
 		return lhv;
 	}
 
-	Matrix4 operator-(Matrix4 lhv, f32 f)
+	Matrix4 operator-(Matrix4 lhv, float f)
 	{
 		lhv -= f;
 		return lhv;
 	}
 
-	Matrix4 operator*(Matrix4 lhv, f32 f)
+	Matrix4 operator*(Matrix4 lhv, float f)
 	{
 		lhv *= f;
 		return lhv;
 	}
 
-	Matrix4 operator/(Matrix4 lhv, f32 f)
+	Matrix4 operator/(Matrix4 lhv, float f)
 	{
 		lhv /= f;
 		return lhv;

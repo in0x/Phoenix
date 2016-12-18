@@ -5,22 +5,22 @@
 
 namespace Phoenix
 {
-	// Small f32 value used to check for < 0 with tolerance for 
+	// Small float value used to check for < 0 with tolerance for 
 	// floating point imprecission. 
-	constexpr f32 VERY_SMALL_FLT = std::numeric_limits<f32>::epsilon();
+	constexpr float VERY_SMALL_FLT = std::numeric_limits<float>::epsilon();
 
-	constexpr f32 PI = 3.1415926535897932384626433832795f;
+	constexpr float PI = 3.1415926535897932384626433832795f;
 
-	constexpr f32 degrees(f32 angleRad)
+	constexpr float degrees(float angleRad)
 	{
 		return angleRad * (180.f / PI);
 	}
 
-	constexpr f32 radians(f32 angleDeg)
+	constexpr float radians(float angleDeg)
 	{
 		return angleDeg * (PI / 180.f);
 	}
 
-	f32 fastInvSqrt(f32 x);
-	bool almostEqualRelative(f32 a, f32 b, f32 maxRelDif = 0.001f);
+	float fastInvSqrt(float x);
+	bool almostEqualRelative(float a, float b, float maxRelDif = 0.001f);
 }

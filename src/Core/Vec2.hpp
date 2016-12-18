@@ -10,24 +10,24 @@ namespace Phoenix
 	class Vec2
 	{
 	public:
-		f32 x, y;
+		float x, y;
 		
 		Vec2()
 			: x(0.f)
 			, y(0.f)
 		{}
 
-		Vec2(f32 _x, f32 _y)
+		Vec2(float _x, float _y)
 			: x(_x)
 			, y(_y)
 		{}
 
-		f32& operator()(int32 i)
+		float& operator()(int i)
 		{
 			return *(&x + i);
 		}
 
-		f32 operator()(int32 i) const
+		float operator()(int i) const
 		{
 			return *(&x + i);
 		}
@@ -42,23 +42,23 @@ namespace Phoenix
 		Vec2& operator*=(const Vec2& rhv);
 		Vec2& operator/=(const Vec2& rhv);
 
-		Vec2& operator+=(f32 rhv);
-		Vec2& operator-=(f32 rhv);
-		Vec2& operator*=(f32 rhv);
-		Vec2& operator/=(f32 rhv);
+		Vec2& operator+=(float rhv);
+		Vec2& operator-=(float rhv);
+		Vec2& operator*=(float rhv);
+		Vec2& operator/=(float rhv);
 
 		bool operator==(const Vec2& rhv) const;
 
-		f32 length() const;
-		f32 length2() const;
+		float length() const;
+		float length2() const;
 
-		f32 distance(const Vec2& rhv) const;
-		f32 distance2(const Vec2& rhv) const;
+		float distance(const Vec2& rhv) const;
+		float distance2(const Vec2& rhv) const;
 
 		Vec2& normalize();
 		Vec2 normalized() const;
 
-		f32 dot(const Vec2& rhv) const;
+		float dot(const Vec2& rhv) const;
 		Vec2 reflect(const Vec2& rhv) const;
 	};
 
@@ -66,10 +66,10 @@ namespace Phoenix
 	Vec2 operator-(Vec2 lhv, const Vec2& rhv);
 	Vec2 operator*(Vec2 lhv, const Vec2& rhv);
 	Vec2 operator/(Vec2 lhv, const Vec2& rhv);
-	Vec2 operator+(Vec2 lhv, f32 rhv);
-	Vec2 operator-(Vec2 lhv, f32 rhv);
-	Vec2 operator*(Vec2 lhv, f32 rhv);
-	Vec2 operator/(Vec2 lhv, f32 rhv);
+	Vec2 operator+(Vec2 lhv, float rhv);
+	Vec2 operator-(Vec2 lhv, float rhv);
+	Vec2 operator*(Vec2 lhv, float rhv);
+	Vec2 operator/(Vec2 lhv, float rhv);
 
 	inline std::ostream& operator<<(std::ostream& out, const Vec2& vec)
 	{

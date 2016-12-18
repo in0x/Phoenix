@@ -6,7 +6,7 @@ namespace Phoenix
 	void Clock::start()
 	{
 		m_bStarted = true;
-		m_timeAtStart = f64(std::clock());
+		m_timeAtStart = double(std::clock());
 	}
 	
 	void Clock::stop()
@@ -20,20 +20,20 @@ namespace Phoenix
 		start();
 	}
 
-	f64 Clock::getElapsedTime()
+	double Clock::getElapsedTime()
 	{
 		if (!m_bStarted)
 			return 0;
 
-		return f64(std::clock()) - m_timeAtStart;
+		return double(std::clock()) - m_timeAtStart;
 	}
 
-	f64 Clock::getElapsedS()
+	double Clock::getElapsedS()
 	{
 		return getElapsedTime() / CLOCKS_PER_SEC;
 	}
 	
-	f64 Clock::getElapsedMS()
+	double Clock::getElapsedMS()
 	{
 		return (getElapsedTime() / CLOCKS_PER_SEC) * 1000;
 	}

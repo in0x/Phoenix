@@ -31,28 +31,28 @@ namespace Phoenix
 		return *this;
 	}
 
-	Vec2& Vec2::operator+=(f32 rhv)
+	Vec2& Vec2::operator+=(float rhv)
 	{
 		x += rhv;
 		y += rhv;
 		return *this;
 	}
 
-	Vec2& Vec2::operator-=(f32 rhv)
+	Vec2& Vec2::operator-=(float rhv)
 	{
 		x -= rhv;
 		y -= rhv;
 		return *this;
 	}
 
-	Vec2& Vec2::operator*=(f32 rhv)
+	Vec2& Vec2::operator*=(float rhv)
 	{
 		x *= rhv;
 		y *= rhv;
 		return *this;
 	}
 
-	Vec2& Vec2::operator/=(f32 rhv)
+	Vec2& Vec2::operator/=(float rhv)
 	{
 		assert(rhv != 0);
 		x /= rhv;
@@ -65,29 +65,29 @@ namespace Phoenix
 		return almostEqualRelative(x, rhv.x) && almostEqualRelative(y, rhv.y);
 	}
 
-	f32 Vec2::length() const
+	float Vec2::length() const
 	{
 		return std::sqrt(x * x + y * y);
 	}
 
-	f32 Vec2::length2() const
+	float Vec2::length2() const
 	{
 		return x * x + y * y;
 	}
 
-	f32 Vec2::distance(const Vec2& rhv) const
+	float Vec2::distance(const Vec2& rhv) const
 	{
 		return std::sqrt((x * rhv.x) * (x * rhv.x) - (y * rhv.y) * (y * rhv.y));
 	}
 
-	f32 Vec2::distance2(const Vec2& rhv) const
+	float Vec2::distance2(const Vec2& rhv) const
 	{
 		return (x * rhv.x) * (x * rhv.x) - (y * rhv.y) * (y * rhv.y);
 	}
 
 	Vec2& Vec2::normalize()
 	{
-		f32 len = length();
+		float len = length();
 		x /= len;
 		y /= len;
 		return *this;
@@ -100,7 +100,7 @@ namespace Phoenix
 		return norm;
 	}
 
-	f32 Vec2::dot(const Vec2& rhv) const
+	float Vec2::dot(const Vec2& rhv) const
 	{
 		return x * rhv.x + y * rhv.y;
 	}
@@ -134,25 +134,25 @@ namespace Phoenix
 		return lhv;
 	}
 
-	Vec2 operator+(Vec2 lhv, f32 rhv)
+	Vec2 operator+(Vec2 lhv, float rhv)
 	{
 		lhv += rhv;
 		return lhv;
 	}
 
-	Vec2 operator-(Vec2 lhv, f32 rhv)
+	Vec2 operator-(Vec2 lhv, float rhv)
 	{
 		lhv -= rhv;
 		return lhv;
 	}
 
-	Vec2 operator*(Vec2 lhv, f32 rhv)
+	Vec2 operator*(Vec2 lhv, float rhv)
 	{
 		lhv *= rhv;
 		return lhv;
 	}
 
-	Vec2 operator/(Vec2 lhv, f32 rhv)
+	Vec2 operator/(Vec2 lhv, float rhv)
 	{
 		lhv /= rhv;
 		return lhv;

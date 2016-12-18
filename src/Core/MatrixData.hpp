@@ -4,6 +4,6 @@
 
 namespace Phoenix
 {
-	template<int32 N>
-	using MatrixData = std::array<std::array<f32, N>, N>;
+	template<int N>
+	using MatrixData = std::array<std::array<float, N>, N>;
 }

@@ -186,7 +186,6 @@
     <ClInclude Include="..\src\Core\Matrix4.hpp" />
     <ClInclude Include="..\src\Core\MatrixData.hpp" />
     <ClInclude Include="..\src\Core\PhiCoreRequired.hpp" />
-    <ClInclude Include="..\src\Core\PhiTypes.hpp" />
     <ClInclude Include="..\src\Core\Plane.hpp" />
     <ClInclude Include="..\src\Core\Projections.hpp" />
     <ClInclude Include="..\src\Core\Quaternion.hpp" />

@@ -12,7 +12,7 @@ namespace Phoenix
 	class Vec4
 	{
 	public:
-		f32 x, y, z, w;
+		float x, y, z, w;
 
 		Vec4()
 			: x(0.f)
@@ -21,19 +21,19 @@ namespace Phoenix
 			, w(0.f)
 		{}
 
-		Vec4(f32 _x, f32 _y, f32 _z, f32 _w)
+		Vec4(float _x, float _y, float _z, float _w)
 			: x(_x)
 			, y(_y)
 			, z(_z)
 			, w (_w)
 		{}
 
-		f32& operator()(int32 i)
+		float& operator()(int i)
 		{
 			return *(&x + i);
 		}
 
-		f32 operator()(int32 i) const
+		float operator()(int i) const
 		{
 			return *(&x + i);
 		}
@@ -50,23 +50,23 @@ namespace Phoenix
 
 		Vec4& operator*=(const Matrix4& rhv);
 
-		Vec4& operator+=(f32 rhv);
-		Vec4& operator-=(f32 rhv);
-		Vec4& operator*=(f32 rhv);
-		Vec4& operator/=(f32 rhv);
+		Vec4& operator+=(float rhv);
+		Vec4& operator-=(float rhv);
+		Vec4& operator*=(float rhv);
+		Vec4& operator/=(float rhv);
 		
 		bool operator==(const Vec4& rhv) const;
 
-		f32 length() const;
-		f32 length2() const;
+		float length() const;
+		float length2() const;
 	
-		f32 distance(const Vec4& rhv) const;
-		f32 distance2(const Vec4& rhv) const;
+		float distance(const Vec4& rhv) const;
+		float distance2(const Vec4& rhv) const;
 
 		Vec4& normalize();
 		Vec4 normalized() const;
 
-		f32 dot(const Vec4& rhv) const;
+		float dot(const Vec4& rhv) const;
 
 		Vec4 reflect(const Vec4& rhv) const;
 	};
@@ -75,10 +75,10 @@ namespace Phoenix
 	Vec4 operator-(Vec4 lhv, const Vec4& rhv);
 	Vec4 operator*(Vec4 lhv, const Vec4& rhv);
 	Vec4 operator/(Vec4 lhv, const Vec4& rhv);
-	Vec4 operator+(Vec4 lhv, f32 rhv);
-	Vec4 operator-(Vec4 lhv, f32 rhv);
-	Vec4 operator*(Vec4 lhv, f32 rhv);
-	Vec4 operator/(Vec4 lhv, f32 rhv);
+	Vec4 operator+(Vec4 lhv, float rhv);
+	Vec4 operator-(Vec4 lhv, float rhv);
+	Vec4 operator*(Vec4 lhv, float rhv);
+	Vec4 operator/(Vec4 lhv, float rhv);
 	
 	inline std::ostream& operator<<(std::ostream& out, const Vec4& vec)
 	{

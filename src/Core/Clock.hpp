@@ -11,15 +11,15 @@ namespace Phoenix
 		void stop();
 		void restart();
 
-		f64 getElapsedS();
-		f64 getElapsedMS();
+		double getElapsedS();
+		double getElapsedMS();
 
 		bool started();
 
 	private:
-		f64 m_timeAtStart;
-		int32 m_bStarted : 1;
+		double m_timeAtStart;
+		int m_bStarted : 1;
 
-		f64 getElapsedTime();
+		double getElapsedTime();
 	};
 }

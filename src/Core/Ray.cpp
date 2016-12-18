@@ -10,7 +10,7 @@ namespace Phoenix
 	}
 
 
-	Vec3 Ray::pointAt(f32 t) const
+	Vec3 Ray::pointAt(float t) const
 	{
 		return origin + (direction * t);
 	}

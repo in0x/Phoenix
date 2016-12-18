@@ -13,5 +13,5 @@ namespace Phoenix::Rendering
 	};
 
 	Matrix4 lookAtRH(Vec3& cameraPos, Vec3& target, Vec3& up);
-	Matrix4 projectionRH(f32 yFOV, f32 aspect, f32 near, f32 far, ProjectionType type);	
+	Matrix4 projectionRH(float yFOV, float aspect, float near, float far, ProjectionType type);	
 }

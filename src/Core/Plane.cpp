@@ -4,7 +4,7 @@
 
 namespace Phoenix
 {
-	Plane::Plane(const Vec3& _n, f32 _d)
+	Plane::Plane(const Vec3& _n, float _d)
 		: n(_n)
 		, d(_d)
 	{ 
@@ -28,25 +28,25 @@ namespace Phoenix
 	
 	// Returns if ray intersects plane at positive t and if yes, at which t.
 	// The point of intersection can be gotten via ray.pointAt(t).
-	std::pair<bool, f32> Plane::intersect(const Ray& ray) const
+	std::pair<bool, float> Plane::intersect(const Ray& ray) const
 	{
-		f32 denom = n.dot(ray.direction);
+		float denom = n.dot(ray.direction);
 		if (std::abs(denom) < VERY_SMALL_FLT) // Parallel.
 		{
 			return{ false, 0.f };
 		}
 		else
 		{
-			f32 nom = dot(ray.origin) - 2*d;
-			f32 t = -(nom / denom);
+			float nom = dot(ray.origin) - 2*d;
+			float t = -(nom / denom);
 
 			if (t > 0.0f)
 			{
-				return std::pair<bool, f32>(true, t);
+				return std::pair<bool, float>(true, t);
 			}
 			else
 			{
-				return std::pair<bool, f32>(false, t);
+				return std::pair<bool, float>(false, t);
 			}
 		}
 	}
@@ -57,7 +57,7 @@ namespace Phoenix
 	std::pair<bool, Ray> Plane::intersect(const Plane& other) const
 	{
 		Vec3 v = n.cross(other.n);
-		f32 denom = v.dot(v);
+		float denom = v.dot(v);
 		
 		if (denom > VERY_SMALL_FLT)
 		{
@@ -68,12 +68,12 @@ namespace Phoenix
 		return{ false , {Vec3{}, Vec3{}} };
 	}
 
-	f32 Plane::dot(const Vec3& point) const
+	float Plane::dot(const Vec3& point) const
 	{
 		return n.dot(point) + d;
 	}
 
-	f32 Plane::distance(const Vec3& point) const
+	float Plane::distance(const Vec3& point) const
 	{
 		return dot(point);
 	}

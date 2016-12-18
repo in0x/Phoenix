@@ -93,9 +93,6 @@
     <ClInclude Include="..\src\Core\PhiCoreRequired.hpp">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Core\PhiTypes.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Core\Common.hpp">
       <Filter>Math</Filter>
     </ClInclude>

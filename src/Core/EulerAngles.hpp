@@ -10,7 +10,7 @@ namespace Phoenix
 	class EulerAngles : public Vec3 
 	{
 	public:
-		EulerAngles(f32 _x, f32 _y, f32 _z) : Vec3(_x, _y, _z) 
+		EulerAngles(float _x, float _y, float _z) : Vec3(_x, _y, _z) 
 		{}
 	};
 }

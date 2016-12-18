@@ -23,20 +23,20 @@ namespace Phoenix
 		};
 
 		Vec3 n;
-		f32 d;
+		float d;
 
-		Plane(const Vec3& _n, f32 _d);
+		Plane(const Vec3& _n, float _d);
 		Plane(const Plane& other);
 		Plane(const Vec3& p0, const Vec3& p1, const Vec3& p2);
 
 		void normalize();
-		f32 dot(const Vec3& point) const;
+		float dot(const Vec3& point) const;
 
-		Side getSideOn(const Vec3& point32) const;
-		f32 distance(const Vec3& point32) const;
-		Vec3 reflect(const Vec3& point32) const;
+		Side getSideOn(const Vec3& point) const;
+		float distance(const Vec3& point) const;
+		Vec3 reflect(const Vec3& point) const;
 
-		std::pair<bool, f32> intersect(const Ray& ray) const;
+		std::pair<bool, float> intersect(const Ray& ray) const;
 		std::pair<bool, Ray> intersect(const Plane& other) const;
 	};
 }
