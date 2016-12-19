@@ -55,5 +55,24 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	Win32Window window{config};
 	window.init();
 
+	MSG msg;
+	msg.message = ~WM_QUIT;
+
+	window.isOpen();
+
+	while (msg.message != WM_QUIT)
+	{
+		DWORD result = MsgWaitForMultipleObjectsEx(0, nullptr, 1.f / 60.f, QS_ALLEVENTS, 0);
+	
+		if (result != WAIT_TIMEOUT)
+		{
+			while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+			{
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}
+		}
+	}
+
 	return 0;
 }

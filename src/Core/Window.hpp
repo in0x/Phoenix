@@ -36,10 +36,10 @@ namespace Phoenix
 		virtual void maximize() = 0;
 		virtual void show() = 0;
 		virtual void hide() = 0;
-		virtual bool isFullscreen() = 0;
-		virtual bool isOpen() = 0;
+		virtual bool isFullscreen() const = 0;
+		virtual bool isOpen() const = 0;
 		virtual void setFullscreen(bool fullscreen) = 0;
-		virtual Size getDimensions() = 0;
+		virtual Size getDimensions() const = 0;
 		virtual void resize(unsigned int width, unsigned int height) = 0;
 	};
 
@@ -51,7 +51,8 @@ namespace Phoenix
 	public:
 
 		Win32Window(const WindowConfig& config)
-			: m_config(config) {}
+			: m_config(config) 
+		{}
 
 		virtual ~Win32Window()
 		{
@@ -142,12 +143,16 @@ namespace Phoenix
 		{
 			if (message == WM_NCCREATE)
 			{
-				CREATESTRUCT* createParams = reinterpret_cast<CREATESTRUCT*>(lParam);
-				SetWindowLongPtr(handle, GWLP_USERDATA, reinterpret_cast<long>(
-					createParams->lpCreateParams));
+				auto pCreateParams = reinterpret_cast<CREATESTRUCT*>(lParam);
+				SetWindowLongPtr(handle, GWLP_USERDATA, reinterpret_cast<uintptr_t>( 
+					/* On 64-bit we need to cast to long long, otherwise we'll get a 32-bit
+					   pointer which will truncate the upper 32 bits.
+					   
+					   TODO: Does this work on 32-bit? */
+					pCreateParams->lpCreateParams));
 			}
 
-			Win32Window* pWindow = reinterpret_cast<Win32Window*>
+			auto pWindow = reinterpret_cast<Win32Window*>
 				(GetWindowLongPtr(handle, GWLP_USERDATA));
 
 			if (pWindow)
@@ -161,10 +166,10 @@ namespace Phoenix
 		void maximize() override {}
 		void show() override {}
 		void hide() override {}
-		bool isFullscreen() override { return m_config.fullscreen; }
-		bool isOpen() override { return !m_config.closed; }
+		bool isFullscreen() const override { return m_config.fullscreen; }
+		bool isOpen() const override { return !m_config.closed; }
 		void setFullscreen(bool fullscreen) override {}
-		Size getDimensions() override { return{ m_config.width, m_config.height }; }
+		Size getDimensions() const override { return{ m_config.width, m_config.height }; }
 		void resize(unsigned int width, unsigned int height) override {}
 
 	private:
