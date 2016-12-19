@@ -64,6 +64,9 @@
     <ClInclude Include="..\src\Core\Projections.hpp">
       <Filter>Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Core\Window.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Main.cpp" />

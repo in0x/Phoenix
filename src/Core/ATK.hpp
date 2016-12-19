@@ -5,33 +5,9 @@
 	at first since most of the models I own are in that format.
 */
 
-/*
-	TODO:
-		* Figure out what obj and mtl can contain
-		* Figure out data representations
-		* Figure out how to do parsing efficiently
-
-	Links:
-		* http://web.cse.ohio-state.edu/~hwshen/581/Site/Lab3_files/Labhelp_Obj_parser.htm
-
-
-		* o [*] -> object name (TODO: What is this used for?)
-
-		* g [*] -> group name (TODO: What is this used for?)	
-
-		Maybe have a static error struct that we can write errors into? The struct can then always be checked 
-		for errors at any point.
-*/
-
 #include "PhiCoreRequired.hpp"
 #include "Logger.hpp"
-
-#include <vector>
-#include <memory>
 #include <fstream>
-#include <functional>
-#include <algorithm>
-
 #include "PhiMath.hpp"
 
 namespace Phoenix::ATK
@@ -63,7 +39,7 @@ namespace Phoenix::ATK
 		std::vector<Vec3> normals;
 		std::vector<Face> faces;
 		std::vector<Material> materials;
-		int bSmoothShading : 1;
+		bool bSmoothShading;
 	};
 
 	std::vector<std::string> strSplit(std::string& string, const char* pDelimiter)
