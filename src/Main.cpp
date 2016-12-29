@@ -22,7 +22,7 @@ using namespace Phoenix;
 //}
 
 #include <Windows.h>
-#include "Core\Window.hpp"
+#include "Core\Win32Window.hpp"
 /*
 	Likely structure:
 		Window -> Interface class with game
@@ -47,13 +47,18 @@ char* getCMDOption(char** start, char** end, const std::string& option)
 
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-	WindowConfig config = { 800,600,
+	WindowConfig config = { 1920, 1080,
 							0,0,
-							std::wstring{L"Phoenix"},
+							std::wstring(L"Phoenix"),
 							false };
 
-	Win32Window window{config};
-	window.init();
+	Win32Window window(config);
+
+	if (!window.init())
+	{
+		Logger::Error("Failed to initialize Win32Window");
+		return -1;
+	}
 
 	MSG msg;
 	msg.message = ~WM_QUIT;

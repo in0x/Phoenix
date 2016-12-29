@@ -182,7 +182,8 @@
     <ClInclude Include="..\src\Core\PhiMath.hpp" />
     <ClInclude Include="..\src\Core\PhiSTL.hpp" />
     <ClInclude Include="..\src\Core\Projections.hpp" />
-    <ClInclude Include="..\src\Core\Window.hpp" />
+    <ClInclude Include="..\src\Core\IWindow.hpp" />
+    <ClInclude Include="..\src\Core\Win32Window.hpp" />
     <ClInclude Include="..\src\Tests\MathTests.hpp" />
   </ItemGroup>
   <ItemGroup>
@@ -198,6 +199,7 @@
     <ClCompile Include="..\src\Core\Math\Vec3.cpp" />
     <ClCompile Include="..\src\Core\Math\Vec4.cpp" />
     <ClCompile Include="..\src\Core\Projections.cpp" />
+    <ClCompile Include="..\src\Core\Win32Window.cpp" />
     <ClCompile Include="..\src\Main.cpp" />
     <ClCompile Include="..\src\Tests\MathTests.cpp" />
   </ItemGroup>
