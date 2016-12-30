@@ -49,6 +49,7 @@ namespace Phoenix
 		if (self->fullscreen)
 		{
 			DEVMODE displayConfig = {};
+			memset(&displayConfig, 0, sizeof(displayConfig));
 			displayConfig.dmSize = sizeof(displayConfig);
 			displayConfig.dmPelsWidth = self->width;
 			displayConfig.dmPelsHeight = self->height;
@@ -58,7 +59,8 @@ namespace Phoenix
 			if (ChangeDisplaySettings(&displayConfig, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL)
 			{
 				Logger::Error("Failed to fullscreen the window.");
-				return; // TODO: cleanup?
+				self = nullptr; 
+				return;
 			}
 
 			exWindStyle = WS_EX_APPWINDOW;
@@ -88,7 +90,10 @@ namespace Phoenix
 		{
 			Logger::Error("Failed to create window.");
 			self = nullptr;
+			return;
 		}
+
+		// Create Context
 
 		ShowWindow(self->window, SW_SHOW);
 	}
@@ -128,23 +133,12 @@ namespace Phoenix
 		return DefWindowProc(handle, message, wParam, lParam);
 	}
 
-	void Win32Window::minimize() {}
-	void Win32Window::maximize() {}
-	void Win32Window::show() {}
-	void Win32Window::hide() {}
-	bool Win32Window::isFullscreen() const { return self->fullscreen; }
-	bool Win32Window::isOpen() const { return self != nullptr; }
-	void Win32Window::setFullscreen(bool fullscreen) {}
-	IWindow::Size Win32Window::getDimensions() const { return{ self->width, self->height }; }
-	void Win32Window::resize(unsigned int width, unsigned int height) {}
-
 	void Win32Window::processEvent(UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		switch (message)
 		{
 		case WM_CLOSE:
 			PostQuitMessage(0);
-			self = nullptr;
 			break;
 
 		case WM_SIZE:
@@ -152,12 +146,30 @@ namespace Phoenix
 			break;
 
 		case WM_KEYDOWN:
-			break; 
+			break;
 
 		case WM_KEYUP:
 			break;
 		}
 	}
+
+	void Win32Window::minimize() {}
+	
+	void Win32Window::maximize() {}
+	
+	void Win32Window::show() {}
+	
+	void Win32Window::hide() {}
+	
+	bool Win32Window::isFullscreen() const { return self->fullscreen; }
+	
+	bool Win32Window::isOpen() const { return self != nullptr; }
+	
+	void Win32Window::setFullscreen(bool fullscreen) {}
+	
+	IWindow::Size Win32Window::getDimensions() const { return{ self->width, self->height }; }
+	
+	void Win32Window::resize(unsigned int width, unsigned int height) {}
 
 	void Win32Window::OnResize(int width, int height)
 	{
