@@ -60,6 +60,9 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 		return -1;
 	}
 
+	Logger::LogOut::get().logToConsole = true;
+	Logger::LogOut::get().logToFile = true;
+	
 	MSG msg;
 	msg.message = ~WM_QUIT;
 
