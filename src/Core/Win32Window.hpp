@@ -14,7 +14,6 @@ namespace Phoenix
 
 		static LRESULT CALLBACK OnEvent(HWND handle, UINT message, WPARAM wParam, LPARAM lParam);
 
-		bool init() override;
 		void minimize() override;
 		void maximize() override;
 		void show() override;
@@ -26,9 +25,9 @@ namespace Phoenix
 		void resize(unsigned int width, unsigned int height) override;
 
 	private:
-		WindowConfig m_config;
-		HWND m_window;
-
+		struct Pimpl;
+		std::unique_ptr<Pimpl> self;
+		
 		void processEvent(UINT message, WPARAM wParam, LPARAM lParam);
 		void OnResize(int width, int height);
 	};

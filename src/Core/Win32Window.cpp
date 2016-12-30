@@ -2,21 +2,27 @@
 
 namespace Phoenix
 {
-	Win32Window::Win32Window(const WindowConfig& config)
-		: m_config(config)
-	{}
-
-	Win32Window::~Win32Window()
+	struct Win32Window::Pimpl
 	{
-		if (m_config.fullscreen)
-			ChangeDisplaySettings(nullptr, 0);
-
-		DestroyWindow(m_window);
-		UnregisterClass(m_config.windowName.c_str(), GetModuleHandle(nullptr));
+		unsigned int left;
+		unsigned int top;
+		unsigned int width;
+		unsigned int height;
+		bool fullscreen;
+		HWND window;
+		std::wstring name;
 	};
 
-	bool Win32Window::init()
+	Win32Window::Win32Window(const WindowConfig& config)
 	{
+		self = std::make_unique<Pimpl>();
+		self->left = config.left;
+		self->top = config.top;
+		self->width = config.width;
+		self->height = config.height;
+		self->fullscreen = config.fullscreen;
+		self->name = config.windowName;
+
 		WNDCLASS windowClass;
 
 		windowClass.style = 0;
@@ -28,31 +34,31 @@ namespace Phoenix
 		windowClass.hCursor = 0;
 		windowClass.hbrBackground = 0;
 		windowClass.lpszMenuName = nullptr;
-		windowClass.lpszClassName = m_config.windowName.c_str();
+		windowClass.lpszClassName = config.windowName.c_str();
 
 		RegisterClass(&windowClass);
 
 		DWORD exWindStyle = 0;
 		DWORD windStyle = 0;
 
-		RECT rect = { m_config.left,
-			m_config.top,
-			m_config.left + m_config.width,
-			m_config.top + m_config.height };
+		RECT rect = { self->left,
+			self->top,
+			self->left + self->width,
+			self->top + self->height };
 
-		if (m_config.fullscreen)
+		if (self->fullscreen)
 		{
 			DEVMODE displayConfig = {};
 			displayConfig.dmSize = sizeof(displayConfig);
-			displayConfig.dmPelsWidth = m_config.width;
-			displayConfig.dmPelsHeight = m_config.height;
+			displayConfig.dmPelsWidth = self->width;
+			displayConfig.dmPelsHeight = self->height;
 			displayConfig.dmBitsPerPel = 32;
 			displayConfig.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT | DM_BITSPERPEL;
 
 			if (ChangeDisplaySettings(&displayConfig, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL)
 			{
 				Logger::Error("Failed to fullscreen the window.");
-				return false; // TODO: cleanup?
+				return; // TODO: cleanup?
 			}
 
 			exWindStyle = WS_EX_APPWINDOW;
@@ -67,26 +73,34 @@ namespace Phoenix
 		// Reconfigures window rect to factor in size of border etc.
 		AdjustWindowRectEx(&rect, windStyle, FALSE, exWindStyle);
 
-		m_window = CreateWindowEx(exWindStyle,
-			m_config.windowName.c_str(),
-			m_config.windowName.c_str(),
+			self->window = CreateWindowEx(exWindStyle,
+			self->name.c_str(),
+			self->name.c_str(),
 			WS_CLIPSIBLINGS | WS_CLIPCHILDREN | windStyle,
-			m_config.left, m_config.top,
-			m_config.width, m_config.height,
+			self->left, self->top,
+			self->width, self->height,
 			nullptr, // Parent window
 			nullptr,
 			GetModuleHandle(nullptr),
 			this);
 
-		if (!m_window)
+		if (!self->window)
 		{
 			Logger::Error("Failed to create window.");
-			return false; // TODO: cleanup?
+			self = nullptr;
 		}
 
-		ShowWindow(m_window, SW_SHOW);
-		return true;
+		ShowWindow(self->window, SW_SHOW);
 	}
+
+	Win32Window::~Win32Window()
+	{
+		if (self->fullscreen)
+			ChangeDisplaySettings(nullptr, 0);
+
+		DestroyWindow(self->window);
+		UnregisterClass(self->name.c_str(), GetModuleHandle(nullptr));
+	};
 
 	/*
 	WPARAM -> Word parameter, carries "words" i.e. handle, integers
@@ -118,10 +132,10 @@ namespace Phoenix
 	void Win32Window::maximize() {}
 	void Win32Window::show() {}
 	void Win32Window::hide() {}
-	bool Win32Window::isFullscreen() const { return m_config.fullscreen; }
-	bool Win32Window::isOpen() const { return !m_config.closed; }
+	bool Win32Window::isFullscreen() const { return self->fullscreen; }
+	bool Win32Window::isOpen() const { return self != nullptr; }
 	void Win32Window::setFullscreen(bool fullscreen) {}
-	IWindow::Size Win32Window::getDimensions() const { return{ m_config.width, m_config.height }; }
+	IWindow::Size Win32Window::getDimensions() const { return{ self->width, self->height }; }
 	void Win32Window::resize(unsigned int width, unsigned int height) {}
 
 	void Win32Window::processEvent(UINT message, WPARAM wParam, LPARAM lParam)
@@ -130,7 +144,7 @@ namespace Phoenix
 		{
 		case WM_CLOSE:
 			PostQuitMessage(0);
-			m_config.closed = true;
+			self = nullptr;
 			break;
 
 		case WM_SIZE:
@@ -138,7 +152,7 @@ namespace Phoenix
 			break;
 
 		case WM_KEYDOWN:
-			break;
+			break; 
 
 		case WM_KEYUP:
 			break;

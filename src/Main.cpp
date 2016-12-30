@@ -54,7 +54,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	Win32Window window(config);
 
-	if (!window.init())
+	if (!window.isOpen())
 	{
 		Logger::Error("Failed to initialize Win32Window");
 		return -1;

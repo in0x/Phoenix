@@ -30,7 +30,6 @@ namespace Phoenix
 		IWindow(IWindow&) = delete;
 		IWindow(IWindow&&) = delete;
 
-		virtual bool init() = 0;
 		virtual void minimize() = 0;
 		virtual void maximize() = 0;
 		virtual void show() = 0;
