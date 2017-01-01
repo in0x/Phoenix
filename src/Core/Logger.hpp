@@ -5,15 +5,22 @@
 
 namespace Phoenix::Logger
 {
-	enum ColorCode
+	namespace
 	{
-		RED = 31,
-		GREEN = 32,
-		YELLOW = 33,
-		LIGHT_RED = 91,
-		LIGHT_GREEN = 92,
-		LIGHT_YELLOW = 93
-	};
+		enum ColorCode
+		{
+			RED = 31,
+			GREEN = 32,
+			YELLOW = 33,
+			LIGHT_RED = 91,
+			LIGHT_GREEN = 92,
+			LIGHT_YELLOW = 93
+		};
+	}
+
+#define S1(x) #x
+#define S2(x) S1(x)
+#define __LOCATION_INFO__ "In: " __FILE__ "\nAt: " S2(__LINE__) ", " __FUNCTION__ "\n" 
 
 	class LogOut
 	{
@@ -35,7 +42,7 @@ namespace Phoenix::Logger
 			}
 			if (logToFile)
 			{
-				m_file << "LOG: " << msg;
+				m_file << "LOG: " << msg << "\n";
 			}
 		}
 
@@ -47,7 +54,7 @@ namespace Phoenix::Logger
 			}
 			if (logToFile)
 			{
-				m_file << "WARNING: " << msg;
+				m_file << "WARNING: " << msg << "\n";
 			}
 		}
 
@@ -59,7 +66,7 @@ namespace Phoenix::Logger
 			}
 			if (logToFile)
 			{
-				m_file << "ERROR: " << msg;
+				m_file << "ERROR: " << msg << "\n";
 			}
 		}
 
