@@ -5,10 +5,22 @@
 
 namespace Phoenix
 {
+	struct WindowConfig
+	{
+		unsigned int width;
+		unsigned int height;
+		unsigned int left;
+		unsigned int top;
+		std::wstring windowName;
+		bool fullscreen;
+		bool closed;
+	};
+
 	class Win32Window : public IWindow
 	{
 	public:
 
+		// Can fail. Check isOpen() to see if window creation was successful.
 		Win32Window(const WindowConfig& config);
 		virtual ~Win32Window();
 
@@ -16,8 +28,7 @@ namespace Phoenix
 
 		void minimize() override;
 		void maximize() override;
-		void show() override;
-		void hide() override;
+		void setVisible(bool visible) override;
 		bool isFullscreen() const override;
 		bool isOpen() const override;
 		void setFullscreen(bool fullscreen) override;
@@ -25,6 +36,8 @@ namespace Phoenix
 		void resize(unsigned int width, unsigned int height) override;
 
 	private:
+		static unsigned int s_windowCount;
+
 		struct Pimpl;
 		std::unique_ptr<Pimpl> self;
 		

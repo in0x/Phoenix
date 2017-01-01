@@ -47,21 +47,21 @@ char* getCMDOption(char** start, char** end, const std::string& option)
 
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-	WindowConfig config = { 1920, 1080,
+	Logger::LogOut::get().logToConsole = true;
+	Logger::LogOut::get().logToFile = true;
+
+	WindowConfig config = { 1600, 900,
 							0,0,
 							std::wstring(L"Phoenix"),
 							false };
 
-	Win32Window window(config);
-
+	Win32Window window(config); 
+	
 	if (!window.isOpen())
 	{
 		Logger::Error("Failed to initialize Win32Window");
 		return -1;
-	}
-
-	Logger::LogOut::get().logToConsole = true;
-	Logger::LogOut::get().logToFile = true;
+	} 
 	
 	MSG msg;
 	msg.message = ~WM_QUIT;

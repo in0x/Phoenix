@@ -5,16 +5,7 @@
 
 namespace Phoenix
 {
-	struct WindowConfig
-	{
-		unsigned int width;
-		unsigned int height;
-		unsigned int left;
-		unsigned int top;
-		std::wstring windowName;
-		bool fullscreen;
-		bool closed;
-	};
+	struct WindowConfig;
 
 	class IWindow
 	{
@@ -25,15 +16,13 @@ namespace Phoenix
 			unsigned int height;
 		};
 
-
 		IWindow() {}
 		IWindow(IWindow&) = delete;
 		IWindow(IWindow&&) = delete;
 
 		virtual void minimize() = 0;
 		virtual void maximize() = 0;
-		virtual void show() = 0;
-		virtual void hide() = 0;
+		virtual void setVisible(bool visible) = 0;
 		virtual bool isFullscreen() const = 0;
 		virtual bool isOpen() const = 0;
 		virtual void setFullscreen(bool fullscreen) = 0;

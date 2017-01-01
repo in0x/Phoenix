@@ -13,6 +13,8 @@ namespace Phoenix
 		std::wstring name;
 	};
 
+	unsigned int Win32Window::s_windowCount;
+
 	Win32Window::Win32Window(const WindowConfig& config)
 	{
 		self = std::make_unique<Pimpl>();
@@ -36,15 +38,18 @@ namespace Phoenix
 		windowClass.lpszMenuName = nullptr;
 		windowClass.lpszClassName = config.windowName.c_str();
 
-		RegisterClass(&windowClass);
+		if (s_windowCount == 0)
+		{
+			RegisterClass(&windowClass);
+		}
 
 		DWORD exWindStyle = 0;
 		DWORD windStyle = 0;
 
 		RECT rect = { self->left,
-			self->top,
-			self->left + self->width,
-			self->top + self->height };
+					  self->top,
+					  self->left + self->width,
+					  self->top + self->height };
 
 		if (self->fullscreen)
 		{
@@ -70,12 +75,13 @@ namespace Phoenix
 		{
 			exWindStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
 			windStyle = WS_OVERLAPPEDWINDOW;
+
+			// Reconfigures window rect to factor in size of border.
+			AdjustWindowRectEx(&rect, windStyle, FALSE, exWindStyle);
 		}
 
-		// Reconfigures window rect to factor in size of border etc.
-		AdjustWindowRectEx(&rect, windStyle, FALSE, exWindStyle);
-
-			self->window = CreateWindowEx(exWindStyle,
+		self->window = CreateWindowEx(
+			exWindStyle,
 			self->name.c_str(),
 			self->name.c_str(),
 			WS_CLIPSIBLINGS | WS_CLIPCHILDREN | windStyle,
@@ -93,9 +99,9 @@ namespace Phoenix
 			return;
 		}
 
-		// Create Context
-
 		ShowWindow(self->window, SW_SHOW);
+		s_windowCount++;
+		minimize();
 	}
 
 	Win32Window::~Win32Window()
@@ -118,9 +124,8 @@ namespace Phoenix
 			auto pCreateParams = reinterpret_cast<CREATESTRUCT*>(lParam);
 			SetWindowLongPtr(handle, GWLP_USERDATA, reinterpret_cast<uintptr_t>(
 				/* On 64-bit we need to cast to long long, otherwise we'll get a 32-bit
-				pointer which will truncate the upper 32 bits.
-
-				TODO: Does this work on 32-bit? */
+				   pointer which will truncate the upper 32 bits.
+				   TODO: Does this work on 32-bit? */
 				pCreateParams->lpCreateParams));
 		}
 
@@ -153,26 +158,48 @@ namespace Phoenix
 		}
 	}
 
-	void Win32Window::minimize() {}
+	void Win32Window::minimize() 
+	{
+		Logger::Warning(__LOCATION_INFO__ "Not implemented!");
+	}
 	
-	void Win32Window::maximize() {}
+	void Win32Window::maximize() 
+	{
+		Logger::Warning(__LOCATION_INFO__ "Not implemented!");
+	}
 	
-	void Win32Window::show() {}
+	void Win32Window::setVisible(bool visible)
+	{
+		ShowWindow(self->window, visible ? SW_SHOW : SW_HIDE);
+	}
 	
-	void Win32Window::hide() {}
+	bool Win32Window::isFullscreen() const 
+	{
+		return self->fullscreen; 
+	}
 	
-	bool Win32Window::isFullscreen() const { return self->fullscreen; }
+	bool Win32Window::isOpen() const 
+	{
+		return self != nullptr; 
+	}
 	
-	bool Win32Window::isOpen() const { return self != nullptr; }
+	void Win32Window::setFullscreen(bool fullscreen) 
+	{
+		Logger::Warning(__LOCATION_INFO__ "Not implemented!");
+	} 
 	
-	void Win32Window::setFullscreen(bool fullscreen) {}
+	IWindow::Size Win32Window::getDimensions() const 
+	{ 
+		return{ self->width, self->height };
+	}
 	
-	IWindow::Size Win32Window::getDimensions() const { return{ self->width, self->height }; }
-	
-	void Win32Window::resize(unsigned int width, unsigned int height) {}
+	void Win32Window::resize(unsigned int width, unsigned int height) 
+	{
+		Logger::Warning(__LOCATION_INFO__ "Not implemented!");
+	}
 
 	void Win32Window::OnResize(int width, int height)
 	{
-
+		Logger::Warning(__LOCATION_INFO__ "Not implemented!");
 	}
 }

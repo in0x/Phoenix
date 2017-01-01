@@ -7,8 +7,8 @@ namespace Phoenix::Rendering
 {
 	enum class ProjectionType
 	{
-	PERSPECTIVE,
-	ORTHO
+		PERSPECTIVE,
+		ORTHO
 	};
 
 	Matrix4 lookAtRH(Vec3& cameraPos, Vec3& target, Vec3& up);

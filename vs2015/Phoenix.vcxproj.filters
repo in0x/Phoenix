@@ -64,15 +64,14 @@
     <ClInclude Include="..\src\Core\Projections.hpp">
       <Filter>Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Core\IWindow.hpp">
+    <ClInclude Include="..\src\Core\Win32Window.hpp">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Core\Win32Window.hpp">
+    <ClInclude Include="..\src\Core\IWindow.hpp">
       <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\Main.cpp" />
     <ClCompile Include="..\src\Core\Math\Matrix3.cpp">
       <Filter>Math</Filter>
     </ClCompile>
@@ -115,6 +114,7 @@
     <ClCompile Include="..\src\Core\Win32Window.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Win32Main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Math">
