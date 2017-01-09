@@ -3,14 +3,17 @@
 #include "PhiCoreRequired.hpp"
 #include "PhiMath.hpp"
 
-namespace Phoenix::Rendering
+namespace Phoenix
 {
-	enum class ProjectionType
+	namespace Rendering
 	{
-		PERSPECTIVE,
-		ORTHO
-	};
+		enum class ProjectionType
+		{
+			PERSPECTIVE,
+			ORTHO
+		};
 
-	Matrix4 lookAtRH(Vec3& cameraPos, Vec3& target, Vec3& up);
-	Matrix4 projectionRH(float yFOV, float aspect, float near, float far, ProjectionType type);	
+		Matrix4 lookAtRH(Vec3& cameraPos, Vec3& target, Vec3& up);
+		Matrix4 projectionRH(float yFOV, float aspect, float near, float far, ProjectionType type);
+	}
 }

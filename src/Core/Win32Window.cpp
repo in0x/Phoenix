@@ -5,7 +5,7 @@ namespace Phoenix
 	struct Win32Window::Pimpl
 	{
 		unsigned int left;
-		unsigned int top;
+		unsigned int top;	
 		unsigned int width;
 		unsigned int height;
 		bool fullscreen;
@@ -101,7 +101,6 @@ namespace Phoenix
 
 		ShowWindow(self->window, SW_SHOW);
 		s_windowCount++;
-		minimize();
 	}
 
 	Win32Window::~Win32Window()
