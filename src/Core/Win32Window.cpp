@@ -10,7 +10,20 @@ namespace Phoenix
 		unsigned int height;
 		bool fullscreen;
 		HWND window;
+		MSG msg;
 		std::wstring name;
+
+		~Pimpl()
+		{
+			if (!window)
+				return;
+
+			if (fullscreen)
+				ChangeDisplaySettings(nullptr, 0);
+
+			DestroyWindow(window);
+			UnregisterClass(name.c_str(), GetModuleHandle(nullptr));
+		}
 	};
 
 	unsigned int Win32Window::s_windowCount;
@@ -99,17 +112,15 @@ namespace Phoenix
 			return;
 		}
 
+		self->msg.message = ~WM_QUIT;
 		ShowWindow(self->window, SW_SHOW);
 		s_windowCount++;
 	}
 
 	Win32Window::~Win32Window()
 	{
-		if (self->fullscreen)
-			ChangeDisplaySettings(nullptr, 0);
-
-		DestroyWindow(self->window);
-		UnregisterClass(self->name.c_str(), GetModuleHandle(nullptr));
+		self = nullptr;
+		s_windowCount--;
 	};
 
 	/*
@@ -142,6 +153,7 @@ namespace Phoenix
 		switch (message)
 		{
 		case WM_CLOSE:
+			self = nullptr;
 			PostQuitMessage(0);
 			break;
 
@@ -154,6 +166,15 @@ namespace Phoenix
 
 		case WM_KEYUP:
 			break;
+		}
+	}
+
+	void Win32Window::processMessages()
+	{
+		if (PeekMessage(&self->msg, nullptr, 0, 0, PM_REMOVE)) 
+		{
+			TranslateMessage(&self->msg);
+			DispatchMessage(&self->msg);
 		}
 	}
 

@@ -25,7 +25,8 @@ namespace Phoenix
 		virtual ~Win32Window();
 
 		static LRESULT CALLBACK OnEvent(HWND handle, UINT message, WPARAM wParam, LPARAM lParam);
-
+		
+		void processMessages();
 		void minimize() override;
 		void maximize() override;
 		void setVisible(bool visible) override;

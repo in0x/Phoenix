@@ -4,25 +4,9 @@
 
 #include "Tests/MathTests.hpp"
 #include "Core/ATK.hpp"
-
-using namespace Phoenix;
-
-/*
-	TODO:
-		Create a platform layer for opening a window. We want to be able to attach the window
-		to either a DirectX or an OpenGL context. To reduce complexity we will only support
-		Windows for now. Being able to switch between rendering apis is more important for me.
-*/
-
-//int main(int arc, char** argv)
-//{
-//	Tests::MathTests::RunMathTests();
-//	auto scene = ATK::parseOBJ("Fox/", "RedFox.obj");
-//	return 0;
-//}
-
 #include <Windows.h>
 #include "Core\Win32Window.hpp"
+
 /*
 	Likely structure:
 		Window -> Interface class with game
@@ -47,39 +31,25 @@ char* getCMDOption(char** start, char** end, const std::string& option)
 
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-	Logger::LogOut::get().logToConsole = true;
-	Logger::LogOut::get().logToFile = true;
+	Phoenix::Logger::LogOut::get().logToConsole = true;
+	Phoenix::Logger::LogOut::get().logToFile = true;
 
-	WindowConfig config = { 1600, 900,
+	Phoenix::WindowConfig config = { 1600, 900,
 							0,0,
 							std::wstring(L"Phoenix"),
 							false };
 
-	Win32Window window(config); 
+	Phoenix::Win32Window window(config);
 	
 	if (!window.isOpen())
 	{
-		Logger::Error("Failed to initialize Win32Window");
+		Phoenix::Logger::Error("Failed to initialize Win32Window");
 		return -1;
 	} 
-	
-	MSG msg;
-	msg.message = ~WM_QUIT;
 
-	window.isOpen();
-
-	while (msg.message != WM_QUIT)
+	while (window.isOpen())
 	{
-		DWORD result = MsgWaitForMultipleObjectsEx(0, nullptr, 1.f / 60.f, QS_ALLEVENTS, 0);
-	
-		if (result != WAIT_TIMEOUT)
-		{
-			while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
-			{
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-			}
-		}
+		window.processMessages();
 	}
 
 	return 0;

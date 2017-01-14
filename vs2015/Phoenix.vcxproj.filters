@@ -115,6 +115,9 @@
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Win32Main.cpp" />
+    <ClCompile Include="..\src\Core\Win32GLContext.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Math">

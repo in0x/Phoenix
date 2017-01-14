@@ -200,6 +200,7 @@
     <ClCompile Include="..\src\Core\Math\Vec3.cpp" />
     <ClCompile Include="..\src\Core\Math\Vec4.cpp" />
     <ClCompile Include="..\src\Core\Projections.cpp" />
+    <ClCompile Include="..\src\Core\Win32GLContext.cpp" />
     <ClCompile Include="..\src\Core\Win32Window.cpp" />
     <ClCompile Include="..\src\Win32Main.cpp" />
     <ClCompile Include="..\src\Tests\MathTests.cpp" />
