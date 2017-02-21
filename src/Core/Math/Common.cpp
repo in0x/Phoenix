@@ -23,9 +23,6 @@ namespace Phoenix
 
 		float larger = std::max(a, b);
 
-		if (diff <= larger * maxRelDif)
-			return true;
-
-		return false;
+		return (diff <= larger * maxRelDif);
 	}
 }
