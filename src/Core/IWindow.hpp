@@ -19,6 +19,7 @@ namespace Phoenix
 		IWindow() {}
 		IWindow(IWindow&) = delete;
 		IWindow(IWindow&&) = delete;
+		virtual ~IWindow() {}
 
 		virtual void minimize() = 0;
 		virtual void maximize() = 0;
