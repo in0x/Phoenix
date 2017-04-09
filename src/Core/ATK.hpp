@@ -34,7 +34,7 @@ namespace Phoenix
 			std::string textureMap;
 		};
 
-		struct Scene
+		struct Mesh
 		{
 			std::vector<Vec3> vertices;
 			std::vector<Vec2> uvs;
@@ -64,7 +64,7 @@ namespace Phoenix
 		}
 
 		// v -> Vertex(x, y, z, [w])
-		void parseVertex(const std::vector<std::string>& tokens, Scene* pScene)
+		void parseVertex(const std::vector<std::string>& tokens, Mesh* pScene)
 		{
 			if (tokens.size() < 4)
 			{
@@ -78,7 +78,7 @@ namespace Phoenix
 		}
 
 		// vn -> Vertex Normal(x, y, z)
-		void parseNormal(const std::vector<std::string>& tokens, Scene* pScene)
+		void parseNormal(const std::vector<std::string>& tokens, Mesh* pScene)
 		{
 			if (tokens.size() < 4)
 			{
@@ -92,7 +92,7 @@ namespace Phoenix
 		}
 
 		// vt -> Texture Coord(u, v, [w])
-		void parseUV(const std::vector<std::string>& tokens, Scene* pScene)
+		void parseUV(const std::vector<std::string>& tokens, Mesh* pScene)
 		{
 			if (tokens.size() < 3)
 			{
@@ -107,7 +107,7 @@ namespace Phoenix
 		/* f-> Face
 		 * Texture or normal can be missing
 		 */
-		void parseFace(std::vector<std::string>& tokens, Scene* pScene)
+		void parseFace(std::vector<std::string>& tokens, Mesh* pScene)
 		{
 			std::function<void(std::string&, int)> parser;
 			pScene->faces.push_back(Face{});
@@ -173,7 +173,7 @@ namespace Phoenix
 		}
 
 		// How do we properly signal failure here?
-		void parseMTL(const std::string& path, Scene* pScene)
+		void parseMTL(const std::string& path, Mesh* pScene)
 		{
 			auto file = openFile(path);
 
@@ -237,15 +237,15 @@ namespace Phoenix
 			}
 		}
 
-		std::unique_ptr<Scene> parseOBJ(const std::string& pathTo, const std::string& name)
+		std::unique_ptr<Mesh> parseOBJ(const std::string& pathTo, const std::string& name)
 		{
 			auto file = openFile(pathTo + name);
 
 			if (!file)
 				return nullptr;
 
-			auto pScene = std::make_unique<Scene>();
-			Scene* pSceneRaw = pScene.get();
+			auto pScene = std::make_unique<Mesh>();
+			Mesh* pSceneRaw = pScene.get();
 			std::string line;
 
 			while (std::getline(file, line))

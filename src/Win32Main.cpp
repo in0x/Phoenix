@@ -5,15 +5,8 @@
 #include "Tests/MathTests.hpp"
 #include "Core/ATK.hpp"
 
-/*
-	Likely structure:
-		Window -> Interface class with game
-		Win32Window -> Takes care of Windows specific stuff
-			and is created on start up
-
-		Engine -> actual engine class, gets a window passed to it
-			on creation
-*/
+#include "gl3w/gl3w.h"
+#include "GLFW/glfw3.h"
 
 char* getCMDOption(char** start, char** end, const std::string& option)
 {
@@ -29,8 +22,15 @@ char* getCMDOption(char** start, char** end, const std::string& option)
 
 int main(int argc, char** argv)
 {
-	Phoenix::Logger::LogOut::get().logToConsole = true;
-	Phoenix::Logger::LogOut::get().logToFile = true;
+	using namespace Phoenix;
+
+	Logger::LogOut::get().logToConsole = true;
+	Logger::LogOut::get().logToFile = false;
+
+	Tests::RunMathTests();
+
+	std::unique_ptr<ATK::Mesh> fox = ATK::parseOBJ("Fox/", "RedFox.obj");
+	assert(fox != nullptr);
 
 	return 0;
 }
