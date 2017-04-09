@@ -18,7 +18,7 @@ namespace Phoenix
 
 	private:
 		double m_timeAtStart;
-		int m_bStarted : 1;
+		bool m_bStarted;
 
 		double getElapsedTime();
 	};

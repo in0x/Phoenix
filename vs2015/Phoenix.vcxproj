@@ -118,7 +118,7 @@
       <AdditionalOptions>/std:c++latest %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;glu32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -183,8 +183,6 @@
     <ClInclude Include="..\src\Core\PhiMath.hpp" />
     <ClInclude Include="..\src\Core\PhiSTL.hpp" />
     <ClInclude Include="..\src\Core\Projections.hpp" />
-    <ClInclude Include="..\src\Core\IWindow.hpp" />
-    <ClInclude Include="..\src\Core\Win32Window.hpp" />
     <ClInclude Include="..\src\Tests\MathTests.hpp" />
   </ItemGroup>
   <ItemGroup>
@@ -200,8 +198,6 @@
     <ClCompile Include="..\src\Core\Math\Vec3.cpp" />
     <ClCompile Include="..\src\Core\Math\Vec4.cpp" />
     <ClCompile Include="..\src\Core\Projections.cpp" />
-    <ClCompile Include="..\src\Core\Win32GLContext.cpp" />
-    <ClCompile Include="..\src\Core\Win32Window.cpp" />
     <ClCompile Include="..\src\Win32Main.cpp" />
     <ClCompile Include="..\src\Tests\MathTests.cpp" />
   </ItemGroup>
