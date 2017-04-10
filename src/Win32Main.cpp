@@ -3,7 +3,7 @@
 #include "Core\Engine.hpp"
 
 #include "Tests/MathTests.hpp"
-#include "Core/ATK.hpp"
+#include "Core/obj.hpp"
 
 #include "gl3w/gl3w.h"
 #include "GLFW/glfw3.h"
@@ -29,7 +29,7 @@ int main(int argc, char** argv)
 
 	Tests::RunMathTests();
 
-	std::unique_ptr<ATK::Mesh> fox = ATK::parseOBJ("Fox/", "RedFox.obj");
+	std::unique_ptr<Mesh> fox = parseOBJ("Fox/", "RedFox.obj");
 	assert(fox != nullptr);
 
 	return 0;
