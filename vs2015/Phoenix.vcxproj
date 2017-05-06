@@ -178,6 +178,7 @@
     <ClInclude Include="..\src\Core\Math\Vec4.hpp" />
     <ClInclude Include="..\src\Core\PhiCoreRequired.hpp" />
     <ClInclude Include="..\src\Core\PhiSTL.hpp" />
+    <ClInclude Include="..\src\Core\Win32GLContext.hpp" />
     <ClInclude Include="..\src\Core\Win32Window.hpp" />
     <ClInclude Include="..\src\Tests\MathTests.hpp" />
   </ItemGroup>
