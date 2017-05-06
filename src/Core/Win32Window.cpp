@@ -3,16 +3,41 @@
 
 namespace Phoenix
 {
+	struct Win32Window::Pimpl
+	{
+		unsigned int left;
+		unsigned int top;
+		unsigned int width;
+		unsigned int height;
+		bool fullscreen;
+		HWND window;
+		MSG msg;
+		std::wstring name;
+
+		~Pimpl()
+		{
+			if (!window)
+				return;
+
+			if (fullscreen)
+				ChangeDisplaySettings(nullptr, 0);
+
+			DestroyWindow(window);
+			UnregisterClass(name.c_str(), GetModuleHandle(nullptr));
+		}
+	};
+
 	unsigned int Win32Window::s_windowCount;
 
 	Win32Window::Win32Window(const WindowConfig& config)
 	{
-		left = config.left;
-		top = config.top;
-		width = config.width;
-		height = config.height;
-		fullscreen = config.fullscreen;
-		name = config.windowName;
+		self = std::make_unique<Pimpl>();
+		self->left = config.left;
+		self->top = config.top;
+		self->width = config.width;
+		self->height = config.height;
+		self->fullscreen = config.fullscreen;
+		self->name = config.windowName;
 
 		WNDCLASS windowClass;
 
@@ -35,24 +60,25 @@ namespace Phoenix
 		DWORD exWindStyle = 0;
 		DWORD windStyle = 0;
 
-		RECT rect = { left,
-			top,
-			left + width,
-			top + height };
+		RECT rect = { self->left,
+			self->top,
+			self->left + self->width,
+			self->top + self->height };
 
-		if (fullscreen)
+		if (self->fullscreen)
 		{
 			DEVMODE displayConfig = {};
 			memset(&displayConfig, 0, sizeof(displayConfig));
 			displayConfig.dmSize = sizeof(displayConfig);
-			displayConfig.dmPelsWidth = width;
-			displayConfig.dmPelsHeight = height;
+			displayConfig.dmPelsWidth = self->width;
+			displayConfig.dmPelsHeight = self->height;
 			displayConfig.dmBitsPerPel = 32;
 			displayConfig.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT | DM_BITSPERPEL;
 
 			if (ChangeDisplaySettings(&displayConfig, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL)
 			{
 				Logger::Error("Failed to fullscreen the window.");
+				self = nullptr;
 				return;
 			}
 
@@ -68,37 +94,33 @@ namespace Phoenix
 			AdjustWindowRectEx(&rect, windStyle, FALSE, exWindStyle);
 		}
 
-		window = CreateWindowEx(
+		self->window = CreateWindowEx(
 			exWindStyle,
-			name.c_str(),
-			name.c_str(),
+			self->name.c_str(),
+			self->name.c_str(),
 			WS_CLIPSIBLINGS | WS_CLIPCHILDREN | windStyle,
-			left, top,
-			width, height,
+			self->left, self->top,
+			self->width, self->height,
 			nullptr, // Parent window
 			nullptr,
 			GetModuleHandle(nullptr),
 			this);
 
-		if (!window)
+		if (!self->window)
 		{
 			Logger::Error("Failed to create window.");
+			self = nullptr;
 			return;
 		}
 
-		msg.message = ~WM_QUIT;
-		ShowWindow(window, SW_SHOW);
+		self->msg.message = ~WM_QUIT;
+		ShowWindow(self->window, SW_SHOW);
 		s_windowCount++;
 	}
 
 	Win32Window::~Win32Window()
 	{
-		if (fullscreen)
-			ChangeDisplaySettings(nullptr, 0);
-
-		DestroyWindow(window);
-		UnregisterClass(name.c_str(), GetModuleHandle(nullptr));
-
+		self = nullptr;
 		s_windowCount--;
 	};
 
@@ -132,6 +154,7 @@ namespace Phoenix
 		switch (message)
 		{
 		case WM_CLOSE:
+			self = nullptr;
 			PostQuitMessage(0);
 			break;
 
@@ -149,10 +172,10 @@ namespace Phoenix
 
 	void Win32Window::processMessages()
 	{
-		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+		if (PeekMessage(&self->msg, nullptr, 0, 0, PM_REMOVE))
 		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
+			TranslateMessage(&self->msg);
+			DispatchMessage(&self->msg);
 		}
 	}
 
@@ -168,18 +191,17 @@ namespace Phoenix
 
 	void Win32Window::setVisible(bool visible)
 	{
-		ShowWindow(window, visible ? SW_SHOW : SW_HIDE);
+		ShowWindow(self->window, visible ? SW_SHOW : SW_HIDE);
 	}
 
 	bool Win32Window::isFullscreen() const
 	{
-		return fullscreen;
+		return self->fullscreen;
 	}
 
 	bool Win32Window::isOpen() const
 	{
-		Logger::Warning(__LOCATION_INFO__ "Not implemented!");
-		return true;
+		return self != nullptr;
 	}
 
 	void Win32Window::setFullscreen(bool fullscreen)
@@ -189,7 +211,7 @@ namespace Phoenix
 
 	Win32Window::Size Win32Window::getDimensions() const
 	{
-		return{ width, height };
+		return{ self->width, self->height };
 	}
 
 	void Win32Window::resize(unsigned int width, unsigned int height)
