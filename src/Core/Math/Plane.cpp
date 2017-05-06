@@ -1,6 +1,6 @@
-#include "Common.hpp"
 #include "Ray.hpp"
 #include "Plane.hpp"
+#include "PhiMath.hpp"
 
 namespace Phoenix
 {

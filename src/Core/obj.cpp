@@ -133,7 +133,7 @@ namespace Phoenix
 	// How do we properly signal failure here?
 	void parseMTL(const std::string& path, Mesh* pScene)
 	{
-		auto file = openFile(path);
+		std::ifstream file = openFile(path);
 
 		if (!file)
 			return;
@@ -148,8 +148,8 @@ namespace Phoenix
 			}
 
 			return Vec3{ std::stof(tokens[1]),
-				std::stof(tokens[2]) ,
-				std::stof(tokens[3]) };
+						 std::stof(tokens[2]),
+						 std::stof(tokens[3])};
 		};
 
 		Material* mat = nullptr;
@@ -205,6 +205,14 @@ namespace Phoenix
 		auto pScene = std::make_unique<Mesh>();
 		Mesh* pSceneRaw = pScene.get();
 		std::string line;
+
+		while (std::getline(file, line))
+		{
+		
+		}
+
+		file.clear();
+		file.seekg(0, std::ios::beg);
 
 		while (std::getline(file, line))
 		{

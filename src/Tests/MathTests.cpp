@@ -1,8 +1,7 @@
 #include "MathTests.hpp"
 #include <cassert>
 
-#include "../Core/PhiMath.hpp"
-#include "../Core/Projections.hpp"
+#include "../Core/Math/PhiMath.hpp"
 #include "../Core/Clock.hpp"
 
 namespace Phoenix { namespace Tests
@@ -17,8 +16,6 @@ namespace Phoenix { namespace Tests
 
 	void LegacyTests()
 	{
-		using namespace Rendering;
-
 		std::cout << lookAtRH(Vec3{ 0,0,2 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 }) << '\n';
 		std::cout << projectionRH(90.f, 1920.f / 1080.f, 0.5f, 20.f, ProjectionType::PERSPECTIVE) << '\n';
 

@@ -8,7 +8,7 @@
 #include "PhiCoreRequired.hpp"
 #include "Logger.hpp"
 #include <fstream>
-#include "PhiMath.hpp"
+#include "Math/PhiMath.hpp"
 
 namespace Phoenix
 {

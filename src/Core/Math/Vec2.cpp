@@ -1,5 +1,5 @@
 #include "Vec2.hpp"
-#include "Common.hpp"
+#include "PhiMath.hpp"
 
 namespace Phoenix
 {

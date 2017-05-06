@@ -1,8 +1,8 @@
 #include "Quaternion.hpp"              
-#include "Common.hpp"
 #include "Vec3.hpp"
 #include "Matrix4.hpp"
 #include "EulerAngles.hpp"
+#include "PhiMath.hpp"
 
 namespace Phoenix
 {

@@ -1,6 +1,6 @@
 #include "Vec4.hpp"
-#include "Common.hpp"
 #include "Matrix4.hpp"
+#include "PhiMath.hpp"
 
 namespace Phoenix
 {

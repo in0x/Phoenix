@@ -12,5 +12,8 @@ namespace Phoenix
 	public:
 		EulerAngles(float _x, float _y, float _z) : Vec3(_x, _y, _z) 
 		{}
+
+		EulerAngles(const Vec3& vec) : Vec3(vec)
+		{}
 	};
 }

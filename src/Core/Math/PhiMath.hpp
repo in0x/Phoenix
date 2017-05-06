@@ -1,9 +1,21 @@
 #pragma once
 
-#include "../PhiCoreRequired.hpp"
+#include "Vec2.hpp"
+#include "Vec3.hpp"
+#include "Vec4.hpp"
+
+#include "Matrix3.hpp"
+#include "Matrix4.hpp"
+
+#include "Quaternion.hpp"
+#include "EulerAngles.hpp"
+
+#include "Ray.hpp"
+#include "Plane.hpp"
 
 namespace Phoenix
 {
+
 	// Small float value used to check for < 0 with tolerance for 
 	// floating point imprecission. 
 	constexpr float VERY_SMALL_FLT = std::numeric_limits<float>::epsilon();
@@ -22,4 +34,13 @@ namespace Phoenix
 
 	float fastInvSqrt(float x);
 	bool almostEqualRelative(float a, float b, float maxRelDif = 0.001f);
+
+	enum class ProjectionType
+	{
+		PERSPECTIVE,
+		ORTHO
+	};
+
+	Matrix4 lookAtRH(Vec3& cameraPos, Vec3& target, Vec3& up);
+	Matrix4 projectionRH(float yFOV, float aspect, float near, float far, ProjectionType type);
 }

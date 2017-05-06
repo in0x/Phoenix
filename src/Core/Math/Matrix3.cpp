@@ -1,9 +1,9 @@
 #include "Matrix3.hpp"
-#include "Common.hpp"
 #include "Matrix4.hpp"
 #include "Vec3.hpp"
 #include "EulerAngles.hpp"
 #include "Quaternion.hpp"
+#include "PhiMath.hpp"
 
 namespace Phoenix
 {

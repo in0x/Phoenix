@@ -31,16 +31,10 @@
     <ClInclude Include="..\src\Core\Clock.hpp">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Core\Engine.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Core\Logger.hpp">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Core\PhiCoreRequired.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Core\PhiMath.hpp">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Core\PhiSTL.hpp">
@@ -49,28 +43,28 @@
     <ClInclude Include="..\src\Core\Math\EulerAngles.hpp">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Core\Math\Common.hpp">
-      <Filter>Math</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Tests\MathTests.hpp">
       <Filter>Test</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Core\Projections.hpp">
-      <Filter>Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\gl3w\gl3w.h">
-      <Filter>gl3w</Filter>
+      <Filter>Dep\gl3w</Filter>
     </ClInclude>
     <ClInclude Include="..\src\gl3w\glcorearb.h">
-      <Filter>gl3w</Filter>
+      <Filter>Dep\gl3w</Filter>
     </ClInclude>
     <ClInclude Include="..\src\GLFW\glfw3native.h">
-      <Filter>GLFW</Filter>
+      <Filter>Dep\GLFW</Filter>
     </ClInclude>
     <ClInclude Include="..\src\GLFW\glfw3.h">
-      <Filter>GLFW</Filter>
+      <Filter>Dep\GLFW</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Core\obj.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Math\PhiMath.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Transform.h">
       <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
@@ -102,23 +96,22 @@
     <ClCompile Include="..\src\Core\Clock.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Core\Engine.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Core\Math\Common.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Tests\MathTests.cpp">
       <Filter>Test</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Core\Projections.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Win32Main.cpp" />
     <ClCompile Include="..\src\gl3w\gl3w.c">
-      <Filter>gl3w</Filter>
+      <Filter>Dep\gl3w</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Core\obj.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Core\Math\PhiMath.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\main.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Core\Transform.cpp">
       <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
@@ -132,14 +125,14 @@
     <Filter Include="Test">
       <UniqueIdentifier>{2ef49644-d68b-479e-8fd0-ed3330411f42}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Rendering">
-      <UniqueIdentifier>{f63b6ce5-f385-4e27-a725-2b4066cd2b2f}</UniqueIdentifier>
+    <Filter Include="Dep">
+      <UniqueIdentifier>{39135c7b-bb82-4c17-abaf-59b899824fbf}</UniqueIdentifier>
     </Filter>
-    <Filter Include="gl3w">
-      <UniqueIdentifier>{68ed3d5c-25e5-49af-87d0-42b4cadc4831}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GLFW">
+    <Filter Include="Dep\GLFW">
       <UniqueIdentifier>{c79f1df6-070f-46eb-8ad5-cf8a45cc37c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dep\gl3w">
+      <UniqueIdentifier>{68ed3d5c-25e5-49af-87d0-42b4cadc4831}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

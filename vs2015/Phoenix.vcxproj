@@ -161,11 +161,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\Core\Transform.h" />
+    <ClInclude Include="..\src\Core\Math\PhiMath.hpp" />
     <ClInclude Include="..\src\Core\obj.hpp" />
     <ClInclude Include="..\src\Core\Clock.hpp" />
-    <ClInclude Include="..\src\Core\Engine.hpp" />
     <ClInclude Include="..\src\Core\Logger.hpp" />
-    <ClInclude Include="..\src\Core\Math\Common.hpp" />
     <ClInclude Include="..\src\Core\Math\EulerAngles.hpp" />
     <ClInclude Include="..\src\Core\Math\Matrix3.hpp" />
     <ClInclude Include="..\src\Core\Math\Matrix4.hpp" />
@@ -177,9 +177,7 @@
     <ClInclude Include="..\src\Core\Math\Vec3.hpp" />
     <ClInclude Include="..\src\Core\Math\Vec4.hpp" />
     <ClInclude Include="..\src\Core\PhiCoreRequired.hpp" />
-    <ClInclude Include="..\src\Core\PhiMath.hpp" />
     <ClInclude Include="..\src\Core\PhiSTL.hpp" />
-    <ClInclude Include="..\src\Core\Projections.hpp" />
     <ClInclude Include="..\src\gl3w\gl3w.h" />
     <ClInclude Include="..\src\gl3w\glcorearb.h" />
     <ClInclude Include="..\src\GLFW\glfw3.h" />
@@ -188,10 +186,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Core\Clock.cpp" />
-    <ClCompile Include="..\src\Core\Engine.cpp" />
-    <ClCompile Include="..\src\Core\Math\Common.cpp" />
     <ClCompile Include="..\src\Core\Math\Matrix3.cpp" />
     <ClCompile Include="..\src\Core\Math\Matrix4.cpp" />
+    <ClCompile Include="..\src\Core\Math\PhiMath.cpp" />
     <ClCompile Include="..\src\Core\Math\Plane.cpp" />
     <ClCompile Include="..\src\Core\Math\Quaternion.cpp" />
     <ClCompile Include="..\src\Core\Math\Ray.cpp" />
@@ -199,9 +196,9 @@
     <ClCompile Include="..\src\Core\Math\Vec3.cpp" />
     <ClCompile Include="..\src\Core\Math\Vec4.cpp" />
     <ClCompile Include="..\src\Core\obj.cpp" />
-    <ClCompile Include="..\src\Core\Projections.cpp" />
+    <ClCompile Include="..\src\Core\Transform.cpp" />
     <ClCompile Include="..\src\gl3w\gl3w.c" />
-    <ClCompile Include="..\src\Win32Main.cpp" />
+    <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\Tests\MathTests.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

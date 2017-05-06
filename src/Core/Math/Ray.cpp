@@ -1,4 +1,5 @@
 #include "Ray.hpp"
+#include "PhiMath.hpp"
 
 namespace Phoenix
 {
