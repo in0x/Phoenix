@@ -39,13 +39,11 @@ namespace Phoenix
 			{ 
 				// Try to set that pixel format
 				m_renderContext = wglCreateContext(deviceContext);
-				wglMakeCurrent(deviceContext, m_renderContext);
-
+				
 				if (m_renderContext != 0) 
 				{
 					wglMakeCurrent(deviceContext, m_renderContext);		// Make our render context current
 					glEnable(GL_TEXTURE_2D);							// Enable Texture Mapping
-					glShadeModel(GL_SMOOTH);							// Enable Smooth Shading
 					glClearColor(0.0f, 0.0f, 0.0f, 0.0f);				// Black Background
 					glClearDepth(1.0f);									// Depth Buffer Setup
 					glEnable(GL_DEPTH_TEST);							// Enables Depth Testing
