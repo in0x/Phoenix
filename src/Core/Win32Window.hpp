@@ -39,6 +39,7 @@ namespace Phoenix
 		void setFullscreen(bool fullscreen);
 		Size getDimensions() const;
 		void resize(unsigned int width, unsigned int height);
+		HWND getNativeHandle();
 
 	private:
 		static unsigned int s_windowCount;

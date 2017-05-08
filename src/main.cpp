@@ -3,6 +3,7 @@
 #include "Core/obj.hpp"
 #include "Tests/MathTests.hpp"
 #include "Core\Win32Window.hpp"
+#include "Core\Win32GLContext.hpp"
 
 char* getCMDOption(char** start, char** end, const std::string& option)
 {
@@ -37,12 +38,13 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	std::unique_ptr<Mesh> fox = parseOBJ("Fox/", "RedFox.obj");
 	assert(fox != nullptr);
 	
-	Phoenix::WindowConfig config = { 1600, 900,
+	WindowConfig config = { 1600, 900,
 		0,0,
 		std::wstring(L"Phoenix"),
 		false };
 
-	Phoenix::Win32Window window(config);
+	Win32Window window(config);
+	Win32GLContext glc(window.getNativeHandle());
 
 	if (!window.isOpen())
 	{

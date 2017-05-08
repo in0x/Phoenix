@@ -219,6 +219,11 @@ namespace Phoenix
 		Logger::Warning(__LOCATION_INFO__ "Not implemented!");
 	}
 
+	HWND Win32Window::getNativeHandle()
+	{
+		return self->window;
+	}
+
 	void Win32Window::OnResize(int width, int height)
 	{
 		Logger::Warning(__LOCATION_INFO__ "Not implemented!");
