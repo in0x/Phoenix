@@ -1,4 +1,6 @@
 #include "obj.hpp"
+#include <functional>
+#include <cassert>
 
 namespace Phoenix
 {

@@ -4,6 +4,7 @@
 #include "EulerAngles.hpp"
 #include "Quaternion.hpp"
 #include "PhiMath.hpp"
+#include <cassert>
 
 namespace Phoenix
 {

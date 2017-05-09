@@ -1,4 +1,5 @@
 #include "Clock.hpp"
+#include <ctime>
 
 namespace Phoenix
 {

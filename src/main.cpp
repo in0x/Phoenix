@@ -37,7 +37,13 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	std::unique_ptr<Mesh> fox = parseOBJ("Fox/", "RedFox.obj");
 	assert(fox != nullptr);
-	
+
+	if (!gl3wInit())
+	{
+		Logger::Error("Failed to initialize gl3w");
+		return -1;
+	}
+
 	WindowConfig config = { 1600, 900,
 		0,0,
 		std::wstring(L"Phoenix"),
@@ -48,7 +54,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	if (!window.isOpen())
 	{
-		Phoenix::Logger::Error("Failed to initialize Win32Window");
+		Logger::Error("Failed to initialize Win32Window");
 		return -1;
 	}
 

@@ -1,7 +1,5 @@
 #pragma once
 
-#include "../PhiCoreRequired.hpp"
-
 namespace Phoenix
 {	
 	class Vec3;
@@ -47,10 +45,4 @@ namespace Phoenix
 	Quaternion operator*(Quaternion lhv, float rhv);
 	Quaternion operator*(Quaternion lhv, const Quaternion& rhv);
 	Quaternion slerp(Quaternion a, const Quaternion& b, float t);
-
-	inline std::ostream& operator<<(std::ostream& out, const Quaternion& quat)
-	{
-		out << "( w: " << quat.w << " x: " << quat.x << " y: " << quat.y << " z: " << quat.z << " )";
-		return out;
-	}
 }

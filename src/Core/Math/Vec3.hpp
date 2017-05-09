@@ -1,7 +1,5 @@
 #pragma once
 
-#include "../PhiCoreRequired.hpp"
-
 namespace Phoenix
 {
 	class Matrix4;
@@ -74,11 +72,5 @@ namespace Phoenix
 	Vec3 operator-(Vec3 lhv, float rhv);
 	Vec3 operator*(Vec3 lhv, float rhv);
 	Vec3 operator/(Vec3 lhv, float rhv);
-
-	inline std::ostream& operator<<(std::ostream& out, const Vec3& vec)
-	{
-		out << "( " << vec.x << " | " << vec.y << " | " << vec.z << " )";
-		return out;
-	}
 }
 

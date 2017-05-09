@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../PhiCoreRequired.hpp"
+#include <array>
 
 namespace Phoenix
 {

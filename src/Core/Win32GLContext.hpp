@@ -1,8 +1,7 @@
 #pragma once
 
-#include "PhiCoreRequired.hpp"
 #include <Windows.h>
-#include <GL/GL.h>
+#include "OpenGL.hpp"
 
 namespace Phoenix
 {

@@ -1,7 +1,5 @@
 #pragma once
 
-#include "PhiCoreRequired.hpp"
-
 namespace Phoenix
 {
 	class Clock

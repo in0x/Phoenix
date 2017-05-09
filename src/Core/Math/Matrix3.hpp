@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../PhiCoreRequired.hpp"
 #include "MatrixData.hpp"
 
 namespace Phoenix
@@ -86,12 +85,4 @@ namespace Phoenix
 	Matrix3 operator-(Matrix3 lhv, float f);
 	Matrix3 operator*(Matrix3 lhv, float f);
 	Matrix3 operator/(Matrix3 lhv, float f);
-
-	inline std::ostream& operator<<(std::ostream& out, const Matrix3& mat3)
-	{
-		std::cout << mat3(0, 0) << " " << mat3(0, 1) << " " << mat3(0, 2) << "\n"
-			<< mat3(1, 0) << " " << mat3(1, 1) << " " << mat3(1, 2) << "\n"
-			<< mat3(2, 0) << " " << mat3(2, 1) << " " << mat3(2, 2);
-		return out;
-	}
 }

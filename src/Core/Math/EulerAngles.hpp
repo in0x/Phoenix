@@ -1,6 +1,6 @@
 #pragma once
 #include "Vec3.hpp"
-#include "../PhiCoreRequired.hpp"
+
 
 namespace Phoenix
 {

@@ -5,9 +5,10 @@
 	at first since most of the models I own are in that format.
 */
 
-#include "PhiCoreRequired.hpp"
 #include "Logger.hpp"
 #include <fstream>
+#include <vector>
+#include <memory>
 #include "Math/PhiMath.hpp"
 
 namespace Phoenix

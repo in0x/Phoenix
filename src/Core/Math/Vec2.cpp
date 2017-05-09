@@ -1,4 +1,5 @@
 #include "Vec2.hpp"
+#include <cassert>
 #include "PhiMath.hpp"
 
 namespace Phoenix

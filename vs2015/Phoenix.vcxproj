@@ -121,7 +121,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glu32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -158,9 +158,15 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>opengl32.lib;glu32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\Core\gl3w\GL\gl3w.h" />
+    <ClInclude Include="..\src\Core\gl3w\GL\glcorearb.h" />
+    <ClInclude Include="..\src\Core\Math\MathStreamOverloads.hpp" />
+    <ClInclude Include="..\src\Core\OpenGL.hpp" />
+    <ClInclude Include="..\src\Core\GLShader.hpp" />
     <ClInclude Include="..\src\Core\Transform.h" />
     <ClInclude Include="..\src\Core\Math\PhiMath.hpp" />
     <ClInclude Include="..\src\Core\obj.hpp" />
@@ -176,7 +182,6 @@
     <ClInclude Include="..\src\Core\Math\Vec2.hpp" />
     <ClInclude Include="..\src\Core\Math\Vec3.hpp" />
     <ClInclude Include="..\src\Core\Math\Vec4.hpp" />
-    <ClInclude Include="..\src\Core\PhiCoreRequired.hpp" />
     <ClInclude Include="..\src\Core\PhiSTL.hpp" />
     <ClInclude Include="..\src\Core\Win32GLContext.hpp" />
     <ClInclude Include="..\src\Core\Win32Window.hpp" />
@@ -184,6 +189,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Core\Clock.cpp" />
+    <ClCompile Include="..\src\Core\gl3w\gl3w.c" />
+    <ClCompile Include="..\src\Core\Math\MathStreamOverloads.cpp" />
     <ClCompile Include="..\src\Core\Math\Matrix3.cpp" />
     <ClCompile Include="..\src\Core\Math\Matrix4.cpp" />
     <ClCompile Include="..\src\Core\Math\PhiMath.cpp" />

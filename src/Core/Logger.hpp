@@ -1,6 +1,8 @@
 #pragma once
 
-#include "PhiCoreRequired.hpp"
+#include <ctime>
+#include <string>
+#include <iostream> 
 #include <fstream>
 
 namespace Phoenix

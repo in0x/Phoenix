@@ -34,9 +34,6 @@
     <ClInclude Include="..\src\Core\Logger.hpp">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Core\PhiCoreRequired.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Core\PhiSTL.hpp">
       <Filter>Core</Filter>
     </ClInclude>
@@ -60,6 +57,21 @@
     </ClInclude>
     <ClInclude Include="..\src\Core\Win32GLContext.hpp">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\GLShader.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\OpenGL.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\gl3w\GL\gl3w.h">
+      <Filter>gl3w</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\gl3w\GL\glcorearb.h">
+      <Filter>gl3w</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Math\MathStreamOverloads.hpp">
+      <Filter>Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -108,6 +120,12 @@
     <ClCompile Include="..\src\Core\Win32Window.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Core\gl3w\gl3w.c">
+      <Filter>gl3w</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Core\Math\MathStreamOverloads.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Math">
@@ -118,6 +136,9 @@
     </Filter>
     <Filter Include="Test">
       <UniqueIdentifier>{2ef49644-d68b-479e-8fd0-ed3330411f42}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="gl3w">
+      <UniqueIdentifier>{33b0579d-149a-4363-b49d-bfc6d0132c81}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

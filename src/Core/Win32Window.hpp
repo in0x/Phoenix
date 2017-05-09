@@ -1,5 +1,6 @@
 #pragma once
-#include "PhiCoreRequired.hpp"
+#include <memory>
+#include <string>
 #include <Windows.h>
 
 namespace Phoenix

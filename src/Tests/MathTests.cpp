@@ -1,7 +1,8 @@
 #include "MathTests.hpp"
 #include <cassert>
-
+#include <iostream>
 #include "../Core/Math/PhiMath.hpp"
+#include "../Core/Math/MathStreamOverloads.hpp"
 #include "../Core/Clock.hpp"
 
 namespace Phoenix { namespace Tests

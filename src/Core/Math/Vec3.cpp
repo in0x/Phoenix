@@ -1,6 +1,7 @@
 #include "Vec3.hpp"
 #include "Matrix4.hpp"
 #include "PhiMath.hpp"
+#include <cassert>
 
 namespace Phoenix
 {
