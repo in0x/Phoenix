@@ -14,10 +14,6 @@ out VS_OUT_STRUCT // Data Type
 
 void main()
 {
-  //vs_out.color = vec4(0.94,0.42f,0.35f,1);
-  //vs_out.color = vec4(0.94,0.42f,0.35f,1) + position;
   vs_out.color = vec4(normal, 1);
-  //vs_out.color = vec4(1,0,0,1);
-  
   gl_Position = projectionTf * viewTf * modelTf * vec4(position,1);
 }

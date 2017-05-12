@@ -9,5 +9,5 @@ in VS_OUT_STRUCT
 
 void main()
 {
-  color = normalize(vs_in.color);//vec4(0.0, 0.8, 1.0, 1.0);
+  color = normalize(vs_in.color);
 }
