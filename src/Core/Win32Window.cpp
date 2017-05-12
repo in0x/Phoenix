@@ -41,7 +41,7 @@ namespace Phoenix
 
 		WNDCLASS windowClass;
 
-		windowClass.style = 0;
+		windowClass.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
 		windowClass.lpfnWndProc = &Win32Window::OnEvent;
 		windowClass.cbClsExtra = 0;
 		windowClass.cbWndExtra = 0;

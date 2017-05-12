@@ -1,5 +1,4 @@
 #pragma once
-#include "PhiCoreRequired.hpp"
 #include <Windows.h>
 #include "OpenGL.hpp"
 

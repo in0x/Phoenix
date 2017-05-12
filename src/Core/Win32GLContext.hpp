@@ -31,17 +31,17 @@ namespace Phoenix
 				0, 0, 0
 			};
 
-			HDC deviceContext = GetDC(owningWindow);				
-			int chosenPixelFormat = ChoosePixelFormat(deviceContext, &pfd); 
+			m_deviceContext = GetDC(owningWindow);
+			int chosenPixelFormat = ChoosePixelFormat(m_deviceContext, &pfd);
 			
-			if (SetPixelFormat(deviceContext, chosenPixelFormat, &pfd))
+			if (SetPixelFormat(m_deviceContext, chosenPixelFormat, &pfd))
 			{ 
 				// Try to set that pixel format
-				m_renderContext = wglCreateContext(deviceContext);
+				m_renderContext = wglCreateContext(m_deviceContext);
 				
 				if (m_renderContext != 0) 
 				{
-					wglMakeCurrent(deviceContext, m_renderContext);		// Make our render context current
+					wglMakeCurrent(m_deviceContext, m_renderContext);		// Make our render context current
 					glEnable(GL_TEXTURE_2D);							// Enable Texture Mapping
 					glClearColor(0.0f, 0.0f, 0.0f, 0.0f);				// Black Background
 					glClearDepth(1.0f);									// Depth Buffer Setup
@@ -51,7 +51,12 @@ namespace Phoenix
 				}
 			}
 			
-			ReleaseDC(owningWindow, deviceContext);	// Release the window device context now that we are done
+			//ReleaseDC(owningWindow, deviceContext);	// Release the window device context now that we are done
+		}
+
+		void SwapBuffer()
+		{
+			SwapBuffers(m_deviceContext);
 		}
 
 		~Win32GLContext()
@@ -62,5 +67,6 @@ namespace Phoenix
 	
 	private:
 		HGLRC m_renderContext;
+		HDC m_deviceContext;
 	};
 }
