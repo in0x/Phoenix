@@ -33,15 +33,9 @@ namespace Phoenix
 	}
 
 	float fastInvSqrt(float x);
-	bool almostEqualRelative(float a, float b, float maxRelDif = 0.001f);
-
-	enum class ProjectionType
-	{
-		PERSPECTIVE,
-		ORTHO
-	};
 	bool almostEqualRelative(float a, float b, float maxRelDif = VERY_SMALL_FLT);
 
 	Matrix4 lookAtRH(Vec3& cameraPos, Vec3& target, Vec3& up);
-	Matrix4 projectionRH(float yFOV, float aspect, float near, float far, ProjectionType type);
+	Matrix4 perspectiveRH(float yFOV, float aspect, float near, float far);		
+	Matrix4 orthographicRH(float yFOV, float aspect, float near, float far);
 }

@@ -26,7 +26,6 @@ namespace Phoenix
 		return (diff <= larger * maxRelDif);
 	}
 
-	// Currently only supporting OpenGL
 	Matrix4 lookAtRH(Vec3& cameraPos, Vec3& target, Vec3& up)
 	{
 		// Construct basis vectors
@@ -47,29 +46,39 @@ namespace Phoenix
 		};
 	}
 
-	Matrix4 projectionRH(float yFOV, float aspect, float near, float far, ProjectionType type)
+	Matrix4 perspectiveRH(float yFOV, float aspect, float near, float far)
 	{
-		float xFOV = yFOV / aspect;
-		float zoomX = 1.f / std::tan(xFOV / 2.f);
-		float zoomY = 1.f / std::tan(yFOV / 2.f);
+		float tanTheta2 = std::tan(yFOV * (PI / 360.f));
 
-		if (type == ProjectionType::PERSPECTIVE)
-		{
-			return Matrix4{
-				zoomX, 0, 0, 0,
-				0, zoomY, 0, 0,
-				0, 0, -((far + near) / (far - near)), ((-2.f * near * far) / (far - near)),
-				0, 0, -1, 0
-			};
-		}
-		else
-		{
-			return Matrix4{
-				zoomX, 0, 0, 0,
-				0, zoomY, 0, 0,
-				0, 0, -(2.f / (far - near)), -((far + near) / (far - near)),
-				0, 0, 0, 1
-			};
-		}
+		return Matrix4{
+			1.f / tanTheta2 ,0, 0, 0,
+			0, aspect / tanTheta2, 0, 0,
+			0, 0, (near + far) / (near - far), ((2.f * near * far) / (near - far)),
+			0, 0, -1, 0
+		};
+	}
+
+	Matrix4 orthographicRH(float yFOV, float aspect, float near, float far)
+	{
+		float scale = std::tan(yFOV * 0.5f * PI / 180.f) * near;
+		float right = aspect * scale;
+		float left = -right;
+		float top = scale;
+		float bottom = -top;
+
+		float a = 2 * near / (right - left);
+		float b = 2 * near / (top - bottom);
+		float c = (right + left) / (right - left);
+		float d = (top + bottom) / (top - bottom);
+		float e = -(far + near) / (far - near);
+		float f = (-2 * far * near) / (far - near);
+
+		return Matrix4 {
+			a, 0, c, 0,
+			0, b, d, 0,
+			0, 0, e, f,
+			0, 0, -1, 0
+		};	
 	}
 }
+

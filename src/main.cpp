@@ -107,7 +107,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	std::unique_ptr<Mesh> fox = parseOBJ("Fox/", "RedFox.obj");
 	assert(fox != nullptr);
 
-	WindowConfig config = { 480, 320,
+	WindowConfig config = { 800, 600,
 		0,0,
 		std::wstring(L"Phoenix"),
 		false };
@@ -129,8 +129,9 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	}
 	
 	Matrix4 worldMat = Matrix4::identity();
-	Matrix4 viewMat = lookAtRH(Vec3{ 2, 1, 2 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 });
-	Matrix4 projMat = projectionRH(40, (float)config.width / (float)config.height, 1, 100, ProjectionType::PERSPECTIVE); 
+	Matrix4 viewMat = lookAtRH(Vec3{ 2, 1, 3 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 });
+	Matrix4 projMat = perspectiveRH(40, (float)config.width / (float)config.height, 1, 100);
+	//Matrix4 projMat = orthographicRH(90, (float)config.width / (float)config.height, 1, 100);
 
 	GLuint vert = createShader("Shaders/test.vert", GL_VERTEX_SHADER);
 	GLuint frag = createShader("Shaders/test.frag", GL_FRAGMENT_SHADER);
