@@ -206,7 +206,9 @@
     <ClCompile Include="..\src\Core\Math\Vec3.cpp" />
     <ClCompile Include="..\src\Core\Math\Vec4.cpp" />
     <ClCompile Include="..\src\Core\obj.cpp" />
+    <ClCompile Include="..\src\Core\OpenGL.cpp" />
     <ClCompile Include="..\src\Core\Transform.cpp" />
+    <ClCompile Include="..\src\Core\Win32GLContext.cpp" />
     <ClCompile Include="..\src\Core\Win32Window.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\Tests\MathTests.cpp" />

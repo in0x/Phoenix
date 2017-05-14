@@ -28,73 +28,6 @@ Engine -> actual engine class, gets a window passed to it
 on creation
 */
 
-struct Cube
-{
-	std::vector<Phoenix::Vec3> vertices = {
-		// bottom
-		{ 0.5f, -0.5f, 0.5f },
-		{ -0.5f, -0.5f, 0.5f },
-		{ 0.5f, -0.5f, -0.5f },
-
-		{ -0.5f, -0.5f, -0.5f },
-		{ -0.5f, -0.5f, 0.5f },
-		{ 0.5f, -0.5f, -0.5f },
-
-		// top 
-		{ 0.5f, 0.5f, 0.5f },
-		{ 0.5f, 0.5f, -0.5f },
-		{ -0.5f, 0.5f, 0.5f },
-
-		{ -0.5f, 0.5f, -0.5f },
-		{ -0.5f, 0.5f, 0.5f },
-		{ 0.5f, 0.5f, -0.5f },
-
-		// front
-		{ -0.5f, -0.5f, 0.5f },
-		{ 0.5f, -0.5f, 0.5f },
-		{ 0.5f, 0.5f, 0.5f },
-
-		{ -0.5f, -0.5f, 0.5f },
-		{ 0.5f, 0.5f, 0.5f },
-		{ -0.5f, 0.5f, 0.5f },
-
-		// left
-		{ -0.5f, -0.5f,  0.5f },
-		{ -0.5f, 0.5f,  0.5f },
-		{ -0.5f, -0.5f, -0.5f },
-
-		{ -0.5f, -0.5f, -0.5f },
-		{ -0.5f, 0.5f,  0.5f },
-		{ -0.5f, 0.5f, -0.5f },
-
-		// right
-		{ 0.5f, -0.5f, 0.5f },
-		{ 0.5f, -0.5f, -0.5f },
-		{ 0.5f, 0.5f, -0.5f },
-
-		{ 0.5f, -0.5f,  0.5f },
-		{ 0.5f, 0.5f, -0.5f },
-		{ 0.5f, 0.5f,  0.5f },
-		// back
-		{ 0.5f, -0.5f, -0.5f },
-		{ -0.5f, -0.5f, -0.5f },
-		{ -0.5f, 0.5f, -0.5f },
-
-		{ 0.5f, -0.5f, -0.5f },
-		{ -0.5f, 0.5f, -0.5f },
-		{ 0.5f, 0.5f, -0.5f }
-	};
-
-	std::vector<Phoenix::Vec3> normals = {
-		{ 0,-1, 0 },{ 0,-1, 0 },{ 0,-1, 0 },{ 0,-1, 0 },{ 0,-1, 0 },{ 0,-1, 0 },
-		{ 0, 1, 0 },{ 0, 1, 0 },{ 0, 1, 0 },{ 0, 1, 0 },{ 0, 1, 0 },{ 0, 1, 0 },
-		{ 0, 0, -1 },{ 0, 0, -1 },{ 0, 0, -1 },{ 0, 0, -1 },{ 0, 0, -1 },{ 0, 0, -1 },
-		{ -1, 0, 0 },{ -1, 0, 0 },{ -1, 0, 0 },{ -1, 0, 0 },{ -1, 0, 0 },{ -1, 0, 0 },
-		{ 1, 0, 0 },{ 1, 0, 0 },{ 1, 0, 0 },{ 1, 0, 0 },{ 1, 0, 0 },{ 1, 0, 0 },
-		{ 0, 0, -1 },{ 0, 0, -1 },{ 0, 0, -1 },{ 0, 0, -1 },{ 0, 0, -1 },{ 0, 0, -1 }
-	};
-};
-
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	using namespace Phoenix;
@@ -131,8 +64,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	Matrix4 worldMat = Matrix4::identity();
 	Matrix4 viewMat = lookAtRH(Vec3{ 2, 1, 3 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 });
 	Matrix4 projMat = perspectiveRH(40, (float)config.width / (float)config.height, 1, 100);
-	//Matrix4 projMat = orthographicRH(90, (float)config.width / (float)config.height, 1, 100);
-
+	
 	GLuint vert = createShader("Shaders/test.vert", GL_VERTEX_SHADER);
 	GLuint frag = createShader("Shaders/test.frag", GL_FRAGMENT_SHADER);
 
@@ -150,23 +82,13 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	GLuint normals_vbo;
 	GLuint vao;
 
-	//glGenBuffers(1, &vbo);
-	//glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(Vec3) * fox->vertices.size(), fox->vertices.data(), GL_STATIC_DRAW);
-
-	//glGenBuffers(1, &normals_vbo);
-	//glBindBuffer(GL_ARRAY_BUFFER, normals_vbo);
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(Vec3) * fox->normals.size(), fox->normals.data(), GL_STATIC_DRAW);
-
-	Cube cube;
-
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vec3) * cube.vertices.size(), cube.vertices.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vec3) * fox->vertices.size(), fox->vertices.data(), GL_STATIC_DRAW);
 
 	glGenBuffers(1, &normals_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, normals_vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vec3) * cube.normals.size(), cube.normals.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vec3) * fox->normals.size(), fox->normals.data(), GL_STATIC_DRAW);
 
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);

@@ -15,7 +15,6 @@
 
 namespace Phoenix
 {
-
 	// Small float value used to check for < 0 with tolerance for 
 	// floating point imprecission. 
 	constexpr float VERY_SMALL_FLT = std::numeric_limits<float>::epsilon();
