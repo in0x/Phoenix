@@ -15,9 +15,10 @@ namespace Phoenix
 {
 	struct Face
 	{
-		Vec3 vertexIndices;
-		Vec3 normalIndices;
-		Vec3 uvIndices;
+		Vec4 vertexIndices;
+		Vec4 normalIndices;
+		Vec4 uvIndices;
+		bool bQuad;
 	};
 
 	struct Material

@@ -2,6 +2,13 @@
 #include <functional>
 #include <cassert>
 
+/*
+	* TODO
+	* Rearrange data so that we can actually use an index buffer
+	* Transform quad faces into two triangles
+	* Support parsing indices and values (f: 1.000/... vs f: -23/...)
+*/
+
 namespace Phoenix
 {
 	std::vector<std::string> strSplit(std::string& string, const char* pDelimiter)
@@ -64,24 +71,29 @@ namespace Phoenix
 			std::stof(tokens[2]) });
 	}
 
-	/* f-> Face
+	/* f -> Face
 	* Texture or normal can be missing
 	*/
 	void parseFace(std::vector<std::string>& tokens, Mesh* pScene)
 	{
-		std::function<void(std::string&, int)> parser;
-		pScene->faces.push_back(Face{});
+		if (tokens.size() < 4)
+		{
+			Logger::Error("Cannot parse face, not enough tokens.");
+			assert(false);
+		}
+
+		std::function<void(std::string&, int)> vertexParser;
 
 		if (tokens[2].find("/") == std::string::npos) // f a b c -> Vertex
 		{
-			parser = [pScene](auto token, int idx)
+			vertexParser = [pScene](auto token, int idx)
 			{
 				pScene->faces.back().vertexIndices(idx) = std::stof(token);
 			};
 		}
 		else if (tokens[2].find("//")) // f a//u b//v c//w -> Vertex//Normal
 		{
-			parser = [pScene](auto token, int idx)
+			vertexParser = [pScene](auto token, int idx)
 			{
 				auto nums = strSplit(token, "//");
 				pScene->faces.back().vertexIndices(idx) = std::stof(nums[0]);
@@ -90,11 +102,11 @@ namespace Phoenix
 		}
 		else
 		{
-			auto sepCount = tokens[2].find("/");
+			size_t sepCount = tokens[2].find("/");
 
 			if (sepCount == 1) // f a/i b/j c/k -> Vertex/Texture
 			{
-				parser = [pScene](auto token, int idx)
+				vertexParser = [pScene](auto token, int idx)
 				{
 					auto nums = strSplit(token, "/");
 					pScene->faces.back().vertexIndices(idx) = std::stof(std::string{ nums[0] });
@@ -103,7 +115,7 @@ namespace Phoenix
 			}
 			else // f a/i/u b/j/v c/k/w -> Vertex/Texture/Normal 
 			{
-				parser = [&](auto token, int idx)
+				vertexParser = [&](auto token, int idx)
 				{
 					auto nums = strSplit(token, "/");
 					pScene->faces.back().vertexIndices(idx) = std::stof(std::string{ nums[0] });
@@ -113,9 +125,23 @@ namespace Phoenix
 			}
 		}
 
-		parser(tokens[1], 0);
-		parser(tokens[2], 1);
-		parser(tokens[3], 2);
+		pScene->faces.push_back(Face{});
+		vertexParser(tokens[1], 0);
+		vertexParser(tokens[2], 1);
+		vertexParser(tokens[3], 2);
+
+		size_t tokenCount = tokens.size();
+		
+		if (tokenCount > 4)
+		{
+			for (size_t i = 4; i < tokenCount; ++i)
+			{
+				pScene->faces.push_back(Face{});
+				vertexParser(tokens[i - 3], 0);
+				vertexParser(tokens[i - 1], 1);
+				vertexParser(tokens[i],		2);
+			}
+		}
 	}
 
 	std::ifstream openFile(const std::string& path)
@@ -197,6 +223,12 @@ namespace Phoenix
 		}
 	}
 
+	std::unique_ptr<Mesh> convert(const Mesh* loaded)
+	{
+		auto converted = std::make_unique<Mesh>;
+		return nullptr;
+	}
+
 	std::unique_ptr<Mesh> parseOBJ(const std::string& pathTo, const std::string& name)
 	{
 		auto file = openFile(pathTo + name);
@@ -264,6 +296,7 @@ namespace Phoenix
 			}
 		}
 
+		//return convert(pScene.get());
 		return pScene;
 	}
 }
