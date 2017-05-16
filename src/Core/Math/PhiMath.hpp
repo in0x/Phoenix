@@ -32,8 +32,21 @@ namespace Phoenix
 	}
 
 	float fastInvSqrt(float x);
-	bool almostEqualRelative(float a, float b, float maxRelDif = VERY_SMALL_FLT);
+	
+	// If the absolute difference between two floats is within an a small n% of the
+	// larger of the two numbers, we can consider them to be equal.
+	template<class NumberType>
+	bool almostEqualRelative(NumberType a, NumberType b, NumberType maxRelDif = VERY_SMALL_FLT)
+	{
+		NumberType diff = std::abs(a - b);
+		a = std::abs(a);
+		b = std::abs(b);
 
+		NumberType larger = std::max(a, b);
+
+		return (diff <= larger * maxRelDif);
+	}
+	
 	Matrix4 lookAtRH(Vec3& cameraPos, Vec3& target, Vec3& up);
 	Matrix4 perspectiveRH(float yFOV, float aspect, float near, float far);		
 	Matrix4 orthographicRH(float yFOV, float aspect, float near, float far);

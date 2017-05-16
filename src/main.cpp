@@ -38,6 +38,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	Tests::RunMathTests();
 
 	std::unique_ptr<Mesh> fox = parseOBJ("Fox/", "RedFox.obj");
+	//std::unique_ptr<Mesh> fox = parseOBJ("rungholt/", "rungholt.obj");
 	assert(fox != nullptr);
 
 	WindowConfig config = { 800, 600,
@@ -62,7 +63,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	}
 	
 	Matrix4 worldMat = Matrix4::identity();
-	Matrix4 viewMat = lookAtRH(Vec3{ 2, 1, 3 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 });
+	Matrix4 viewMat = lookAtRH(Vec3{ 2, 1, -4 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 });
 	Matrix4 projMat = perspectiveRH(40, (float)config.width / (float)config.height, 1, 100);
 	
 	GLuint vert = createShader("Shaders/test.vert", GL_VERTEX_SHADER);

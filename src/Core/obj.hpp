@@ -15,10 +15,9 @@ namespace Phoenix
 {
 	struct Face
 	{
-		Vec4 vertexIndices;
-		Vec4 normalIndices;
-		Vec4 uvIndices;
-		bool bQuad;
+		Vec3 vertexIndices;
+		Vec3 normalIndices;
+		Vec3 uvIndices;
 	};
 
 	struct Material
@@ -39,7 +38,7 @@ namespace Phoenix
 		std::vector<Vec3> vertices;
 		std::vector<Vec2> uvs;
 		std::vector<Vec3> normals;
-		std::vector<Face> faces;
+		std::vector<unsigned int> indices;
 		std::vector<Material> materials;
 		bool bSmoothShading;
 	};
