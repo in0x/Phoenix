@@ -143,7 +143,7 @@ namespace Phoenix
 		{
 			for (int j = 0; j < 3; j++)
 			{
-				if (!almostEqualRelative(lhv(i, j), rhv(i, j)))
+				if (!(lhv(i, j) == rhv(i, j)))
 				{
 					return false;
 				}

@@ -103,8 +103,7 @@ namespace Phoenix
 
 	bool Vec4::operator==(const Vec4& rhv) const
 	{
-		return almostEqualRelative(x, rhv.x) && almostEqualRelative(y, rhv.y) 
-			&& almostEqualRelative(z, rhv.z) && almostEqualRelative(w, rhv.w);
+		return x == rhv.x && y == rhv.y && z == rhv.z && w == rhv.w;
 	}
 
 	float Vec4::length() const

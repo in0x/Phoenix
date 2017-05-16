@@ -63,7 +63,7 @@ namespace Phoenix
 
 	bool Vec2::operator==(const Vec2& rhv) const
 	{
-		return almostEqualRelative(x, rhv.x) && almostEqualRelative(y, rhv.y);
+		return x == rhv.x && y == rhv.y;
 	}
 
 	float Vec2::length() const
