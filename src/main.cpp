@@ -35,10 +35,10 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	Logger::LogOut::get().logToConsole = true;
 	Logger::LogOut::get().logToFile = false;
 
-	Tests::RunMathTests();
+	//Tests::RunMathTests();
 
-	std::unique_ptr<Mesh> fox = parseOBJ("Fox/", "RedFox.obj");
-	//std::unique_ptr<Mesh> fox = parseOBJ("rungholt/", "rungholt.obj");
+	//std::unique_ptr<Mesh> fox = parseOBJ("Fox/", "RedFox.obj");
+	std::unique_ptr<Mesh> fox = parseOBJ("rungholt/", "rungholt.obj");
 	assert(fox != nullptr);
 
 	WindowConfig config = { 800, 600,
