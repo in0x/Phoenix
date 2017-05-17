@@ -252,11 +252,11 @@ namespace Phoenix
 
 		void (*vertexParser)(std::string&, int, ObjData*) = nullptr;
 		
-		if (tokens[2].find("/") == std::string::npos) // f a b c -> Vertex
+		if (tokens.find(2, "/")) // f a b c -> Vertex
 		{
 			vertexParser = &parseFaceVertexV;
 		}
-		else if (tokens[2].find("//") != std::string::npos) // f a//u b//v c//w -> Vertex//Normal
+		else if (tokens.find(2, "//")) // f a//u b//v c//w -> Vertex//Normal
 		{
 			vertexParser = &parseFaceVertexVN;
 		}
@@ -341,37 +341,37 @@ namespace Phoenix
 			line = result;
 			StringTokenizer tokens = StringTokenizer(line, " ");
 
-			if (tokens[0] == "newmtl")
+			if (tokens.compare(0, "newmtl"))
 			{
 				pScene->materials.push_back(Material{});
 				mat = &pScene->materials.back();
 				mat->name = tokens[1];
 			}
-			else if (tokens[0] == "Ka")
+			else if (tokens.compare(0, "Ka"))
 			{
 				mat->ambient = parseColor(tokens);
 			}
-			else if (tokens[0] == "Kd")
+			else if (tokens.compare(0, "Kd"))
 			{
 				mat->diffuse = parseColor(tokens);
 			}
-			else if (tokens[0] == "Ks")
+			else if (tokens.compare(0, "Ks"))
 			{
 				mat->specular = parseColor(tokens);
 			}
-			else if (tokens[0] == "illum")
+			else if (tokens.compare(0, "illum"))
 			{
 				mat->illum = std::stof(tokens[1]);
 			}
-			else if (tokens[0] == "Ns")
+			else if (tokens.compare(0, "Ns"))
 			{
 				mat->shininess = std::stof(tokens[1]);
 			}
-			else if (tokens[0] == "d" || tokens[0] == "Tr")
+			else if (tokens.compare(0, "d") || tokens.compare(0, "Tr"))
 			{
 				mat->transperency = std::stof(tokens[1]);
 			}
-			else if (tokens[0] == "map_Ka")
+			else if (tokens.compare(0, "map_Ka"))
 			{
 				mat->textureMap = tokens[1];
 			}
@@ -399,34 +399,34 @@ namespace Phoenix
 			line = result;
 			StringTokenizer tokens = StringTokenizer(line, " ");
 
-			if (tokens[0] == "v")
+			if (tokens.compare(0, "v"))
 			{
 				parseVertex(tokens, pSceneRaw);
 			}
-			else if (tokens[0] == "vn")
+			else if (tokens.compare(0, "vn"))
 			{
 				parseNormal(tokens, pSceneRaw);
 			}
-			else if (tokens[0] == "vt")
+			else if (tokens.compare(0, "vt"))
 			{
 				parseUV(tokens, pSceneRaw);
 			}
-			else if (tokens[0] == "f")
+			else if (tokens.compare(0, "f"))
 			{
 				parseFace(tokens, pSceneRaw);
 			}
-			else if (tokens[0] == "s")
+			else if (tokens.compare(0, "s"))
 			{
-				pScene->bSmoothShading = tokens[1] == "off";
+				pScene->bSmoothShading = tokens.compare(1, "off");
 			}
-			else if (tokens[0] == "mtllib")
+			else if (tokens.compare(0, "mtllib"))
 			{
 				parseMTL(pathTo + tokens[1], pSceneRaw);
 			}
-			else if (tokens[0] == "usemtl")
+			else if (tokens.compare(0, "usemtl"))
 			{
 				auto mat = std::find_if(pScene->materials.begin(), pScene->materials.end(),
-					[&name = tokens[1]](const Material& mat) {
+					[name = tokens[1]](const Material& mat) {
 					return mat.name == name;
 				});
 
