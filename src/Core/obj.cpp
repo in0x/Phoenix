@@ -361,14 +361,6 @@ namespace Phoenix
 
 		while (std::getline(file, line))
 		{
-		
-		}
-
-		file.clear();
-		file.seekg(0, std::ios::beg);
-
-		while (std::getline(file, line))
-		{
 			auto tokens = strSplit(line, " ");
 
 			if (tokens[0] == "v")
