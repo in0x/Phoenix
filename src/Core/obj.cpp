@@ -119,12 +119,27 @@ namespace Phoenix
 		}
 	};
 
+	int subStrCount(const std::string& string, const std::string& substr)
+	{
+		int count = 0;
+		size_t pos = 0;
+		while ((pos = string.find(substr, pos)) != std::string::npos)
+		{
+			++count;
+			++pos;
+		}
+		return count; 
+	}
+
 	std::vector<std::string> strSplit(std::string& string, const char* pDelimiter)
 	{
 		int pos = 0;
 		std::string token;
 		std::string delimiter(pDelimiter);
-		std::vector<std::string> elements{}; // Using a fixed size for this (i.e. 16), helps remove a lot of reallocations.
+
+		int sepCount = subStrCount(string, delimiter);
+		std::vector<std::string> elements;
+		elements.reserve(sepCount + 1);
 
 		while ((pos = string.find(delimiter)) != std::string::npos)
 		{
@@ -196,6 +211,33 @@ namespace Phoenix
 		return index;
 	}
 
+	void parseFaceVertexV(std::string& token, int idx, ObjData* pScene)
+	{
+		pScene->faces.back().vertexIndices(idx) = parseFaceIndex(token, pScene->vertices.size());
+	}
+
+	void parseFaceVertexVN(std::string& token, int idx, ObjData* pScene)
+	{
+		auto nums = strSplit(token, "//");
+		pScene->faces.back().vertexIndices(idx) = parseFaceIndex(nums[0], pScene->vertices.size());
+		pScene->faces.back().normalIndices(idx) = parseFaceIndex(nums[1], pScene->normals.size());
+	}
+
+	void parseFaceVertexVT(std::string& token, int idx, ObjData* pScene)
+	{
+		auto nums = strSplit(token, "/");
+		pScene->faces.back().vertexIndices(idx) = parseFaceIndex(nums[0], pScene->vertices.size());
+		pScene->faces.back().uvIndices(idx) = parseFaceIndex(nums[1], pScene->uvs.size());
+	}
+
+	void parseFaceVertexVTN(std::string& token, int idx, ObjData* pScene)
+	{
+		auto nums = strSplit(token, "/");
+		pScene->faces.back().vertexIndices(idx) = parseFaceIndex(nums[0], pScene->vertices.size());
+		pScene->faces.back().uvIndices(idx) = parseFaceIndex(nums[1], pScene->uvs.size());
+		pScene->faces.back().normalIndices(idx) = parseFaceIndex(nums[2], pScene->normals.size());
+	}
+	
 	/* f -> Face
 	* Texture or normal can be missing
 	*/
@@ -207,23 +249,15 @@ namespace Phoenix
 			assert(false);
 		}
 
-		std::function<void(std::string&, int)> vertexParser;
-
+		void (*vertexParser)(std::string&, int, ObjData*) = nullptr;
+		
 		if (tokens[2].find("/") == std::string::npos) // f a b c -> Vertex
 		{
-			vertexParser = [pScene](auto token, int idx)
-			{
-				pScene->faces.back().vertexIndices(idx) = parseFaceIndex(token, pScene->vertices.size());
-			};
+			vertexParser = &parseFaceVertexV;
 		}
 		else if (tokens[2].find("//") != std::string::npos) // f a//u b//v c//w -> Vertex//Normal
 		{
-			vertexParser = [pScene](auto token, int idx)
-			{
-				auto nums = strSplit(token, "//");
-				pScene->faces.back().vertexIndices(idx) = parseFaceIndex(nums[0], pScene->vertices.size());
-				pScene->faces.back().normalIndices(idx) = parseFaceIndex(nums[1], pScene->normals.size());
-			};
+			vertexParser = &parseFaceVertexVN;
 		}
 		else
 		{
@@ -231,29 +265,18 @@ namespace Phoenix
 
 			if (sepCount == 1) // f a/i b/j c/k -> Vertex/Texture
 			{
-				vertexParser = [pScene](auto token, int idx)
-				{
-					auto nums = strSplit(token, "/");
-					pScene->faces.back().vertexIndices(idx) = parseFaceIndex(nums[0], pScene->vertices.size());
-					pScene->faces.back().uvIndices(idx) = parseFaceIndex(nums[1], pScene->uvs.size());
-				};
+				vertexParser = &parseFaceVertexVT;
 			}
 			else // f a/i/u b/j/v c/k/w -> Vertex/Texture/Normal 
 			{
-				vertexParser = [&](auto token, int idx)
-				{
-					auto nums = strSplit(token, "/");
-					pScene->faces.back().vertexIndices(idx) = parseFaceIndex(nums[0], pScene->vertices.size());
-					pScene->faces.back().uvIndices(idx) = parseFaceIndex(nums[1], pScene->uvs.size());
-					pScene->faces.back().normalIndices(idx) = parseFaceIndex(nums[2], pScene->normals.size());
-				};
+				vertexParser = &parseFaceVertexVTN;
 			}
 		}
 
 		pScene->faces.push_back(Face{});
-		vertexParser(tokens[1], 0);
-		vertexParser(tokens[2], 1);
-		vertexParser(tokens[3], 2);
+		vertexParser(tokens[1], 0, pScene);
+		vertexParser(tokens[2], 1, pScene);
+		vertexParser(tokens[3], 2, pScene);
 
 		size_t tokenCount = tokens.size();
 		
@@ -262,9 +285,9 @@ namespace Phoenix
 			for (size_t i = 4; i < tokenCount; ++i)
 			{
 				pScene->faces.push_back(Face{});
-				vertexParser(tokens[i - 3], 0);
-				vertexParser(tokens[i - 1], 1);
-				vertexParser(tokens[i],		2);
+				vertexParser(tokens[i - 3], 0, pScene);
+				vertexParser(tokens[i - 1], 1, pScene);
+				vertexParser(tokens[i],		2, pScene);
 			}
 		}
 	}
@@ -286,12 +309,11 @@ namespace Phoenix
 	// How do we properly signal failure here?
 	void parseMTL(const std::string& path, ObjData* pScene)
 	{
-		std::ifstream file = openFile(path);
+		//std::ifstream file = openFile(path);
+		FILE* file = fopen(path.c_str(), "r");
 
 		if (!file)
 			return;
-
-		std::string line;
 
 		auto parseColor = [](auto& tokens) -> Vec3 {
 			if (tokens.size() < 4)
@@ -307,8 +329,14 @@ namespace Phoenix
 
 		Material* mat = nullptr;
 
-		while (std::getline(file, line))
+		const int MAX_LINE = 8192; // TODO: figure out proper value for max line length
+		char input_line[MAX_LINE];
+		char* result;
+		std::string line;
+
+		while ((result = fgets(input_line, MAX_LINE, stdin)) != NULL)
 		{
+			line = result;
 			auto tokens = strSplit(line, " ");
 
 			if (tokens[0] == "newmtl")
@@ -350,17 +378,23 @@ namespace Phoenix
 
 	std::unique_ptr<Mesh> parseOBJ(const std::string& pathTo, const std::string& name)
 	{
-		auto file = openFile(pathTo + name);
+		//auto file = openFile(pathTo + name);
+		FILE* file = fopen((pathTo + name).c_str(), "r");
 
 		if (!file)
 			return nullptr;
 
 		auto pScene = std::make_unique<ObjData>();
 		ObjData* pSceneRaw = pScene.get();
+		
+		const int MAX_LINE = 8192; // TODO: figure out proper value for max line length
+		char input_line[MAX_LINE]; 
+		char* result;
 		std::string line;
 
-		while (std::getline(file, line))
+		while ((result = fgets(input_line, MAX_LINE, file)) != NULL)
 		{
+			line = result;
 			auto tokens = strSplit(line, " ");
 
 			if (tokens[0] == "v")
