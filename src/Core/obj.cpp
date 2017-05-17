@@ -124,7 +124,7 @@ namespace Phoenix
 		int pos = 0;
 		std::string token;
 		std::string delimiter(pDelimiter);
-		std::vector<std::string> elements{};
+		std::vector<std::string> elements{}; // Using a fixed size for this (i.e. 16), helps remove a lot of reallocations.
 
 		while ((pos = string.find(delimiter)) != std::string::npos)
 		{
@@ -216,7 +216,7 @@ namespace Phoenix
 				pScene->faces.back().vertexIndices(idx) = parseFaceIndex(token, pScene->vertices.size());
 			};
 		}
-		else if (tokens[2].find("//")) // f a//u b//v c//w -> Vertex//Normal
+		else if (tokens[2].find("//") != std::string::npos) // f a//u b//v c//w -> Vertex//Normal
 		{
 			vertexParser = [pScene](auto token, int idx)
 			{
@@ -227,7 +227,7 @@ namespace Phoenix
 		}
 		else
 		{
-			size_t sepCount = tokens[2].find("/");
+			int sepCount = std::count(tokens[2].begin(), tokens[2].end(), '/');
 
 			if (sepCount == 1) // f a/i b/j c/k -> Vertex/Texture
 			{
