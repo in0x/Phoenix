@@ -5,6 +5,7 @@
 #include "Core/Win32Window.hpp"
 #include "Core/Win32GLContext.hpp"
 #include "Core/GLShader.hpp"
+#include "Core/StringTokenizer.hpp"
 #include "Tests/MathTests.hpp"
 
 char* getCMDOption(char** start, char** end, const std::string& option)
@@ -35,7 +36,10 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	Logger::LogOut::get().logToConsole = true;
 	Logger::LogOut::get().logToFile = false;
 
-	//Tests::RunMathTests();
+	Tests::RunMathTests();
+
+	StringTokenizer tokenizer("vt 0.353516 0.755859", " ");
+	//StringTokenizer tokenizer("f -1491242/-576/-13 -1485347/-575/-13 -1485346/-574/-13 -1491241/-573/-13", " ");
 
 	//std::unique_ptr<Mesh> fox = parseOBJ("Fox/", "RedFox.obj");
 	std::unique_ptr<Mesh> fox = parseOBJ("rungholt/", "rungholt.obj");

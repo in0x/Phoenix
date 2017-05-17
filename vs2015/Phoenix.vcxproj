@@ -176,6 +176,7 @@
     <ClInclude Include="..\src\Core\Math\MathStreamOverloads.hpp" />
     <ClInclude Include="..\src\Core\OpenGL.hpp" />
     <ClInclude Include="..\src\Core\GLShader.hpp" />
+    <ClInclude Include="..\src\Core\StringTokenizer.hpp" />
     <ClInclude Include="..\src\Core\Transform.h" />
     <ClInclude Include="..\src\Core\Math\PhiMath.hpp" />
     <ClInclude Include="..\src\Core\obj.hpp" />
@@ -210,6 +211,7 @@
     <ClCompile Include="..\src\Core\Math\Vec4.cpp" />
     <ClCompile Include="..\src\Core\obj.cpp" />
     <ClCompile Include="..\src\Core\OpenGL.cpp" />
+    <ClCompile Include="..\src\Core\StringTokenizer.cpp" />
     <ClCompile Include="..\src\Core\Transform.cpp" />
     <ClCompile Include="..\src\Core\Win32GLContext.cpp" />
     <ClCompile Include="..\src\Core\Win32Window.cpp" />

@@ -144,7 +144,7 @@ namespace Phoenix
 		while ((pos = string.find(delimiter)) != std::string::npos)
 		{
 			token = string.substr(0, pos);
-			elements.push_back(token);
+			elements.emplace_back(token);
 			string.erase(0, pos + delimiter.length());
 		}
 
