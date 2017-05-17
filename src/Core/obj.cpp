@@ -1,6 +1,7 @@
 #include "obj.hpp"
 #include <functional>
 #include <cassert>
+#include "StringTokenizer.hpp"
 
 /*
 	* TODO
@@ -119,42 +120,42 @@ namespace Phoenix
 		}
 	};
 
-	int subStrCount(const std::string& string, const std::string& substr)
-	{
-		int count = 0;
-		size_t pos = 0;
-		while ((pos = string.find(substr, pos)) != std::string::npos)
-		{
-			++count;
-			++pos;
-		}
-		return count; 
-	}
+	//int subStrCount(const std::string& string, const std::string& substr)
+	//{
+	//	int count = 0;
+	//	size_t pos = 0;
+	//	while ((pos = string.find(substr, pos)) != std::string::npos)
+	//	{
+	//		++count;
+	//		++pos;
+	//	}
+	//	return count; 
+	//}
 
-	std::vector<std::string> strSplit(std::string& string, const char* pDelimiter)
-	{
-		int pos = 0;
-		std::string token;
-		std::string delimiter(pDelimiter);
+	//std::vector<std::string> strSplit(std::string& string, const char* pDelimiter)
+	//{
+	//	int pos = 0;
+	//	std::string token;
+	//	std::string delimiter(pDelimiter);
 
-		int sepCount = subStrCount(string, delimiter);
-		std::vector<std::string> elements;
-		elements.reserve(sepCount + 1);
+	//	int sepCount = subStrCount(string, delimiter);
+	//	std::vector<std::string> elements;
+	//	elements.reserve(sepCount + 1);
 
-		while ((pos = string.find(delimiter)) != std::string::npos)
-		{
-			token = string.substr(0, pos);
-			elements.emplace_back(token);
-			string.erase(0, pos + delimiter.length());
-		}
+	//	while ((pos = string.find(delimiter)) != std::string::npos)
+	//	{
+	//		token = string.substr(0, pos);
+	//		elements.emplace_back(token);
+	//		string.erase(0, pos + delimiter.length());
+	//	}
 
-		elements.push_back(string);
+	//	elements.push_back(string);
 
-		return elements;
-	}
+	//	return elements;
+	//}
 
 	// v -> Vertex(x, y, z, [w])
-	void parseVertex(const std::vector<std::string>& tokens, ObjData* pScene)
+	void parseVertex(StringTokenizer& tokens, ObjData* pScene)
 	{
 		if (tokens.size() < 4)
 		{
@@ -168,7 +169,7 @@ namespace Phoenix
 	}
 
 	// vn -> Vertex Normal(x, y, z)
-	void parseNormal(const std::vector<std::string>& tokens, ObjData* pScene)
+	void parseNormal(StringTokenizer& tokens, ObjData* pScene)
 	{
 		if (tokens.size() < 4)
 		{
@@ -182,7 +183,7 @@ namespace Phoenix
 	}
 
 	// vt -> Texture Coord(u, v, [w])
-	void parseUV(const std::vector<std::string>& tokens, ObjData* pScene)
+	void parseUV(StringTokenizer& tokens, ObjData* pScene)
 	{
 		if (tokens.size() < 3)
 		{
@@ -218,21 +219,21 @@ namespace Phoenix
 
 	void parseFaceVertexVN(std::string& token, int idx, ObjData* pScene)
 	{
-		auto nums = strSplit(token, "//");
+		StringTokenizer nums = StringTokenizer(token, "//");
 		pScene->faces.back().vertexIndices(idx) = parseFaceIndex(nums[0], pScene->vertices.size());
 		pScene->faces.back().normalIndices(idx) = parseFaceIndex(nums[1], pScene->normals.size());
 	}
 
 	void parseFaceVertexVT(std::string& token, int idx, ObjData* pScene)
 	{
-		auto nums = strSplit(token, "/");
+		StringTokenizer nums = StringTokenizer(token, "/");
 		pScene->faces.back().vertexIndices(idx) = parseFaceIndex(nums[0], pScene->vertices.size());
 		pScene->faces.back().uvIndices(idx) = parseFaceIndex(nums[1], pScene->uvs.size());
 	}
 
 	void parseFaceVertexVTN(std::string& token, int idx, ObjData* pScene)
 	{
-		auto nums = strSplit(token, "/");
+		StringTokenizer nums = StringTokenizer(token, "/");
 		pScene->faces.back().vertexIndices(idx) = parseFaceIndex(nums[0], pScene->vertices.size());
 		pScene->faces.back().uvIndices(idx) = parseFaceIndex(nums[1], pScene->uvs.size());
 		pScene->faces.back().normalIndices(idx) = parseFaceIndex(nums[2], pScene->normals.size());
@@ -241,7 +242,7 @@ namespace Phoenix
 	/* f -> Face
 	* Texture or normal can be missing
 	*/
-	void parseFace(std::vector<std::string>& tokens, ObjData* pScene)
+	void parseFace(StringTokenizer& tokens, ObjData* pScene)
 	{
 		if (tokens.size() < 4)
 		{
@@ -261,7 +262,8 @@ namespace Phoenix
 		}
 		else
 		{
-			int sepCount = std::count(tokens[2].begin(), tokens[2].end(), '/');
+			std::string token = tokens[2];
+			int sepCount = std::count(token.begin(), token.end(), '/');
 
 			if (sepCount == 1) // f a/i b/j c/k -> Vertex/Texture
 			{
@@ -337,7 +339,7 @@ namespace Phoenix
 		while ((result = fgets(input_line, MAX_LINE, stdin)) != NULL)
 		{
 			line = result;
-			auto tokens = strSplit(line, " ");
+			StringTokenizer tokens = StringTokenizer(line, " ");
 
 			if (tokens[0] == "newmtl")
 			{
@@ -395,7 +397,7 @@ namespace Phoenix
 		while ((result = fgets(input_line, MAX_LINE, file)) != NULL)
 		{
 			line = result;
-			auto tokens = strSplit(line, " ");
+			StringTokenizer tokens = StringTokenizer(line, " ");
 
 			if (tokens[0] == "v")
 			{

@@ -38,11 +38,13 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	Tests::RunMathTests();
 
-	StringTokenizer tokenizer("vt 0.353516 0.755859", " ");
 	//StringTokenizer tokenizer("f -1491242/-576/-13 -1485347/-575/-13 -1485346/-574/-13 -1491241/-573/-13", " ");
+	//StringTokenizer tokenizer("", " "); // TODO: Fix crasherinos if tokenized is fast
 
 	//std::unique_ptr<Mesh> fox = parseOBJ("Fox/", "RedFox.obj");
-	std::unique_ptr<Mesh> fox = parseOBJ("rungholt/", "rungholt.obj");
+	//std::unique_ptr<Mesh> fox = parseOBJ("rungholt/", "rungholt.obj");
+	std::unique_ptr<Mesh> fox = parseOBJ("rungholt/", "house.obj");
+
 	assert(fox != nullptr);
 
 	WindowConfig config = { 
