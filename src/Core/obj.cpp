@@ -12,45 +12,6 @@
 
 namespace Phoenix
 {
-	float strToFloat(const std::string& s)
-	{
-		const char* string = s.c_str();
-
-		float real = 0.0f;
-		bool neg = false;
-		if (*string == '-') 
-		{
-			neg = true;
-			++string;
-		}
-
-		while (*string >= '0' && *string <= '9') 
-		{
-			real = (real * 10.0f) + (*string - '0');
-			++string;
-		}
-		
-		if (*string == '.') 
-		{
-			float fract = 0.0f;
-			int fractLen = 0;
-			++string;
-
-			while (*string >= '0' && *string <= '9') 
-			{
-				fract = (fract*10.0f) + (*string - '0');
-				++string;
-				++fractLen;
-			}
-			
-			real += fract / std::pow(10.0f, fractLen);
-		}
-		if (neg) 
-		{
-			real = -real;
-		}
-		return real;
-	}
 
 	struct ObjData
 	{
@@ -160,40 +121,6 @@ namespace Phoenix
 		}
 	};
 
-	//int subStrCount(const std::string& string, const std::string& substr)
-	//{
-	//	int count = 0;
-	//	size_t pos = 0;
-	//	while ((pos = string.find(substr, pos)) != std::string::npos)
-	//	{
-	//		++count;
-	//		++pos;
-	//	}
-	//	return count; 
-	//}
-
-	//std::vector<std::string> strSplit(std::string& string, const char* pDelimiter)
-	//{
-	//	int pos = 0;
-	//	std::string token;
-	//	std::string delimiter(pDelimiter);
-
-	//	int sepCount = subStrCount(string, delimiter);
-	//	std::vector<std::string> elements;
-	//	elements.reserve(sepCount + 1);
-
-	//	while ((pos = string.find(delimiter)) != std::string::npos)
-	//	{
-	//		token = string.substr(0, pos);
-	//		elements.emplace_back(token);
-	//		string.erase(0, pos + delimiter.length());
-	//	}
-
-	//	elements.push_back(string);
-
-	//	return elements;
-	//}
-
 	// v -> Vertex(x, y, z, [w])
 	void parseVertex(StringTokenizer& tokens, ObjData* pScene)
 	{
@@ -203,9 +130,9 @@ namespace Phoenix
 			assert(false);
 		}
 
-		pScene->vertices.push_back(Vec3{ strToFloat(tokens[1]),
-			strToFloat(tokens[2]),
-			strToFloat(tokens[3]) });
+		pScene->vertices.push_back(Vec3{ tokens.tokenToFloat(1),
+										 tokens.tokenToFloat(2),
+										 tokens.tokenToFloat(3) });
 	}
 
 	// vn -> Vertex Normal(x, y, z)
@@ -217,9 +144,9 @@ namespace Phoenix
 			assert(false);
 		}
 
-		pScene->normals.push_back(Vec3{ strToFloat(tokens[1]),
-			strToFloat(tokens[2]),
-			strToFloat(tokens[3]) });
+		pScene->normals.push_back(Vec3{ tokens.tokenToFloat(1),
+										tokens.tokenToFloat(2),
+										tokens.tokenToFloat(3) });
 	}
 
 	// vt -> Texture Coord(u, v, [w])
@@ -231,14 +158,12 @@ namespace Phoenix
 			assert(false);
 		}
 
-		pScene->uvs.push_back(Vec2{ strToFloat(tokens[1]),
-			strToFloat(tokens[2]) });
+		pScene->uvs.push_back(Vec2{ tokens.tokenToFloat(1),
+									tokens.tokenToFloat(2) });
 	}
 
-	float parseFaceIndex(std::string& token, size_t elementCount)
+	float mapFaceIndex(float index, size_t elementCount)
 	{
-		float index = strToFloat(token); // TODO: These should really be converted to int
-
 		if (index < 0)
 		{
 			index = elementCount - index;
@@ -252,31 +177,31 @@ namespace Phoenix
 		return index;
 	}
 
-	void parseFaceVertexV(std::string& token, int idx, ObjData* pScene)
+	void parseFaceVertexV(const std::string& token, int idx, ObjData* pScene)
 	{
-		pScene->faces.back().vertexIndices(idx) = parseFaceIndex(token, pScene->vertices.size());
+		pScene->faces.back().vertexIndices(idx) = mapFaceIndex(strToFloat(token.c_str()), pScene->vertices.size());
 	}
 
-	void parseFaceVertexVN(std::string& token, int idx, ObjData* pScene)
+	void parseFaceVertexVN(const std::string& token, int idx, ObjData* pScene)
 	{
 		StringTokenizer nums = StringTokenizer(token, "//");
-		pScene->faces.back().vertexIndices(idx) = parseFaceIndex(nums[0], pScene->vertices.size());
-		pScene->faces.back().normalIndices(idx) = parseFaceIndex(nums[1], pScene->normals.size());
+		pScene->faces.back().vertexIndices(idx) = mapFaceIndex(nums.tokenToFloat(0), pScene->vertices.size());
+		pScene->faces.back().normalIndices(idx) = mapFaceIndex(nums.tokenToFloat(1), pScene->normals.size());
 	}
 
-	void parseFaceVertexVT(std::string& token, int idx, ObjData* pScene)
+	void parseFaceVertexVT(const std::string& token, int idx, ObjData* pScene)
 	{
 		StringTokenizer nums = StringTokenizer(token, "/");
-		pScene->faces.back().vertexIndices(idx) = parseFaceIndex(nums[0], pScene->vertices.size());
-		pScene->faces.back().uvIndices(idx) = parseFaceIndex(nums[1], pScene->uvs.size());
+		pScene->faces.back().vertexIndices(idx) = mapFaceIndex(nums.tokenToFloat(0), pScene->vertices.size());
+		pScene->faces.back().uvIndices(idx) = mapFaceIndex(nums.tokenToFloat(1), pScene->uvs.size());
 	}
 		
-	void parseFaceVertexVTN(std::string& token, int idx, ObjData* pScene)
+	void parseFaceVertexVTN(const std::string& token, int idx, ObjData* pScene)
 	{
 		StringTokenizer nums = StringTokenizer(token, "/");
-		pScene->faces.back().vertexIndices(idx) = parseFaceIndex(nums[0], pScene->vertices.size());
-		pScene->faces.back().uvIndices(idx) = parseFaceIndex(nums[1], pScene->uvs.size());
-		pScene->faces.back().normalIndices(idx) = parseFaceIndex(nums[2], pScene->normals.size());
+		pScene->faces.back().vertexIndices(idx) = mapFaceIndex(nums.tokenToFloat(0), pScene->vertices.size());
+		pScene->faces.back().uvIndices(idx) = mapFaceIndex(nums.tokenToFloat(1), pScene->uvs.size());
+		pScene->faces.back().normalIndices(idx) = mapFaceIndex(nums.tokenToFloat(2), pScene->normals.size());
 	}
 	
 	/* f -> Face
@@ -290,7 +215,7 @@ namespace Phoenix
 			assert(false);
 		}
 
-		void (*vertexParser)(std::string&, int, ObjData*) = nullptr;
+		void (*vertexParser)(const std::string&, int, ObjData*) = nullptr;
 		
 		if (!tokens.find(2, "/")) // f a b c -> Vertex
 		{
@@ -364,9 +289,9 @@ namespace Phoenix
 				assert(false);
 			}
 
-			return Vec3{ strToFloat(tokens[1]),
-						 strToFloat(tokens[2]),
-						 strToFloat(tokens[3])};
+			return Vec3{ tokens.tokenToFloat(1),
+			  			 tokens.tokenToFloat(2),
+						 tokens.tokenToFloat(3)};
 		};
 
 		Material* mat = nullptr;
@@ -401,15 +326,15 @@ namespace Phoenix
 			}
 			else if (tokens.compare(0, "illum"))
 			{
-				mat->illum = strToFloat(tokens[1]);
+				mat->illum = tokens.tokenToFloat(1);
 			}
 			else if (tokens.compare(0, "Ns"))
 			{
-				mat->shininess = strToFloat(tokens[1]);
+				mat->shininess = tokens.tokenToFloat(1);
 			}
 			else if (tokens.compare(0, "d") || tokens.compare(0, "Tr"))
 			{
-				mat->transperency = strToFloat(tokens[1]);
+				mat->transperency = tokens.tokenToFloat(1);
 			}
 			else if (tokens.compare(0, "map_Ka"))
 			{
