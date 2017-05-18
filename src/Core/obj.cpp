@@ -12,6 +12,46 @@
 
 namespace Phoenix
 {
+	float strToFloat(const std::string& s)
+	{
+		const char* string = s.c_str();
+
+		float real = 0.0f;
+		bool neg = false;
+		if (*string == '-') 
+		{
+			neg = true;
+			++string;
+		}
+
+		while (*string >= '0' && *string <= '9') 
+		{
+			real = (real * 10.0f) + (*string - '0');
+			++string;
+		}
+		
+		if (*string == '.') 
+		{
+			float fract = 0.0f;
+			int fractLen = 0;
+			++string;
+
+			while (*string >= '0' && *string <= '9') 
+			{
+				fract = (fract*10.0f) + (*string - '0');
+				++string;
+				++fractLen;
+			}
+			
+			real += fract / std::pow(10.0f, fractLen);
+		}
+		if (neg) 
+		{
+			real = -real;
+		}
+		return real;
+	}
+
 	struct ObjData
 	{
 		std::vector<Vec3> vertices;
@@ -163,9 +203,9 @@ namespace Phoenix
 			assert(false);
 		}
 
-		pScene->vertices.push_back(Vec3{ std::stof(tokens[1]),
-			std::stof(tokens[2]),
-			std::stof(tokens[3]) });
+		pScene->vertices.push_back(Vec3{ strToFloat(tokens[1]),
+			strToFloat(tokens[2]),
+			strToFloat(tokens[3]) });
 	}
 
 	// vn -> Vertex Normal(x, y, z)
@@ -177,9 +217,9 @@ namespace Phoenix
 			assert(false);
 		}
 
-		pScene->normals.push_back(Vec3{ std::stof(tokens[1]),
-			std::stof(tokens[2]),
-			std::stof(tokens[3]) });
+		pScene->normals.push_back(Vec3{ strToFloat(tokens[1]),
+			strToFloat(tokens[2]),
+			strToFloat(tokens[3]) });
 	}
 
 	// vt -> Texture Coord(u, v, [w])
@@ -191,13 +231,13 @@ namespace Phoenix
 			assert(false);
 		}
 
-		pScene->uvs.push_back(Vec2{ std::stof(tokens[1]),
-			std::stof(tokens[2]) });
+		pScene->uvs.push_back(Vec2{ strToFloat(tokens[1]),
+			strToFloat(tokens[2]) });
 	}
 
 	float parseFaceIndex(std::string& token, size_t elementCount)
 	{
-		float index = std::stof(token); // TODO: These should really be converted to int
+		float index = strToFloat(token); // TODO: These should really be converted to int
 
 		if (index < 0)
 		{
@@ -324,9 +364,9 @@ namespace Phoenix
 				assert(false);
 			}
 
-			return Vec3{ std::stof(tokens[1]),
-						 std::stof(tokens[2]),
-						 std::stof(tokens[3])};
+			return Vec3{ strToFloat(tokens[1]),
+						 strToFloat(tokens[2]),
+						 strToFloat(tokens[3])};
 		};
 
 		Material* mat = nullptr;
@@ -361,15 +401,15 @@ namespace Phoenix
 			}
 			else if (tokens.compare(0, "illum"))
 			{
-				mat->illum = std::stof(tokens[1]);
+				mat->illum = strToFloat(tokens[1]);
 			}
 			else if (tokens.compare(0, "Ns"))
 			{
-				mat->shininess = std::stof(tokens[1]);
+				mat->shininess = strToFloat(tokens[1]);
 			}
 			else if (tokens.compare(0, "d") || tokens.compare(0, "Tr"))
 			{
-				mat->transperency = std::stof(tokens[1]);
+				mat->transperency = strToFloat(tokens[1]);
 			}
 			else if (tokens.compare(0, "map_Ka"))
 			{
