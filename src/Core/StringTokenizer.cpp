@@ -22,7 +22,21 @@ bool StringTokenizer::compare(size_t idxOfToken, const std::string& other)
 
 bool StringTokenizer::find(size_t idxOfToken, const std::string& toFind)
 {
-	return strstr(m_pTokens[idxOfToken], toFind.c_str()) != nullptr;
+	const char* search = m_pTokens[idxOfToken];
+	const char* token = toFind.c_str();
+	size_t tokenSize = toFind.size();
+
+	const char* current = search;
+
+	while ((current = strstr(current, token)) != nullptr)
+	{
+		if (strncmp(current, token, tokenSize) == 0)
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 
 size_t StringTokenizer::size()

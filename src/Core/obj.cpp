@@ -230,7 +230,7 @@ namespace Phoenix
 		pScene->faces.back().vertexIndices(idx) = parseFaceIndex(nums[0], pScene->vertices.size());
 		pScene->faces.back().uvIndices(idx) = parseFaceIndex(nums[1], pScene->uvs.size());
 	}
-
+		
 	void parseFaceVertexVTN(std::string& token, int idx, ObjData* pScene)
 	{
 		StringTokenizer nums = StringTokenizer(token, "/");
@@ -252,7 +252,7 @@ namespace Phoenix
 
 		void (*vertexParser)(std::string&, int, ObjData*) = nullptr;
 		
-		if (tokens.find(2, "/")) // f a b c -> Vertex
+		if (!tokens.find(2, "/")) // f a b c -> Vertex
 		{
 			vertexParser = &parseFaceVertexV;
 		}
