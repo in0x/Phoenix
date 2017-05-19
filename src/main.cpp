@@ -38,15 +38,12 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	Tests::RunMathTests();
 
-	//StringTokenizer tokenizer("f -1491242/-576/-13 -1485347/-575/-13 -1485346/-574/-13 -1491241/-573/-13", " ");
-	//StringTokenizer tokenizer("", " "); // TODO: Fix crasherinos if tokenized is fast
-
 	//std::unique_ptr<Mesh> fox = parseOBJ("Fox/", "RedFox.obj");
 	std::unique_ptr<Mesh> fox = parseOBJ("rungholt/", "rungholt.obj");
 	//std::unique_ptr<Mesh> fox = parseOBJ("rungholt/", "house.obj");
 
 	assert(fox != nullptr);
-
+	
 	WindowConfig config = { 
 		800, 600,
 		0,0,
@@ -70,8 +67,8 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	}
 	
 	Matrix4 worldMat = Matrix4::identity();
-	Matrix4 viewMat = lookAtRH(Vec3{ 2, 1, -4 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 });
-	Matrix4 projMat = perspectiveRH(40, (float)config.width / (float)config.height, 1, 100);
+	Matrix4 viewMat = lookAtRH(Vec3{ 2, 90, -700 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 });
+	Matrix4 projMat = perspectiveRH(70, (float)config.width / (float)config.height, 1, 10000);
 	
 	GLuint vert = createShader("Shaders/test.vert", GL_VERTEX_SHADER);
 	GLuint frag = createShader("Shaders/test.frag", GL_FRAGMENT_SHADER);
@@ -89,6 +86,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	GLuint vbo;
 	GLuint normals_vbo;
 	GLuint vao;
+	GLuint ibo;
 
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -108,6 +106,10 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	glEnableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, normals_vbo);
 	glVertexAttribPointer(1, 3, GL_FLOAT, false, sizeof(Vec3), nullptr);
+
+	glGenBuffers(1, &ibo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, fox->indices.size() * sizeof(unsigned int), &fox->indices[0], GL_STATIC_DRAW);
 	
 	glUseProgram(progHandle);
 
@@ -115,7 +117,11 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	glUniformMatrix4fv(3, 1, GL_FALSE, (GLfloat*)&viewMat);
 	glUniformMatrix4fv(4, 1, GL_FALSE, (GLfloat*)&projMat);
 
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+
 	getGlErrorString();
+
+	float angle = 0.f;
 
 	while (window.isOpen())
 	{
@@ -127,7 +133,11 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 		glBindVertexArray(vao);
 
-		glDrawArrays(GL_TRIANGLES, 0, fox->vertices.size());
+		angle += 0.5f; // TODO: I think the += operator for Matrix4 doesnt work.
+		Matrix4 rotMat = Matrix4::rotation(0.f, angle, 0.f);
+		glUniformMatrix4fv(2, 1, GL_FALSE, (GLfloat*)&rotMat);
+
+		glDrawElements(GL_TRIANGLES, fox->indices.size(), GL_UNSIGNED_INT, nullptr);
 
 		glDisable(GL_MULTISAMPLE);
 		glDisable(GL_DEPTH_TEST);

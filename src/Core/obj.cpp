@@ -2,12 +2,14 @@
 #include <functional>
 #include <cassert>
 #include "StringTokenizer.hpp"
+#include <map>
 
 /*
 	* TODO
 	* Rearrange data so that we can actually use an index buffer -> DONE
-	* Transform quad faces into two triangles -> DONE
-	* Support parsing indices and values (f: 1.000/... vs f: -23/...)
+	* Transform quad faces into two triangles -> DONE 
+	* Support parsing indices and values (f: 1.000/... vs f: -23/...) -> DONE
+	* Make remapping run fast
 */
 
 namespace Phoenix
@@ -30,10 +32,14 @@ namespace Phoenix
 			Vec3 vertex;
 			Vec3 normal;
 			Vec2 uv;
-			int index;
+			
+			bool operator<(const PackedVertexData rhv) const 
+			{
+				return memcmp((void*)this, (void*)&rhv, sizeof(PackedVertexData)) > 0;
+			};
 		};
 
-		std::vector<PackedVertexData> packed;
+		std::map<PackedVertexData, size_t> packed;
 		std::unique_ptr<Mesh> pConvertedMesh;
 
 	public:
@@ -49,7 +55,7 @@ namespace Phoenix
 			pConvertedMesh->normals.reserve(vertexCount);
 			pConvertedMesh->uvs.reserve(vertexCount);
 
-			packed.resize(vertexCount);
+			//vertexToOutIndex.res(vertexCount);
 
 			for (const Face& face : loaded->faces)
 			{
@@ -73,7 +79,7 @@ namespace Phoenix
 
 				for (const auto& data : packedVertices)
 				{
-					int index;
+					size_t index;
 					bool bDataExists = doesDataExist(data, index);
 
 					if (bDataExists)
@@ -91,20 +97,16 @@ namespace Phoenix
 		}
 
 	private:
-		bool doesDataExist(const PackedVertexData& data, int& outIndex)
+		bool doesDataExist(const PackedVertexData& data, size_t& outIndex)
 		{
-			auto iter = std::find_if(packed.begin(), packed.end(), [&](const PackedVertexData& lhv)
-			{
-				return lhv.vertex == data.vertex && lhv.normal == data.normal && lhv.uv == data.uv;
-			});
+			auto iter = packed.find(data);
 
 			if (iter == packed.end())
 			{
 				return false;
 			}
-			else
-			{
-				outIndex = iter->index;
+			else {
+				outIndex = iter->second;
 				return true;
 			}
 		}
@@ -115,9 +117,9 @@ namespace Phoenix
 			pConvertedMesh->normals.push_back(data.normal);
 			pConvertedMesh->uvs.push_back(data.uv);
 
-			packed.push_back(data);
-			packed.back().index = packed.size() - 1;
-			pConvertedMesh->indices.push_back(packed.back().index);
+			size_t index = packed.size();
+			packed[data] = index;
+			pConvertedMesh->indices.push_back(index);
 		}
 	};
 
@@ -166,7 +168,7 @@ namespace Phoenix
 	{
 		if (index < 0)
 		{
-			index = elementCount - index;
+			index = elementCount + index;
 		}
 		else
 		{

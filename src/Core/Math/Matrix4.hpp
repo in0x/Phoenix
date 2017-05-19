@@ -80,6 +80,7 @@ namespace Phoenix {
 
 		static Matrix4 scale(float x, float y, float z);
 		static Matrix4 translation(float x, float y, float z);
+		static Matrix4 rotation(float x, float y, float z);
 
 		static Matrix4 identity();
 	};

@@ -10,4 +10,5 @@ in VS_OUT_STRUCT
 void main()
 {
   color = normalize(vs_in.color);
+  //color = vec4(1.0, 0, 0, 1.0);
 }

@@ -2,8 +2,7 @@
 #include "StringTokenizer.hpp"
 
 StringTokenizer::StringTokenizer(const std::string& tokens, const std::string& delimiter)
-	: m_string(std::move(tokens)) // TODO: Use move semantics?
-	//, m_pTokens()
+	: m_string(std::move(tokens))
 	, m_tokenLenghts()
 {
 	tokenize(delimiter);

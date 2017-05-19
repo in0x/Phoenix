@@ -284,6 +284,28 @@ namespace Phoenix
 		};
 	}
 
+	Matrix4 Matrix4::rotation(float x, float y, float z)
+	{
+		auto radX = radians(x);
+		auto radY = radians(y);
+		auto radZ = radians(z);
+
+		float A = std::cos(radX);
+		float B = std::sin(radX);
+		float C = std::cos(radY);
+		float D = std::sin(radY);
+		float E = std::cos(radZ);
+		float F = std::sin(radZ);
+
+		return Matrix4
+		{
+			C*E,           -C*F,        -D,  0.f,
+		   -B*D*E + A*F,  B*D*F + A*E, -B*C, 0.f, 
+			A*D*E + B*F, -A*D*F + B*E,  A*C, 0.f, 
+			0.f,		  0.f,			0.f, 1.f
+		};
+	}
+
 	Matrix4 Matrix4::identity()
 	{
 		return Matrix4{ 1, 0, 0, 0,
