@@ -7,14 +7,14 @@
 /*
 	* TODO
 	* Rearrange data so that we can actually use an index buffer -> DONE
-	* Transform quad faces into two triangles -> DONE 
+	* Transform quad faces into two triangles -> DONE
 	* Support parsing indices and values (f: 1.000/... vs f: -23/...) -> DONE
-	* Make remapping run fast
+	* Make remapping run fast -> DONE
+	* Handle normals / uvs being able to be missing
 */
 
 namespace Phoenix
 {
-
 	struct ObjData
 	{
 		std::vector<Vec3> vertices;
@@ -32,8 +32,8 @@ namespace Phoenix
 			Vec3 vertex;
 			Vec3 normal;
 			Vec2 uv;
-			
-			bool operator<(const PackedVertexData rhv) const 
+
+			bool operator<(const PackedVertexData rhv) const
 			{
 				return memcmp((void*)this, (void*)&rhv, sizeof(PackedVertexData)) > 0;
 			};
@@ -45,37 +45,55 @@ namespace Phoenix
 	public:
 		std::unique_ptr<Mesh> convertForOpenGL(std::unique_ptr<ObjData> loaded)
 		{
-			pConvertedMesh = std::make_unique<Mesh>();
+			const ObjData* pLoaded = loaded.get();
 
+			pConvertedMesh = std::make_unique<Mesh>();
 			pConvertedMesh->materials.swap(loaded->materials);
 			pConvertedMesh->bSmoothShading = loaded->bSmoothShading;
 
+			bool bHasVertices = loaded->vertices.size() > 0;
+			assert(bHasVertices);
+			bool bHasNormals = loaded->normals.size() > 0;
+			bool bHasUVs = loaded->uvs.size() > 0;
+
+			if (bHasVertices & bHasNormals & bHasUVs)
+			{
+				toPacked = &ObjIndexer::toPackedVTN;
+				addData = &ObjIndexer::addVTN;
+			}
+			else if (bHasVertices & bHasNormals & !bHasUVs)
+			{
+				toPacked = &ObjIndexer::toPackedVN;
+				addData = &ObjIndexer::addVN;
+			}
+			else if (bHasVertices & bHasUVs & !bHasNormals)
+			{
+				toPacked = &ObjIndexer::toPackedVT;
+				addData = &ObjIndexer::addVT;
+			}
+			else // bHasVertices & !bHasNormals & !bHasUVs 
+			{
+				toPacked = &ObjIndexer::toPackedV;
+				addData = &ObjIndexer::addV;
+			}
+
 			size_t vertexCount = pConvertedMesh->vertices.size();
 			pConvertedMesh->vertices.reserve(vertexCount);
-			pConvertedMesh->normals.reserve(vertexCount);
-			pConvertedMesh->uvs.reserve(vertexCount);
 
-			//vertexToOutIndex.res(vertexCount);
+			if (loaded->normals.size() > 0)
+			{
+				pConvertedMesh->normals.reserve(vertexCount);
+			}
+
+			if (loaded->normals.size() > 0)
+			{
+				pConvertedMesh->uvs.reserve(vertexCount);
+			}
 
 			for (const Face& face : loaded->faces)
 			{
-				PackedVertexData packedVertices[] = {
-					{
-						loaded->vertices[face.vertexIndices.x],
-						loaded->normals[face.normalIndices.x],
-						loaded->uvs[face.uvIndices.x]
-					},
-					{
-						loaded->vertices[face.vertexIndices.y],
-						loaded->normals[face.normalIndices.y],
-						loaded->uvs[face.uvIndices.y]
-					},
-					{
-						loaded->vertices[face.vertexIndices.z],
-						loaded->normals[face.normalIndices.z],
-						loaded->uvs[face.uvIndices.z]
-					}
-				};
+				PackedVertexData packedVertices[3];
+				(this->*toPacked)(packedVertices, face, pLoaded);
 
 				for (const auto& data : packedVertices)
 				{
@@ -88,7 +106,7 @@ namespace Phoenix
 					}
 					else
 					{
-						addData(data);
+						addDataAndIndex(data);
 					}
 				}
 			}
@@ -97,6 +115,12 @@ namespace Phoenix
 		}
 
 	private:
+		//std::function<void(PackedVertexData* dataArr, const Face& face, const ObjData* loaded)> toPacked;
+		//std::function<void(const PackedVertexData&)> addData;
+
+		void(ObjIndexer::*toPacked)(PackedVertexData*, const Face&, const ObjData*);
+		void(ObjIndexer::*addData)(const PackedVertexData&);
+
 		bool doesDataExist(const PackedVertexData& data, size_t& outIndex)
 		{
 			auto iter = packed.find(data);
@@ -111,11 +135,79 @@ namespace Phoenix
 			}
 		}
 
-		void addData(const PackedVertexData& data)
+		void toPackedV(PackedVertexData* dataArr, const Face& face, const ObjData* loaded)
+		{
+			dataArr[0].vertex = loaded->vertices[face.vertexIndices.x];
+			dataArr[1].vertex = loaded->vertices[face.vertexIndices.y];
+			dataArr[2].vertex = loaded->vertices[face.vertexIndices.z];
+		}
+
+		void toPackedVN(PackedVertexData* dataArr, const Face& face, const ObjData* loaded)
+		{
+			dataArr[0].vertex = loaded->vertices[face.vertexIndices.x];
+			dataArr[0].normal = loaded->normals[face.normalIndices.x];
+
+			dataArr[1].vertex = loaded->vertices[face.vertexIndices.y];
+			dataArr[1].normal = loaded->normals[face.normalIndices.y];
+
+			dataArr[2].vertex = loaded->vertices[face.vertexIndices.z];
+			dataArr[2].normal = loaded->normals[face.normalIndices.z];
+		}
+
+		void toPackedVT(PackedVertexData* dataArr, const Face& face, const ObjData* loaded)
+		{
+			dataArr[0].vertex = loaded->vertices[face.vertexIndices.x];
+			dataArr[0].uv = loaded->uvs[face.uvIndices.x];
+
+			dataArr[1].vertex = loaded->vertices[face.vertexIndices.y];
+			dataArr[1].uv = loaded->uvs[face.uvIndices.y];
+
+			dataArr[2].vertex = loaded->vertices[face.vertexIndices.z];
+			dataArr[2].uv = loaded->uvs[face.uvIndices.z];
+		}
+
+		void toPackedVTN(PackedVertexData* dataArr, const Face& face, const ObjData* loaded)
+		{
+			dataArr[0].vertex = loaded->vertices[face.vertexIndices.x];
+			dataArr[0].normal = loaded->normals[face.normalIndices.x];
+			dataArr[0].uv = loaded->uvs[face.uvIndices.x];
+
+			dataArr[1].vertex = loaded->vertices[face.vertexIndices.y];
+			dataArr[1].normal = loaded->normals[face.normalIndices.y];
+			dataArr[1].uv = loaded->uvs[face.uvIndices.y];
+
+			dataArr[2].vertex = loaded->vertices[face.vertexIndices.z];
+			dataArr[2].normal = loaded->normals[face.normalIndices.z];
+			dataArr[2].uv = loaded->uvs[face.uvIndices.z];
+		}
+
+		void addV(const PackedVertexData& data)
+		{
+			pConvertedMesh->vertices.push_back(data.vertex);
+		}
+	
+		void addVN(const PackedVertexData& data)
+		{
+			pConvertedMesh->vertices.push_back(data.vertex);
+			pConvertedMesh->normals.push_back(data.normal);
+		}
+
+		void addVT(const PackedVertexData& data)
+		{
+			pConvertedMesh->vertices.push_back(data.vertex);
+			pConvertedMesh->uvs.push_back(data.uv);
+		}
+	
+		void addVTN(const PackedVertexData& data)
 		{
 			pConvertedMesh->vertices.push_back(data.vertex);
 			pConvertedMesh->normals.push_back(data.normal);
 			pConvertedMesh->uvs.push_back(data.uv);
+		}
+		
+		void addDataAndIndex(const PackedVertexData& data)
+		{
+			(this->*addData)(data);
 
 			size_t index = packed.size();
 			packed[data] = index;
@@ -175,7 +267,7 @@ namespace Phoenix
 			// Subtract 1 from indices because obj is 1-based.
 			index -= 1;
 		}
-		
+
 		return index;
 	}
 
@@ -197,7 +289,7 @@ namespace Phoenix
 		pScene->faces.back().vertexIndices(idx) = mapFaceIndex(nums.tokenToFloat(0), pScene->vertices.size());
 		pScene->faces.back().uvIndices(idx) = mapFaceIndex(nums.tokenToFloat(1), pScene->uvs.size());
 	}
-		
+
 	void parseFaceVertexVTN(const std::string& token, int idx, ObjData* pScene)
 	{
 		StringTokenizer nums = StringTokenizer(token, "/");
@@ -205,7 +297,7 @@ namespace Phoenix
 		pScene->faces.back().uvIndices(idx) = mapFaceIndex(nums.tokenToFloat(1), pScene->uvs.size());
 		pScene->faces.back().normalIndices(idx) = mapFaceIndex(nums.tokenToFloat(2), pScene->normals.size());
 	}
-	
+
 	/* f -> Face
 	* Texture or normal can be missing
 	*/
@@ -217,8 +309,8 @@ namespace Phoenix
 			assert(false);
 		}
 
-		void (*vertexParser)(const std::string&, int, ObjData*) = nullptr;
-		
+		void(*vertexParser)(const std::string&, int, ObjData*) = nullptr;
+
 		if (!tokens.find(2, "/")) // f a b c -> Vertex
 		{
 			vertexParser = &parseFaceVertexV;
@@ -248,7 +340,7 @@ namespace Phoenix
 		vertexParser(tokens[3], 2, pScene);
 
 		size_t tokenCount = tokens.size();
-		
+
 		if (tokenCount > 4)
 		{
 			for (size_t i = 4; i < tokenCount; ++i)
@@ -256,7 +348,7 @@ namespace Phoenix
 				pScene->faces.push_back(Face{});
 				vertexParser(tokens[i - 3], 0, pScene);
 				vertexParser(tokens[i - 1], 1, pScene);
-				vertexParser(tokens[i],		2, pScene);
+				vertexParser(tokens[i], 2, pScene);
 			}
 		}
 	}
@@ -278,7 +370,6 @@ namespace Phoenix
 	// How do we properly signal failure here?
 	void parseMTL(const std::string& path, ObjData* pScene)
 	{
-		//std::ifstream file = openFile(path);
 		FILE* file = fopen(path.c_str(), "r");
 
 		if (!file)
@@ -292,8 +383,8 @@ namespace Phoenix
 			}
 
 			return Vec3{ tokens.tokenToFloat(1),
-			  			 tokens.tokenToFloat(2),
-						 tokens.tokenToFloat(3)};
+						 tokens.tokenToFloat(2),
+						 tokens.tokenToFloat(3) };
 		};
 
 		Material* mat = nullptr;
@@ -347,7 +438,6 @@ namespace Phoenix
 
 	std::unique_ptr<Mesh> parseOBJ(const std::string& pathTo, const std::string& name)
 	{
-		//auto file = openFile(pathTo + name);
 		FILE* file = fopen((pathTo + name).c_str(), "r");
 
 		if (!file)
@@ -355,9 +445,9 @@ namespace Phoenix
 
 		auto pScene = std::make_unique<ObjData>();
 		ObjData* pSceneRaw = pScene.get();
-		
+
 		const int MAX_LINE = 8192; // TODO: figure out proper value for max line length
-		char input_line[MAX_LINE]; 
+		char input_line[MAX_LINE];
 		char* result;
 		std::string line;
 
@@ -408,7 +498,6 @@ namespace Phoenix
 		}
 
 		ObjIndexer indexer;
-		pScene->uvs.push_back({}); // TODO: Remove this, this is a super temporary fix to avoid having to work around missing uvs for now.
 		return indexer.convertForOpenGL(std::move(pScene));
 	}
 }
