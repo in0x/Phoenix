@@ -346,7 +346,7 @@ namespace Phoenix
 			for (size_t i = 4; i < tokenCount; ++i)
 			{
 				pScene->faces.push_back(Face{});
-				vertexParser(tokens[i - 3], 0, pScene);
+				vertexParser(tokens[1], 0, pScene);
 				vertexParser(tokens[i - 1], 1, pScene);
 				vertexParser(tokens[i], 2, pScene);
 			}
