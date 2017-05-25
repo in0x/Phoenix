@@ -2,25 +2,28 @@
 #include <vector>
 #include <string>
 
-float strToFloat(const char* string);
-
-class StringTokenizer
+namespace Phoenix
 {
-public:
-	StringTokenizer(const std::string& string, const std::string& delimiter);	
+	float strToFloat(const char* string);
 
-	std::string operator[](size_t idx);
-	size_t size();
+	class StringTokenizer
+	{
+	public:
+		StringTokenizer(const std::string& string, const std::string& delimiter);
 
-	bool compare(size_t idxOfToken, const std::string& other);	
-	bool find(size_t idxOfToken, const std::string& toFind);
-	float tokenToFloat(size_t idxOfToken);
+		std::string operator[](size_t idx) const;
+		size_t size() const;
 
-private:
-	std::string m_string;
-	std::vector<int> m_tokenLenghts;
+		bool compare(size_t idxOfToken, const std::string& other) const;
+		bool find(size_t idxOfToken, const std::string& toFind) const;
+		float tokenToFloat(size_t idxOfToken) const;
 
-	const char* getToken(size_t idx);
-	void tokenize(const std::string& delimiter);
-	size_t subStrCount(const std::string& substr);
-};
+	private:
+		std::string m_string;
+		std::vector<size_t> m_tokenLenghts;
+
+		const char* getToken(size_t idx) const;
+		void tokenize(const std::string& delimiter);
+		size_t subStrCount(const std::string& substr) const;
+	};
+}

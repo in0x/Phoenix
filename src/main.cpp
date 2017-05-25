@@ -39,9 +39,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	Tests::RunMathTests();
 
 	std::unique_ptr<Mesh> fox = parseOBJ("Fox/", "RedFox.obj");
-	//std::unique_ptr<Mesh> fox = parseOBJ("rungholt/", "house.obj");
-	//std::unique_ptr<Mesh> fox = parseOBJ("rungholt/", "rungholt.obj");
-
+	
 	assert(fox != nullptr);
 	
 	WindowConfig config = { 
