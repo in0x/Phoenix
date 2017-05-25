@@ -10,7 +10,8 @@
 	* Transform quad faces into two triangles -> DONE
 	* Support parsing indices and values (f: 1.000/... vs f: -23/...) -> DONE
 	* Make remapping run fast -> DONE
-	* Handle normals / uvs being able to be missing
+	* Handle normals / uvs being able to be missing -> DONE
+	* Fix materials not being loaded (file is acting weird)
 */
 
 namespace Phoenix
@@ -21,7 +22,7 @@ namespace Phoenix
 		std::vector<Vec2> uvs;
 		std::vector<Vec3> normals;
 		std::vector<Face> faces;
-		std::vector<Material> materials;
+		std::vector<MTL> materials;
 		bool bSmoothShading;
 	};
 
@@ -367,13 +368,16 @@ namespace Phoenix
 		return file;
 	}
 
-	// How do we properly signal failure here?
+	// TODO: How do we properly signal failure here?
 	void parseMTL(const std::string& path, ObjData* pScene)
 	{
 		FILE* file = fopen(path.c_str(), "r");
 
 		if (!file)
+		{
+			fclose(file);
 			return;
+		}
 
 		auto parseColor = [](auto& tokens) -> Vec3 {
 			if (tokens.size() < 4)
@@ -387,21 +391,20 @@ namespace Phoenix
 						 tokens.tokenToFloat(3) };
 		};
 
-		Material* mat = nullptr;
+		MTL* mat = nullptr;
 
 		const int MAX_LINE = 8192; // TODO: figure out proper value for max line length
 		char input_line[MAX_LINE];
 		char* result;
 		std::string line;
 
-		while ((result = fgets(input_line, MAX_LINE, stdin)) != NULL)
+		while ((result = fgets(input_line, MAX_LINE, file)) != nullptr)
 		{
-			line = result;
-			StringTokenizer tokens = StringTokenizer(line, " ");
+			StringTokenizer tokens = StringTokenizer(result, " ");
 
 			if (tokens.compare(0, "newmtl"))
 			{
-				pScene->materials.push_back(Material{});
+				pScene->materials.push_back(MTL{});
 				mat = &pScene->materials.back();
 				mat->name = tokens[1];
 			}
@@ -427,13 +430,15 @@ namespace Phoenix
 			}
 			else if (tokens.compare(0, "d") || tokens.compare(0, "Tr"))
 			{
-				mat->transperency = tokens.tokenToFloat(1);
+				mat->transparency = tokens.tokenToFloat(1);
 			}
 			else if (tokens.compare(0, "map_Ka"))
 			{
 				mat->textureMap = tokens[1];
 			}
 		}
+
+		fclose(file);
 	}
 
 	std::unique_ptr<Mesh> parseOBJ(const std::string& pathTo, const std::string& name)
@@ -441,7 +446,10 @@ namespace Phoenix
 		FILE* file = fopen((pathTo + name).c_str(), "r");
 
 		if (!file)
+		{
+			fclose(file);
 			return nullptr;
+		}
 
 		auto pScene = std::make_unique<ObjData>();
 		ObjData* pSceneRaw = pScene.get();
@@ -451,10 +459,9 @@ namespace Phoenix
 		char* result;
 		std::string line;
 
-		while ((result = fgets(input_line, MAX_LINE, file)) != NULL)
+		while ((result = fgets(input_line, MAX_LINE, file)) != nullptr)
 		{
-			line = result;
-			StringTokenizer tokens = StringTokenizer(line, " ");
+			StringTokenizer tokens = StringTokenizer(result, " ");
 
 			if (tokens.compare(0, "v"))
 			{
@@ -478,12 +485,14 @@ namespace Phoenix
 			}
 			else if (tokens.compare(0, "mtllib"))
 			{
-				parseMTL(pathTo + tokens[1], pSceneRaw);
+				std::string fileName = tokens[1];
+				fileName.erase(fileName.find('\n'), 1); // TODO: Need to generally trim paths
+				parseMTL(pathTo + fileName/*tokens[1]*/, pSceneRaw);
 			}
 			else if (tokens.compare(0, "usemtl"))
 			{
 				auto mat = std::find_if(pScene->materials.begin(), pScene->materials.end(),
-					[name = tokens[1]](const Material& mat) {
+					[name = tokens[1]](const MTL& mat) {
 					return mat.name == name;
 				});
 
@@ -498,6 +507,7 @@ namespace Phoenix
 		}
 
 		ObjIndexer indexer;
+		fclose(file);
 		return indexer.convertForOpenGL(std::move(pScene));
 	}
 }

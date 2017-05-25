@@ -20,14 +20,14 @@ namespace Phoenix
 		Vec3 uvIndices;
 	};
 
-	struct Material
+	struct MTL
 	{
 		Vec3 ambient;
 		Vec3 diffuse;
 		Vec3 specular;
 		float shininess;
-		float transperency;
-		int idxFaceFrom;
+		float transparency;
+		size_t idxFaceFrom;
 		int8_t illum;
 		std::string name;
 		std::string textureMap;
@@ -39,7 +39,7 @@ namespace Phoenix
 		std::vector<Vec2> uvs;
 		std::vector<Vec3> normals;
 		std::vector<unsigned int> indices;
-		std::vector<Material> materials;
+		std::vector<MTL> materials;
 		bool bSmoothShading;
 	};
 

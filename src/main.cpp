@@ -5,7 +5,6 @@
 #include "Core/Win32Window.hpp"
 #include "Core/Win32GLContext.hpp"
 #include "Core/GLShader.hpp"
-#include "Core/StringTokenizer.hpp"
 #include "Tests/MathTests.hpp"
 
 char* getCMDOption(char** start, char** end, const std::string& option)
