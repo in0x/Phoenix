@@ -54,26 +54,33 @@ namespace Phoenix
 
 		if (s_windowCount == 0)
 		{
-			RegisterClass(&windowClass);
+			if (!RegisterClass(&windowClass))
+			{
+				Logger::Error("Failed to register the window class.");
+				self = nullptr;
+				return;
+			}
 		}
 
 		DWORD exWindStyle = 0;
 		DWORD windStyle = 0;
 
 		RECT rect = { self->left,
-			self->top,
-			self->left + self->width,
-			self->top + self->height };
+					  self->top,
+					  self->left + self->width,
+					  self->top  + self->height };
 
 		if (self->fullscreen)
 		{
-			DEVMODE displayConfig = {};
+			DEVMODE displayConfig;
 			memset(&displayConfig, 0, sizeof(displayConfig));
-			displayConfig.dmSize = sizeof(displayConfig);
+		/*	displayConfig.dmSize = sizeof(displayConfig);
 			displayConfig.dmPelsWidth = self->width;
 			displayConfig.dmPelsHeight = self->height;
 			displayConfig.dmBitsPerPel = 32;
-			displayConfig.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT | DM_BITSPERPEL;
+			displayConfig.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT | DM_BITSPERPEL;*/
+
+			EnumDisplaySettings(nullptr, ENUM_REGISTRY_SETTINGS, &displayConfig);
 
 			if (ChangeDisplaySettings(&displayConfig, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL)
 			{

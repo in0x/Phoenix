@@ -6,6 +6,7 @@
 #include "Core/Win32GLContext.hpp"
 #include "Core/GLShader.hpp"
 #include "Tests/MathTests.hpp"
+#include "Core/StringTokenizer.hpp"
 
 char* getCMDOption(char** start, char** end, const std::string& option)
 {
@@ -20,6 +21,13 @@ char* getCMDOption(char** start, char** end, const std::string& option)
 }
 
 /*
+TODO:
+	* Window doesnt fullscreen properly (scaling)
+	* GPU API (Brooke Hodgeman Style)
+		* Build mental model of how it all works
+		* Start implementing
+	* Crashes when closed by closing window via taskbar
+
 Likely structure:
 Window -> Interface class with game
 Win32Window -> Takes care of Windows specific stuff
@@ -38,14 +46,13 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	Tests::RunMathTests();
 
 	std::unique_ptr<Mesh> fox = parseOBJ("Fox/", "RedFox.obj");
-	
 	assert(fox != nullptr);
-	
+
 	WindowConfig config = { 
 		1400, 900,
 		0,0,
 		std::wstring(L"Phoenix"),
-		false };
+		true };
 
 	Win32Window window(config);
 	Win32GLContext glc(window.getNativeHandle());
@@ -64,9 +71,9 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	}
 	
 	Matrix4 worldMat = Matrix4::identity();
-	Matrix4 viewMat = lookAtRH(Vec3{ 2, 1, -8 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 });
+	Matrix4 viewMat = lookAtRH(Vec3{ 2, 2, -7}, Vec3{ 0,0,0 }, Vec3{ 0,1,0 });
 	Matrix4 projMat = perspectiveRH(70, (float)config.width / (float)config.height, 1, 10000);
-	Vec3 lightPosition = Vec3(-5, 3, -5);
+	Vec3 lightPosition = Vec3(5, 3, 5);
 	
 	GLuint vert = createShader("Shaders/diffuse.vert", GL_VERTEX_SHADER);
 	GLuint frag = createShader("Shaders/diffuse.frag", GL_FRAGMENT_SHADER);

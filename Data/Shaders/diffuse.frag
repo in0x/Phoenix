@@ -18,7 +18,7 @@ const float shininess = 100;
 //vec3 kSpecular = vec3(0.5, 0.5, 0.5);
 
 float kAmbient = 0.7;
-float kDiffuse = 0.7;
+float kDiffuse = 1.0;
 float kSpecular = 0.5;
 
 void main()

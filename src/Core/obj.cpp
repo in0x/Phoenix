@@ -11,7 +11,8 @@
 	* Support parsing indices and values (f: 1.000/... vs f: -23/...) -> DONE
 	* Make remapping run fast -> DONE
 	* Handle normals / uvs being able to be missing -> DONE
-	* Fix materials not being loaded (file is acting weird)
+	* Fix materials not being loaded (file is acting weird) -> DONE
+	* Do one pass before hand to count sizes (should reduce loading time (less allocations))
 */
 
 namespace Phoenix
@@ -116,9 +117,6 @@ namespace Phoenix
 		}
 
 	private:
-		//std::function<void(PackedVertexData* dataArr, const Face& face, const ObjData* loaded)> toPacked;
-		//std::function<void(const PackedVertexData&)> addData;
-
 		void(ObjIndexer::*toPacked)(PackedVertexData*, const Face&, const ObjData*);
 		void(ObjIndexer::*addData)(const PackedVertexData&);
 
@@ -335,47 +333,58 @@ namespace Phoenix
 			}
 		}
 
-		pScene->faces.push_back(Face{});
+		pScene->faces.emplace_back();
 		vertexParser(tokens[1], 0, pScene);
 		vertexParser(tokens[2], 1, pScene);
 		vertexParser(tokens[3], 2, pScene);
 
 		size_t tokenCount = tokens.size();
 
-		if (tokenCount > 4)
+		for (size_t i = 4; i < tokenCount; ++i)
 		{
-			for (size_t i = 4; i < tokenCount; ++i)
+			pScene->faces.emplace_back();
+			vertexParser(tokens[1], 0, pScene);
+			vertexParser(tokens[i - 1], 1, pScene);
+			vertexParser(tokens[i], 2, pScene);
+		}
+	}
+
+	void sanetizePath(std::string& path)
+	{
+		char tokensToRemove[] = { '\n', '\r', ' ' };
+
+		for (char toRemove : tokensToRemove)
+		{
+			size_t tokenPos = 0;
+			
+			while ((tokenPos = path.find(toRemove, tokenPos)) != std::string::npos)
 			{
-				pScene->faces.push_back(Face{});
-				vertexParser(tokens[1], 0, pScene);
-				vertexParser(tokens[i - 1], 1, pScene);
-				vertexParser(tokens[i], 2, pScene);
+				path.erase(tokenPos, 1);
 			}
 		}
 	}
 
-	std::ifstream openFile(const std::string& path)
+	FILE* openFile(std::string& path)
 	{
-		std::ifstream file;
-		file.open(path);
+		sanetizePath(path);
+		FILE* file = fopen(path.c_str(), "r");
 
-		if (!file.good())
+		if (!file)
 		{
 			Logger::Error("Failed to open OBJ file " + path);
-			return file;
+			fclose(file);
 		}
 
 		return file;
 	}
 
 	// TODO: How do we properly signal failure here?
-	void parseMTL(const std::string& path, ObjData* pScene)
+	void parseMTL(std::string& path, ObjData* pScene)
 	{
-		FILE* file = fopen(path.c_str(), "r");
+		FILE* file = openFile(path);
 
 		if (!file)
 		{
-			fclose(file);
 			return;
 		}
 
@@ -443,11 +452,11 @@ namespace Phoenix
 
 	std::unique_ptr<Mesh> parseOBJ(const std::string& pathTo, const std::string& name)
 	{
-		FILE* file = fopen((pathTo + name).c_str(), "r");
-
+		std::string path = pathTo + name;
+		FILE* file = openFile(path);
+		
 		if (!file)
 		{
-			fclose(file);
 			return nullptr;
 		}
 
@@ -486,8 +495,8 @@ namespace Phoenix
 			else if (tokens.compare(0, "mtllib"))
 			{
 				std::string fileName = tokens[1];
-				fileName.erase(fileName.find('\n'), 1); // TODO: Need to generally trim paths
-				parseMTL(pathTo + fileName/*tokens[1]*/, pSceneRaw);
+				//fileName.erase(fileName.find('\n'), 1); // TODO: Need to generally trim paths
+				parseMTL(pathTo + fileName, pSceneRaw);
 			}
 			else if (tokens.compare(0, "usemtl"))
 			{

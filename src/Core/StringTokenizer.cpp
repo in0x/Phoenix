@@ -115,7 +115,7 @@ namespace Phoenix
 		size_t pos = 0;
 		const size_t delimiterLength = delimiter.length();
 
-		const size_t delimiterCount = subStrCount(delimiter);
+		const size_t delimiterCount = subStrCount(delimiter) + 1;
 		m_tokenLenghts.reserve(delimiterCount);
 
 		const char* first = m_string.c_str();
