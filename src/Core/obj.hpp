@@ -13,13 +13,6 @@
 
 namespace Phoenix
 {
-	struct Face
-	{
-		Vec3 vertexIndices;
-		Vec3 normalIndices;
-		Vec3 uvIndices;
-	};
-
 	struct MTL
 	{
 		Vec3 ambient;

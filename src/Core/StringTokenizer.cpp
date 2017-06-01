@@ -98,6 +98,34 @@ namespace Phoenix
 		return strToFloat(getToken(idxOfToken));
 	}
 
+	int strToInt(const char* string)
+	{
+		int real = 0;
+		bool neg = false;
+		if (*string == '-')
+		{
+			neg = true;
+			++string;
+		}
+
+		while (*string >= '0' && *string <= '9')
+		{
+			real = (real * 10) + (*string - '0');
+			++string;
+		}
+
+		if (neg)
+		{
+			real = -real;
+		}
+		return real;
+	}
+
+	int StringTokenizer::tokenToInt(size_t idxOfToken) const
+	{
+		return strToInt(getToken(idxOfToken));
+	}
+
 	size_t StringTokenizer::subStrCount(const std::string& substr) const
 	{
 		size_t count = 0;

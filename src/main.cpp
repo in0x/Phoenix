@@ -22,7 +22,8 @@ char* getCMDOption(char** start, char** end, const std::string& option)
 
 /*
 TODO:
-	* Window doesnt fullscreen properly (scaling)
+	* Window doesnt fullscreen properly (scaling) (is this is only solvable by rendering to a 
+		lower res framebuffer and blitting to a native size window?)
 	* GPU API (Brooke Hodgeman Style)
 		* Build mental model of how it all works
 		* Start implementing
@@ -52,7 +53,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 		1400, 900,
 		0,0,
 		std::wstring(L"Phoenix"),
-		true };
+		false };
 
 	Win32Window window(config);
 	Win32GLContext glc(window.getNativeHandle());

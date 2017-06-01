@@ -17,6 +17,13 @@
 
 namespace Phoenix
 {
+	struct Face
+	{
+		int vertexIndices[3];
+		int normalIndices[3];
+		int uvIndices[3];
+	};
+
 	struct ObjData
 	{
 		std::vector<Vec3> vertices;
@@ -41,7 +48,7 @@ namespace Phoenix
 			};
 		};
 
-		std::map<PackedVertexData, size_t> packed;
+		std::map<PackedVertexData, unsigned int> packed;
 		std::unique_ptr<Mesh> pConvertedMesh;
 
 	public:
@@ -99,7 +106,7 @@ namespace Phoenix
 
 				for (const auto& data : packedVertices)
 				{
-					size_t index;
+					unsigned int index;
 					bool bDataExists = doesDataExist(data, index);
 
 					if (bDataExists)
@@ -120,7 +127,7 @@ namespace Phoenix
 		void(ObjIndexer::*toPacked)(PackedVertexData*, const Face&, const ObjData*);
 		void(ObjIndexer::*addData)(const PackedVertexData&);
 
-		bool doesDataExist(const PackedVertexData& data, size_t& outIndex)
+		bool doesDataExist(const PackedVertexData& data, unsigned int& outIndex)
 		{
 			auto iter = packed.find(data);
 
@@ -136,48 +143,48 @@ namespace Phoenix
 
 		void toPackedV(PackedVertexData* dataArr, const Face& face, const ObjData* loaded)
 		{
-			dataArr[0].vertex = loaded->vertices[face.vertexIndices.x];
-			dataArr[1].vertex = loaded->vertices[face.vertexIndices.y];
-			dataArr[2].vertex = loaded->vertices[face.vertexIndices.z];
+			dataArr[0].vertex = loaded->vertices[face.vertexIndices[0]];
+			dataArr[1].vertex = loaded->vertices[face.vertexIndices[1]];
+			dataArr[2].vertex = loaded->vertices[face.vertexIndices[2]];
 		}
 
 		void toPackedVN(PackedVertexData* dataArr, const Face& face, const ObjData* loaded)
 		{
-			dataArr[0].vertex = loaded->vertices[face.vertexIndices.x];
-			dataArr[0].normal = loaded->normals[face.normalIndices.x];
+			dataArr[0].vertex = loaded->vertices[face.vertexIndices[0]];
+			dataArr[0].normal = loaded->normals[face.normalIndices[0]];
 
-			dataArr[1].vertex = loaded->vertices[face.vertexIndices.y];
-			dataArr[1].normal = loaded->normals[face.normalIndices.y];
+			dataArr[1].vertex = loaded->vertices[face.vertexIndices[1]];
+			dataArr[1].normal = loaded->normals[face.normalIndices[1]];
 
-			dataArr[2].vertex = loaded->vertices[face.vertexIndices.z];
-			dataArr[2].normal = loaded->normals[face.normalIndices.z];
+			dataArr[2].vertex = loaded->vertices[face.vertexIndices[2]];
+			dataArr[2].normal = loaded->normals[face.normalIndices[2]];
 		}
 
 		void toPackedVT(PackedVertexData* dataArr, const Face& face, const ObjData* loaded)
 		{
-			dataArr[0].vertex = loaded->vertices[face.vertexIndices.x];
-			dataArr[0].uv = loaded->uvs[face.uvIndices.x];
+			dataArr[0].vertex = loaded->vertices[face.vertexIndices[0]];
+			dataArr[0].uv = loaded->uvs[face.uvIndices[0]];
 
-			dataArr[1].vertex = loaded->vertices[face.vertexIndices.y];
-			dataArr[1].uv = loaded->uvs[face.uvIndices.y];
+			dataArr[1].vertex = loaded->vertices[face.vertexIndices[1]];
+			dataArr[1].uv = loaded->uvs[face.uvIndices[1]];
 
-			dataArr[2].vertex = loaded->vertices[face.vertexIndices.z];
-			dataArr[2].uv = loaded->uvs[face.uvIndices.z];
+			dataArr[2].vertex = loaded->vertices[face.vertexIndices[2]];
+			dataArr[2].uv = loaded->uvs[face.uvIndices[2]];
 		}
 
 		void toPackedVTN(PackedVertexData* dataArr, const Face& face, const ObjData* loaded)
 		{
-			dataArr[0].vertex = loaded->vertices[face.vertexIndices.x];
-			dataArr[0].normal = loaded->normals[face.normalIndices.x];
-			dataArr[0].uv = loaded->uvs[face.uvIndices.x];
+			dataArr[0].vertex = loaded->vertices[face.vertexIndices[0]];
+			dataArr[0].normal = loaded->normals[face.normalIndices[0]];
+			dataArr[0].uv = loaded->uvs[face.uvIndices[0]];
 
-			dataArr[1].vertex = loaded->vertices[face.vertexIndices.y];
-			dataArr[1].normal = loaded->normals[face.normalIndices.y];
-			dataArr[1].uv = loaded->uvs[face.uvIndices.y];
+			dataArr[1].vertex = loaded->vertices[face.vertexIndices[1]];
+			dataArr[1].normal = loaded->normals[face.normalIndices[1]];
+			dataArr[1].uv = loaded->uvs[face.uvIndices[1]];
 
-			dataArr[2].vertex = loaded->vertices[face.vertexIndices.z];
-			dataArr[2].normal = loaded->normals[face.normalIndices.z];
-			dataArr[2].uv = loaded->uvs[face.uvIndices.z];
+			dataArr[2].vertex = loaded->vertices[face.vertexIndices[2]];
+			dataArr[2].normal = loaded->normals[face.normalIndices[2]];
+			dataArr[2].uv = loaded->uvs[face.uvIndices[2]];
 		}
 
 		void addV(const PackedVertexData& data)
@@ -208,7 +215,7 @@ namespace Phoenix
 		{
 			(this->*addData)(data);
 
-			size_t index = packed.size();
+			unsigned int index = static_cast<unsigned int>(packed.size());
 			packed[data] = index;
 			pConvertedMesh->indices.push_back(index);
 		}
@@ -255,11 +262,11 @@ namespace Phoenix
 									tokens.tokenToFloat(2) });
 	}
 
-	float mapFaceIndex(float index, size_t elementCount)
+	int mapFaceIndex(int index, size_t elementCount)
 	{
 		if (index < 0)
 		{
-			index = elementCount + index;
+			index = static_cast<int>(elementCount) + index;
 		}
 		else
 		{
@@ -272,29 +279,29 @@ namespace Phoenix
 
 	void parseFaceVertexV(const std::string& token, int idx, ObjData* pScene)
 	{
-		pScene->faces.back().vertexIndices(idx) = mapFaceIndex(strToFloat(token.c_str()), pScene->vertices.size());
+		pScene->faces.back().vertexIndices[idx] = mapFaceIndex(strToInt(token.c_str()), pScene->vertices.size());
 	}
 
 	void parseFaceVertexVN(const std::string& token, int idx, ObjData* pScene)
 	{
 		StringTokenizer nums = StringTokenizer(token, "//");
-		pScene->faces.back().vertexIndices(idx) = mapFaceIndex(nums.tokenToFloat(0), pScene->vertices.size());
-		pScene->faces.back().normalIndices(idx) = mapFaceIndex(nums.tokenToFloat(1), pScene->normals.size());
+		pScene->faces.back().vertexIndices[idx] = mapFaceIndex(nums.tokenToInt(0), pScene->vertices.size());
+		pScene->faces.back().normalIndices[idx] = mapFaceIndex(nums.tokenToInt(1), pScene->normals.size());
 	}
 
 	void parseFaceVertexVT(const std::string& token, int idx, ObjData* pScene)
 	{
 		StringTokenizer nums = StringTokenizer(token, "/");
-		pScene->faces.back().vertexIndices(idx) = mapFaceIndex(nums.tokenToFloat(0), pScene->vertices.size());
-		pScene->faces.back().uvIndices(idx) = mapFaceIndex(nums.tokenToFloat(1), pScene->uvs.size());
+		pScene->faces.back().vertexIndices[idx] = mapFaceIndex(nums.tokenToInt(0), pScene->vertices.size());
+		pScene->faces.back().uvIndices[idx] = mapFaceIndex(nums.tokenToInt(1), pScene->uvs.size());
 	}
 
 	void parseFaceVertexVTN(const std::string& token, int idx, ObjData* pScene)
 	{
 		StringTokenizer nums = StringTokenizer(token, "/");
-		pScene->faces.back().vertexIndices(idx) = mapFaceIndex(nums.tokenToFloat(0), pScene->vertices.size());
-		pScene->faces.back().uvIndices(idx) = mapFaceIndex(nums.tokenToFloat(1), pScene->uvs.size());
-		pScene->faces.back().normalIndices(idx) = mapFaceIndex(nums.tokenToFloat(2), pScene->normals.size());
+		pScene->faces.back().vertexIndices[idx] = mapFaceIndex(nums.tokenToInt(0), pScene->vertices.size());
+		pScene->faces.back().uvIndices[idx] = mapFaceIndex(nums.tokenToInt(1), pScene->uvs.size());
+		pScene->faces.back().normalIndices[idx] = mapFaceIndex(nums.tokenToInt(2), pScene->normals.size());
 	}
 
 	/* f -> Face
@@ -321,7 +328,7 @@ namespace Phoenix
 		else
 		{
 			std::string token = tokens[2];
-			int sepCount = std::count(token.begin(), token.end(), '/');
+			std::ptrdiff_t sepCount = std::count(token.begin(), token.end(), '/');
 
 			if (sepCount == 1) // f a/i b/j c/k -> Vertex/Texture
 			{
@@ -431,7 +438,7 @@ namespace Phoenix
 			}
 			else if (tokens.compare(0, "illum"))
 			{
-				mat->illum = tokens.tokenToFloat(1);
+				mat->illum = tokens.tokenToInt(1);
 			}
 			else if (tokens.compare(0, "Ns"))
 			{

@@ -5,6 +5,7 @@
 namespace Phoenix
 {
 	float strToFloat(const char* string);
+	int strToInt(const char* string);
 
 	class StringTokenizer
 	{
@@ -17,6 +18,7 @@ namespace Phoenix
 		bool compare(size_t idxOfToken, const std::string& other) const;
 		bool find(size_t idxOfToken, const std::string& toFind) const;
 		float tokenToFloat(size_t idxOfToken) const;
+		int tokenToInt(size_t idxOfToken) const;
 
 	private:
 		std::string m_string;
