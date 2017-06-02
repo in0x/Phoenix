@@ -222,21 +222,21 @@ namespace Phoenix
 	};
 
 	// v -> Vertex(x, y, z, [w])
-	void parseVertex(StringTokenizer& tokens, ObjData* pScene)
+	void parseVertex(std::vector<char*>& tokens, ObjData* pScene)
 	{
 		if (tokens.size() < 4)
 		{
 			Logger::Error("Cannot parse vertex, not enough tokens.");
 			assert(false);
 		}
-
-		pScene->vertices.push_back(Vec3{ tokens.tokenToFloat(1),
-										 tokens.tokenToFloat(2),
-										 tokens.tokenToFloat(3) });
+		
+		pScene->vertices.push_back(Vec3{ strToFloat(tokens[1]),
+										 strToFloat(tokens[2]), 
+										 strToFloat(tokens[3]) });
 	}
 
 	// vn -> Vertex Normal(x, y, z)
-	void parseNormal(StringTokenizer& tokens, ObjData* pScene)
+	void parseNormal(std::vector<char*>& tokens, ObjData* pScene)
 	{
 		if (tokens.size() < 4)
 		{
@@ -244,13 +244,13 @@ namespace Phoenix
 			assert(false);
 		}
 
-		pScene->normals.push_back(Vec3{ tokens.tokenToFloat(1),
-										tokens.tokenToFloat(2),
-										tokens.tokenToFloat(3) });
+		pScene->normals.push_back(Vec3{ strToFloat(tokens[1]),
+										strToFloat(tokens[2]),
+										strToFloat(tokens[3]) });
 	}
 
 	// vt -> Texture Coord(u, v, [w])
-	void parseUV(StringTokenizer& tokens, ObjData* pScene)
+	void parseUV(std::vector<char*>& tokens, ObjData* pScene)
 	{
 		if (tokens.size() < 3)
 		{
@@ -258,8 +258,8 @@ namespace Phoenix
 			assert(false);
 		}
 
-		pScene->uvs.push_back(Vec2{ tokens.tokenToFloat(1),
-									tokens.tokenToFloat(2) });
+		pScene->uvs.push_back(Vec2{ strToFloat(tokens[1]),
+									strToFloat(tokens[2]) });
 	}
 
 	int mapFaceIndex(int index, size_t elementCount)
@@ -277,37 +277,34 @@ namespace Phoenix
 		return index;
 	}
 
-	void parseFaceVertexV(const std::string& token, int idx, ObjData* pScene)
+	void parseFaceVertexV(std::vector<char*>& tokens, int idx, ObjData* pScene)
 	{
-		pScene->faces.back().vertexIndices[idx] = mapFaceIndex(strToInt(token.c_str()), pScene->vertices.size());
+		pScene->faces.back().vertexIndices[idx] = mapFaceIndex(strToInt(tokens[0]), pScene->vertices.size());
 	}
 
-	void parseFaceVertexVN(const std::string& token, int idx, ObjData* pScene)
+	void parseFaceVertexVN(std::vector<char*>& tokens, int idx, ObjData* pScene)
 	{
-		StringTokenizer nums = StringTokenizer(token, "//");
-		pScene->faces.back().vertexIndices[idx] = mapFaceIndex(nums.tokenToInt(0), pScene->vertices.size());
-		pScene->faces.back().normalIndices[idx] = mapFaceIndex(nums.tokenToInt(1), pScene->normals.size());
+		pScene->faces.back().vertexIndices[idx] = mapFaceIndex(strToInt(tokens[0]), pScene->vertices.size());
+		pScene->faces.back().normalIndices[idx] = mapFaceIndex(strToInt(tokens[1]), pScene->normals.size());
 	}
 
-	void parseFaceVertexVT(const std::string& token, int idx, ObjData* pScene)
+	void parseFaceVertexVT(std::vector<char*>& tokens, int idx, ObjData* pScene)
 	{
-		StringTokenizer nums = StringTokenizer(token, "/");
-		pScene->faces.back().vertexIndices[idx] = mapFaceIndex(nums.tokenToInt(0), pScene->vertices.size());
-		pScene->faces.back().uvIndices[idx] = mapFaceIndex(nums.tokenToInt(1), pScene->uvs.size());
+		pScene->faces.back().vertexIndices[idx] = mapFaceIndex(strToInt(tokens[0]), pScene->vertices.size());
+		pScene->faces.back().uvIndices[idx] = mapFaceIndex(strToInt(tokens[1]), pScene->uvs.size());
 	}
 
-	void parseFaceVertexVTN(const std::string& token, int idx, ObjData* pScene)
+	void parseFaceVertexVTN(std::vector<char*>& tokens, int idx, ObjData* pScene)
 	{
-		StringTokenizer nums = StringTokenizer(token, "/");
-		pScene->faces.back().vertexIndices[idx] = mapFaceIndex(nums.tokenToInt(0), pScene->vertices.size());
-		pScene->faces.back().uvIndices[idx] = mapFaceIndex(nums.tokenToInt(1), pScene->uvs.size());
-		pScene->faces.back().normalIndices[idx] = mapFaceIndex(nums.tokenToInt(2), pScene->normals.size());
+		pScene->faces.back().vertexIndices[idx] = mapFaceIndex(strToInt(tokens[0]), pScene->vertices.size());
+		pScene->faces.back().uvIndices[idx] = mapFaceIndex(strToInt(tokens[1]), pScene->uvs.size());
+		pScene->faces.back().normalIndices[idx] = mapFaceIndex(strToInt(tokens[2]), pScene->normals.size());
 	}
 
 	/* f -> Face
 	* Texture or normal can be missing
 	*/
-	void parseFace(StringTokenizer& tokens, ObjData* pScene)
+	void parseFace(std::vector<char*>& tokens, ObjData* pScene)
 	{
 		if (tokens.size() < 4)
 		{
@@ -315,20 +312,31 @@ namespace Phoenix
 			assert(false);
 		}
 
-		void(*vertexParser)(const std::string&, int, ObjData*) = nullptr;
+		size_t tokenCount = tokens.size();
+		size_t indexCount = tokenCount - 1;
 
-		if (!tokens.find(2, "/")) // f a b c -> Vertex
+		std::vector<std::vector<char*>> indices;
+		indices.reserve(indexCount);
+		char* delimiter = nullptr;
+
+		// Deciding which parse function to use can probable be done once, check the spec if its consistent throught the entire file
+		void(*vertexParser)(std::vector<char*>&, int, ObjData*) = nullptr; 
+
+		if (find(tokens[2], "/") == std::string::npos) // f a b c -> Vertex
 		{
 			vertexParser = &parseFaceVertexV;
+			delimiter = " ";
 		}
-		else if (tokens.find(2, "//")) // f a//u b//v c//w -> Vertex//Normal
+		else if (find(tokens[2], "//") != std::string::npos) // f a//u b//v c//w -> Vertex//Normal
 		{
 			vertexParser = &parseFaceVertexVN;
+			delimiter = "//";
 		}
 		else
 		{
 			std::string token = tokens[2];
 			std::ptrdiff_t sepCount = std::count(token.begin(), token.end(), '/');
+			delimiter = "/";
 
 			if (sepCount == 1) // f a/i b/j c/k -> Vertex/Texture
 			{
@@ -340,19 +348,22 @@ namespace Phoenix
 			}
 		}
 
+		for (size_t i = 1; i < tokenCount; ++i)
+		{
+			indices.push_back(tokenize(tokens[i], delimiter));
+		}
+
 		pScene->faces.emplace_back();
-		vertexParser(tokens[1], 0, pScene);
-		vertexParser(tokens[2], 1, pScene);
-		vertexParser(tokens[3], 2, pScene);
+		vertexParser(indices[0], 0, pScene);
+		vertexParser(indices[1], 1, pScene);
+		vertexParser(indices[2], 2, pScene);
 
-		size_t tokenCount = tokens.size();
-
-		for (size_t i = 4; i < tokenCount; ++i)
+		for (size_t i = 3; i < indexCount; ++i)
 		{
 			pScene->faces.emplace_back();
-			vertexParser(tokens[1], 0, pScene);
-			vertexParser(tokens[i - 1], 1, pScene);
-			vertexParser(tokens[i], 2, pScene);
+			vertexParser(indices[0], 0, pScene);
+			vertexParser(indices[i - 1], 1, pScene);
+			vertexParser(indices[i], 2, pScene);
 		}
 	}
 
@@ -363,7 +374,7 @@ namespace Phoenix
 		for (char toRemove : tokensToRemove)
 		{
 			size_t tokenPos = 0;
-			
+
 			while ((tokenPos = path.find(toRemove, tokenPos)) != std::string::npos)
 			{
 				path.erase(tokenPos, 1);
@@ -402,9 +413,9 @@ namespace Phoenix
 				assert(false);
 			}
 
-			return Vec3{ tokens.tokenToFloat(1),
-						 tokens.tokenToFloat(2),
-						 tokens.tokenToFloat(3) };
+			return Vec3{ strToFloat(tokens[1]),
+						 strToFloat(tokens[2]),
+						 strToFloat(tokens[3]) };
 		};
 
 		MTL* mat = nullptr;
@@ -416,39 +427,40 @@ namespace Phoenix
 
 		while ((result = fgets(input_line, MAX_LINE, file)) != nullptr)
 		{
-			StringTokenizer tokens = StringTokenizer(result, " ");
+			auto tokens = tokenize(result, " ");
+			const char* firstToken = tokens[0];
 
-			if (tokens.compare(0, "newmtl"))
+			if (compare(firstToken, "newmtl"))
 			{
 				pScene->materials.push_back(MTL{});
 				mat = &pScene->materials.back();
 				mat->name = tokens[1];
 			}
-			else if (tokens.compare(0, "Ka"))
+			else if (compare(firstToken, "Ka"))
 			{
 				mat->ambient = parseColor(tokens);
 			}
-			else if (tokens.compare(0, "Kd"))
+			else if (compare(firstToken, "Kd"))
 			{
 				mat->diffuse = parseColor(tokens);
 			}
-			else if (tokens.compare(0, "Ks"))
+			else if (compare(firstToken, "Ks"))
 			{
 				mat->specular = parseColor(tokens);
 			}
-			else if (tokens.compare(0, "illum"))
+			else if (compare(firstToken, "illum"))
 			{
-				mat->illum = tokens.tokenToInt(1);
+				mat->illum = strToInt(tokens[1]);
 			}
-			else if (tokens.compare(0, "Ns"))
+			else if (compare(firstToken, "Ns"))
 			{
-				mat->shininess = tokens.tokenToFloat(1);
+				mat->shininess = strToFloat(tokens[1]);
 			}
-			else if (tokens.compare(0, "d") || tokens.compare(0, "Tr"))
+			else if (compare(firstToken, "d") || compare(firstToken, "Tr"))
 			{
-				mat->transparency = tokens.tokenToFloat(1);
+				mat->transparency = strToFloat(tokens[1]);
 			}
-			else if (tokens.compare(0, "map_Ka"))
+			else if (compare(firstToken, "map_Ka"))
 			{
 				mat->textureMap = tokens[1];
 			}
@@ -461,7 +473,7 @@ namespace Phoenix
 	{
 		std::string path = pathTo + name;
 		FILE* file = openFile(path);
-		
+
 		if (!file)
 		{
 			return nullptr;
@@ -477,35 +489,35 @@ namespace Phoenix
 
 		while ((result = fgets(input_line, MAX_LINE, file)) != nullptr)
 		{
-			StringTokenizer tokens = StringTokenizer(result, " ");
+			auto tokens = tokenize(result, " ");
+			char* firstToken = tokens[0];
 
-			if (tokens.compare(0, "v"))
+			if (compare(firstToken, "v"))
 			{
 				parseVertex(tokens, pSceneRaw);
 			}
-			else if (tokens.compare(0, "vn"))
+			else if (compare(firstToken, "vn"))
 			{
 				parseNormal(tokens, pSceneRaw);
 			}
-			else if (tokens.compare(0, "vt"))
+			else if (compare(firstToken, "vt"))
 			{
 				parseUV(tokens, pSceneRaw);
 			}
-			else if (tokens.compare(0, "f"))
+			else if (compare(firstToken, "f"))
 			{
 				parseFace(tokens, pSceneRaw);
 			}
-			else if (tokens.compare(0, "s"))
+			else if (compare(firstToken, "s"))
 			{
-				pScene->bSmoothShading = tokens.compare(1, "off");
+				pScene->bSmoothShading = compare(tokens[1], "off");
 			}
-			else if (tokens.compare(0, "mtllib"))
+			else if (compare(firstToken, "mtllib"))
 			{
 				std::string fileName = tokens[1];
-				//fileName.erase(fileName.find('\n'), 1); // TODO: Need to generally trim paths
 				parseMTL(pathTo + fileName, pSceneRaw);
 			}
-			else if (tokens.compare(0, "usemtl"))
+			else if (compare(firstToken, "usemtl"))
 			{
 				auto mat = std::find_if(pScene->materials.begin(), pScene->materials.end(),
 					[name = tokens[1]](const MTL& mat) {
@@ -525,5 +537,6 @@ namespace Phoenix
 		ObjIndexer indexer;
 		fclose(file);
 		return indexer.convertForOpenGL(std::move(pScene));
+		return{};
 	}
 }

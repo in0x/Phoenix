@@ -46,9 +46,12 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	Tests::RunMathTests();
 
-	std::unique_ptr<Mesh> fox = parseOBJ("Fox/", "RedFox.obj");
-	assert(fox != nullptr);
+	//std::unique_ptr<Mesh> fox = parseOBJ("Fox/", "RedFox.obj");
+	std::unique_ptr<Mesh> fox = parseOBJ("rungholt/", "rungholt.obj");
 
+	//return 0;
+	assert(fox != nullptr);
+	
 	WindowConfig config = { 
 		1400, 900,
 		0,0,
@@ -72,9 +75,9 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	}
 	
 	Matrix4 worldMat = Matrix4::identity();
-	Matrix4 viewMat = lookAtRH(Vec3{ 2, 2, -7}, Vec3{ 0,0,0 }, Vec3{ 0,1,0 });
+	Matrix4 viewMat = lookAtRH(Vec3{ /*2, 2, -7*/  2, 90, -700 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 });
 	Matrix4 projMat = perspectiveRH(70, (float)config.width / (float)config.height, 1, 10000);
-	Vec3 lightPosition = Vec3(5, 3, 5);
+	Vec3 lightPosition = Vec3(50, 30, 50);
 	
 	GLuint vert = createShader("Shaders/diffuse.vert", GL_VERTEX_SHADER);
 	GLuint frag = createShader("Shaders/diffuse.frag", GL_FRAGMENT_SHADER);

@@ -3,58 +3,6 @@
 
 namespace Phoenix
 {
-	StringTokenizer::StringTokenizer(const std::string& tokens, const std::string& delimiter)
-		: m_string(std::move(tokens))
-		, m_tokenLenghts()
-	{
-		if (tokens.empty())
-		{
-			return;
-		}
-
-		tokenize(delimiter);
-	}
-
-	std::string StringTokenizer::operator[](size_t idx) const
-	{
-		const char* begin = m_string.c_str();;
-		return std::string(begin + m_tokenLenghts[idx]);
-	}
-
-	const char* StringTokenizer::getToken(size_t idx) const
-	{
-		return m_string.c_str() + m_tokenLenghts[idx];
-	}
-
-	bool StringTokenizer::compare(size_t idxOfToken, const std::string& other) const
-	{
-		return strcmp(getToken(idxOfToken), other.c_str()) == 0;
-	}
-
-	bool StringTokenizer::find(size_t idxOfToken, const std::string& toFind) const
-	{
-		const char* search = getToken(idxOfToken);
-		const char* token = toFind.c_str();
-		size_t tokenSize = toFind.size();
-
-		const char* current = search;
-
-		while ((current = strstr(current, token)) != nullptr)
-		{
-			if (strncmp(current, token, tokenSize) == 0)
-			{
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	size_t StringTokenizer::size() const
-	{
-		return m_tokenLenghts.size();
-	}
-
 	float strToFloat(const char* string)
 	{
 		float real = 0.0f;
@@ -93,11 +41,6 @@ namespace Phoenix
 		return real;
 	}
 
-	float StringTokenizer::tokenToFloat(size_t idxOfToken) const
-	{
-		return strToFloat(getToken(idxOfToken));
-	}
-
 	int strToInt(const char* string)
 	{
 		int real = 0;
@@ -121,44 +64,66 @@ namespace Phoenix
 		return real;
 	}
 
-	int StringTokenizer::tokenToInt(size_t idxOfToken) const
+	bool compare(const char* token, const char* other)
 	{
-		return strToInt(getToken(idxOfToken));
+		return strcmp(token, other) == 0;
 	}
 
-	size_t StringTokenizer::subStrCount(const std::string& substr) const
+	// Returns first index of substring if found, else std::string::npos;
+	size_t find(const char* token, const char* toFind, size_t pos)
+	{
+		size_t tokenSize = strlen(toFind);
+
+		const char* current = token + pos;
+
+		while ((current = strstr(current, toFind)) != nullptr)
+		{
+			if (strncmp(current, toFind, tokenSize) == 0)
+			{
+				return current - token;
+			}
+		}
+
+		return std::string::npos;
+	}
+
+	std::vector<char*> tokenize(char* string, const char* delimiter)
+	{
+		std::vector<char*> tokens;
+
+		size_t pos = 0;
+		const size_t delimiterLength = strlen(delimiter);
+
+		const size_t delimiterCount = subStrCount(string, delimiter) + 1;
+		tokens.reserve(delimiterCount);
+
+		char* first = string;
+		tokens.push_back(first);
+
+		while ((pos = find(string, delimiter, pos)) != std::string::npos)
+		{
+			tokens.push_back(first + pos + delimiterLength);
+
+			for (size_t i = pos; i < pos + delimiterLength; ++i)
+			{
+				string[i] = '\0';
+			}
+
+			pos += delimiterLength;
+		}
+
+		return tokens;
+	}
+
+	size_t subStrCount(const char* string, const char* substr)
 	{
 		size_t count = 0;
 		size_t pos = 0;
-		while ((pos = m_string.find(substr, pos)) != std::string::npos)
+		while ((pos = find(string, substr, pos)) != std::string::npos)
 		{
 			++count;
 			++pos;
 		}
 		return count;
-	}
-
-	void StringTokenizer::tokenize(const std::string& delimiter)
-	{
-		size_t pos = 0;
-		const size_t delimiterLength = delimiter.length();
-
-		const size_t delimiterCount = subStrCount(delimiter) + 1;
-		m_tokenLenghts.reserve(delimiterCount);
-
-		const char* first = m_string.c_str();
-		m_tokenLenghts.push_back(0);
-
-		while ((pos = m_string.find(delimiter, pos)) != std::string::npos)
-		{
-			const char* thisTokenBegin = &m_string[pos] + delimiterLength;
-
-			m_tokenLenghts.push_back(thisTokenBegin - first);
-
-			for (size_t i = pos; i < pos + delimiterLength; ++i)
-			{
-				m_string[i] = '\0';
-			}
-		}
 	}
 }

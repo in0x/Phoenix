@@ -7,25 +7,9 @@ namespace Phoenix
 	float strToFloat(const char* string);
 	int strToInt(const char* string);
 
-	class StringTokenizer
-	{
-	public:
-		StringTokenizer(const std::string& string, const std::string& delimiter);
-
-		std::string operator[](size_t idx) const;
-		size_t size() const;
-
-		bool compare(size_t idxOfToken, const std::string& other) const;
-		bool find(size_t idxOfToken, const std::string& toFind) const;
-		float tokenToFloat(size_t idxOfToken) const;
-		int tokenToInt(size_t idxOfToken) const;
-
-	private:
-		std::string m_string;
-		std::vector<size_t> m_tokenLenghts;
-
-		const char* getToken(size_t idx) const;
-		void tokenize(const std::string& delimiter);
-		size_t subStrCount(const std::string& substr) const;
-	};
+	bool compare(const char* token, const char* other);
+	size_t find(const char* token, const char* toFind, size_t pos = 0);
+	
+	std::vector<char*> tokenize(char* string, const char*delimiter);
+	size_t subStrCount(const char* string, const char* substr);
 }
