@@ -87,6 +87,16 @@ namespace Phoenix
 		return std::string::npos;
 	}
 
+	void trimTrailingWhitespace(char* string)
+	{
+		size_t i = strlen(string);
+
+		while (i > 0 && string[i - 1] == ' ')
+		{
+			string[--i] = '\0';
+		}
+	}
+
 	std::vector<char*> tokenize(char* string, const char* delimiter)
 	{
 		std::vector<char*> tokens;
@@ -119,6 +129,7 @@ namespace Phoenix
 	{
 		size_t count = 0;
 		size_t pos = 0;
+		
 		while ((pos = find(string, substr, pos)) != std::string::npos)
 		{
 			++count;

@@ -9,7 +9,8 @@ namespace Phoenix
 
 	bool compare(const char* token, const char* other);
 	size_t find(const char* token, const char* toFind, size_t pos = 0);
-	
+	void trimTrailingWhitespace(char* string);
+
 	std::vector<char*> tokenize(char* string, const char*delimiter);
 	size_t subStrCount(const char* string, const char* substr);
 }

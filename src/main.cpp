@@ -46,10 +46,8 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	Tests::RunMathTests();
 
-	//std::unique_ptr<Mesh> fox = parseOBJ("Fox/", "RedFox.obj");
-	std::unique_ptr<Mesh> fox = parseOBJ("rungholt/", "rungholt.obj");
-
-	//return 0;
+	std::unique_ptr<Mesh> fox = parseOBJ("Fox/", "RedFox.obj");
+	
 	assert(fox != nullptr);
 	
 	WindowConfig config = { 
@@ -75,7 +73,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	}
 	
 	Matrix4 worldMat = Matrix4::identity();
-	Matrix4 viewMat = lookAtRH(Vec3{ /*2, 2, -7*/  2, 90, -700 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 });
+	Matrix4 viewMat = lookAtRH(Vec3{ 2, 2, -7  /*2, 90, -700 */}, Vec3{ 0,0,0 }, Vec3{ 0,1,0 });
 	Matrix4 projMat = perspectiveRH(70, (float)config.width / (float)config.height, 1, 10000);
 	Vec3 lightPosition = Vec3(50, 30, 50);
 	
@@ -143,8 +141,8 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 		GLfloat color[] = { 1.f, 1.f, 1.f, 1.f };
 		glClearBufferfv(GL_COLOR, 0, color);
 
-		angle += 0.5f; 
-		Matrix4 rotMat = Matrix4::rotation(0.f, angle, 0.f);
+		angle += 0.01f; 
+		Matrix4 rotMat = Matrix4::rotation(0.f, angle, 0.f) /** Matrix4::scale(10, 10, 10)*/;
 		glUniformMatrix4fv(2, 1, GL_FALSE, (GLfloat*)&rotMat);
 
 		glDrawElements(GL_TRIANGLES, fox->indices.size(), GL_UNSIGNED_INT, nullptr);

@@ -12,7 +12,9 @@
 	* Make remapping run fast -> DONE
 	* Handle normals / uvs being able to be missing -> DONE
 	* Fix materials not being loaded (file is acting weird) -> DONE
-	* Do one pass before hand to count sizes (should reduce loading time (less allocations))
+	* Trailing newline fucks face parsing up -> DONE
+	* KennyNL models probably fuck off because they use mesh groups, which is whey the die when they hit a new mesh with different indices
+
 */
 
 namespace Phoenix
@@ -427,8 +429,10 @@ namespace Phoenix
 
 		while ((result = fgets(input_line, MAX_LINE, file)) != nullptr)
 		{
+			result[strcspn(result, "\r\n")] = 0;
+			trimTrailingWhitespace(result);
 			auto tokens = tokenize(result, " ");
-			const char* firstToken = tokens[0];
+			char* firstToken = tokens[0];
 
 			if (compare(firstToken, "newmtl"))
 			{
@@ -485,10 +489,11 @@ namespace Phoenix
 		const int MAX_LINE = 8192; // TODO: figure out proper value for max line length
 		char input_line[MAX_LINE];
 		char* result;
-		std::string line;
-
+		
 		while ((result = fgets(input_line, MAX_LINE, file)) != nullptr)
 		{
+			result[strcspn(result, "\r\n")] = 0;
+			trimTrailingWhitespace(result);
 			auto tokens = tokenize(result, " ");
 			char* firstToken = tokens[0];
 
