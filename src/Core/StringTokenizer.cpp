@@ -5,7 +5,7 @@ namespace Phoenix
 {
 	float strToFloat(const char* string)
 	{
-		float real = 0.0f;
+		float real = 0.f;
 		bool neg = false;
 		if (*string == '-')
 		{
@@ -15,29 +15,37 @@ namespace Phoenix
 
 		while (*string >= '0' && *string <= '9')
 		{
-			real = (real * 10.0f) + (*string - '0');
+			real = (real * 10.f) + (*string - '0');
 			++string;
 		}
 
 		if (*string == '.')
 		{
-			float fract = 0.0f;
+			float fract = 0.f;
 			int fractLen = 0;
 			++string;
 
 			while (*string >= '0' && *string <= '9')
 			{
-				fract = (fract*10.0f) + (*string - '0');
+				fract = (fract*10.f) + (*string - '0');
 				++string;
 				++fractLen;
 			}
 
-			real += fract / std::pow(10.0f, fractLen);
+			real += fract / std::pow(10.f, fractLen);
 		}
 		if (neg)
 		{
 			real = -real;
 		}
+
+		if (*string == 'e')
+		{
+			++string;
+			int pow = strToInt(string);
+			return real * (std::pow(10.f, pow));
+		}
+
 		return real;
 	}
 

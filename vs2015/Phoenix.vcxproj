@@ -174,6 +174,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Core\Math\MathStreamOverloads.hpp" />
+    <ClInclude Include="..\src\Core\ObjIndexer.hpp" />
+    <ClInclude Include="..\src\Core\ObjStructs.hpp" />
     <ClInclude Include="..\src\Core\OpenGL.hpp" />
     <ClInclude Include="..\src\Core\GLShader.hpp" />
     <ClInclude Include="..\src\Core\StringTokenizer.hpp" />
@@ -210,6 +212,7 @@
     <ClCompile Include="..\src\Core\Math\Vec3.cpp" />
     <ClCompile Include="..\src\Core\Math\Vec4.cpp" />
     <ClCompile Include="..\src\Core\obj.cpp" />
+    <ClCompile Include="..\src\Core\ObjIndexer.cpp" />
     <ClCompile Include="..\src\Core\OpenGL.cpp" />
     <ClCompile Include="..\src\Core\StringTokenizer.cpp" />
     <ClCompile Include="..\src\Core\Transform.cpp" />
