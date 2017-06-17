@@ -383,4 +383,3 @@ namespace Phoenix
 		return parser.parseOBJ(pathTo, name);
 	}
 }
-}

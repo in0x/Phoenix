@@ -24,7 +24,7 @@ char* getCMDOption(char** start, char** end, const std::string& option)
 TODO:
 	* Window doesnt fullscreen properly (scaling) (is this is only solvable by rendering to a 
 		lower res framebuffer and blitting to a native size window?)
-	* GPU API (Brooke Hodgeman Style)
+	* GPU API 
 		* Build mental model of how it all works
 		* Start implementing
 	* Crashes when closed by closing window via taskbar
@@ -46,9 +46,9 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	Tests::RunMathTests();
 
-	//std::unique_ptr<Mesh> fox = loadObj("Fox/", "RedFox.obj");
+	std::unique_ptr<Mesh> fox = loadObj("Fox/", "RedFox.obj");
 	//std::unique_ptr<Mesh> fox = loadObj("rungholt/", "rungholt.obj");
-	std::unique_ptr<Mesh> fox = loadObj("sniper/", "sniper.obj");
+	//std::unique_ptr<Mesh> fox = loadObj("sniper/", "sniper.obj");
 	
 	assert(fox != nullptr);
 	
@@ -77,7 +77,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	Matrix4 worldMat = Matrix4::identity();
 	Matrix4 viewMat = lookAtRH(Vec3{ 2, 2, -7  /*2, 90, -700 */}, Vec3{ 0,0,0 }, Vec3{ 0,1,0 });
 	Matrix4 projMat = perspectiveRH(70, (float)config.width / (float)config.height, 1, 10000);
-	Vec3 lightPosition = Vec3(5, 3, 5);
+	Vec3 lightPosition = Vec3(-5, 3, 5);
 	
 	GLuint vert = createShader("Shaders/diffuse.vert", GL_VERTEX_SHADER);
 	GLuint frag = createShader("Shaders/diffuse.frag", GL_FRAGMENT_SHADER);
@@ -144,7 +144,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 		glClearBufferfv(GL_COLOR, 0, color);
 
 		angle += 0.1f; 
-		Matrix4 rotMat = Matrix4::rotation(0.f, angle, 0.f) * Matrix4::scale(20, 20, 20);
+		Matrix4 rotMat = Matrix4::rotation(0.f, angle, 0.f);
 		glUniformMatrix4fv(2, 1, GL_FALSE, (GLfloat*)&rotMat);
 
 		glDrawElements(GL_TRIANGLES, fox->indices.size(), GL_UNSIGNED_INT, nullptr);

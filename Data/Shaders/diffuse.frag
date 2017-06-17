@@ -28,8 +28,8 @@ void main()
 	float dotNL = max(dot(N, L), 0.0);
 	
 	vec3 R = reflect(-L, N);
-	vec3 V = -vs_in.eyePosition.xyz; // Camera is at origin in view space.
-	vec3 H = L + V;
+	vec3 V = normalize(-vs_in.eyePosition.xyz); // Camera is at origin in view space.
+	vec3 H = normalize(L + V);
 	//float specular = pow(max(dot(normalize(R),normalize(V)), 0.0), shininess); 
 	float specular = pow(max(dot(normalize(H),normalize(N)), 0.0), shininess); 
 	

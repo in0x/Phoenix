@@ -67,12 +67,17 @@
     <ClInclude Include="..\src\Core\Math\MathStreamOverloads.hpp">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Core\StringTokenizer.hpp" />
     <ClInclude Include="..\src\Core\ObjIndexer.hpp">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Core\ObjStructs.hpp">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\StringTokenizer.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Render\Render.hpp">
+      <Filter>Render</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -144,6 +149,9 @@
     </Filter>
     <Filter Include="Test">
       <UniqueIdentifier>{2ef49644-d68b-479e-8fd0-ed3330411f42}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Render">
+      <UniqueIdentifier>{ab39b72c-2d1c-4535-9d5f-272eb2d8e422}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

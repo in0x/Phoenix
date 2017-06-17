@@ -20,7 +20,7 @@ void main()
 	mat4 modelviewTf = viewTf * modelTf;
 	
 	vs_out.eyePosition = modelviewTf * vec4(position, 1.0);
-	vs_out.eyeNormal = normalize(vec4(inverse(transpose(mat3(modelviewTf))) * normal, 1.0));
+	vs_out.eyeNormal = normalize(vec4(inverse(transpose(mat3(modelviewTf))) * normal, 0.0));
 	vs_out.eyeLight = viewTf * vec4(lightPosition, 1.0);
 	
 	gl_Position = projectionTf * modelviewTf * vec4(position,1.0);

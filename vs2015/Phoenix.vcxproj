@@ -178,6 +178,7 @@
     <ClInclude Include="..\src\Core\ObjStructs.hpp" />
     <ClInclude Include="..\src\Core\OpenGL.hpp" />
     <ClInclude Include="..\src\Core\GLShader.hpp" />
+    <ClInclude Include="..\src\Core\Render\Render.hpp" />
     <ClInclude Include="..\src\Core\StringTokenizer.hpp" />
     <ClInclude Include="..\src\Core\Transform.h" />
     <ClInclude Include="..\src\Core\Math\PhiMath.hpp" />
