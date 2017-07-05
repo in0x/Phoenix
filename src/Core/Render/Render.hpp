@@ -18,6 +18,19 @@ namespace Phoenix
 	*/
 
 	/*
+		- A game creates a Renderer, this might be a ForwardRenderer, a DeferredRenderer, a ClusteredRenderer etc
+		- A Renderer has n CommandBuckets used for storing the commands it requires to perform the Render step.
+		  A CommandBucket has a variably sized key, used to sort commands. Certain bits in the key represent 
+		  criteria to sort by, such as depth, material, mesh etc.
+		  A DeferredRenderer might have a GBuffer Bucket, a Lights Bucket, a Normal Buckets etc.
+		- A CommandBucket stores Commands. Commands represent actions that can be performed by the rendering backend,
+		  such as drawing primitives, creating a buffer, etc.
+		- After sorting the commands, the bucket can be flushed to submit the commands to the backend. 
+		- A backend represents a rendering context, such as a hardware-accelerated API such as D3D or GL or even a software renderer.
+		  A backend performs actions specific to that rendering context such as executing commands or allocating resources.
+	*/
+
+	/*
 		Research:
 		https://blog.molecular-matters.com/2014/11/06/stateless-layered-multi-threaded-rendering-part-1/
 		http://www.goatientertainment.com/downloads/Designing%20a%20Modern%20GPU%20Interface.pptx
@@ -55,7 +68,7 @@ namespace Phoenix
 
 	//class Shader {}; // Problem: These should already be compiled into a program. So it should not be possible specify a shader pair that has not be compiled into a program/effect/whatever after loading, right?
 
-	class ShaderProgram { /* Compiled shader / program / effect */};
+	class ShaderProgram { /* Compiled shader / program / effect */ };
 
 	class GlShaderProgram : public ShaderProgram
 	{
@@ -209,4 +222,89 @@ namespace Phoenix
 	
 	}
 
+	/*
+		RendererInit,
+		RendererShutdownBegin,
+		CreateVertexDecl,
+		CreateIndexBuffer,
+		CreateVertexBuffer,
+		CreateShader,
+		CreateProgram,
+		CreateTexture,
+		UpdateTexture,
+		ResizeTexture,
+		CreateFrameBuffer,
+		CreateUniform,
+		End,
+		RendererShutdownEnd,
+		DestroyVertexDecl,
+		DestroyIndexBuffer,
+		DestroyVertexBuffer,
+		DestroyShader,
+		DestroyProgram,
+		DestroyTexture,
+		DestroyFrameBuffer,
+		DestroyUniform,
+		ReadTexture,
+		RequestScreenShot,
+	*/
+
+#include <limits>
+
+#undef max // y tho
+
+
+#define HANDLE(name, size) \
+	struct name \
+	{ \
+		static const size invalidValue = std::numeric_limits<size>::max(); \
+		size idx = invalidValue; \
+		static bool isValid(name handle) { return handle.idx != invalidValue; } \
+	}; \
+			
+
+	HANDLE(VertexBufferHandle, uint16_t)
+	HANDLE(IndexBufferHandle, uint16_t)
+	HANDLE(ShaderHandle, uint16_t)
+	HANDLE(ProgramHandle, uint16_t)
+	HANDLE(TextureHandle, uint16_t)
+	HANDLE(FrameBufferHandle, uint16_t)
+
+	class IRenderContext
+	{
+	public: // Each of these adds a 
+		virtual void init() = 0;
+		virtual VertexBufferHandle createVertexBuffer() = 0;
+		virtual IndexBufferHandle createIndexBuffer() = 0;
+		virtual ShaderHandle createShader() = 0;
+		virtual ProgramHandle createProgram() = 0;
+		virtual TextureHandle createTexture() = 0;
+		virtual FrameBufferHandle createFrameBuffer() = 0;
+	};
+
+	class GlRenderContext : public IRenderContext
+	{
+		virtual void init() override
+		{
+			GLenum err = glewInit(); // I need to do this when a context is created / made current for the first time.
+			if (err != GLEW_OK)
+			{
+				Logger::Error("Failed to initialize gl3w");
+				//return -1;
+			}
+		}
+	
+		virtual VertexBufferHandle createVertexBuffer() override
+		{
+			VertexBufferHandle handle;
+			VertexBufferHandle::isValid(handle);
+		}
+
+		virtual IndexBufferHandle createIndexBuffer() = 0;
+		virtual ShaderHandle createShader() = 0;
+		virtual ProgramHandle createProgram() = 0;
+		virtual TextureHandle createTexture() = 0;
+		virtual FrameBufferHandle createFrameBuffer() = 0;
+
+	};
 }
