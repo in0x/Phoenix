@@ -54,7 +54,7 @@ namespace Phoenix
 		wglDeleteContext(m_renderContext);
 	}
 
-	void Win32GLContext::SwapBuffer()
+	void Win32GLContext::swapBuffer()
 	{
 		SwapBuffers(m_deviceContext);
 	}

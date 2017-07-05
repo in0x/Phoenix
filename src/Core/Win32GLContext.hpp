@@ -9,7 +9,7 @@ namespace Phoenix
 	public:
 		Win32GLContext(HWND owningWindow);
 		~Win32GLContext();
-		void SwapBuffer();
+		void swapBuffer();
 	
 	private:
 		HGLRC m_renderContext;

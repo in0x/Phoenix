@@ -152,7 +152,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 		glDisable(GL_MULTISAMPLE);
 		glDisable(GL_DEPTH_TEST);
 
-		glc.SwapBuffer();
+		glc.swapBuffer();
 
 		window.processMessages();
 	}
