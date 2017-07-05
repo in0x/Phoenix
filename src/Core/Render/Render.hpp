@@ -1,5 +1,8 @@
 #pragma once
 
+#include "../OpenGL.hpp"
+#include "../Logger.hpp"
+
 namespace Phoenix
 {
 	/*
@@ -21,6 +24,16 @@ namespace Phoenix
 		https://www.gamedev.net/topic/684820-drawitems-for-temporary-rendering/
 		https://www.gamedev.net/topic/604899-frostbite-rendering-architecture-question/
 		https://github.com/bkaradzic/bgfx
+		https://github.com/bkaradzic/bgfx/blob/30b6d07e292ba7803210db823968fd55e2f73937/src/renderer_gl.cpp
+		https://github.com/bkaradzic/bgfx/blob/master/include/bgfx/bgfx.h
+		https://github.com/bkaradzic/bgfx/blob/master/examples/01-cubes/cubes.cpp
+		https://www.gamedev.net/topic/630029-data-driven-renderer/
+		http://gamedevs.org/uploads/flexible-rendering-multiple-platforms.pdf
+		http://amd-dev.wpengine.netdna-cdn.com/wordpress/media/2012/10/Andersson-Tatarchuk-FrostbiteRenderingArchitecture(GDC07_AMD_Session).pdf
+		https://www.kth.se/social/upload/5283df9bf276542df7e59cb0/RikardBlomberg_KTH20131112.pdf
+		http://realtimecollisiondetection.net/blog/?p=86
+		https://www.google.at/search?q=sort-based+draw+call+bucketing&oq=sort-based+draw+call+bucketing&aqs=chrome..69i57.2604j0j4&sourceid=chrome&ie=UTF-8
+		https://www.reddit.com/r/gamedev/comments/67jc0u/rendering_architecture_multiple_apis/
 	*/
 
 
@@ -40,6 +53,30 @@ namespace Phoenix
 		wrap that handle.
 	*/
 
+	//class Shader {}; // Problem: These should already be compiled into a program. So it should not be possible specify a shader pair that has not be compiled into a program/effect/whatever after loading, right?
+
+	class ShaderProgram { /* Compiled shader / program / effect */};
+
+	class GlShaderProgram : public ShaderProgram
+	{
+	public:
+		GLuint m_nativeHandle;
+	};
+
+	class VertexBuffer {};
+
+	class IndexBuffer {};
+
+	namespace Primitive
+	{
+		enum Type
+		{
+			Points,
+			Lines,
+			Triangles
+		};
+	};
+
 	class StateGroup
 	{
 		/*
@@ -55,31 +92,121 @@ namespace Phoenix
 			- Stencil
 			- What buffers are bound
 		*/
+	public:
+		StateGroup()
+			: vertices(nullptr)
+			, indices(nullptr)
+			, shaderProgram(nullptr)
+		{
+		}
+
+		VertexBuffer* vertices;
+		IndexBuffer* indices;
+		ShaderProgram* shaderProgram;
 	};
+
+	//class StateGroupWriter
+	//{
+	//	StateGroup group;
+
+	//	void begin()
+	//	{
+	//		// Set defaults here?
+	//		// Shouldn't they be set by constructor?
+	//	}
+	//	
+	//	void end()
+	//	{
+	//	}
+
+	//	void addShaderProgram(ShaderProgram* vertexShader)
+	//	{
+	//	}
+
+	//	void addVertexBuffer(VertexBuffer* vertexBuffer)
+	//	{
+	//	}
+
+	//	void addIndexBuffer(IndexBuffer* indexBuffer)
+	//	{
+	//	}
+	//};
 
 	// On Renderable can have multiple stategroups,
 	// i.e. one from the mesh, one from the material, one for defaults
 	// Order decides overrides, hodgeman has the front most stategroup as the highest priority,
 	// i.e. settings set by a stategroup are always overriden if a stategroup in front of it sets 
 	// the same setting. 
-	using StateGroupStack = StateGroup[];
+	using StateGroupStack = StateGroup*;
 
-	class DrawCommand
+	struct DrawCommand
 	{
 		// Basically what is given in GlDrawArrays: What draw type (lines, points, triangles, strips)
 		// and how many
+		Primitive::Type primtiveType;
+		size_t count;
+		size_t startIndex;
 	};
 
-	class DrawItem
+	struct DrawItem
 	{
 		// Represents a draw which is compiled from a StateGroup stack and a DrawCommand
+		StateGroupStack states;
+		DrawCommand drawCommand;
 	};
 
-	class Shader;
+	StateGroup evalStateGroupStack(StateGroupStack stateStack)
+	{
+		
+	}
 
-	class Program;
+	namespace Commands
+	{
+		struct DrawIndexed
+		{
+			DrawItem* drawItem;
+		};
+	}
 
-	class VertexBuffer;
+
+	namespace GlBackend
+	{
+		void draw(Commands::DrawIndexed* command)
+		{
+			GLenum primtiveType = GL_TRIANGLES;
+
+			DrawCommand& drawCmd = command->drawItem->drawCommand;
+
+			switch (drawCmd.primtiveType)
+			{
+			case Primitive::Triangles:
+			{
+				primtiveType = GL_TRIANGLES;
+				break;
+			}
+			case Primitive::Lines:
+			{
+				primtiveType = GL_LINES;
+				break;
+			}
+			case Primitive::Points:
+			{
+				primtiveType = GL_POINTS;
+				break;
+			}
+			default:
+			{
+				Logger::Warning("PrimitiveType unsupported, reverting to default triangles");
+				assert(false);
+			}
+			}
+
+			GlShaderProgram* glProgram = static_cast<GlShaderProgram*>(command->drawItem->states->shaderProgram);
+			glUseProgram(glProgram->m_nativeHandle);
+
+			glDrawElements(primtiveType, drawCmd.count, GL_UNSIGNED_INT, (GLvoid*)(sizeof(unsigned int) * drawCmd.startIndex));
+		}
 	
-	class IndexBuffer;
+	}
+
 }

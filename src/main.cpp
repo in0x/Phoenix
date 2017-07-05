@@ -7,6 +7,7 @@
 #include "Core/GLShader.hpp"
 #include "Tests/MathTests.hpp"
 #include "Core/StringTokenizer.hpp"
+#include "Core/Render/Render.hpp"
 
 char* getCMDOption(char** start, char** end, const std::string& option)
 {
