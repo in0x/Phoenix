@@ -55,9 +55,6 @@
     <ClInclude Include="..\src\Core\Win32Window.hpp">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Core\Win32GLContext.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Core\GLShader.hpp">
       <Filter>Core</Filter>
     </ClInclude>
@@ -77,6 +74,12 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Core\Render\Render.hpp">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Render\IRenderContext.hpp">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Render\WGlRenderContext.hpp">
       <Filter>Render</Filter>
     </ClInclude>
   </ItemGroup>
@@ -127,9 +130,6 @@
       <Filter>Math</Filter>
     </ClCompile>
     <ClCompile Include="..\src\main.cpp" />
-    <ClCompile Include="..\src\Core\Win32GLContext.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Core\OpenGL.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -138,6 +138,9 @@
     </ClCompile>
     <ClCompile Include="..\src\Core\ObjIndexer.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Core\Render\WGlRenderContext.cpp">
+      <Filter>Render</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

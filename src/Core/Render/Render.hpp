@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../OpenGL.hpp"
 #include "../Logger.hpp"
 
 namespace Phoenix
@@ -20,12 +19,12 @@ namespace Phoenix
 	/*
 		- A game creates a Renderer, this might be a ForwardRenderer, a DeferredRenderer, a ClusteredRenderer etc
 		- A Renderer has n CommandBuckets used for storing the commands it requires to perform the Render step.
-		  A CommandBucket has a variably sized key, used to sort commands. Certain bits in the key represent 
+		  A CommandBucket has a variably sized key, used to sort commands. Certain bits in the key represent
 		  criteria to sort by, such as depth, material, mesh etc.
 		  A DeferredRenderer might have a GBuffer Bucket, a Lights Bucket, a Normal Buckets etc.
 		- A CommandBucket stores Commands. Commands represent actions that can be performed by the rendering backend,
 		  such as drawing primitives, creating a buffer, etc.
-		- After sorting the commands, the bucket can be flushed to submit the commands to the backend. 
+		- After sorting the commands, the bucket can be flushed to submit the commands to the backend.
 		- A backend represents a rendering context, such as a hardware-accelerated API such as D3D or GL or even a software renderer.
 		  A backend performs actions specific to that rendering context such as executing commands or allocating resources.
 	*/
@@ -170,7 +169,7 @@ namespace Phoenix
 
 	StateGroup evalStateGroupStack(StateGroupStack stateStack)
 	{
-		
+		return StateGroup();
 	}
 
 	namespace Commands
@@ -219,7 +218,7 @@ namespace Phoenix
 
 			glDrawElements(primtiveType, drawCmd.count, GL_UNSIGNED_INT, (GLvoid*)(sizeof(unsigned int) * drawCmd.startIndex));
 		}
-	
+
 	}
 
 	/*
@@ -248,63 +247,4 @@ namespace Phoenix
 		ReadTexture,
 		RequestScreenShot,
 	*/
-
-#include <limits>
-
-#undef max // y tho
-
-
-#define HANDLE(name, size) \
-	struct name \
-	{ \
-		static const size invalidValue = std::numeric_limits<size>::max(); \
-		size idx = invalidValue; \
-		static bool isValid(name handle) { return handle.idx != invalidValue; } \
-	}; \
-			
-
-	HANDLE(VertexBufferHandle, uint16_t)
-	HANDLE(IndexBufferHandle, uint16_t)
-	HANDLE(ShaderHandle, uint16_t)
-	HANDLE(ProgramHandle, uint16_t)
-	HANDLE(TextureHandle, uint16_t)
-	HANDLE(FrameBufferHandle, uint16_t)
-
-	class IRenderContext
-	{
-	public: // Each of these adds a 
-		virtual void init() = 0;
-		virtual VertexBufferHandle createVertexBuffer() = 0;
-		virtual IndexBufferHandle createIndexBuffer() = 0;
-		virtual ShaderHandle createShader() = 0;
-		virtual ProgramHandle createProgram() = 0;
-		virtual TextureHandle createTexture() = 0;
-		virtual FrameBufferHandle createFrameBuffer() = 0;
-	};
-
-	class GlRenderContext : public IRenderContext
-	{
-		virtual void init() override
-		{
-			GLenum err = glewInit(); // I need to do this when a context is created / made current for the first time.
-			if (err != GLEW_OK)
-			{
-				Logger::Error("Failed to initialize gl3w");
-				//return -1;
-			}
-		}
-	
-		virtual VertexBufferHandle createVertexBuffer() override
-		{
-			VertexBufferHandle handle;
-			VertexBufferHandle::isValid(handle);
-		}
-
-		virtual IndexBufferHandle createIndexBuffer() = 0;
-		virtual ShaderHandle createShader() = 0;
-		virtual ProgramHandle createProgram() = 0;
-		virtual TextureHandle createTexture() = 0;
-		virtual FrameBufferHandle createFrameBuffer() = 0;
-
-	};
 }

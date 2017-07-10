@@ -3,11 +3,11 @@
 #include "Core/obj.hpp"
 #include "Core/Math/PhiMath.hpp"
 #include "Core/Win32Window.hpp"
-#include "Core/Win32GLContext.hpp"
 #include "Core/GLShader.hpp"
 #include "Tests/MathTests.hpp"
 #include "Core/StringTokenizer.hpp"
 #include "Core/Render/Render.hpp"
+#include "Core/Render/WGlRenderContext.hpp"
 
 char* getCMDOption(char** start, char** end, const std::string& option)
 {
@@ -60,20 +60,14 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 		false };
 
 	Win32Window window(config);
-	Win32GLContext glc(window.getNativeHandle());
-
 	if (!window.isOpen())
 	{
 		Logger::Error("Failed to initialize Win32Window");
 		return -1;
 	}
 
-	GLenum err = glewInit(); // I need to do this when a context is created / made current for the first time.
-	if (err != GLEW_OK) 
-	{
-		Logger::Error("Failed to initialize gl3w");
-		return -1;
-	}
+	std::unique_ptr<IRenderContext> context = std::make_unique<WGlRenderContext>(window.getNativeHandle());
+	context->init();
 	
 	Matrix4 worldMat = Matrix4::identity();
 	Matrix4 viewMat = lookAtRH(Vec3{ 2, 2, -7  /*2, 90, -700 */}, Vec3{ 0,0,0 }, Vec3{ 0,1,0 });
