@@ -1,7 +1,10 @@
 #pragma once
+
+#include <stdint.h>
+#include <vector>
 #include "Windows.h"
 #include "IRenderContext.hpp"
-#include <vector>
+#include "../OpenGL.hpp"
 
 namespace Phoenix
 {
@@ -12,16 +15,13 @@ namespace Phoenix
 	HANDLE(TextureHandle, uint16_t)
 	HANDLE(FrameBufferHandle, uint16_t)
 
-
 	struct GlVertexBuffer
 	{
-		
-
 		GLuint m_id;
 		GLenum m_target;
 		uint32_t m_size;
-		VertexDeclHandle m_decl;
-		VaoCacheRef m_vcref;
+		/*VertexDeclHandle m_decl;
+		VaoCacheRef m_vcref;*/
 	};
 
 	class WGlRenderContext : public IRenderContext
@@ -32,7 +32,7 @@ namespace Phoenix
 		virtual void init() override;
 		virtual void swapBuffer() override;
 
-		virtual VertexBufferHandle createVertexBuffer() override;
+		virtual VertexBufferHandle createVertexBuffer(size_t size, const void* data) override;
 		virtual IndexBufferHandle createIndexBuffer()override;
 		virtual ShaderHandle createShader() override;
 		virtual ProgramHandle createProgram() override;
@@ -40,7 +40,7 @@ namespace Phoenix
 		virtual FrameBufferHandle createFrameBuffer() override;
 
 	private:
-		std::vector<GLuint> m_vertexBuffers; // These vectors need replacing when I create custom allocators
+		std::vector<GlVertexBuffer> m_vertexBuffers; // These vectors need replacing when I create custom allocators
 		std::vector<IndexBufferHandle> m_indexBuffers;
 		std::vector<ShaderHandle> m_shaders;
 		std::vector<ProgramHandle> m_programs;

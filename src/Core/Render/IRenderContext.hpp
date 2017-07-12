@@ -1,5 +1,4 @@
 #pragma once
-#include <stdint.h>
 #include <limits>
 #undef max // TODO(Phil): Figure out how to stop this
 
@@ -25,7 +24,7 @@ namespace Phoenix
 	{
 	public: 
 		virtual void init() = 0;
-		virtual VertexBufferHandle createVertexBuffer() = 0;
+		virtual VertexBufferHandle createVertexBuffer(size_t size, const void* data) = 0;
 		virtual IndexBufferHandle createIndexBuffer() = 0;
 		virtual ShaderHandle createShader() = 0;
 		virtual ProgramHandle createProgram() = 0;

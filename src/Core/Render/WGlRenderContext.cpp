@@ -75,19 +75,27 @@ namespace Phoenix
 	}
 
 
-	VertexBufferHandle WGlRenderContext::createVertexBuffer() 
+	VertexBufferHandle WGlRenderContext::createVertexBuffer(size_t size, const void* data)
 	{
-		VertexBufferHandle handle;
-		GLuint vbo;
+		m_vertexBuffers.emplace_back();
+		GlVertexBuffer& buffer = m_vertexBuffers.back();
 
-		glGenBuffers(1, &vbo);
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(Vec3) * fox->vertices.size(), fox->vertices.data(), GL_STATIC_DRAW);
+		VertexBufferHandle handle;
+		handle.idx = static_cast<uint16_t>(m_vertexBuffers.size() - 1);
+
+		glGenBuffers(1, &buffer.m_id);
+		glBindBuffer(GL_ARRAY_BUFFER, buffer.m_id);
+		glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW); // TODO(Phil): Check what GL_DYNAMIC_DRAW does
+
+
+		// TODO(Phil): Check for errors here.
+
+		return handle;
 	}
 
-	IndexBufferHandle WGlRenderContext::createIndexBuffer() {};
-	ShaderHandle WGlRenderContext::createShader() {}
-	ProgramHandle WGlRenderContext::createProgram() {}
-	TextureHandle WGlRenderContext::createTexture() {}
-	FrameBufferHandle WGlRenderContext::createFrameBuffer() {}
+	IndexBufferHandle WGlRenderContext::createIndexBuffer() { return {}; };
+	ShaderHandle WGlRenderContext::createShader() { return{}; }
+	ProgramHandle WGlRenderContext::createProgram() { return{}; }
+	TextureHandle WGlRenderContext::createTexture() { return{}; }
+	FrameBufferHandle WGlRenderContext::createFrameBuffer() { return{}; }
 }

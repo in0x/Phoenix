@@ -68,7 +68,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	std::unique_ptr<IRenderContext> context = std::make_unique<WGlRenderContext>(window.getNativeHandle());
 	context->init();
-	
+
 	Matrix4 worldMat = Matrix4::identity();
 	Matrix4 viewMat = lookAtRH(Vec3{ 2, 2, -7  /*2, 90, -700 */}, Vec3{ 0,0,0 }, Vec3{ 0,1,0 });
 	Matrix4 projMat = perspectiveRH(70, (float)config.width / (float)config.height, 1, 10000);
@@ -92,13 +92,21 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	GLuint vao;
 	GLuint ibo;
 
+	// =
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vec3) * fox->vertices.size(), fox->vertices.data(), GL_STATIC_DRAW);
 
+	VertexBufferHandle vertices = context->createVertexBuffer(fox->vertices.size(), fox->vertices.data());
+	// -
+
+	// =
 	glGenBuffers(1, &normals_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, normals_vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vec3) * fox->normals.size(), fox->normals.data(), GL_STATIC_DRAW);
+
+	VertexBufferHandle normals = context->createVertexBuffer(fox->normals.size(), fox->normals.data());
+	// -
 
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
@@ -147,8 +155,8 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 		glDisable(GL_MULTISAMPLE);
 		glDisable(GL_DEPTH_TEST);
 
-		glc.swapBuffer();
-
+		context->swapBuffer();
+		
 		window.processMessages();
 	}
 
