@@ -86,26 +86,9 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	glDeleteShader(vert);
 	glDeleteShader(frag);
 
-	GLuint vbo;
-	GLuint normals_vbo;
-	GLuint vao;
-	GLuint ibo;
-
-	// =
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vec3) * fox->vertices.size(), fox->vertices.data(), GL_STATIC_DRAW);
-
-	VertexBufferHandle vertices = context->createVertexBuffer(fox->vertices.size(), fox->vertices.data());
-	// -
-
-	// =
-	glGenBuffers(1, &normals_vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, normals_vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vec3) * fox->normals.size(), fox->normals.data(), GL_STATIC_DRAW);
-
-	VertexBufferHandle normals = context->createVertexBuffer(fox->normals.size(), fox->normals.data());
-	// -
+	VertexBufferHandle vertices = context->createVertexBuffer(sizeof(Vec3) * fox->vertices.size(), fox->vertices.data());
+	VertexBufferHandle normals = context->createVertexBuffer(sizeof(Vec3) * fox->normals.size(), fox->normals.data());
+	IndexBufferHandle indices = context->createIndexBuffer(sizeof(GLuint) * fox->indices.size(), fox->indices.data());
 
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
@@ -118,10 +101,6 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	glBindBuffer(GL_ARRAY_BUFFER, normals_vbo);
 	glVertexAttribPointer(1, 3, GL_FLOAT, false, sizeof(Vec3), nullptr);
 
-	glGenBuffers(1, &ibo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, fox->indices.size() * sizeof(GLuint), fox->indices.data(), GL_STATIC_DRAW);
-	
 	glUseProgram(progHandle);
 
 	glUniformMatrix4fv(2, 1, GL_FALSE, (GLfloat*)&worldMat);

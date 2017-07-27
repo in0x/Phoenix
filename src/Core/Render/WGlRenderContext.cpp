@@ -74,8 +74,7 @@ namespace Phoenix
 		SwapBuffers(m_deviceContext);
 	}
 
-
-	VertexBufferHandle WGlRenderContext::createVertexBuffer(size_t size, const void* data)
+	VertexBufferHandle WGlRenderContext::createVertexBuffer(uint32_t size, const void* data)
 	{
 		m_vertexBuffers.emplace_back();
 		GlVertexBuffer& buffer = m_vertexBuffers.back();
@@ -87,15 +86,83 @@ namespace Phoenix
 		glBindBuffer(GL_ARRAY_BUFFER, buffer.m_id);
 		glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW); // TODO(Phil): Check what GL_DYNAMIC_DRAW does
 
-
 		// TODO(Phil): Check for errors here.
 
 		return handle;
 	}
 
-	IndexBufferHandle WGlRenderContext::createIndexBuffer() { return {}; };
-	ShaderHandle WGlRenderContext::createShader() { return{}; }
-	ProgramHandle WGlRenderContext::createProgram() { return{}; }
-	TextureHandle WGlRenderContext::createTexture() { return{}; }
-	FrameBufferHandle WGlRenderContext::createFrameBuffer() { return{}; }
+	IndexBufferHandle WGlRenderContext::createIndexBuffer(uint32_t size, const void* data)
+	{
+		m_indexBuffers.emplace_back();
+		GlIndexBuffer& buffer = m_indexBuffers.back();
+
+		IndexBufferHandle handle;
+		handle.idx = static_cast<uint16_t>(m_indexBuffers.size() - 1);
+
+		glGenBuffers(1, &buffer.m_id);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.m_id);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, GL_STATIC_DRAW); // TODO(Phil): Check what GL_DYNAMIC_DRAW does
+
+		return handle;
+	};
+
+	GLenum getShaderEnum(Shader::Type type)
+	{
+		switch (type)
+		{
+		case Shader::Type::Vertex:
+		{
+			return GL_VERTEX_SHADER;
+		}
+		case Shader::Type::Fragment:
+		{
+			return GL_FRAGMENT_SHADER;
+		}
+		case Shader::Type::Compute:
+		{
+			return GL_COMPUTE_SHADER;
+		}
+		case Shader::Type::Geometry:
+		{
+			return GL_GEOMETRY_SHADER;
+		}
+		}
+	}
+
+	ShaderHandle WGlRenderContext::createShader(const char* source, Shader::Type shaderType)
+	{
+		m_shaders.emplace_back();
+		GlShader& shader = m_shaders.back();
+
+		ShaderHandle handle;
+
+		if (source == nullptr)
+		{
+			Logger::Error("Shader source is null");
+			return handle;
+		}
+
+		handle.idx = static_cast<uint16_t>(m_shaders.size() - 1);
+
+		shader.m_id = glCreateShader(getShaderEnum(shaderType));
+		glShaderSource(shader.m_id, 1, (const char**)&source, NULL);
+		glCompileShader(shader.m_id);
+	
+		return handle;
+	}
+	
+	ProgramHandle WGlRenderContext::createProgram() 
+	{ 
+		return{}; 
+	}
+	
+	TextureHandle WGlRenderContext::createTexture() 
+	{ 
+		return{}; 
+	}
+	
+	FrameBufferHandle WGlRenderContext::createFrameBuffer() 
+	{ 
+		return{}; 
+	}
 }

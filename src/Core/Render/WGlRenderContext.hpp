@@ -18,10 +18,17 @@ namespace Phoenix
 	struct GlVertexBuffer
 	{
 		GLuint m_id;
-		GLenum m_target;
-		uint32_t m_size;
-		/*VertexDeclHandle m_decl;
-		VaoCacheRef m_vcref;*/
+	};
+
+	struct GlIndexBuffer
+	{
+		GLuint m_id;
+	};
+
+	struct GlShader
+	{
+		GLuint m_id;
+		GLenum m_shaderType;
 	};
 
 	class WGlRenderContext : public IRenderContext
@@ -32,17 +39,17 @@ namespace Phoenix
 		virtual void init() override;
 		virtual void swapBuffer() override;
 
-		virtual VertexBufferHandle createVertexBuffer(size_t size, const void* data) override;
-		virtual IndexBufferHandle createIndexBuffer()override;
-		virtual ShaderHandle createShader() override;
+		virtual VertexBufferHandle createVertexBuffer(uint32_t size, const void* data) override;
+		virtual IndexBufferHandle createIndexBuffer(uint32_t size, const void* data) override;
+		virtual ShaderHandle createShader(const char* source, Shader::Type shaderType) override;
 		virtual ProgramHandle createProgram() override;
 		virtual TextureHandle createTexture() override;
 		virtual FrameBufferHandle createFrameBuffer() override;
 
 	private:
 		std::vector<GlVertexBuffer> m_vertexBuffers; // These vectors need replacing when I create custom allocators
-		std::vector<IndexBufferHandle> m_indexBuffers;
-		std::vector<ShaderHandle> m_shaders;
+		std::vector<GlIndexBuffer> m_indexBuffers;
+		std::vector<GlShader> m_shaders;
 		std::vector<ProgramHandle> m_programs;
 
 		HWND m_owningWindow;
