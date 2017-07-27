@@ -11,7 +11,7 @@ namespace Phoenix
 		{ \
 			static const size invalidValue = std::numeric_limits<size>::max(); \
 			size idx = invalidValue; \
-			static bool isValid(name handle) { return handle.idx != invalidValue; } \
+			bool isValid() const { return idx != invalidValue; } \
 		}; \
 
 	struct VertexBufferHandle;
@@ -23,13 +23,16 @@ namespace Phoenix
 
 	namespace Shader
 	{
-		enum class Type
+		enum Type
 		{
 			Vertex,
 			Geometry,
 			Fragment,
 			Compute,
+			None,
 		};
+
+		using List = ShaderHandle[4];
 	}
 
 	class IRenderContext
@@ -39,7 +42,7 @@ namespace Phoenix
 		virtual VertexBufferHandle createVertexBuffer(uint32_t size, const void* data) = 0;
 		virtual IndexBufferHandle createIndexBuffer(uint32_t size, const void* data) = 0;
 		virtual ShaderHandle createShader(const char* source, Shader::Type shaderType) = 0;
-		virtual ProgramHandle createProgram() = 0;
+		virtual ProgramHandle createProgram(const Shader::List& shaders) = 0;
 		virtual TextureHandle createTexture() = 0;
 		virtual FrameBufferHandle createFrameBuffer() = 0;
 		virtual void swapBuffer() = 0;

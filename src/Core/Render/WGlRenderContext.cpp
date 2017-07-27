@@ -126,6 +126,66 @@ namespace Phoenix
 		{
 			return GL_GEOMETRY_SHADER;
 		}
+		default:
+		{
+			Logger::error("Trying to convert invalid Shader::Type to GlEnum");
+			return 0;
+		}
+		}
+	}
+
+	Shader::Type getShaderType(GLenum shaderEnum)
+	{
+		switch (shaderEnum)
+		{
+		case GL_VERTEX_SHADER:
+		{
+			return Shader::Type::Vertex;
+		}
+		case GL_FRAGMENT_SHADER:
+		{
+			return Shader::Type::Fragment;
+		}
+		case GL_COMPUTE_SHADER:
+		{
+			return Shader::Type::Compute;
+		}
+		case GL_GEOMETRY_SHADER:
+		{
+			return Shader::Type::Geometry;
+		}
+		default:
+		{
+			Logger::error("Trying to convert invalid GlEnum to Shader::Type ");
+			return Shader::Type::None;
+		}
+		}
+	}
+
+	void printShaderLog(GLuint shader)
+	{
+		if (glIsShader(shader))
+		{
+			int infoLogLength = 0;
+			int maxLength = infoLogLength;
+
+			glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLength);
+
+			char* infoLog = new char[maxLength];
+
+			glGetShaderInfoLog(shader, maxLength, &infoLogLength, infoLog);
+
+			if (infoLogLength > 0)
+			{
+				Logger::error(infoLog);
+			}
+
+			delete[] infoLog;
+		}
+
+		else
+		{
+			Logger::error(std::to_string(shader) + " is not a shader\n");
 		}
 	}
 
@@ -138,7 +198,7 @@ namespace Phoenix
 
 		if (source == nullptr)
 		{
-			Logger::Error("Shader source is null");
+			Logger::error("Shader source is null");
 			return handle;
 		}
 
@@ -147,15 +207,55 @@ namespace Phoenix
 		shader.m_id = glCreateShader(getShaderEnum(shaderType));
 		glShaderSource(shader.m_id, 1, (const char**)&source, NULL);
 		glCompileShader(shader.m_id);
+
+		printShaderLog(shader.m_id);
 	
 		return handle;
 	}
 	
-	ProgramHandle WGlRenderContext::createProgram() 
-	{ 
-		return{}; 
+	ProgramHandle WGlRenderContext::createProgram(const Shader::List& shaders)
+	{
+		m_programs.emplace_back();
+		GlProgram& program = m_programs.back();
+
+		GLuint progHandle = glCreateProgram();
+
+		int typeValue = 0;
+
+		for (const ShaderHandle& handle : shaders)
+		{
+			if (!handle.isValid())
+			{
+				Logger::error("Trying to access invalid shader");
+				continue;
+			}
+
+			GlShader& shader = m_shaders[handle.idx];
+
+			if (getShaderType(shader.m_shaderType) != typeValue)
+			{
+				Logger::error("Trying to attach shader of invalid type");
+				continue;
+			}
+
+			glAttachShader(progHandle, shader.m_id);
+			typeValue++;
+		}
+
+		glLinkProgram(progHandle);
+		ProgramHandle handle;
+
+		if (!glIsProgram(progHandle))
+		{
+			Logger::error("Failed to compile shader program.");
+			return handle;
+		}
+
+		program.m_id = progHandle;
+		handle.idx = static_cast<uint16_t>(m_programs.size() - 1);
+		return handle;
 	}
-	
+
 	TextureHandle WGlRenderContext::createTexture() 
 	{ 
 		return{}; 

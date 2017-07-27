@@ -30,6 +30,7 @@ namespace Phoenix
 
 		public:
 			LogOut(bool bLogToConsole, bool bLogToFile);
+			~LogOut();
 			void Log(const std::string& msg);
 			void Warning(const std::string& msg);
 			void Error(const std::string& msg);
@@ -48,6 +49,11 @@ namespace Phoenix
 
 				m_file.open(path);
 			}
+		}
+
+		LogOut::~LogOut()
+		{
+			m_file.close();
 		}
 
 		void LogOut::Log(const std::string& msg)

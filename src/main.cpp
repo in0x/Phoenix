@@ -1,12 +1,12 @@
-#include <cassert>
 #include <Windows.h>
+#include <cassert>
+#include <fstream>
 #include "Core/obj.hpp"
 #include "Core/Math/PhiMath.hpp"
 #include "Core/Win32Window.hpp"
-#include "Core/GLShader.hpp"
 #include "Tests/MathTests.hpp"
 #include "Core/StringTokenizer.hpp"
-#include "Core/Render/Render.hpp"
+#include "Core/Logger.hpp"
 #include "Core/Render/WGlRenderContext.hpp"
 
 char* getCMDOption(char** start, char** end, const std::string& option)
@@ -38,21 +38,43 @@ Engine -> actual engine class, gets a window passed to it
 on creation
 */
 
+std::string loadText(const char* path)
+{
+	std::string fileString;
+	std::ifstream fileStream("Shaders/diffuse.vert");
+	GLuint shader;
+
+	if (fileStream)
+	{
+		fileString.assign(std::istreambuf_iterator<char>(fileStream), std::istreambuf_iterator<char>());
+		fileString.erase(std::remove_if(fileString.begin(), fileString.end(),
+			[](const char c) {
+			return !(c >= 0 && c < 128);
+		}), fileString.end());
+		return fileString;
+	}
+	else
+	{
+		Phoenix::Logger::error("Failed to load shader");
+		return nullptr;
+	}
+}
+
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	using namespace Phoenix;
 
-	Logger::init(true, false);
+	Logger::init(true, true);
 
 	Tests::RunMathTests();
 
 	std::unique_ptr<Mesh> fox = loadObj("Fox/", "RedFox.obj");
 	//std::unique_ptr<Mesh> fox = loadObj("rungholt/", "rungholt.obj");
 	//std::unique_ptr<Mesh> fox = loadObj("sniper/", "sniper.obj");
-	
+
 	assert(fox != nullptr);
-	
-	WindowConfig config = { 
+
+	WindowConfig config = {
 		800, 600,
 		0,0,
 		std::wstring(L"Phoenix"),
@@ -69,11 +91,11 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	context->init();
 
 	Matrix4 worldMat = Matrix4::identity();
-	Matrix4 viewMat = lookAtRH(Vec3{ 2, 2, -7  /*2, 90, -700 */}, Vec3{ 0,0,0 }, Vec3{ 0,1,0 });
+	Matrix4 viewMat = lookAtRH(Vec3{ 2, 2, -7  /*2, 90, -700 */ }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 });
 	Matrix4 projMat = perspectiveRH(70, (float)config.width / (float)config.height, 1, 10000);
 	Vec3 lightPosition = Vec3(-5, 3, 5);
-	
-	GLuint vert = createShader("Shaders/diffuse.vert", GL_VERTEX_SHADER);
+
+	/*GLuint vert = createShader("Shaders/diffuse.vert", GL_VERTEX_SHADER);
 	GLuint frag = createShader("Shaders/diffuse.frag", GL_FRAGMENT_SHADER);
 
 	GLuint progHandle = glCreateProgram();
@@ -84,13 +106,24 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	glLinkProgram(progHandle);
 
 	glDeleteShader(vert);
-	glDeleteShader(frag);
+	glDeleteShader(frag);*/
 
 	VertexBufferHandle vertices = context->createVertexBuffer(sizeof(Vec3) * fox->vertices.size(), fox->vertices.data());
 	VertexBufferHandle normals = context->createVertexBuffer(sizeof(Vec3) * fox->normals.size(), fox->normals.data());
 	IndexBufferHandle indices = context->createIndexBuffer(sizeof(GLuint) * fox->indices.size(), fox->indices.data());
 
-	glGenVertexArrays(1, &vao);
+	std::string vsSource = loadText("Shaders/diffuse.vert");
+	std::string fsSource = loadText("Shaders/diffuse.frag");
+
+	ShaderHandle vs = context->createShader(vsSource.c_str(), Shader::Vertex);
+	ShaderHandle fs = context->createShader(fsSource.c_str(), Shader::Fragment);
+
+	Shader::List shaders;
+	shaders[Shader::Vertex] = vs;
+	shaders[Shader::Fragment] = fs;
+	ProgramHandle program = context->createProgram(shaders);
+
+	/*glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
 	glEnableVertexAttribArray(0);
@@ -109,7 +142,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	glUniform3fv(5, 1, (GLfloat*)&lightPosition);
 
 	glBindVertexArray(vao);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);*/
 
 	getGlErrorString();
 
