@@ -56,7 +56,7 @@ namespace Phoenix
 		{
 			if (!RegisterClass(&windowClass))
 			{
-				Logger::Error("Failed to register the window class.");
+				Logger::error("Failed to register the window class.");
 				self = nullptr;
 				return;
 			}
@@ -84,7 +84,7 @@ namespace Phoenix
 
 			if (ChangeDisplaySettings(&displayConfig, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL)
 			{
-				Logger::Error("Failed to fullscreen the window.");
+				Logger::error("Failed to fullscreen the window.");
 				self = nullptr;
 				return;
 			}
@@ -115,7 +115,7 @@ namespace Phoenix
 
 		if (!self->window)
 		{
-			Logger::Error("Failed to create window.");
+			Logger::error("Failed to create window.");
 			self = nullptr;
 			return;
 		}
@@ -188,12 +188,12 @@ namespace Phoenix
 
 	void Win32Window::minimize()
 	{
-		Logger::Warning(__LOCATION_INFO__ "Not implemented!");
+		Logger::warning(__LOCATION_INFO__ "Not implemented!");
 	}
 
 	void Win32Window::maximize()
 	{
-		Logger::Warning(__LOCATION_INFO__ "Not implemented!");
+		Logger::warning(__LOCATION_INFO__ "Not implemented!");
 	}
 
 	void Win32Window::setVisible(bool visible)
@@ -213,7 +213,7 @@ namespace Phoenix
 
 	void Win32Window::setFullscreen(bool fullscreen)
 	{
-		Logger::Warning(__LOCATION_INFO__ "Not implemented!");
+		Logger::warning(__LOCATION_INFO__ "Not implemented!");
 	}
 
 	Win32Window::Size Win32Window::getDimensions() const
@@ -223,7 +223,7 @@ namespace Phoenix
 
 	void Win32Window::resize(unsigned int width, unsigned int height)
 	{
-		Logger::Warning(__LOCATION_INFO__ "Not implemented!");
+		Logger::warning(__LOCATION_INFO__ "Not implemented!");
 	}
 
 	HWND Win32Window::getNativeHandle()
@@ -233,6 +233,6 @@ namespace Phoenix
 
 	void Win32Window::OnResize(int width, int height)
 	{
-		Logger::Warning(__LOCATION_INFO__ "Not implemented!");
+		Logger::warning(__LOCATION_INFO__ "Not implemented!");
 	}
 }

@@ -58,7 +58,7 @@ namespace Phoenix
 		GLenum err = glewInit(); // I need to do this when a context is created / made current for the first time.
 		if (err != GLEW_OK)
 		{
-			Logger::Error("Failed to initialize gl3w");
+			Logger::error("Failed to initialize gl3w");
 			assert(false);
 		}
 	}

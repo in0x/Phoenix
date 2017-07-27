@@ -56,7 +56,7 @@ namespace Phoenix
 	{
 		if (tokens.size() < 4)
 		{
-			Logger::Error("Cannot parse vertex, not enough tokens.");
+			Logger::error("Cannot parse vertex, not enough tokens.");
 			assert(false);
 		}
 
@@ -70,7 +70,7 @@ namespace Phoenix
 	{
 		if (tokens.size() < 4)
 		{
-			Logger::Error("Cannot parse normal, not enough tokens.");
+			Logger::error("Cannot parse normal, not enough tokens.");
 			assert(false);
 		}
 
@@ -84,7 +84,7 @@ namespace Phoenix
 	{
 		if (tokens.size() < 3)
 		{
-			Logger::Error("Cannot parse uv, not enough tokens.");
+			Logger::error("Cannot parse uv, not enough tokens.");
 			assert(false);
 		}
 
@@ -138,7 +138,7 @@ namespace Phoenix
 	{
 		if (tokens.size() < 4)
 		{
-			Logger::Error("Cannot parse face, not enough tokens.");
+			Logger::error("Cannot parse face, not enough tokens.");
 			assert(false);
 		}
 
@@ -189,7 +189,7 @@ namespace Phoenix
 
 		if (!file)
 		{
-			Logger::Error("Failed to open OBJ file " + path);
+			Logger::error("Failed to open OBJ file " + path);
 			fclose(file);
 		}
 
@@ -209,7 +209,7 @@ namespace Phoenix
 		auto parseColor = [](auto& tokens) -> Vec3 {
 			if (tokens.size() < 4)
 			{
-				Logger::Error("Cannot parse color, not enough tokens.");
+				Logger::error("Cannot parse color, not enough tokens.");
 				assert(false);
 			}
 

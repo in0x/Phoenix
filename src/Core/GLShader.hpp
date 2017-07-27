@@ -20,7 +20,7 @@ namespace Phoenix
 
 			if (infoLogLength > 0)
 			{
-				Logger::LogOut::get().Error(infoLog);
+				Logger::error(infoLog);
 			}
 
 			delete[] infoLog;
@@ -28,7 +28,7 @@ namespace Phoenix
 
 		else
 		{
-			std::cout << shader << " is not a shader" << '\n';
+			Logger::error(std::to_string(shader) + " is not a shader\n");
 		}
 	}
 
@@ -59,7 +59,7 @@ namespace Phoenix
 
 		else
 		{
-			Logger::LogOut::get().Error("Failed to load shader");
+			Logger::error("Failed to load shader");
 		}
 
 		printShaderLog(shader);

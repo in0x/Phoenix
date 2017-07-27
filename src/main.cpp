@@ -42,8 +42,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 {
 	using namespace Phoenix;
 
-	Logger::LogOut::get().logToConsole = true;
-	Logger::LogOut::get().logToFile = true;
+	Logger::init(true, false);
 
 	Tests::RunMathTests();
 
@@ -54,7 +53,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	assert(fox != nullptr);
 	
 	WindowConfig config = { 
-		1400, 900,
+		800, 600,
 		0,0,
 		std::wstring(L"Phoenix"),
 		false };
@@ -62,7 +61,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	Win32Window window(config);
 	if (!window.isOpen())
 	{
-		Logger::Error("Failed to initialize Win32Window");
+		Logger::error("Failed to initialize Win32Window");
 		return -1;
 	}
 
@@ -146,7 +145,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 		GLfloat color[] = { 1.f, 1.f, 1.f, 1.f };
 		glClearBufferfv(GL_COLOR, 0, color);
 
-		angle += 0.1f; 
+		angle += 0.05f; 
 		Matrix4 rotMat = Matrix4::rotation(0.f, angle, 0.f);
 		glUniformMatrix4fv(2, 1, GL_FALSE, (GLfloat*)&rotMat);
 
@@ -159,6 +158,8 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 		
 		window.processMessages();
 	}
+
+	Logger::exit();
 
 	return 0;
 }

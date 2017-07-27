@@ -208,7 +208,7 @@ namespace Phoenix
 			}
 			default:
 			{
-				Logger::Warning("PrimitiveType unsupported, reverting to default triangles");
+				Logger::warning("PrimitiveType unsupported, reverting to default triangles");
 				assert(false);
 			}
 			}
