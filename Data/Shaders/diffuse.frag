@@ -33,5 +33,6 @@ void main()
 	//float specular = pow(max(dot(normalize(R),normalize(V)), 0.0), shininess); 
 	float specular = pow(max(dot(normalize(H),normalize(N)), 0.0), shininess); 
 	
-	color = vec4(kAmbient * modelColor + kDiffuse* dotNL * modelColor + kSpecular * specular * modelColor, 1.0);
+	//color = vec4(kAmbient * modelColor + kDiffuse* dotNL * modelColor + kSpecular * specular * modelColor, 1.0);
+	color = vs_in.eyeNormal;
 }

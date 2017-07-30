@@ -9,7 +9,7 @@ std::string getGlErrorString()
 	case GL_NO_ERROR:
 		return std::string("GL Error: No Error");
 	case GL_INVALID_OPERATION:
-		return std::string("INVALID_OPERATION");
+			return std::string("INVALID_OPERATION");
 	case GL_INVALID_ENUM:
 		return std::string("INVALID_ENUM");
 	case GL_INVALID_VALUE:

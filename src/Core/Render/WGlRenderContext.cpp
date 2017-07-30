@@ -127,7 +127,7 @@ namespace Phoenix
 
 			GLuint vbo = createVBO(attribData.m_size, attribData.m_count, attribData.m_data);
 			
-			glEnableVertexAttribArray(0);
+			glEnableVertexAttribArray(i);
 			glBindBuffer(GL_ARRAY_BUFFER, vbo);
 			glVertexAttribPointer(
 				i, 

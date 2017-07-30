@@ -119,15 +119,14 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	ProgramHandle program = context->createProgram(shaders);
 
 	context->tempUseProgram(program);
-	
+	context->tempUseVertexBuffer(foxVertices);
+	context->tempUseIdxBuffer(foxIndices);
+
 	glUniformMatrix4fv(2, 1, GL_FALSE, (GLfloat*)&worldMat);
 	glUniformMatrix4fv(3, 1, GL_FALSE, (GLfloat*)&viewMat);
 	glUniformMatrix4fv(4, 1, GL_FALSE, (GLfloat*)&projMat);
 	glUniform3fv(5, 1, (GLfloat*)&lightPosition);
-
-	context->tempUseVertexBuffer(foxVertices);
-	context->tempUseIdxBuffer(foxIndices);
-
+	
 	getGlErrorString();
 
 	float angle = 0.f;
