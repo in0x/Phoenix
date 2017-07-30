@@ -44,7 +44,25 @@ namespace Phoenix
 		virtual ProgramHandle createProgram(const Shader::List& shaders) override;
 		virtual TextureHandle createTexture() override;
 		virtual FrameBufferHandle createFrameBuffer() override;
+
+		void tempUseVertexBuffer(VertexBufferHandle handle)
+		{
+			GlVertexBuffer buffer = m_vertexBuffers[handle.idx];
+			glBindVertexArray(buffer.m_id);
+		}
 		
+		void tempUseIdxBuffer(IndexBufferHandle handle)
+		{
+			GlIndexBuffer buffer = m_indexBuffers[handle.idx];
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.m_id);
+		}
+
+		void tempUseProgram(ProgramHandle handle)
+		{
+			GlProgram program = m_programs[handle.idx];
+			glUseProgram(program.m_id);
+		}
+
 	private:
 		std::vector<GlVertexBuffer> m_vertexBuffers; // These vectors need replacing when I create custom allocators
 		std::vector<GlIndexBuffer> m_indexBuffers;

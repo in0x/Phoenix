@@ -87,8 +87,16 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 		return -1;
 	}
 
-	std::unique_ptr<IRenderContext> context = std::make_unique<WGlRenderContext>(window.getNativeHandle());
+	//std::unique_ptr<IRenderContext> context = std::make_unique<WGlRenderContext>(window.getNativeHandle());
+	std::unique_ptr<WGlRenderContext> context = std::make_unique<WGlRenderContext>(window.getNativeHandle());
 	context->init();
+
+	if (glDebugMessageControlARB != NULL) {
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+		glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+		glDebugMessageCallbackARB((GLDEBUGPROCARB)err_cb, NULL);
+	}
+
 
 	Matrix4 worldMat = Matrix4::identity();
 	Matrix4 viewMat = lookAtRH(Vec3{ 2, 2, -7  /*2, 90, -700 */ }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 });
@@ -97,14 +105,14 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	VertexBufferFormat foxLayout;
 	foxLayout.add({ AttributeType::Position, AttributeSize::Float, 3 }
-				, {sizeof(Vec3), fox->vertices.size(), fox->vertices.data()});
+				, { sizeof(Vec3), fox->vertices.size(), fox->vertices.data() });
 
 	foxLayout.add({ AttributeType::Normal, AttributeSize::Float, 3 }
-				, { sizeof(Vec3), fox->normals.size(), fox->normals.data()});
+				, { sizeof(Vec3), fox->normals.size(), fox->normals.data() });
 
-	VertexBufferHandle foxBuffer = context->createVertexBuffer(foxLayout);
+	VertexBufferHandle foxVertices = context->createVertexBuffer(foxLayout);
 
-	IndexBufferHandle indices = context->createIndexBuffer(sizeof(GLuint), fox->indices.size(), fox->indices.data());
+	IndexBufferHandle foxIndices = context->createIndexBuffer(sizeof(GLuint), fox->indices.size(), fox->indices.data());
 
 	std::string vsSource = loadText("Shaders/diffuse.vert");
 	std::string fsSource = loadText("Shaders/diffuse.frag");
@@ -117,17 +125,16 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	shaders[Shader::Fragment] = fs;
 	ProgramHandle program = context->createProgram(shaders);
 
-	/*
-	glUseProgram(progHandle);
+	context->tempUseVertexBuffer(foxVertices);
+	context->tempUseIdxBuffer(foxIndices);
+	context->tempUseProgram(program);
+	getGlErrorString();
+	GetFirstNMessages(2);
 
 	glUniformMatrix4fv(2, 1, GL_FALSE, (GLfloat*)&worldMat);
 	glUniformMatrix4fv(3, 1, GL_FALSE, (GLfloat*)&viewMat);
 	glUniformMatrix4fv(4, 1, GL_FALSE, (GLfloat*)&projMat);
 	glUniform3fv(5, 1, (GLfloat*)&lightPosition);
-
-	glBindVertexArray(vao);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	*/
 
 	getGlErrorString();
 

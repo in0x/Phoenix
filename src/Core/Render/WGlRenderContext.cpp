@@ -256,7 +256,8 @@ namespace Phoenix
 
 		handle.idx = static_cast<uint16_t>(m_shaders.size() - 1);
 
-		shader.m_id = glCreateShader(getShaderEnum(shaderType));
+		shader.m_shaderType = getShaderEnum(shaderType);
+		shader.m_id = glCreateShader(shader.m_shaderType);
 		glShaderSource(shader.m_id, 1, (const char**)&source, NULL);
 		glCompileShader(shader.m_id);
 

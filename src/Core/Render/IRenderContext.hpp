@@ -66,12 +66,19 @@ namespace Phoenix
 	{
 		struct Decl
 		{
-			/*Decl()
+			Decl()
 				: m_type(AttributeType::Count)
 				, m_size(AttributeSize::Count)
 				, m_numElements(0)
 			{}
-*/
+
+
+			Decl(AttributeType::Value type, AttributeSize::Value size, uint8_t numElement)
+				: m_type(type)
+				, m_size(size)
+				, m_numElements(numElement)
+			{}
+
 			AttributeType::Value m_type;
 			AttributeSize::Value m_size;
 			uint8_t m_numElements;
@@ -79,21 +86,29 @@ namespace Phoenix
 
 		struct Data
 		{
-			/*Data()
+			Data()
 				: m_size(0)
 				, m_count(0)
 				, m_data(nullptr)
 				, m_bNormalize(false)
-			{}*/
+			{}
+
+			Data(size_t size, size_t count, const void* data, bool bNormalize = false)
+				: m_size(size)
+				, m_count(count)
+				, m_data(data)
+				, m_bNormalize(m_bNormalize)
+			{}
 
 			size_t m_size;
-			uint32_t m_count;
+			size_t m_count;
 			const void* m_data;
 			bool m_bNormalize;
 		};
 	}
 
-	const char* attribTypeToName(AttributeType::Value type)
+	// NOTE(Phil): This should be moved.
+	inline const char* attribTypeToName(AttributeType::Value type)
 	{
 		static const char* const names[AttributeType::Count] =
 		{
