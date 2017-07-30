@@ -277,21 +277,24 @@ namespace Phoenix
 
 		for (const ShaderHandle& handle : shaders)
 		{
-			if (!handle.isValid())
+			if (handle.isValid())
 			{
+				GlShader& shader = m_shaders[handle.idx];
+
+				if (getShaderType(shader.m_shaderType) == typeValue)
+				{
+					glAttachShader(progHandle, shader.m_id);
+				}
+				else
+				{
+					Logger::error("Trying to attach shader of invalid type");
+				}
+			}
+			else
+			{			
 				Logger::error("Trying to access invalid shader");
-				continue;
 			}
 
-			GlShader& shader = m_shaders[handle.idx];
-
-			if (getShaderType(shader.m_shaderType) != typeValue)
-			{
-				Logger::error("Trying to attach shader of invalid type");
-				continue;
-			}
-
-			glAttachShader(progHandle, shader.m_id);
 			typeValue++;
 		}
 

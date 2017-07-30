@@ -91,13 +91,6 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	std::unique_ptr<WGlRenderContext> context = std::make_unique<WGlRenderContext>(window.getNativeHandle());
 	context->init();
 
-	if (glDebugMessageControlARB != NULL) {
-		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-		glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-		glDebugMessageCallbackARB((GLDEBUGPROCARB)err_cb, NULL);
-	}
-
-
 	Matrix4 worldMat = Matrix4::identity();
 	Matrix4 viewMat = lookAtRH(Vec3{ 2, 2, -7  /*2, 90, -700 */ }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 });
 	Matrix4 projMat = perspectiveRH(70, (float)config.width / (float)config.height, 1, 10000);
@@ -125,16 +118,15 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	shaders[Shader::Fragment] = fs;
 	ProgramHandle program = context->createProgram(shaders);
 
-	context->tempUseVertexBuffer(foxVertices);
-	context->tempUseIdxBuffer(foxIndices);
 	context->tempUseProgram(program);
-	getGlErrorString();
-	GetFirstNMessages(2);
-
+	
 	glUniformMatrix4fv(2, 1, GL_FALSE, (GLfloat*)&worldMat);
 	glUniformMatrix4fv(3, 1, GL_FALSE, (GLfloat*)&viewMat);
 	glUniformMatrix4fv(4, 1, GL_FALSE, (GLfloat*)&projMat);
 	glUniform3fv(5, 1, (GLfloat*)&lightPosition);
+
+	context->tempUseVertexBuffer(foxVertices);
+	context->tempUseIdxBuffer(foxIndices);
 
 	getGlErrorString();
 

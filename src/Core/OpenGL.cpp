@@ -33,13 +33,21 @@ void err_cb(GLenum        source,
 			const GLchar* message,
 			GLvoid*       userParam)
 {
-	std::vector<int> vec;
-	vec.push_back(3);
 	return;
 }
 
 void GetFirstNMessages(GLuint numMsgs)
 {
+	/*
+	
+	if (glDebugMessageControlARB != NULL) {
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+		glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+		glDebugMessageCallbackARB((GLDEBUGPROCARB)err_cb, NULL);
+	}
+
+	*/
+
 	GLint maxMsgLen = 0;
 	glGetIntegerv(GL_MAX_DEBUG_MESSAGE_LENGTH, &maxMsgLen);
 
