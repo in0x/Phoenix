@@ -41,7 +41,7 @@ on creation
 std::string loadText(const char* path)
 {
 	std::string fileString;
-	std::ifstream fileStream("Shaders/diffuse.vert");
+	std::ifstream fileStream(path);
 	GLuint shader;
 
 	if (fileStream)
@@ -95,22 +95,16 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	Matrix4 projMat = perspectiveRH(70, (float)config.width / (float)config.height, 1, 10000);
 	Vec3 lightPosition = Vec3(-5, 3, 5);
 
-	/*GLuint vert = createShader("Shaders/diffuse.vert", GL_VERTEX_SHADER);
-	GLuint frag = createShader("Shaders/diffuse.frag", GL_FRAGMENT_SHADER);
+	VertexBufferFormat foxLayout;
+	foxLayout.add({ AttributeType::Position, AttributeSize::Float, 3 }
+				, {sizeof(Vec3), fox->vertices.size(), fox->vertices.data()});
 
-	GLuint progHandle = glCreateProgram();
+	foxLayout.add({ AttributeType::Normal, AttributeSize::Float, 3 }
+				, { sizeof(Vec3), fox->normals.size(), fox->normals.data()});
 
-	glAttachShader(progHandle, vert);
-	glAttachShader(progHandle, frag);
+	VertexBufferHandle foxBuffer = context->createVertexBuffer(foxLayout);
 
-	glLinkProgram(progHandle);
-
-	glDeleteShader(vert);
-	glDeleteShader(frag);*/
-
-	VertexBufferHandle vertices = context->createVertexBuffer(sizeof(Vec3) * fox->vertices.size(), fox->vertices.data());
-	VertexBufferHandle normals = context->createVertexBuffer(sizeof(Vec3) * fox->normals.size(), fox->normals.data());
-	IndexBufferHandle indices = context->createIndexBuffer(sizeof(GLuint) * fox->indices.size(), fox->indices.data());
+	IndexBufferHandle indices = context->createIndexBuffer(sizeof(GLuint), fox->indices.size(), fox->indices.data());
 
 	std::string vsSource = loadText("Shaders/diffuse.vert");
 	std::string fsSource = loadText("Shaders/diffuse.frag");
@@ -123,17 +117,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	shaders[Shader::Fragment] = fs;
 	ProgramHandle program = context->createProgram(shaders);
 
-	/*glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
-
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glVertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(Vec3), nullptr);
-
-	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, normals_vbo);
-	glVertexAttribPointer(1, 3, GL_FLOAT, false, sizeof(Vec3), nullptr);
-
+	/*
 	glUseProgram(progHandle);
 
 	glUniformMatrix4fv(2, 1, GL_FALSE, (GLfloat*)&worldMat);
@@ -142,7 +126,8 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	glUniform3fv(5, 1, (GLfloat*)&lightPosition);
 
 	glBindVertexArray(vao);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);*/
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	*/
 
 	getGlErrorString();
 

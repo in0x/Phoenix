@@ -23,7 +23,7 @@
     <ProjectGuid>{0C26F14E-F342-44F4-86CE-144C428639AA}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Phoenix</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -177,7 +177,6 @@
     <ClInclude Include="..\src\Core\ObjIndexer.hpp" />
     <ClInclude Include="..\src\Core\ObjStructs.hpp" />
     <ClInclude Include="..\src\Core\OpenGL.hpp" />
-    <ClInclude Include="..\src\Core\GLShader.hpp" />
     <ClInclude Include="..\src\Core\Render\IRenderContext.hpp" />
     <ClInclude Include="..\src\Core\Render\Render.hpp" />
     <ClInclude Include="..\src\Core\Render\WGlRenderContext.hpp" />
@@ -203,6 +202,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Core\Clock.cpp" />
+    <ClCompile Include="..\src\Core\Logger.cpp" />
     <ClCompile Include="..\src\Core\Math\MathStreamOverloads.cpp" />
     <ClCompile Include="..\src\Core\Math\Matrix3.cpp" />
     <ClCompile Include="..\src\Core\Math\Matrix4.cpp" />

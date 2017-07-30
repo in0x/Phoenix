@@ -55,9 +55,6 @@
     <ClInclude Include="..\src\Core\Win32Window.hpp">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Core\GLShader.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Core\OpenGL.hpp">
       <Filter>Core</Filter>
     </ClInclude>
@@ -141,6 +138,9 @@
     </ClCompile>
     <ClCompile Include="..\src\Core\Render\WGlRenderContext.cpp">
       <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Core\Logger.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

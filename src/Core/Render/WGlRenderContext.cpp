@@ -61,6 +61,16 @@ namespace Phoenix
 			Logger::error("Failed to initialize gl3w");
 			assert(false);
 		}
+
+		const char* version = reinterpret_cast<const char*>(glGetString(GL_VERSION));
+		const char* vendor = reinterpret_cast<const char*>(glGetString(GL_VENDOR));
+		const char* renderer = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
+		const char* glslVersion = reinterpret_cast<const char*>(glGetString(GL_SHADING_LANGUAGE_VERSION));
+
+		Logger::log(version);
+		Logger::log(vendor);
+		Logger::log(renderer);
+		Logger::log(glslVersion);
 	}
 
 	WGlRenderContext::~WGlRenderContext()
@@ -74,7 +84,30 @@ namespace Phoenix
 		SwapBuffers(m_deviceContext);
 	}
 
-	VertexBufferHandle WGlRenderContext::createVertexBuffer(uint32_t size, const void* data)
+	GLuint createVBO(size_t typeSize, uint32_t elementCount, const void* data)
+	{
+		GLuint vbo;
+		glGenBuffers(1, &vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glBufferData(GL_ARRAY_BUFFER, typeSize * elementCount, data, GL_STATIC_DRAW); // TODO(Phil): Check what GL_DYNAMIC_DRAW does																			  
+																					  // TODO(Phil): Check for errors here.
+		return vbo;
+	}
+
+	GLuint attribSizeToGl(AttributeSize::Value type)
+	{
+		static const GLuint glType[AttributeSize::Count] =
+		{
+			GL_DOUBLE,
+			GL_FLOAT,
+			GL_UNSIGNED_INT,
+			GL_INT
+		};
+
+		return glType[type];
+	}
+
+	VertexBufferHandle WGlRenderContext::createVertexBuffer(VertexBufferFormat format)
 	{
 		m_vertexBuffers.emplace_back();
 		GlVertexBuffer& buffer = m_vertexBuffers.back();
@@ -82,16 +115,35 @@ namespace Phoenix
 		VertexBufferHandle handle;
 		handle.idx = static_cast<uint16_t>(m_vertexBuffers.size() - 1);
 
-		glGenBuffers(1, &buffer.m_id);
-		glBindBuffer(GL_ARRAY_BUFFER, buffer.m_id);
-		glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW); // TODO(Phil): Check what GL_DYNAMIC_DRAW does
+		glGenVertexArrays(1, &buffer.m_id);
+		glBindVertexArray(buffer.m_id);
+
+		size_t attributeCount = format.m_count;
+		
+		for (size_t i = 0; i < attributeCount; ++i)
+		{
+			const VertexFormat::Data& attribData = format.m_inputData[i];
+			const VertexFormat::Decl& attribDecl = format.m_inputDecl[i];
+
+			GLuint vbo = createVBO(attribData.m_size, attribData.m_count, attribData.m_data);
+			
+			glEnableVertexAttribArray(0);
+			glBindBuffer(GL_ARRAY_BUFFER, vbo);
+			glVertexAttribPointer(
+				i, 
+				attribDecl.m_numElements, 
+				attribSizeToGl(attribDecl.m_size), 
+				attribData.m_bNormalize, 
+				attribData.m_size, 
+				nullptr); 
+		}
 
 		// TODO(Phil): Check for errors here.
 
 		return handle;
 	}
 
-	IndexBufferHandle WGlRenderContext::createIndexBuffer(uint32_t size, const void* data)
+	IndexBufferHandle WGlRenderContext::createIndexBuffer(size_t size, uint32_t count, const void* data)
 	{
 		m_indexBuffers.emplace_back();
 		GlIndexBuffer& buffer = m_indexBuffers.back();
@@ -101,7 +153,7 @@ namespace Phoenix
 
 		glGenBuffers(1, &buffer.m_id);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.m_id);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, GL_STATIC_DRAW); // TODO(Phil): Check what GL_DYNAMIC_DRAW does
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, size * count, data, GL_STATIC_DRAW); // TODO(Phil): Check what GL_DYNAMIC_DRAW does
 
 		return handle;
 	};

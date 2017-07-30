@@ -8,16 +8,10 @@
 
 namespace Phoenix
 {
-	HANDLE(VertexBufferHandle, uint16_t)
-	HANDLE(IndexBufferHandle, uint16_t)
-	HANDLE(ShaderHandle, uint16_t)
-	HANDLE(ProgramHandle, uint16_t)
-	HANDLE(TextureHandle, uint16_t)
-	HANDLE(FrameBufferHandle, uint16_t)
-
 	struct GlVertexBuffer
 	{
-		GLuint m_id;
+		VertexBufferFormat m_format; // This format can later be used to check the layout when binding to a shader.
+		GLuint m_id;				 
 	};
 
 	struct GlIndexBuffer
@@ -44,8 +38,8 @@ namespace Phoenix
 		virtual void init() override;
 		virtual void swapBuffer() override;
 
-		virtual VertexBufferHandle createVertexBuffer(uint32_t size, const void* data) override;
-		virtual IndexBufferHandle createIndexBuffer(uint32_t size, const void* data) override;
+		virtual VertexBufferHandle createVertexBuffer(VertexBufferFormat format) override;
+		virtual IndexBufferHandle createIndexBuffer(size_t size, uint32_t count, const void* data) override;
 		virtual ShaderHandle createShader(const char* source, Shader::Type shaderType) override;
 		virtual ProgramHandle createProgram(const Shader::List& shaders) override;
 		virtual TextureHandle createTexture() override;
