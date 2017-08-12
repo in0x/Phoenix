@@ -8,13 +8,13 @@ namespace Phoenix
 {
 
 #define HANDLE(name, size) \
-		struct name \
+		class name \
 		{ \
+		public: \
 			static const size invalidValue = std::numeric_limits<size>::max(); \
 			size idx = invalidValue; \
 			bool isValid() const { return idx != invalidValue; } \
 		}; \
-
 
 	HANDLE(VertexBufferHandle, uint16_t)
 	HANDLE(IndexBufferHandle, uint16_t)
@@ -22,20 +22,7 @@ namespace Phoenix
 	HANDLE(ProgramHandle, uint16_t)
 	HANDLE(TextureHandle, uint16_t)
 	HANDLE(FrameBufferHandle, uint16_t)
-
-	namespace Shader
-	{
-		enum Type
-		{
-			Vertex,
-			Geometry,
-			Fragment,
-			Compute,
-			None,
-		};
-
-		using List = ShaderHandle[4];
-	}
+	HANDLE(UniformHandle, uint16_t)
 
 	namespace AttributeType
 	{
@@ -62,7 +49,7 @@ namespace Phoenix
 		};
 	}
 
-	namespace VertexFormat
+	namespace VertexAttrib
 	{
 		struct Decl
 		{
@@ -129,7 +116,7 @@ namespace Phoenix
 			: m_count(0)
 		{}
 		
-		void add(const VertexFormat::Decl& format, const VertexFormat::Data& data)
+		void add(const VertexAttrib::Decl& format, const VertexAttrib::Data& data)
 		{
 			if (m_count >= AttributeType::Count)
 			{
@@ -142,10 +129,24 @@ namespace Phoenix
 			m_count++;
 		}
 
-		VertexFormat::Data m_inputData[AttributeType::Count];
-		VertexFormat::Decl m_inputDecl[AttributeType::Count];
+		VertexAttrib::Data m_inputData[AttributeType::Count];
+		VertexAttrib::Decl m_inputDecl[AttributeType::Count];
 		size_t m_count;
 	};
+
+	namespace Shader
+	{
+		enum Type
+		{
+			Vertex,
+			Geometry,
+			Fragment,
+			Compute,
+			Count,
+		};
+
+		using List = ShaderHandle[Shader::Type::Count];
+	}
 
 	class IRenderContext
 	{
@@ -157,6 +158,10 @@ namespace Phoenix
 		virtual ProgramHandle createProgram(const Shader::List& shaders) = 0;
 		virtual TextureHandle createTexture() = 0;
 		virtual FrameBufferHandle createFrameBuffer() = 0;
+		virtual UniformHandle createUniform() = 0;
+
+		//TODO(Phil): Destruction functions / release of resources on self destruction
+
 		virtual void swapBuffer() = 0;
 	};
 }

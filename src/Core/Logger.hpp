@@ -15,7 +15,6 @@ namespace Phoenix
 
 #define S1(x) #x
 #define S2(x) S1(x)
-#define __LOCATION_INFO__ "In: " __FILE__ "\nAt: " S2(__LINE__) ", " __FUNCTION__ "\n" 
-//#define LOG(x) Logger::LogOut::get().Log("LOG " __LOCATION_INFO__ "In: " __FILE__ "\nAt: " S2(__LINE__) ", " __FUNCTION__ "\n" x) 
+#define __LOCATION_INFO__ "In: " __FILE__ "\nAt: " S2(__LINE__) ", " __FUNCTION__ "() " 
 	}
 }

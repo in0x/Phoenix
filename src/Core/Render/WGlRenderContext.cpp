@@ -122,8 +122,8 @@ namespace Phoenix
 		
 		for (size_t i = 0; i < attributeCount; ++i)
 		{
-			const VertexFormat::Data& attribData = format.m_inputData[i];
-			const VertexFormat::Decl& attribDecl = format.m_inputDecl[i];
+			const VertexAttrib::Data& attribData = format.m_inputData[i];
+			const VertexAttrib::Decl& attribDecl = format.m_inputDecl[i];
 
 			GLuint vbo = createVBO(attribData.m_size, attribData.m_count, attribData.m_data);
 			
@@ -209,7 +209,7 @@ namespace Phoenix
 		default:
 		{
 			Logger::error("Trying to convert invalid GlEnum to Shader::Type ");
-			return Shader::Type::None;
+			return Shader::Type::Count;
 		}
 		}
 	}
@@ -273,7 +273,7 @@ namespace Phoenix
 
 		GLuint progHandle = glCreateProgram();
 
-		int typeValue = 0;
+		int typeCount = 0;
 
 		for (const ShaderHandle& handle : shaders)
 		{
@@ -281,7 +281,7 @@ namespace Phoenix
 			{
 				GlShader& shader = m_shaders[handle.idx];
 
-				if (getShaderType(shader.m_shaderType) == typeValue)
+				if (getShaderType(shader.m_shaderType) == typeCount)
 				{
 					glAttachShader(progHandle, shader.m_id);
 				}
@@ -295,7 +295,7 @@ namespace Phoenix
 				Logger::error("Trying to access invalid shader");
 			}
 
-			typeValue++;
+			typeCount++;
 		}
 
 		glLinkProgram(progHandle);
@@ -314,11 +314,19 @@ namespace Phoenix
 
 	TextureHandle WGlRenderContext::createTexture() 
 	{ 
+		Logger::warning(__LOCATION_INFO__ "not implemented!");
 		return{}; 
 	}
 	
 	FrameBufferHandle WGlRenderContext::createFrameBuffer() 
 	{ 
+		Logger::warning(__LOCATION_INFO__ "not implemented!");
 		return{}; 
+	}
+
+	UniformHandle WGlRenderContext::createUniform() 
+	{
+		Logger::warning(__LOCATION_INFO__ "not implemented!");
+		return{};
 	}
 }

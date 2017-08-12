@@ -42,8 +42,7 @@ std::string loadText(const char* path)
 {
 	std::string fileString;
 	std::ifstream fileStream(path);
-	GLuint shader;
-
+	
 	if (fileStream)
 	{
 		fileString.assign(std::istreambuf_iterator<char>(fileStream), std::istreambuf_iterator<char>());
@@ -60,17 +59,15 @@ std::string loadText(const char* path)
 	}
 }
 
-int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+void run()
 {
 	using namespace Phoenix;
 
-	Logger::init(true, true);
+	Logger::init(true, false);
 
 	Tests::RunMathTests();
 
 	std::unique_ptr<Mesh> fox = loadObj("Fox/", "RedFox.obj");
-	//std::unique_ptr<Mesh> fox = loadObj("rungholt/", "rungholt.obj");
-	//std::unique_ptr<Mesh> fox = loadObj("sniper/", "sniper.obj");
 
 	assert(fox != nullptr);
 
@@ -84,7 +81,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	if (!window.isOpen())
 	{
 		Logger::error("Failed to initialize Win32Window");
-		return -1;
+		return;
 	}
 
 	//std::unique_ptr<IRenderContext> context = std::make_unique<WGlRenderContext>(window.getNativeHandle());
@@ -92,16 +89,18 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	context->init();
 
 	Matrix4 worldMat = Matrix4::identity();
-	Matrix4 viewMat = lookAtRH(Vec3{ 2, 2, -7  /*2, 90, -700 */ }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 });
-	Matrix4 projMat = perspectiveRH(70, (float)config.width / (float)config.height, 1, 10000);
+	Matrix4 viewMat = lookAtRH(Vec3{ 2, 2, -7 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 });
+	Matrix4 projMat = perspectiveRH(70, (float)config.width / (float)config.height, 1, 100);
 	Vec3 lightPosition = Vec3(-5, 3, 5);
 
 	VertexBufferFormat foxLayout;
-	foxLayout.add({ AttributeType::Position, AttributeSize::Float, 3 }
-				, { sizeof(Vec3), fox->vertices.size(), fox->vertices.data() });
+	VertexAttrib::Decl posDecl = { AttributeType::Position, AttributeSize::Float, 3 };
+	VertexAttrib::Data posData = { sizeof(Vec3), fox->vertices.size(), fox->vertices.data() };
+	foxLayout.add(posDecl, posData);
 
-	foxLayout.add({ AttributeType::Normal, AttributeSize::Float, 3 }
-				, { sizeof(Vec3), fox->normals.size(), fox->normals.data() });
+	VertexAttrib::Decl normalDecl = { AttributeType::Normal, AttributeSize::Float, 3 };
+	VertexAttrib::Data normalData = { sizeof(Vec3), fox->normals.size(), fox->normals.data() };
+	foxLayout.add(normalDecl, normalData);
 
 	VertexBufferHandle foxVertices = context->createVertexBuffer(foxLayout);
 
@@ -126,7 +125,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	glUniformMatrix4fv(3, 1, GL_FALSE, (GLfloat*)&viewMat);
 	glUniformMatrix4fv(4, 1, GL_FALSE, (GLfloat*)&projMat);
 	glUniform3fv(5, 1, (GLfloat*)&lightPosition);
-	
+
 	getGlErrorString();
 
 	float angle = 0.f;
@@ -140,7 +139,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 		GLfloat color[] = { 1.f, 1.f, 1.f, 1.f };
 		glClearBufferfv(GL_COLOR, 0, color);
 
-		angle += 0.05f; 
+		angle += 0.0025f;
 		Matrix4 rotMat = Matrix4::rotation(0.f, angle, 0.f);
 		glUniformMatrix4fv(2, 1, GL_FALSE, (GLfloat*)&rotMat);
 
@@ -150,12 +149,16 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 		glDisable(GL_DEPTH_TEST);
 
 		context->swapBuffer();
-		
+
 		window.processMessages();
 	}
 
 	Logger::exit();
+}
 
+int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+{
+	run();
 	return 0;
 }
 
