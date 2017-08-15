@@ -1,6 +1,7 @@
 #pragma once
 #include <limits>
 #include <stdint.h>
+#include <array>
 #undef max // TODO(Phil): Figure out how to stop this
 #include "../Logger.hpp"
 
@@ -49,7 +50,22 @@ namespace Phoenix
 		};
 	}
 
-	namespace VertexAttrib
+	// NOTE(Phil): This should be moved.
+	inline const char* attribTypeToName(AttributeType::Value type)
+	{
+		static const char* const names[AttributeType::Count] =
+		{
+			"Position",
+			"Normal",
+			"Color",
+			"Bitangent",
+			"TexCoord",
+		};
+
+		return names[type];
+	}
+
+	struct VertexAttrib
 	{
 		struct Decl
 		{
@@ -92,46 +108,51 @@ namespace Phoenix
 			const void* m_data;
 			bool m_bNormalize;
 		};
-	}
 
-	// NOTE(Phil): This should be moved.
-	inline const char* attribTypeToName(AttributeType::Value type)
-	{
-		static const char* const names[AttributeType::Count] =
-		{
-			"Position",
-			"Normal",
-			"Color",
-			"Bitangent",
-			"TexCoord",
-		};
-
-		return names[type];
-	}
+		Decl m_decl;
+		Data m_data;
+	};
 
 	class VertexBufferFormat
 	{
 	public:
-		VertexBufferFormat()
-			: m_count(0)
-		{}
+		VertexBufferFormat() : m_attribs(), m_index(0) {}
 		
-		void add(const VertexAttrib::Decl& format, const VertexAttrib::Data& data)
+		void add(const VertexAttrib::Decl& decl, const VertexAttrib::Data& data)
 		{
-			if (m_count >= AttributeType::Count)
+			if (auto currentAttrib = has(decl.m_type))
 			{
-				Logger::warning("Maximum amount of attributes exceeded.");
+				*currentAttrib = {decl, data};
 				return;
 			}
-			
-			m_inputDecl[m_count] = format;
-			m_inputData[m_count] = data;
-			m_count++;
+
+			m_attribs[m_index] = {decl, data};
+			m_index++;
 		}
 
-		VertexAttrib::Data m_inputData[AttributeType::Count];
-		VertexAttrib::Decl m_inputDecl[AttributeType::Count];
-		size_t m_count;
+		size_t size() const
+		{
+			return m_index;
+		}
+
+		const VertexAttrib* at(size_t index) const 
+		{
+			return &m_attribs[index];
+		}
+
+	private:
+		std::array<VertexAttrib, AttributeType::Count> m_attribs;
+		size_t m_index;
+
+		VertexAttrib* has(AttributeType::Value attribType)
+		{
+			for (auto& attrib : m_attribs)
+			{
+				if (attrib.m_decl.m_type == attribType) 
+					return &attrib;
+			}
+			return nullptr;
+		}
 	};
 
 	namespace Shader
@@ -152,7 +173,7 @@ namespace Phoenix
 	{
 	public: 
 		virtual void init() = 0;
-		virtual VertexBufferHandle createVertexBuffer(VertexBufferFormat format) = 0;
+		virtual VertexBufferHandle createVertexBuffer(const VertexBufferFormat& format) = 0;
 		virtual IndexBufferHandle createIndexBuffer(size_t size, uint32_t count, const void* data) = 0;
 		virtual ShaderHandle createShader(const char* source, Shader::Type shaderType) = 0;
 		virtual ProgramHandle createProgram(const Shader::List& shaders) = 0;

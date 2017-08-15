@@ -94,13 +94,11 @@ void run()
 	Vec3 lightPosition = Vec3(-5, 3, 5);
 
 	VertexBufferFormat foxLayout;
-	VertexAttrib::Decl posDecl = { AttributeType::Position, AttributeSize::Float, 3 };
-	VertexAttrib::Data posData = { sizeof(Vec3), fox->vertices.size(), fox->vertices.data() };
-	foxLayout.add(posDecl, posData);
+	foxLayout.add({ AttributeType::Position, AttributeSize::Float, 3 },
+				  { sizeof(Vec3), fox->vertices.size(), fox->vertices.data() });
 
-	VertexAttrib::Decl normalDecl = { AttributeType::Normal, AttributeSize::Float, 3 };
-	VertexAttrib::Data normalData = { sizeof(Vec3), fox->normals.size(), fox->normals.data() };
-	foxLayout.add(normalDecl, normalData);
+	foxLayout.add({ AttributeType::Normal, AttributeSize::Float, 3 }, 
+				  { sizeof(Vec3), fox->normals.size(), fox->normals.data() });
 
 	VertexBufferHandle foxVertices = context->createVertexBuffer(foxLayout);
 

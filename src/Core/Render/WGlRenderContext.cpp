@@ -107,7 +107,7 @@ namespace Phoenix
 		return glType[type];
 	}
 
-	VertexBufferHandle WGlRenderContext::createVertexBuffer(VertexBufferFormat format)
+	VertexBufferHandle WGlRenderContext::createVertexBuffer(const VertexBufferFormat& format)
 	{
 		m_vertexBuffers.emplace_back();
 		GlVertexBuffer& buffer = m_vertexBuffers.back();
@@ -118,28 +118,26 @@ namespace Phoenix
 		glGenVertexArrays(1, &buffer.m_id);
 		glBindVertexArray(buffer.m_id);
 
-		size_t attributeCount = format.m_count;
-		
-		for (size_t i = 0; i < attributeCount; ++i)
+		size_t attribCount = format.size();
+		for (size_t location = 0; location < attribCount; ++location)
 		{
-			const VertexAttrib::Data& attribData = format.m_inputData[i];
-			const VertexAttrib::Decl& attribDecl = format.m_inputDecl[i];
+			const VertexAttrib::Data& data = format.at(location)->m_data;
+			const VertexAttrib::Decl& decl = format.at(location)->m_decl;
 
-			GLuint vbo = createVBO(attribData.m_size, attribData.m_count, attribData.m_data);
-			
-			glEnableVertexAttribArray(i);
+			GLuint vbo = createVBO(data.m_size, data.m_count, data.m_data);
+
+			glEnableVertexAttribArray(location);
 			glBindBuffer(GL_ARRAY_BUFFER, vbo);
 			glVertexAttribPointer(
-				i, 
-				attribDecl.m_numElements, 
-				attribSizeToGl(attribDecl.m_size), 
-				attribData.m_bNormalize, 
-				attribData.m_size, 
-				nullptr); 
+				location,
+				decl.m_numElements,
+				attribSizeToGl(decl.m_size),
+				data.m_bNormalize,
+				data.m_size,
+				nullptr);
 		}
 
-		// TODO(Phil): Check for errors here.
-
+		// TODO(Phil): Check for errors here
 		return handle;
 	}
 

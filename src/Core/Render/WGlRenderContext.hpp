@@ -38,7 +38,7 @@ namespace Phoenix
 		virtual void init() override;
 		virtual void swapBuffer() override;
 
-		virtual VertexBufferHandle createVertexBuffer(VertexBufferFormat format) override;
+		virtual VertexBufferHandle createVertexBuffer(const VertexBufferFormat& format) override;
 		virtual IndexBufferHandle createIndexBuffer(size_t size, uint32_t count, const void* data) override;
 		virtual ShaderHandle createShader(const char* source, Shader::Type shaderType) override;
 		virtual ProgramHandle createProgram(const Shader::List& shaders) override;
