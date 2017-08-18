@@ -58,6 +58,17 @@ std::string loadText(const char* path)
 
 void run()
 {
+	// NOTE(Phil): Enables ansi color codes being interpreted by the console.
+	// I need a place to put this so its only called when we are on Windows.
+	{
+		// Set output mode to handle virtual terminal sequences
+		HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+		DWORD dwMode = 0;
+		GetConsoleMode(hOut, &dwMode);
+		dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+		SetConsoleMode(hOut, dwMode);
+	}
+
 	using namespace Phoenix;
 
 	Logger::init(true, false);

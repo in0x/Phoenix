@@ -60,7 +60,7 @@ namespace Phoenix
 		{
 			if (m_bLogToConsole)
 			{
-				std::cout << msg << "\n";
+				std::cout << "\033[" << ColorCode::LIGHT_GREEN << "m" << msg << "\n";
 			}
 			if (m_bLogToFile)
 			{
