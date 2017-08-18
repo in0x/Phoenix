@@ -50,7 +50,7 @@ namespace Phoenix
 		virtual ProgramHandle createProgram(const Shader::List& shaders) override;
 		virtual TextureHandle createTexture() override;
 		virtual FrameBufferHandle createFrameBuffer() override;
-		virtual UniformHandle createUniform() override;
+		virtual UniformHandle createUniform(const char* name, Uniform::Type type) override;
 
 		void tempUseVertexBuffer(VertexBufferHandle handle)
 		{

@@ -64,7 +64,7 @@ namespace Phoenix
 			}
 			if (m_bLogToFile)
 			{
-				m_file << "LOG: " << msg << "\n";
+				m_file << "0x1B[32mLOG: " << msg << "\n";
 			}
 		}
 
@@ -73,6 +73,8 @@ namespace Phoenix
 			if (m_bLogToConsole)
 			{
 				std::cout << "\033[" << ColorCode::LIGHT_YELLOW << "m" << msg << "\n";
+				// printf("%c[%dmHELLO!\n", 0x1B, 32);
+				// 0x1B[32m
 			}
 			if (m_bLogToFile)
 			{

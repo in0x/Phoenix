@@ -94,9 +94,9 @@ namespace Phoenix
 		return vbo;
 	}
 
-	GLuint attribSizeToGl(AttributeSize::Value type)
+	GLuint attribSizeToGl(AttributeType::Value type)
 	{
-		static const GLuint glType[AttributeSize::Count] =
+		static const GLuint glType[AttributeType::Count] =
 		{
 			GL_DOUBLE,
 			GL_FLOAT,
@@ -131,7 +131,7 @@ namespace Phoenix
 			glVertexAttribPointer(
 				location,
 				decl.m_numElements,
-				attribSizeToGl(decl.m_size),
+				attribSizeToGl(decl.m_type),
 				data.m_bNormalize,
 				data.m_size,
 				nullptr);
@@ -322,7 +322,7 @@ namespace Phoenix
 		return{}; 
 	}
 
-	UniformHandle WGlRenderContext::createUniform() 
+	UniformHandle WGlRenderContext::createUniform(const char* name, Uniform::Type type)
 	{
 		Logger::warning(__LOCATION_INFO__ "not implemented!");
 		return{};
