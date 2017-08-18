@@ -91,15 +91,15 @@ void run()
 	Vec3 lightPosition = Vec3(-5, 3, 5);
 
 	VertexBufferFormat foxLayout;
-	foxLayout.add({ AttributeType::Position, AttributeSize::Float, 3 },
+	foxLayout.add({ AttributeProperty::Position, AttributeType::Float, 3 },
 				  { sizeof(Vec3), fox->vertices.size(), fox->vertices.data() });
 
-	foxLayout.add({ AttributeType::Normal, AttributeSize::Float, 3 }, 
+	foxLayout.add({ AttributeProperty::Normal, AttributeType::Float, 3 }, 
 				  { sizeof(Vec3), fox->normals.size(), fox->normals.data() });
 
 	VertexBufferHandle foxVertices = context->createVertexBuffer(foxLayout);
 
-	IndexBufferHandle foxIndices = context->createIndexBuffer(sizeof(GLuint), fox->indices.size(), fox->indices.data());
+	IndexBufferHandle foxIndices = context->createIndexBuffer(sizeof(unsigned int), fox->indices.size(), fox->indices.data());
 
 	std::string vsSource = loadText("Shaders/diffuse.vert");
 	std::string fsSource = loadText("Shaders/diffuse.frag");
@@ -151,7 +151,8 @@ void run()
 	Logger::exit();
 }
 
-int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+//int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+int main(int argc, char** argv)
 {
 	run();
 	return 0;
