@@ -23,11 +23,8 @@ char* getCMDOption(char** start, char** end, const std::string& option)
 
 /*
 TODO:
-	* Window doesnt fullscreen properly (scaling) (is this is only solvable by rendering to a 
-		lower res framebuffer and blitting to a native size window?)
-	* GPU API 
-		* Build mental model of how it all works
-		* Start implementing
+	* Figure out seperate implementations for uniform registration and updating
+	* 
 	* Crashes when closed by closing window via taskbar
 
 Likely structure:

@@ -30,6 +30,12 @@ namespace Phoenix
 		GLuint m_id;
 	};
 
+	struct GlUniform
+	{
+		Uniform::Type m_type;
+
+	};
+
 	class WGlRenderContext : public IRenderContext
 	{
 	public:

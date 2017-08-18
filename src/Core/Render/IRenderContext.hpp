@@ -2,6 +2,10 @@
 #include <limits>
 #include <stdint.h>
 #include <array>
+
+#include<vector>
+#include <string>
+
 #undef max // TODO(Phil): Figure out how to stop this
 #include "../Logger.hpp"
 
@@ -169,9 +173,65 @@ namespace Phoenix
 		using List = ShaderHandle[Shader::Type::Count];
 	}
 
+	namespace Uniform
+	{
+		enum Type
+		{
+			Float,
+			Int,
+			Vec3,
+			Vec4,
+			Mat3,
+			Mat4
+		};
+
+
+		class Registry
+		{
+		public:
+			Registry(uint16_t maxUniforms)
+				: m_uniforms(maxUniforms)
+			{
+			
+			}
+			
+			UniformHandle add(const char* name, Uniform::Type type, const void* data)
+			{
+				UniformHandle handle;
+
+				if (strlen(name) > s_maxNameLength)
+				{
+					Logger::error("Uniform name exceeds max length");
+					return handle;
+				}
+
+				m_uniforms.emplace_back(name, type);
+				handle.idx = m_uniforms.size() - 1;
+				return handle;
+			}
+		
+			void update(UniformHandle handle, const void* data)
+			{
+
+			}
+		
+		private:
+			static constexpr uint8_t s_maxNameLength = 32;
+
+			struct Info
+			{
+				char m_name[s_maxNameLength];
+				Uniform::Type m_type;
+			};
+
+			std::vector<Info> m_uniforms;
+		};
+	}
+
 	class IRenderContext
 	{
 	public: 
+		virtual ~IRenderContext() {}
 		virtual void init() = 0;
 		virtual VertexBufferHandle createVertexBuffer(const VertexBufferFormat& format) = 0;
 		virtual IndexBufferHandle createIndexBuffer(size_t size, uint32_t count, const void* data) = 0;

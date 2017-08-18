@@ -1,4 +1,5 @@
 #include "OpenGL.hpp"
+#include <cassert>
 
 std::string getGlErrorString()
 {
@@ -7,16 +8,22 @@ std::string getGlErrorString()
 	switch (err)
 	{
 	case GL_NO_ERROR:
+		assert(false);
 		return std::string("GL Error: No Error");
 	case GL_INVALID_OPERATION:
-			return std::string("INVALID_OPERATION");
+		assert(false);
+		return std::string("INVALID_OPERATION");
 	case GL_INVALID_ENUM:
+		assert(false);
 		return std::string("INVALID_ENUM");
 	case GL_INVALID_VALUE:
+		assert(false);
 		return std::string("INVALID_VALUE");
 	case GL_OUT_OF_MEMORY:
+		assert(false);
 		return std::string("OUT_OF_MEMORY");
 	case GL_INVALID_FRAMEBUFFER_OPERATION:
+		assert(false);
 		return std::string("INVALID_FRAMEBUFFER_OPERATION");
 	default:
 		return std::string("GL Error: Case not covered");
