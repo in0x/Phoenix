@@ -8,7 +8,6 @@ std::string getGlErrorString()
 	switch (err)
 	{
 	case GL_NO_ERROR:
-		assert(false);
 		return std::string("GL Error: No Error");
 	case GL_INVALID_OPERATION:
 		assert(false);
@@ -27,6 +26,7 @@ std::string getGlErrorString()
 		return std::string("INVALID_FRAMEBUFFER_OPERATION");
 	default:
 		return std::string("GL Error: Case not covered");
+		assert(false);
 	}
 }
 
