@@ -327,4 +327,23 @@ namespace Phoenix
 		Logger::warning(__LOCATION_INFO__ "not implemented!");
 		return{};
 	}
+
+	void WGlRenderContext::setVertexBuffer(VertexBufferHandle vb)
+	{
+		GlVertexBuffer buffer = m_vertexBuffers[vb.idx];
+		glBindVertexArray(buffer.m_id);
+	}
+
+	void WGlRenderContext::setIndexBuffer(IndexBufferHandle ib) 
+	{
+		GlIndexBuffer buffer = m_indexBuffers[ib.idx];
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.m_id);
+	}
+
+	void WGlRenderContext::setProgram(ProgramHandle prog) 
+	{
+		GlProgram program = m_programs[prog.idx];
+		glUseProgram(program.m_id);
+	}
+
 }

@@ -52,24 +52,10 @@ namespace Phoenix
 		virtual FrameBufferHandle createFrameBuffer() override;
 		virtual UniformHandle createUniform(const char* name, Uniform::Type type) override;
 
-		void tempUseVertexBuffer(VertexBufferHandle handle)
-		{
-			GlVertexBuffer buffer = m_vertexBuffers[handle.idx];
-			glBindVertexArray(buffer.m_id);
-		}
+		virtual void setVertexBuffer(VertexBufferHandle vb) override;
+		virtual void setIndexBuffer(IndexBufferHandle ib) override;
+		virtual void setProgram(ProgramHandle prog) override;
 		
-		void tempUseIdxBuffer(IndexBufferHandle handle)
-		{
-			GlIndexBuffer buffer = m_indexBuffers[handle.idx];
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.m_id);
-		}
-
-		void tempUseProgram(ProgramHandle handle)
-		{
-			GlProgram program = m_programs[handle.idx];
-			glUseProgram(program.m_id);
-		}
-
 	private:
 		std::vector<GlVertexBuffer> m_vertexBuffers; // These vectors need replacing when I create custom allocators
 		std::vector<GlIndexBuffer> m_indexBuffers;

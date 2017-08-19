@@ -70,13 +70,19 @@
     <ClInclude Include="..\src\Core\StringTokenizer.hpp">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Core\Render\Render.hpp">
-      <Filter>Render</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Core\Render\IRenderContext.hpp">
       <Filter>Render</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Core\Render\WGlRenderContext.hpp">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Render\Research.hpp">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Render\Render.hpp">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Render\Renderer.hpp">
       <Filter>Render</Filter>
     </ClInclude>
   </ItemGroup>
@@ -141,6 +147,9 @@
     </ClCompile>
     <ClCompile Include="..\src\Core\Logger.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Core\Render\Renderer.cpp">
+      <Filter>Render</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

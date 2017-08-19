@@ -123,9 +123,9 @@ void run()
 	shaders[Shader::Fragment] = fs;
 	ProgramHandle program = context->createProgram(shaders);
 
-	context->tempUseProgram(program);
+	/*context->tempUseProgram(program);
 	context->tempUseVertexBuffer(foxVertices);
-	context->tempUseIdxBuffer(foxIndices);
+	context->tempUseIdxBuffer(foxIndices);*/
 
 	glUniformMatrix4fv(2, 1, GL_FALSE, (GLfloat*)&worldMat);
 	glUniformMatrix4fv(3, 1, GL_FALSE, (GLfloat*)&viewMat);
