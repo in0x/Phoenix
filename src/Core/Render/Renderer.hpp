@@ -18,65 +18,6 @@ namespace Phoenix
 {
 	class IRenderContext;
 
-	typedef void(*SubmitFunc)(IRenderContext*, const void*);
-
-	template<class T>
-	struct is_submittable
-	{
-		static constexpr bool value = false;
-	};
-
-	// NOTE(Phil): I currently have no better solution than to just store a func ptr in each command
-#define SUBMITTABLE(Class) \
-		static const SubmitFunc SUBMIT_FUNC; \
-		SubmitFunc submitFunc; \
-		/*template <> \
-		struct is_submittable<Class> \
-		{ \
-			static const bool value = true; \
-		}; \*/
-
-	/*
-	template <>
-	struct is_submittable<Commands::DrawIndexed>
-	{
-		static const bool value = true;
-	};
-	*/
-
-	namespace Commands
-	{
-		struct DrawIndexed
-		{
-			SUBMITTABLE(DrawIndexed)
-
-			uint32_t start;
-			uint32_t count;
-
-			Primitive::Type primitives;
-			VertexBufferHandle vertexBuffer;
-			IndexBufferHandle indexBuffer;
-		};
-
-		struct DrawLinear
-		{
-			SUBMITTABLE(DrawLinear)
-
-			uint32_t start;
-			uint32_t count;
-
-			Primitive::Type primitives;
-			VertexBufferHandle vertexBuffer;
-		};
-
-		static const size_t OFFSET_SUBMIT_FUNC = 0;
-
-		inline SubmitFunc* loadSubmitFunc(void* pCommand)
-		{
-			return reinterpret_cast<SubmitFunc*>(reinterpret_cast<char*>(pCommand) + OFFSET_SUBMIT_FUNC);
-		}
-	}
-
 	// NOTE(Phil): Uses global new as a place 
 	// holder, will switch over to fixed memory 
 	// when linear allocator is implemented. 

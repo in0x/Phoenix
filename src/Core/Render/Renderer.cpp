@@ -3,7 +3,7 @@
 
 namespace Phoenix
 {
-	namespace RenderSubmit
+	namespace DrawFunctions
 	{
 		void IndexedDraw(IRenderContext* rc, const void* command)
 		{
@@ -28,18 +28,18 @@ namespace Phoenix
 		}
 	}
 
-	const SubmitFunc Commands::DrawIndexed::SUBMIT_FUNC = RenderSubmit::IndexedDraw;
-	const SubmitFunc Commands::DrawLinear::SUBMIT_FUNC = RenderSubmit::LinearDraw;
+	const DrawFunction Commands::DrawIndexed::SUBMIT_FUNC = DrawFunctions::IndexedDraw;
+	const DrawFunction Commands::DrawLinear::SUBMIT_FUNC = DrawFunctions::LinearDraw;
 
 	void Renderer::submit(IRenderContext* rc)
 	{
 		for (size_t i = 0; i < m_currentIndex; ++i)
 		{
 			void* command = m_commands[i];
-			SubmitFunc* submitFunc = Commands::loadSubmitFunc(command);
+			DrawFunction* submitFunc = Commands::loadSubmitFunc(command);
 			(*submitFunc)(rc, command);
 
-			//free(command);
+			free(command);
 		}
 
 		m_currentIndex = 0;

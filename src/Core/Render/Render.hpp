@@ -217,8 +217,35 @@ namespace Phoenix
 		ProgramHandle program;
 	};
 
+	typedef void(*DrawFunction)(IRenderContext*, const void*);
+
+	namespace Commands
+	{
+		struct DrawIndexed
+		{
+			uint32_t start;
+			uint32_t count;
+
+			Primitive::Type primitives;
+			VertexBufferHandle vertexBuffer;
+			IndexBufferHandle indexBuffer;
+		};
+
+		struct DrawLinear
+		{
+			uint32_t start;
+			uint32_t count;
+
+			Primitive::Type primitives;
+			VertexBufferHandle vertexBuffer;
+		};
+	}
+
 	struct DrawItem
 	{
 		// StateGroup + Command = DrawItem
+		void* pCommand;
+		DrawFunction draw; // Drawfuncs should be registered to a table somewhere and then fetched via lookup using data from the command (i.e. a key (bitmask))
+		StateGroup state;
 	};
 }

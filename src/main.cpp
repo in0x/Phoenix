@@ -136,7 +136,7 @@ void run()
 
 	while (window.isOpen())
 	{
-		getGlErrorString(); // Fails because no program is bound
+		getGlErrorString(); // NOTE(Phil): Fails because no program is bound
 
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_MULTISAMPLE);
