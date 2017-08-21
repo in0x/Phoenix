@@ -58,6 +58,8 @@ std::string loadText(const char* path)
 
 void run()
 {
+
+#ifdef ENABLE_VIRTUAL_TERMINAL_PROCESSING
 	// NOTE(Phil): Enables ansi color codes being interpreted by the console.
 	// I need a place to put this so its only called when we are on Windows.
 	{
@@ -68,6 +70,7 @@ void run()
 		dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
 		SetConsoleMode(hOut, dwMode);
 	}
+#endif
 
 	using namespace Phoenix;
 
