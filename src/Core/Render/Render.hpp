@@ -199,4 +199,67 @@ namespace Phoenix
 			Triangles
 		};
 	};
+
+	namespace Blend
+	{
+		enum Type
+		{
+			Opaque
+		};
+	}
+
+	namespace Raster
+	{
+		enum Type
+		{
+			Placeholder
+		};
+	}
+
+	namespace Depth
+	{
+		enum Type
+		{
+			Placeholder
+		};
+	}
+
+	namespace Stencil
+	{
+		enum Type
+		{
+			Placeholder
+		};
+	}
+
+	struct StateGroup
+	{
+		Blend::Type blend;
+		Raster::Type raster;
+		Depth::Type depth;
+		Stencil::Type stencil;
+		// Textures?
+		ProgramHandle program;
+	};
+
+	namespace Commands
+	{
+		struct DrawIndexed
+		{
+			Primitive::Type primitive;
+			VertexBufferHandle vertexBuffer;
+			IndexBufferHandle indexBuffer;
+		};
+
+		struct DrawLinear
+		{
+			Primitive::Type primitive;
+			VertexBufferHandle vertexBuffer;
+		};
+	}
+
+	struct DrawItem
+	{
+		// StateGroup + Command = DrawItem
+	};
 }

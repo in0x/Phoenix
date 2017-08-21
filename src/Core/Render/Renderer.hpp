@@ -2,19 +2,19 @@
 
 #include "Render.hpp"
 
+// Goals:
+// Command-based: The user submits commands that specify the desired action
+// and required data which is then executed using the GPU. Commands can be 
+// stored in buckets, which in turn can be sorted in order to group commands
+// with similar data so as to reduce state changes.
+//
+// Stateless: To prevent the pitfalls of stateful APIs such as OpenGL, where
+// a state set by previous call can affect the next call, the system should be
+// stateless: Options set by the previous draw call should not have an effect on 
+// the next. 
+
 namespace Phoenix
 {
-	namespace Commands
-	{
-		struct DrawIndexed
-		{
-			VertexBufferHandle vertexBuffer;
-			IndexBufferHandle indexBuffer;
-			ProgramHandle program;
-			Primitive::Type primitiveType;
-		};
-	}
-
 	class IRenderContext;
 
 	// NOTE(Phil): This is what the using code should be talking to eventually.
