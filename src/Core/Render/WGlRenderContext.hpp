@@ -44,6 +44,9 @@ namespace Phoenix
 		virtual void init() override;
 		virtual void swapBuffer() override;
 
+		virtual uint32_t getMaxTextureUnits() override;
+		virtual uint32_t getMaxUniformCount() override;
+
 		virtual VertexBufferHandle createVertexBuffer(const VertexBufferFormat& format) override;
 		virtual IndexBufferHandle createIndexBuffer(size_t size, uint32_t count, const void* data) override;
 		virtual ShaderHandle createShader(const char* source, Shader::Type shaderType) override;
@@ -55,6 +58,13 @@ namespace Phoenix
 		virtual void setVertexBuffer(VertexBufferHandle vb) override;
 		virtual void setIndexBuffer(IndexBufferHandle ib) override;
 		virtual void setProgram(ProgramHandle prog) override;
+		virtual void setDepth(Depth::Type depth) override;
+		virtual void setRaster(Raster::Type raster) override;
+		virtual void setBlend(Blend::Type blend) override;
+		virtual void setStencil(Stencil::Type stencil) override;
+
+		virtual void drawLinear(Primitive::Type primitive, uint32_t count, uint32_t start) override;
+		virtual void drawIndexed(Primitive::Type primitive, uint32_t count, uint32_t start) override;
 		
 	private:
 		std::vector<GlVertexBuffer> m_vertexBuffers; // These vectors need replacing when I create custom allocators

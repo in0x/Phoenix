@@ -12,7 +12,7 @@ namespace Phoenix
 	{
 	}
 
-	void WGlRenderContext::init()
+	void WGlRenderContext::WGlRenderContext::init()
 	{
 		PIXELFORMATDESCRIPTOR pfd =
 		{
@@ -79,9 +79,23 @@ namespace Phoenix
 		wglDeleteContext(m_renderContext);
 	}
 
-	void WGlRenderContext::swapBuffer()
+	void WGlRenderContext::WGlRenderContext::swapBuffer()
 	{
 		SwapBuffers(m_deviceContext);
+	}
+
+	uint32_t WGlRenderContext::getMaxTextureUnits()
+	{
+		GLint maxTextureUnits;
+		glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxTextureUnits);
+		return static_cast<uint32_t>(maxTextureUnits);
+	}
+	
+	uint32_t WGlRenderContext::getMaxUniformCount()
+	{
+		GLint maxUniforms;
+		glGetIntegerv(GL_MAX_UNIFORM_LOCATIONS, &maxUniforms);
+		return static_cast<uint32_t>(maxUniforms);
 	}
 
 	GLuint createVBO(size_t typeSize, uint32_t elementCount, const void* data)
@@ -158,30 +172,15 @@ namespace Phoenix
 
 	GLenum getShaderEnum(Shader::Type type)
 	{
-		switch (type)
+		static const GLuint glType[Shader::Type::Count] =
 		{
-		case Shader::Type::Vertex:
-		{
-			return GL_VERTEX_SHADER;
-		}
-		case Shader::Type::Fragment:
-		{
-			return GL_FRAGMENT_SHADER;
-		}
-		case Shader::Type::Compute:
-		{
-			return GL_COMPUTE_SHADER;
-		}
-		case Shader::Type::Geometry:
-		{
-			return GL_GEOMETRY_SHADER;
-		}
-		default:
-		{
-			Logger::error("Trying to convert invalid Shader::Type to GlEnum");
-			return 0;
-		}
-		}
+			 GL_VERTEX_SHADER,
+			 GL_GEOMETRY_SHADER,
+			 GL_FRAGMENT_SHADER,
+			 GL_COMPUTE_SHADER,
+		};
+		
+		return glType[type];
 	}
 
 	Shader::Type getShaderType(GLenum shaderEnum)
@@ -328,22 +327,63 @@ namespace Phoenix
 		return{};
 	}
 
-	void WGlRenderContext::setVertexBuffer(VertexBufferHandle vb)
+	void WGlRenderContext::WGlRenderContext::setVertexBuffer(VertexBufferHandle vb)
 	{
 		GlVertexBuffer buffer = m_vertexBuffers[vb.idx];
 		glBindVertexArray(buffer.m_id);
 	}
 
-	void WGlRenderContext::setIndexBuffer(IndexBufferHandle ib) 
+	void WGlRenderContext::WGlRenderContext::setIndexBuffer(IndexBufferHandle ib) 
 	{
 		GlIndexBuffer buffer = m_indexBuffers[ib.idx];
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.m_id);
 	}
 
-	void WGlRenderContext::setProgram(ProgramHandle prog) 
+	void WGlRenderContext::WGlRenderContext::setProgram(ProgramHandle prog) 
 	{
 		GlProgram program = m_programs[prog.idx];
 		glUseProgram(program.m_id);
 	}
 
+	void WGlRenderContext::setDepth(Depth::Type depth) 
+	{
+		Logger::warning(__LOCATION_INFO__ "not implemented!");
+	}
+
+	void WGlRenderContext::setRaster(Raster::Type raster) 
+	{
+		Logger::warning(__LOCATION_INFO__ "not implemented!");
+	}
+
+	void WGlRenderContext::setBlend(Blend::Type blend) 
+	{
+		Logger::warning(__LOCATION_INFO__ "not implemented!");
+	}
+
+	void WGlRenderContext::setStencil(Stencil::Type stencil) 
+	{
+		Logger::warning(__LOCATION_INFO__ "not implemented!");
+	}
+
+	GLenum getPrimitiveEnum(Primitive::Type type)
+	{
+		static const GLuint glType[3] =
+		{
+			GL_POINTS,
+			GL_LINES,
+			GL_TRIANGLES
+		};
+
+		return glType[type];
+	}
+
+	void WGlRenderContext::WGlRenderContext::drawLinear(Primitive::Type primitive, uint32_t count, uint32_t start)
+	{
+		glDrawArrays(getPrimitiveEnum(primitive), start, count);
+	}
+
+	void WGlRenderContext::WGlRenderContext::drawIndexed(Primitive::Type primitive, uint32_t count, uint32_t start)
+	{
+		glDrawElements(getPrimitiveEnum(primitive), count, GL_UNSIGNED_INT, (GLvoid*)(sizeof(GLubyte) * start));
+	}
 }

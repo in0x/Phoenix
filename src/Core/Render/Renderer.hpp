@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Render.hpp"
+#include <vector>
 
 // Goals:
 // Command-based: The user submits commands that specify the desired action
@@ -17,36 +18,94 @@ namespace Phoenix
 {
 	class IRenderContext;
 
-	// NOTE(Phil): This is what the using code should be talking to eventually.
-	// Right now, this functions are just going to forward their argument, but 
-	// the frontend can und should eventually be extended to include key- 
-	// and bucket-based sorting. Maybe, instead of using an interface for 
-	// the context, the backend funtions can be implemented seperately and 
-	// instead just use callbacks to hook up to the frontend.
-	//
-	// Renderer should have its own memory area from which it allocates commands.
-	// It can then hand the user a reference to the command so he can fill it.
-	// On submit, the allocated commands can be sorted, executed and deleted.
+	typedef void(*SubmitFunc)(IRenderContext*, const void*);
+
+	template<class T>
+	struct is_submittable
+	{
+		static constexpr bool value = false;
+	};
+
+	// NOTE(Phil): I currently have no better solution than to just store a func ptr in each command
+#define SUBMITTABLE(Class) \
+		static const SubmitFunc SUBMIT_FUNC; \
+		SubmitFunc submitFunc; \
+		/*template <> \
+		struct is_submittable<Class> \
+		{ \
+			static const bool value = true; \
+		}; \*/
+
+	/*
+	template <>
+	struct is_submittable<Commands::DrawIndexed>
+	{
+		static const bool value = true;
+	};
+	*/
+
+	namespace Commands
+	{
+		struct DrawIndexed
+		{
+			SUBMITTABLE(DrawIndexed)
+
+			uint32_t start;
+			uint32_t count;
+
+			Primitive::Type primitives;
+			VertexBufferHandle vertexBuffer;
+			IndexBufferHandle indexBuffer;
+		};
+
+		struct DrawLinear
+		{
+			SUBMITTABLE(DrawLinear)
+
+			uint32_t start;
+			uint32_t count;
+
+			Primitive::Type primitives;
+			VertexBufferHandle vertexBuffer;
+		};
+
+		static const size_t OFFSET_SUBMIT_FUNC = 0;
+
+		inline SubmitFunc* loadSubmitFunc(void* pCommand)
+		{
+			return reinterpret_cast<SubmitFunc*>(reinterpret_cast<char*>(pCommand) + OFFSET_SUBMIT_FUNC);
+		}
+	}
+
+	// NOTE(Phil): Uses global new as a place 
+	// holder, will switch over to fixed memory 
+	// when linear allocator is implemented. 
 	class Renderer
 	{
 	public:
-		template <class Handle>
-		void checkBufferValid(Handle handle)
+		Renderer(uint32_t maxCommands)
+			: m_currentIndex(0)
+			, m_commands(maxCommands)
+		{}
+
+		template<class Command>
+		Command* create()
 		{
-			if (!handle.isValid())
-			{
-				Logger::error("Failed to create VertexBuffer");
-			}
+			//static_assert(std::is_pod<Command>::value, "Command type should be plain-old-data.");
+			//static_assert(is_submittable<Command>::value, "Command should be submittable");
+
+			Command* command = new Command();
+			command->submitFunc = Command::SUBMIT_FUNC;
+
+			m_commands[m_currentIndex] = static_cast<void*>(command);
+			m_currentIndex++;
+			return command;
 		}
 
-		VertexBufferHandle createVertexBuffer(const VertexBufferFormat& format);
-		IndexBufferHandle createIndexBuffer(size_t size, uint32_t count, const void* data);
-		ShaderHandle createShader(const char* source, Shader::Type shaderType);
-		ProgramHandle createProgram(const Shader::List& shaders);
-		void draw(const Commands::DrawIndexed& command);
-		void submit();
+		void submit(IRenderContext* rc);
 
 	private:
-		IRenderContext* m_pContext;
+		size_t m_currentIndex;
+		std::vector<void*> m_commands;
 	};
 }

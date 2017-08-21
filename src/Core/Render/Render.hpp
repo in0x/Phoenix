@@ -24,6 +24,7 @@ namespace Phoenix
 	HANDLE(TextureHandle, uint16_t);
 	HANDLE(FrameBufferHandle, uint16_t);
 	HANDLE(UniformHandle, uint16_t);
+	HANDLE(TextureListHandle, uint16_t);
 
 	namespace AttributeProperty
 	{
@@ -73,19 +74,6 @@ namespace Phoenix
 	{
 		struct Decl
 		{
-			Decl()
-				: m_property(AttributeProperty::Count)
-				, m_type(AttributeType::Count)
-				, m_numElements(0)
-			{}
-
-
-			Decl(AttributeProperty::Value type, AttributeType::Value size, uint8_t numElement)
-				: m_property(type)
-				, m_type(size)
-				, m_numElements(numElement)
-			{}
-
 			AttributeProperty::Value m_property; // The kind of property the attrib sets (position, normal, color, etc.)
 			AttributeType::Value m_type; // The datatype of the property (float, int, etc.)
 			uint8_t m_numElements; // The number of elements (e.g. 3 for a Vec3)
@@ -93,20 +81,6 @@ namespace Phoenix
 
 		struct Data
 		{
-			Data()
-				: m_size(0)
-				, m_count(0)
-				, m_data(nullptr)
-				, m_bNormalize(false)
-			{}
-
-			Data(size_t size, size_t count, const void* data, bool bNormalize = false)
-				: m_size(size)
-				, m_count(count)
-				, m_data(data)
-				, m_bNormalize(m_bNormalize)
-			{}
-
 			size_t m_size; // The amount of memory taken up by a single element in the buffer (result of sizeof())
 			size_t m_count; // The number of elements in the buffer 
 			const void* m_data; // A non-owning reference to the data to fill the buffer with
@@ -238,25 +212,10 @@ namespace Phoenix
 		Raster::Type raster;
 		Depth::Type depth;
 		Stencil::Type stencil;
-		// Textures?
+		// Textures -> TextureListHandle
+		// Unfiforms can also use a Resourcelist like mechanism
 		ProgramHandle program;
 	};
-
-	namespace Commands
-	{
-		struct DrawIndexed
-		{
-			Primitive::Type primitive;
-			VertexBufferHandle vertexBuffer;
-			IndexBufferHandle indexBuffer;
-		};
-
-		struct DrawLinear
-		{
-			Primitive::Type primitive;
-			VertexBufferHandle vertexBuffer;
-		};
-	}
 
 	struct DrawItem
 	{

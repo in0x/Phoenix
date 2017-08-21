@@ -3,90 +3,46 @@
 
 namespace Phoenix
 {
-	/*namespace API
+	namespace RenderSubmit
 	{
-		enum Type
+		void IndexedDraw(IRenderContext* rc, const void* command)
 		{
-		OpenGL
-		};
-	};*/
+			const Commands::DrawIndexed* dc = static_cast<const Commands::DrawIndexed*>(command);
 
-	/*void init(API::Type api)
-	{
-		switch (api)
-		{
-			case API::OpenGL
-			{
-				sg_context = std::make_unique<>
-			}
-		}
-	}*/
-
-	VertexBufferHandle Renderer::createVertexBuffer(const VertexBufferFormat& format)
-	{
-		auto bufferHandle = m_pContext->createVertexBuffer(format);
-		checkBufferValid(bufferHandle);
-		return bufferHandle;
-	}
-
-	IndexBufferHandle Renderer::createIndexBuffer(size_t size, uint32_t count, const void* data)
-	{
-		auto bufferHandle = m_pContext->createIndexBuffer(size, count, data);
-		checkBufferValid(bufferHandle);
-		return bufferHandle;
-	}
-
-	ShaderHandle Renderer::createShader(const char* source, Shader::Type shaderType)
-	{
-		auto shaderHandle = m_pContext->createShader(source, shaderType);
-		checkBufferValid(shaderHandle);
-		return shaderHandle;
-	}
-
-	ProgramHandle Renderer::createProgram(const Shader::List& shaders)
-	{
-		auto programHandle = m_pContext->createProgram(shaders);
-		checkBufferValid(programHandle);
-		return programHandle;
-	}
-
-	void Renderer::draw(const Commands::DrawIndexed& command)
-	{
-		/*GLenum primtiveType = GL_TRIANGLES;
-
-		switch (drawCmd.primtiveType)
-		{
-		case Primitive::Triangles:
-		{
-		primtiveType = GL_TRIANGLES;
-		break;
-		}
-		case Primitive::Lines:
-		{
-		primtiveType = GL_LINES;
-		break;
-		}
-		case Primitive::Points:
-		{
-		primtiveType = GL_POINTS;
-		break;
-		}
-		default:
-		{
-		Logger::warning("PrimitiveType unsupported, reverting to default triangles");
-		assert(false);
-		}
+			rc->setVertexBuffer(dc->vertexBuffer);
+			rc->setIndexBuffer(dc->indexBuffer);
+			rc->drawIndexed(dc->primitives, dc->count, dc->start);
 		}
 
-		GlShaderProgram* glProgram = static_cast<GlShaderProgram*>(command->drawItem->states->shaderProgram);
-		glUseProgram(glProgram->m_nativeHandle);
+		void LinearDraw(IRenderContext* rc, const void* command)
+		{
+			const Commands::DrawLinear* dc = static_cast<const Commands::DrawLinear*>(command);
 
-		glDrawElements(primtiveType, drawCmd.count, GL_UNSIGNED_INT, (GLvoid*)(sizeof(unsigned int) * drawCmd.startIndex));*/
+			rc->setVertexBuffer(dc->vertexBuffer);
+			rc->drawLinear(dc->primitives, dc->count, dc->start);
+		}
+
+		void TestDraw(IRenderContext* rc, const void* command)
+		{
+			rc->getMaxTextureUnits();
+		}
 	}
 
-	void Renderer::submit()
+	const SubmitFunc Commands::DrawIndexed::SUBMIT_FUNC = RenderSubmit::IndexedDraw;
+	const SubmitFunc Commands::DrawLinear::SUBMIT_FUNC = RenderSubmit::LinearDraw;
+
+	void Renderer::submit(IRenderContext* rc)
 	{
-		m_pContext->swapBuffer();
-	}
+		for (size_t i = 0; i < m_currentIndex; ++i)
+		{
+			void* command = m_commands[i];
+			SubmitFunc* submitFunc = Commands::loadSubmitFunc(command);
+			(*submitFunc)(rc, command);
 
+			//free(command);
+		}
+
+		m_currentIndex = 0;
+		rc->swapBuffer();
+	}
 }
