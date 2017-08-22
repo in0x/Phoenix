@@ -103,10 +103,10 @@ void run()
 	Matrix4 projMat = perspectiveRH(70, (float)config.width / (float)config.height, 1, 100);
 	Vec3 lightPosition = Vec3(-5, 3, 5);
 
-	std::unique_ptr<IRenderContext> context = std::make_unique<WGlRenderContext>(window.getNativeHandle());
+	std::unique_ptr<WGlRenderContext> context = std::make_unique<WGlRenderContext>(window.getNativeHandle());
 	context->init();
 
-	Renderer renderer(16);
+	Renderer renderer(context.get(), 16);
 	
 	VertexBufferFormat foxLayout;
 	foxLayout.add({ AttributeProperty::Position, AttributeType::Float, 3 },
@@ -115,7 +115,7 @@ void run()
 	foxLayout.add({ AttributeProperty::Normal, AttributeType::Float, 3 }, 
 				  { sizeof(Vec3), fox->normals.size(), fox->normals.data() });
 
-	VertexBufferHandle foxVertices = context->createVertexBuffer(foxLayout);
+	VertexBufferHandle foxVertices = /*context->createVertexBuffer(foxLayout)*/ renderer.createVertexBuffer(foxLayout);
 
 	IndexBufferHandle foxIndices = context->createIndexBuffer(sizeof(unsigned int), fox->indices.size(), fox->indices.data());
 
@@ -129,6 +129,15 @@ void run()
 	shaders[Shader::Vertex] = vs;
 	shaders[Shader::Fragment] = fs;
 	ProgramHandle program = context->createProgram(shaders);
+
+	context->tempUseProgram(program);
+	context->tempUseVertexBuffer(foxVertices);
+	context->tempUseIdxBuffer(foxIndices);
+
+	glUniformMatrix4fv(2, 1, GL_FALSE, (GLfloat*)&worldMat);
+	glUniformMatrix4fv(3, 1, GL_FALSE, (GLfloat*)&viewMat);
+	glUniformMatrix4fv(4, 1, GL_FALSE, (GLfloat*)&projMat);
+	glUniform3fv(5, 1, (GLfloat*)&lightPosition);
 
 	getGlErrorString();
 
@@ -145,25 +154,22 @@ void run()
 		GLfloat color[] = { 1.f, 1.f, 1.f, 1.f };
 		glClearBufferfv(GL_COLOR, 0, color);
 
-		angle += 0.0025f;
+		angle += 0.025f;
 		Matrix4 rotMat = Matrix4::rotation(0.f, angle, 0.f);
 
 		glUniformMatrix4fv(2, 1, GL_FALSE, (GLfloat*)&rotMat);
-		glUniformMatrix4fv(2, 1, GL_FALSE, (GLfloat*)&worldMat);
-		glUniformMatrix4fv(3, 1, GL_FALSE, (GLfloat*)&viewMat);
-		glUniformMatrix4fv(4, 1, GL_FALSE, (GLfloat*)&projMat);
-		glUniform3fv(5, 1, (GLfloat*)&lightPosition);
 
 		//glDrawElements(GL_TRIANGLES, fox->indices.size(), GL_UNSIGNED_INT, nullptr);
 
-		auto dc = renderer.create<Commands::DrawIndexed>();
+		//auto dc = renderer.create<Commands::DrawIndexed>();
+		auto dc = renderer.addCommand<Commands::DrawIndexed>();
 		dc->vertexBuffer = foxVertices;
 		dc->indexBuffer = foxIndices;
 		dc->primitives = Primitive::Triangles;
 		dc->start = 0;
 		dc->count = fox->indices.size();
 
-		renderer.submit(context.get());
+		renderer.submit();
 
 		glDisable(GL_MULTISAMPLE);
 		glDisable(GL_DEPTH_TEST);

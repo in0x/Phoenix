@@ -121,39 +121,39 @@ namespace Phoenix
 		return glType[type];
 	}
 
-	VertexBufferHandle WGlRenderContext::createVertexBuffer(const VertexBufferFormat& format)
-	{
-		m_vertexBuffers.emplace_back();
-		GlVertexBuffer& buffer = m_vertexBuffers.back();
+	//VertexBufferHandle WGlRenderContext::createVertexBuffer(const VertexBufferFormat& format)
+	//{
+	//	m_vertexBuffers.emplace_back();
+	//	GlVertexBuffer& buffer = m_vertexBuffers.back();
 
-		VertexBufferHandle handle;
-		handle.idx = static_cast<uint16_t>(m_vertexBuffers.size() - 1);
+	//	VertexBufferHandle handle;
+	//	handle.idx = static_cast<uint16_t>(m_vertexBuffers.size() - 1);
 
-		glGenVertexArrays(1, &buffer.m_id);
-		glBindVertexArray(buffer.m_id);
+	//	glGenVertexArrays(1, &buffer.m_id);
+	//	glBindVertexArray(buffer.m_id);
 
-		size_t attribCount = format.size();
-		for (size_t location = 0; location < attribCount; ++location)
-		{
-			const VertexAttrib::Data& data = format.at(location)->m_data;
-			const VertexAttrib::Decl& decl = format.at(location)->m_decl;
+	//	size_t attribCount = format.size();
+	//	for (size_t location = 0; location < attribCount; ++location)
+	//	{
+	//		const VertexAttrib::Data& data = format.at(location)->m_data;
+	//		const VertexAttrib::Decl& decl = format.at(location)->m_decl;
 
-			GLuint vbo = createVBO(data.m_size, data.m_count, data.m_data);
+	//		GLuint vbo = createVBO(data.m_size, data.m_count, data.m_data);
 
-			glEnableVertexAttribArray(location);
-			glBindBuffer(GL_ARRAY_BUFFER, vbo);
-			glVertexAttribPointer(
-				location,
-				decl.m_numElements,
-				attribSizeToGl(decl.m_type),
-				data.m_bNormalize,
-				data.m_size,
-				nullptr);
-		}
+	//		glEnableVertexAttribArray(location);
+	//		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	//		glVertexAttribPointer(
+	//			location,
+	//			decl.m_numElements,
+	//			attribSizeToGl(decl.m_type),
+	//			data.m_bNormalize,
+	//			data.m_size,
+	//			nullptr);
+	//	}
 
-		// TODO(Phil): Check for errors here
-		return handle;
-	}
+	//	// TODO(Phil): Check for errors here
+	//	return handle;
+	//}
 
 	IndexBufferHandle WGlRenderContext::createIndexBuffer(size_t size, uint32_t count, const void* data)
 	{
@@ -385,5 +385,59 @@ namespace Phoenix
 	void WGlRenderContext::WGlRenderContext::drawIndexed(Primitive::Type primitive, uint32_t count, uint32_t start)
 	{
 		glDrawElements(getPrimitiveEnum(primitive), count, GL_UNSIGNED_INT, (GLvoid*)(sizeof(GLubyte) * start));
+	}
+
+	VertexBufferHandle WGlRenderContext::allocVertexBuffer()
+	{
+		m_vertexBuffers.emplace_back();
+		GlVertexBuffer& buffer = m_vertexBuffers.back();
+
+		VertexBufferHandle handle;
+		handle.idx = static_cast<uint16_t>(m_vertexBuffers.size() - 1);
+		return handle;
+	}
+
+	void WGlRenderContext::createVertexBuffer(VertexBufferHandle handle, const VertexBufferFormat& format)
+	{
+		GlVertexBuffer& buffer = m_vertexBuffers[handle.idx];
+		glGenVertexArrays(1, &buffer.m_id);
+		glBindVertexArray(buffer.m_id);
+
+		size_t attribCount = format.size();
+		for (size_t location = 0; location < attribCount; ++location)
+		{
+			const VertexAttrib::Data& data = format.at(location)->m_data;
+			const VertexAttrib::Decl& decl = format.at(location)->m_decl;
+
+			GLuint vbo = createVBO(data.m_size, data.m_count, data.m_data);
+
+			glEnableVertexAttribArray(location);
+			glBindBuffer(GL_ARRAY_BUFFER, vbo);
+			glVertexAttribPointer(
+				location,
+				decl.m_numElements,
+				attribSizeToGl(decl.m_type),
+				data.m_bNormalize,
+				data.m_size,
+				nullptr);
+		}
+	}
+
+	void WGlRenderContext::tempUseVertexBuffer(VertexBufferHandle handle)
+	{
+		GlVertexBuffer buffer = m_vertexBuffers[handle.idx];
+		glBindVertexArray(buffer.m_id);
+	}
+
+	void WGlRenderContext::tempUseIdxBuffer(IndexBufferHandle handle)
+	{
+		GlIndexBuffer buffer = m_indexBuffers[handle.idx];
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.m_id);
+	}
+
+	void WGlRenderContext::tempUseProgram(ProgramHandle handle)
+	{
+		GlProgram program = m_programs[handle.idx];
+		glUseProgram(program.m_id);
 	}
 }

@@ -15,7 +15,7 @@ namespace Phoenix
 		virtual uint32_t getMaxTextureUnits() = 0;
 		virtual uint32_t getMaxUniformCount() = 0;
 	
-		virtual VertexBufferHandle createVertexBuffer(const VertexBufferFormat& format) = 0;
+		//virtual VertexBufferHandle createVertexBuffer(const VertexBufferFormat& format) = 0;
 		virtual IndexBufferHandle createIndexBuffer(size_t size, uint32_t count, const void* data) = 0;
 		virtual ShaderHandle createShader(const char* source, Shader::Type shaderType) = 0;
 		virtual ProgramHandle createProgram(const Shader::List& shaders) = 0;
@@ -33,6 +33,9 @@ namespace Phoenix
 
 		virtual void drawLinear(Primitive::Type primitive, uint32_t count, uint32_t start) = 0;
 		virtual void drawIndexed(Primitive::Type primitive, uint32_t count, uint32_t start) = 0;
+
+		virtual VertexBufferHandle allocVertexBuffer() = 0;
+		virtual void createVertexBuffer(VertexBufferHandle handle, const VertexBufferFormat& format) = 0;
 	
 		//TODO(Phil): Destruction functions / release of resources on self destruction
 
