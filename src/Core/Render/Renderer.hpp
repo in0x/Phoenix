@@ -198,8 +198,9 @@ namespace Phoenix
 					const void* command = commandPacket::loadCommand(packet);
 					function(m_pContext, command);
 
+					void* previous = packet;
 					packet = commandPacket::loadNextCommandPacket(packet);
-					// TODO(Phil): Free the packets
+					free(previous);
 				} while (packet != nullptr);
 			}
 
