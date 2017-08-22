@@ -125,4 +125,30 @@ namespace Phoenix
 
 		return handle;
 	}
+
+	// Need to implement commands and submitfunc for these resources.
+	ShaderHandle Renderer::createShader(const char* source, Shader::Type shaderType)
+	{
+
+	}
+	
+	ProgramHandle Renderer::createProgram(const Shader::List& shaders)
+	{
+
+	}
+	
+	TextureHandle Renderer::createTexture()
+	{
+		return m_pContext->allocTexture();
+	}
+	
+	FrameBufferHandle Renderer::createFrameBuffer()
+	{
+		return m_pContext->allocFrameBuffer();
+	}
+	
+	UniformHandle Renderer::createUniform(const char* name, Uniform::Type type)
+	{
+		return m_pContext->allocUniform();
+	}
 }

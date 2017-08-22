@@ -90,7 +90,7 @@ namespace Phoenix
 		glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxTextureUnits);
 		return static_cast<uint32_t>(maxTextureUnits);
 	}
-	
+
 	uint32_t WGlRenderContext::getMaxUniformCount()
 	{
 		GLint maxUniforms;
@@ -121,53 +121,68 @@ namespace Phoenix
 		return glType[type];
 	}
 
-	//VertexBufferHandle WGlRenderContext::createVertexBuffer(const VertexBufferFormat& format)
-	//{
-	//	m_vertexBuffers.emplace_back();
-	//	GlVertexBuffer& buffer = m_vertexBuffers.back();
+// NOTE(Phil): Danger, this assumes that all handles use uint16_t for their index
+// this may change with resources that need less slots, so I need a way to get the
+// data type of the handle.
+#define IMPL_ALLOC_FUNC(handleType, funcName, containerName) \
+	handleType WGlRenderContext::funcName() \
+	{ \
+		containerName.emplace_back(); \
+		auto& buffer = m_vertexBuffers.back(); \
+		handleType handle; \
+		handle.idx = static_cast<uint16_t>(containerName.size() - 1); \
+		return handle; \
+	} \
 
-	//	VertexBufferHandle handle;
-	//	handle.idx = static_cast<uint16_t>(m_vertexBuffers.size() - 1);
+#define EMPTY_ALLOC_FUNC(handleType, funcName) \
+	handleType WGlRenderContext::funcName() \
+	{ \
+		Logger::warning(S2(__LOCATION_INFO__) "not implemented!"); \
+		return handleType{}; \
+	} \
 
-	//	glGenVertexArrays(1, &buffer.m_id);
-	//	glBindVertexArray(buffer.m_id);
+	IMPL_ALLOC_FUNC(VertexBufferHandle, allocVertexBuffer, m_vertexBuffers)
+	IMPL_ALLOC_FUNC(IndexBufferHandle, allocIndexBuffer, m_indexBuffers)
+	IMPL_ALLOC_FUNC(ShaderHandle, allocShader, m_shaders)
+	IMPL_ALLOC_FUNC(ProgramHandle, allocProgram, m_programs)
 
-	//	size_t attribCount = format.size();
-	//	for (size_t location = 0; location < attribCount; ++location)
-	//	{
-	//		const VertexAttrib::Data& data = format.at(location)->m_data;
-	//		const VertexAttrib::Decl& decl = format.at(location)->m_decl;
+	EMPTY_ALLOC_FUNC(TextureHandle, allocTexture)
+	EMPTY_ALLOC_FUNC(FrameBufferHandle, allocFrameBuffer)
+	EMPTY_ALLOC_FUNC(UniformHandle, allocUniform)
 
-	//		GLuint vbo = createVBO(data.m_size, data.m_count, data.m_data);
-
-	//		glEnableVertexAttribArray(location);
-	//		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	//		glVertexAttribPointer(
-	//			location,
-	//			decl.m_numElements,
-	//			attribSizeToGl(decl.m_type),
-	//			data.m_bNormalize,
-	//			data.m_size,
-	//			nullptr);
-	//	}
-
-	//	// TODO(Phil): Check for errors here
-	//	return handle;
-	//}
-
-	IndexBufferHandle WGlRenderContext::createIndexBuffer(size_t size, uint32_t count, const void* data)
+	void WGlRenderContext::createVertexBuffer(VertexBufferHandle handle, const VertexBufferFormat& format)
 	{
-		m_indexBuffers.emplace_back();
-		GlIndexBuffer& buffer = m_indexBuffers.back();
+		GlVertexBuffer& buffer = m_vertexBuffers[handle.idx];
+		glGenVertexArrays(1, &buffer.m_id);
+		glBindVertexArray(buffer.m_id);
 
-		IndexBufferHandle handle;
-		handle.idx = static_cast<uint16_t>(m_indexBuffers.size() - 1);
+		size_t attribCount = format.size();
+		for (size_t location = 0; location < attribCount; ++location)
+		{
+			const VertexAttrib::Data& data = format.at(location)->m_data;
+			const VertexAttrib::Decl& decl = format.at(location)->m_decl;
+
+			GLuint vbo = createVBO(data.m_size, data.m_count, data.m_data);
+
+			glEnableVertexAttribArray(location);
+			glBindBuffer(GL_ARRAY_BUFFER, vbo);
+			glVertexAttribPointer(
+				location,
+				decl.m_numElements,
+				attribSizeToGl(decl.m_type),
+				data.m_bNormalize,
+				data.m_size,
+				nullptr);
+		}
+	}
+
+	void WGlRenderContext::createIndexBuffer(IndexBufferHandle handle, size_t size, uint32_t count, const void* data)
+	{
+		GlIndexBuffer& buffer = m_indexBuffers[handle.idx];
 
 		glGenBuffers(1, &buffer.m_id);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.m_id);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, size * count, data, GL_STATIC_DRAW); // TODO(Phil): Check what GL_DYNAMIC_DRAW does
-
-		return handle;
 	};
 
 	GLenum getShaderEnum(Shader::Type type)
@@ -238,17 +253,16 @@ namespace Phoenix
 		}
 	}
 
-	ShaderHandle WGlRenderContext::createShader(const char* source, Shader::Type shaderType)
+	void WGlRenderContext::createShader(ShaderHandle handle, const char* source, Shader::Type shaderType)
 	{
-		m_shaders.emplace_back();
-		GlShader& shader = m_shaders.back();
+		GlShader& shader = m_shaders[handle.idx];
 
 		ShaderHandle handle;
 
 		if (source == nullptr)
 		{
 			Logger::error("Shader source is null");
-			return handle;
+			return;
 		}
 
 		handle.idx = static_cast<uint16_t>(m_shaders.size() - 1);
@@ -259,14 +273,11 @@ namespace Phoenix
 		glCompileShader(shader.m_id);
 
 		printShaderLog(shader.m_id);
-	
-		return handle;
 	}
 	
-	ProgramHandle WGlRenderContext::createProgram(const Shader::List& shaders)
+	void WGlRenderContext::createProgram(ProgramHandle handle, const Shader::List& shaders)
 	{
-		m_programs.emplace_back();
-		GlProgram& program = m_programs.back();
+		GlProgram& program = m_programs[handle.idx];
 
 		GLuint progHandle = glCreateProgram();
 
@@ -301,30 +312,27 @@ namespace Phoenix
 		if (!glIsProgram(progHandle))
 		{
 			Logger::error("Failed to compile shader program.");
-			return handle;
+			return;
 		}
 
 		program.m_id = progHandle;
 		handle.idx = static_cast<uint16_t>(m_programs.size() - 1);
-		return handle;
+		return;
 	}
 
-	TextureHandle WGlRenderContext::createTexture() 
-	{ 
-		Logger::warning(__LOCATION_INFO__ "not implemented!");
-		return{}; 
-	}
-	
-	FrameBufferHandle WGlRenderContext::createFrameBuffer() 
-	{ 
-		Logger::warning(__LOCATION_INFO__ "not implemented!");
-		return{}; 
-	}
-
-	UniformHandle WGlRenderContext::createUniform(const char* name, Uniform::Type type)
+	void WGlRenderContext::createTexture()
 	{
 		Logger::warning(__LOCATION_INFO__ "not implemented!");
-		return{};
+	}
+
+	void WGlRenderContext::createFrameBuffer()
+	{
+		Logger::warning(__LOCATION_INFO__ "not implemented!");
+	}
+
+	void WGlRenderContext::createUniform(UniformHandle handle, const char* name, Uniform::Type type)
+	{
+		Logger::warning(__LOCATION_INFO__ "not implemented!");
 	}
 
 	void WGlRenderContext::WGlRenderContext::setVertexBuffer(VertexBufferHandle vb)
@@ -385,42 +393,6 @@ namespace Phoenix
 	void WGlRenderContext::WGlRenderContext::drawIndexed(Primitive::Type primitive, uint32_t count, uint32_t start)
 	{
 		glDrawElements(getPrimitiveEnum(primitive), count, GL_UNSIGNED_INT, (GLvoid*)(sizeof(GLubyte) * start));
-	}
-
-	VertexBufferHandle WGlRenderContext::allocVertexBuffer()
-	{
-		m_vertexBuffers.emplace_back();
-		GlVertexBuffer& buffer = m_vertexBuffers.back();
-
-		VertexBufferHandle handle;
-		handle.idx = static_cast<uint16_t>(m_vertexBuffers.size() - 1);
-		return handle;
-	}
-
-	void WGlRenderContext::createVertexBuffer(VertexBufferHandle handle, const VertexBufferFormat& format)
-	{
-		GlVertexBuffer& buffer = m_vertexBuffers[handle.idx];
-		glGenVertexArrays(1, &buffer.m_id);
-		glBindVertexArray(buffer.m_id);
-
-		size_t attribCount = format.size();
-		for (size_t location = 0; location < attribCount; ++location)
-		{
-			const VertexAttrib::Data& data = format.at(location)->m_data;
-			const VertexAttrib::Decl& decl = format.at(location)->m_decl;
-
-			GLuint vbo = createVBO(data.m_size, data.m_count, data.m_data);
-
-			glEnableVertexAttribArray(location);
-			glBindBuffer(GL_ARRAY_BUFFER, vbo);
-			glVertexAttribPointer(
-				location,
-				decl.m_numElements,
-				attribSizeToGl(decl.m_type),
-				data.m_bNormalize,
-				data.m_size,
-				nullptr);
-		}
 	}
 
 	void WGlRenderContext::tempUseVertexBuffer(VertexBufferHandle handle)

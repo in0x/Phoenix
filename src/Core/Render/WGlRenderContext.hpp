@@ -47,13 +47,21 @@ namespace Phoenix
 		virtual uint32_t getMaxTextureUnits() override;
 		virtual uint32_t getMaxUniformCount() override;
 
-		//virtual VertexBufferHandle createVertexBuffer(const VertexBufferFormat& format) override;
-		virtual IndexBufferHandle createIndexBuffer(size_t size, uint32_t count, const void* data) override;
-		virtual ShaderHandle createShader(const char* source, Shader::Type shaderType) override;
-		virtual ProgramHandle createProgram(const Shader::List& shaders) override;
-		virtual TextureHandle createTexture() override;
-		virtual FrameBufferHandle createFrameBuffer() override;
-		virtual UniformHandle createUniform(const char* name, Uniform::Type type) override;
+		virtual VertexBufferHandle allocVertexBuffer() override;
+		virtual IndexBufferHandle allocIndexBuffer() override;
+		virtual ShaderHandle allocShader() override;
+		virtual ProgramHandle allocProgram() override;
+		virtual TextureHandle allocTexture() override;
+		virtual FrameBufferHandle allocFrameBuffer() override;
+		virtual UniformHandle allocUniform() override;
+
+		virtual void createVertexBuffer(VertexBufferHandle handle, const VertexBufferFormat& format) override;
+		virtual void createIndexBuffer(IndexBufferHandle handle, size_t size, uint32_t count, const void* data) override;
+		virtual void createShader(ShaderHandle handle, const char* source, Shader::Type shaderType) override;
+		virtual void createProgram(ProgramHandle handle, const Shader::List& shaders) override;
+		virtual void createTexture() override;
+		virtual void createFrameBuffer() override;
+		virtual void createUniform(UniformHandle handle, const char* name, Uniform::Type type) override;
 
 		virtual void setVertexBuffer(VertexBufferHandle vb) override;
 		virtual void setIndexBuffer(IndexBufferHandle ib) override;
@@ -65,9 +73,6 @@ namespace Phoenix
 
 		virtual void drawLinear(Primitive::Type primitive, uint32_t count, uint32_t start) override;
 		virtual void drawIndexed(Primitive::Type primitive, uint32_t count, uint32_t start) override;
-
-		virtual VertexBufferHandle allocVertexBuffer() override;
-		virtual void createVertexBuffer(VertexBufferHandle handle, const VertexBufferFormat& format) override;
 
 		void tempUseVertexBuffer(VertexBufferHandle handle);
 		void tempUseIdxBuffer(IndexBufferHandle handle);

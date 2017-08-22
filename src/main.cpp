@@ -115,9 +115,10 @@ void run()
 	foxLayout.add({ AttributeProperty::Normal, AttributeType::Float, 3 }, 
 				  { sizeof(Vec3), fox->normals.size(), fox->normals.data() });
 
-	VertexBufferHandle foxVertices = /*context->createVertexBuffer(foxLayout)*/ renderer.createVertexBuffer(foxLayout);
+	VertexBufferHandle foxVertices = renderer.createVertexBuffer(foxLayout);
 
-	IndexBufferHandle foxIndices = context->createIndexBuffer(sizeof(unsigned int), fox->indices.size(), fox->indices.data());
+	
+	IndexBufferHandle foxIndices = renderer.createIndexBuffer(sizeof(unsigned int), fox->indices.size(), fox->indices.data());
 
 	std::string vsSource = loadText("Shaders/diffuse.vert");
 	std::string fsSource = loadText("Shaders/diffuse.frag");
@@ -145,7 +146,7 @@ void run()
 
 	while (window.isOpen())
 	{
-		getGlErrorString(); // NOTE(Phil): Fails because no program is bound
+		getGlErrorString(); 
 
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_MULTISAMPLE);
@@ -159,9 +160,6 @@ void run()
 
 		glUniformMatrix4fv(2, 1, GL_FALSE, (GLfloat*)&rotMat);
 
-		//glDrawElements(GL_TRIANGLES, fox->indices.size(), GL_UNSIGNED_INT, nullptr);
-
-		//auto dc = renderer.create<Commands::DrawIndexed>();
 		auto dc = renderer.addCommand<Commands::DrawIndexed>();
 		dc->vertexBuffer = foxVertices;
 		dc->indexBuffer = foxIndices;

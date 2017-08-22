@@ -24,7 +24,6 @@ namespace Phoenix
 
 	typedef void(*SubmitFptr)(IRenderContext*, const void*);
 
-
 	template <class T>
 	struct is_submittable
 	{
@@ -52,6 +51,7 @@ namespace Phoenix
 			Primitive::Type primitives;
 			VertexBufferHandle vertexBuffer;
 			IndexBufferHandle indexBuffer;
+			StateGroup state;
 		};
 
 		struct DrawLinear
@@ -63,6 +63,7 @@ namespace Phoenix
 
 			Primitive::Type primitives;
 			VertexBufferHandle vertexBuffer;
+			StateGroup state;
 		};
 	}
 
@@ -81,7 +82,7 @@ namespace Phoenix
 		sizeof(T) bytes
 	- char* auxMemory
 		Auxillary memory used to temporarly store additional data needed for
-		the command, i.e. the data to be stored in constant buffer
+		the command, i.e. the data to be stored in a constant buffer
 		n bytes size, specified when creating the CommandPacket
 	*/
 
@@ -178,7 +179,6 @@ namespace Phoenix
 
 			CommandPacket packet = commandPacket::create<NewCommand>(auxMemorySize);
 
-			// append this command to the given one
 			commandPacket::setNextCommandPacket<OldCommand>(command, packet);
 
 			commandPacket::setNextCommandPacket(packet, nullptr);
@@ -209,24 +209,15 @@ namespace Phoenix
 		}
 
 		VertexBufferHandle createVertexBuffer(const VertexBufferFormat& vbf);
+		ShaderHandle createShader(const char* source, Shader::Type shaderType);
+		ProgramHandle createProgram(const Shader::List& shaders);
+		TextureHandle createTexture();
+		FrameBufferHandle createFrameBuffer();
+		UniformHandle createUniform(const char* name, Uniform::Type type);
 
 	private:
 		IRenderContext* m_pContext;
 		size_t m_currentIndex;
 		std::vector<void*> m_commands;
-
-		/*template <class T>
-		void registerSubmitFptr(SubmitFptr fptr)
-		{
-			m_submitFptrs.emplace(typeid(T), fptr);
-		}
-
-		template <class T>
-		SubmitFptr getSubmitFptr()
-		{
-			return m_submitFptrs[typeid(T)];
-		}
-
-		std::unordered_map<std::type_index, int> m_submitFptrs;*/
 	};
 }
