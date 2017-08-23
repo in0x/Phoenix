@@ -47,13 +47,13 @@ namespace Phoenix
 		virtual uint32_t getMaxTextureUnits() override;
 		virtual uint32_t getMaxUniformCount() override;
 
-		virtual VertexBufferHandle allocVertexBuffer() override;
-		virtual IndexBufferHandle allocIndexBuffer() override;
-		virtual ShaderHandle allocShader() override;
-		virtual ProgramHandle allocProgram() override;
-		virtual TextureHandle allocTexture() override;
-		virtual FrameBufferHandle allocFrameBuffer() override;
-		virtual UniformHandle allocUniform() override;
+		virtual void alloc(VertexBufferHandle& out) override;
+		virtual void alloc(IndexBufferHandle& out) override;
+		virtual void alloc(ShaderHandle& out) override;
+		virtual void alloc(ProgramHandle& out) override;
+		virtual void alloc(TextureHandle& out) override;
+		virtual void alloc(FrameBufferHandle& out) override;
+		virtual void alloc(UniformHandle& out) override;
 
 		virtual void createVertexBuffer(VertexBufferHandle handle, const VertexBufferFormat& format) override;
 		virtual void createIndexBuffer(IndexBufferHandle handle, size_t size, uint32_t count, const void* data) override;
@@ -74,8 +74,6 @@ namespace Phoenix
 		virtual void drawLinear(Primitive::Type primitive, uint32_t count, uint32_t start) override;
 		virtual void drawIndexed(Primitive::Type primitive, uint32_t count, uint32_t start) override;
 
-		void tempUseVertexBuffer(VertexBufferHandle handle);
-		void tempUseIdxBuffer(IndexBufferHandle handle);
 		void tempUseProgram(ProgramHandle handle);
 
 	private:

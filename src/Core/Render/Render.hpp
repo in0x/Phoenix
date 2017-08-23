@@ -174,7 +174,8 @@ namespace Phoenix
 
 		// A set of shaders to be compiled into a program. 
 		// Some shaders may be omitteted if they are not required to create a valid shader program.
-		using List = ShaderHandle[Shader::Type::Count];
+		//using List = ShaderHandle[Shader::Type::Count];
+		using List = std::array<ShaderHandle, Shader::Type::Count>;
 	}
 
 	namespace Uniform

@@ -65,6 +65,41 @@ namespace Phoenix
 			VertexBufferHandle vertexBuffer;
 			StateGroup state;
 		};
+
+		struct CreateVertexBuffer
+		{
+			SUBMITTABLE();
+
+			VertexBufferFormat format;
+			VertexBufferHandle handle;
+		};
+
+		struct CreateIndexBuffer
+		{
+			SUBMITTABLE();
+
+			size_t size;
+			uint32_t count;
+			const void* data;
+			IndexBufferHandle handle;
+		};
+
+		struct CreateShader
+		{
+			SUBMITTABLE();
+
+			char* source;
+			Shader::Type shaderType;
+			ShaderHandle handle;
+		};
+
+		struct CreateProgram
+		{
+			SUBMITTABLE();
+
+			Shader::List shaders;
+			ProgramHandle handle;
+		};
 	}
 
 	/*
@@ -131,6 +166,12 @@ namespace Phoenix
 			return reinterpret_cast<char*>(command) + sizeof(T);
 		}
 
+		template <class T>
+		const char* loadAuxiliaryMemory(T* command)
+		{
+			return reinterpret_cast<const char*>(command) + sizeof(T);
+		}
+
 		void setNextCommandPacket(CommandPacket packet, CommandPacket nextPacket);
 
 		template <class T>
@@ -187,7 +228,7 @@ namespace Phoenix
 			return commandPacket::getCommand<NewCommand>(packet);
 		}
 
-		void submit()
+		void submit() // TODO(Phil): Because packets are newed they currently still leak.
 		{
 			for (size_t i = 0; i < m_currentIndex; ++i)
 			{
@@ -200,7 +241,7 @@ namespace Phoenix
 
 					void* previous = packet;
 					packet = commandPacket::loadNextCommandPacket(packet);
-					free(previous);
+					
 				} while (packet != nullptr);
 			}
 
@@ -208,12 +249,13 @@ namespace Phoenix
 			m_pContext->swapBuffer();
 		}
 
-		VertexBufferHandle createVertexBuffer(const VertexBufferFormat& vbf);
-		ShaderHandle createShader(const char* source, Shader::Type shaderType);
-		ProgramHandle createProgram(const Shader::List& shaders);
-		TextureHandle createTexture();
-		FrameBufferHandle createFrameBuffer();
-		UniformHandle createUniform(const char* name, Uniform::Type type);
+		template <class T>
+		T alloc()
+		{
+			T handle;
+			m_pContext->alloc(handle);
+			return handle;
+		}
 
 	private:
 		IRenderContext* m_pContext;

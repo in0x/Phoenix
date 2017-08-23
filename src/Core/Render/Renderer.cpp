@@ -41,43 +41,6 @@ namespace Phoenix
 		}
 	};
 
-	namespace Commands
-	{
-		// When enqueuing command, a handle is returned upfront from the context, 
-		// into which is written when the command is submitted later.
-		struct CreateVertexBuffer
-		{
-			SUBMITTABLE();
-
-			VertexBufferFormat format;
-			VertexBufferHandle handle;
-		};
-
-		struct CreateIndexBuffer
-		{
-			const static SubmitFptr SubmitFunc;
-
-			size_t size;
-			uint32_t count;
-			const void* data;
-		};
-
-		struct CreateShader
-		{
-			const static SubmitFptr SubmitFunc;
-
-			const char* source;
-			Shader::Type shaderType;
-		};
-
-		struct CreateProgram
-		{
-			const static SubmitFptr SubmitFunc;
-
-			Shader::List shaders;
-		};
-	}
-
 	namespace SubmitFunctions
 	{
 		void indexedDraw(IRenderContext* rc, const void* command)
@@ -102,53 +65,31 @@ namespace Phoenix
 			auto dc = static_cast<const Commands::CreateVertexBuffer*>(command);
 			rc->createVertexBuffer(dc->handle, dc->format);
 		}
+
+		void indexBufferCreate(IRenderContext* rc, const void* command)
+		{
+			auto dc = static_cast<const Commands::CreateIndexBuffer*>(command);
+			rc->createIndexBuffer(dc->handle, dc->size, dc->count, dc->data);
+		}
+
+		void shaderCreate(IRenderContext* rc, const void* command)
+		{
+			auto dc = static_cast<const Commands::CreateShader*>(command);
+			rc->createShader(dc->handle, dc->source, dc->shaderType);
+		}
+
+		void programCreate(IRenderContext* rc, const void* command)
+		{
+			auto dc = static_cast<const Commands::CreateProgram*>(command);
+			rc->createProgram(dc->handle, dc->shaders);
+		}
 	}
 
 	const SubmitFptr Commands::DrawIndexed::SubmitFunc = SubmitFunctions::indexedDraw;
 	const SubmitFptr Commands::DrawLinear::SubmitFunc = SubmitFunctions::linearDraw;
 	const SubmitFptr Commands::CreateVertexBuffer::SubmitFunc = SubmitFunctions::vertexBufferCreate;
+	const SubmitFptr Commands::CreateIndexBuffer::SubmitFunc = SubmitFunctions::indexBufferCreate;
+	const SubmitFptr Commands::CreateShader::SubmitFunc = SubmitFunctions::shaderCreate;
+	const SubmitFptr Commands::CreateProgram::SubmitFunc = SubmitFunctions::programCreate;
 
-	VertexBufferHandle Renderer::createVertexBuffer(const VertexBufferFormat& vbf)
-	{
-		VertexBufferHandle handle = m_pContext->allocVertexBuffer();
-		
-		if (handle.isValid())
-		{
-			auto cmd = addCommand<Commands::CreateVertexBuffer>();
-			cmd->format = vbf;
-			cmd->handle = handle;
-		}
-		else
-		{
-			Logger::error("Failed to allocate VertexBuffer");
-		}
-
-		return handle;
-	}
-
-	// Need to implement commands and submitfunc for these resources.
-	ShaderHandle Renderer::createShader(const char* source, Shader::Type shaderType)
-	{
-
-	}
-	
-	ProgramHandle Renderer::createProgram(const Shader::List& shaders)
-	{
-
-	}
-	
-	TextureHandle Renderer::createTexture()
-	{
-		return m_pContext->allocTexture();
-	}
-	
-	FrameBufferHandle Renderer::createFrameBuffer()
-	{
-		return m_pContext->allocFrameBuffer();
-	}
-	
-	UniformHandle Renderer::createUniform(const char* name, Uniform::Type type)
-	{
-		return m_pContext->allocUniform();
-	}
 }

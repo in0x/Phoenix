@@ -124,31 +124,28 @@ namespace Phoenix
 // NOTE(Phil): Danger, this assumes that all handles use uint16_t for their index
 // this may change with resources that need less slots, so I need a way to get the
 // data type of the handle.
-#define IMPL_ALLOC_FUNC(handleType, funcName, containerName) \
-	handleType WGlRenderContext::funcName() \
+#define IMPL_ALLOC_FUNC(HandleType, ContainerName) \
+	void WGlRenderContext::alloc(HandleType& out) \
 	{ \
-		containerName.emplace_back(); \
-		auto& buffer = m_vertexBuffers.back(); \
-		handleType handle; \
-		handle.idx = static_cast<uint16_t>(containerName.size() - 1); \
-		return handle; \
+		ContainerName.emplace_back(); \
+		auto& buffer = ContainerName.back(); \
+		out.idx = static_cast<uint16_t>(ContainerName.size() - 1); \
 	} \
 
-#define EMPTY_ALLOC_FUNC(handleType, funcName) \
-	handleType WGlRenderContext::funcName() \
+#define EMPTY_ALLOC_FUNC(HandleType) \
+	void WGlRenderContext::alloc(HandleType& out) \
 	{ \
 		Logger::warning(S2(__LOCATION_INFO__) "not implemented!"); \
-		return handleType{}; \
 	} \
 
-	IMPL_ALLOC_FUNC(VertexBufferHandle, allocVertexBuffer, m_vertexBuffers)
-	IMPL_ALLOC_FUNC(IndexBufferHandle, allocIndexBuffer, m_indexBuffers)
-	IMPL_ALLOC_FUNC(ShaderHandle, allocShader, m_shaders)
-	IMPL_ALLOC_FUNC(ProgramHandle, allocProgram, m_programs)
+	IMPL_ALLOC_FUNC(VertexBufferHandle, m_vertexBuffers)
+	IMPL_ALLOC_FUNC(IndexBufferHandle, m_indexBuffers)
+	IMPL_ALLOC_FUNC(ShaderHandle, m_shaders)
+	IMPL_ALLOC_FUNC(ProgramHandle, m_programs)
 
-	EMPTY_ALLOC_FUNC(TextureHandle, allocTexture)
-	EMPTY_ALLOC_FUNC(FrameBufferHandle, allocFrameBuffer)
-	EMPTY_ALLOC_FUNC(UniformHandle, allocUniform)
+	EMPTY_ALLOC_FUNC(TextureHandle)
+	EMPTY_ALLOC_FUNC(FrameBufferHandle)
+	EMPTY_ALLOC_FUNC(UniformHandle)
 
 	void WGlRenderContext::createVertexBuffer(VertexBufferHandle handle, const VertexBufferFormat& format)
 	{
@@ -257,8 +254,6 @@ namespace Phoenix
 	{
 		GlShader& shader = m_shaders[handle.idx];
 
-		ShaderHandle handle;
-
 		if (source == nullptr)
 		{
 			Logger::error("Shader source is null");
@@ -307,7 +302,6 @@ namespace Phoenix
 		}
 
 		glLinkProgram(progHandle);
-		ProgramHandle handle;
 
 		if (!glIsProgram(progHandle))
 		{
@@ -393,18 +387,6 @@ namespace Phoenix
 	void WGlRenderContext::WGlRenderContext::drawIndexed(Primitive::Type primitive, uint32_t count, uint32_t start)
 	{
 		glDrawElements(getPrimitiveEnum(primitive), count, GL_UNSIGNED_INT, (GLvoid*)(sizeof(GLubyte) * start));
-	}
-
-	void WGlRenderContext::tempUseVertexBuffer(VertexBufferHandle handle)
-	{
-		GlVertexBuffer buffer = m_vertexBuffers[handle.idx];
-		glBindVertexArray(buffer.m_id);
-	}
-
-	void WGlRenderContext::tempUseIdxBuffer(IndexBufferHandle handle)
-	{
-		GlIndexBuffer buffer = m_indexBuffers[handle.idx];
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.m_id);
 	}
 
 	void WGlRenderContext::tempUseProgram(ProgramHandle handle)

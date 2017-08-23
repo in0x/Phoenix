@@ -50,6 +50,7 @@ std::string loadText(const char* path)
 			[](const char c) {
 			return !(c >= 0 && c < 128);
 		}), fileString.end());
+	
 		return fileString;
 	}
 	else
@@ -105,42 +106,75 @@ void run()
 
 	std::unique_ptr<WGlRenderContext> context = std::make_unique<WGlRenderContext>(window.getNativeHandle());
 	context->init();
-
 	Renderer renderer(context.get(), 16);
 	
-	VertexBufferFormat foxLayout;
-	foxLayout.add({ AttributeProperty::Position, AttributeType::Float, 3 },
-				  { sizeof(Vec3), fox->vertices.size(), fox->vertices.data() });
+	VertexBufferHandle foxVertices;
+	IndexBufferHandle foxIndices;
+	{
+		VertexBufferFormat foxLayout;
+		foxLayout.add({ AttributeProperty::Position, AttributeType::Float, 3 },
+		{ sizeof(Vec3), fox->vertices.size(), fox->vertices.data() });
 
-	foxLayout.add({ AttributeProperty::Normal, AttributeType::Float, 3 }, 
-				  { sizeof(Vec3), fox->normals.size(), fox->normals.data() });
+		foxLayout.add({ AttributeProperty::Normal, AttributeType::Float, 3 },
+		{ sizeof(Vec3), fox->normals.size(), fox->normals.data() });
 
-	VertexBufferHandle foxVertices = renderer.createVertexBuffer(foxLayout);
-
+		foxVertices = renderer.alloc<VertexBufferHandle>();
+		auto cvb = renderer.addCommand<Commands::CreateVertexBuffer>();
+		cvb->format = foxLayout;
+		cvb->handle = foxVertices;
 	
-	IndexBufferHandle foxIndices = renderer.createIndexBuffer(sizeof(unsigned int), fox->indices.size(), fox->indices.data());
+		foxIndices = renderer.alloc<IndexBufferHandle>();
+		auto cib = renderer.addCommand<Commands::CreateIndexBuffer>();
+		cib->size = sizeof(unsigned int);
+		cib->count = fox->indices.size();
+		cib->data = fox->indices.data();
+		cib->handle = foxIndices;
+	}
 
-	std::string vsSource = loadText("Shaders/diffuse.vert");
-	std::string fsSource = loadText("Shaders/diffuse.frag");
+	ProgramHandle program;
+	{
+		std::string vsSource = loadText("Shaders/diffuse.vert");
+		std::string fsSource = loadText("Shaders/diffuse.frag");
 
-	ShaderHandle vs = context->createShader(vsSource.c_str(), Shader::Vertex);
-	ShaderHandle fs = context->createShader(fsSource.c_str(), Shader::Fragment);
+		size_t len = vsSource.size();
+		Commands::CreateShader* cvs = renderer.addCommand<Commands::CreateShader>(len);	
+		cvs->shaderType = Shader::Vertex;
+		cvs->handle = renderer.alloc<ShaderHandle>(); 
+		cvs->source = commandPacket::getAuxiliaryMemory(cvs);
+		memcpy(commandPacket::getAuxiliaryMemory(cvs), &vsSource[0], len);
+		cvs->source[len] = '\0';
 
-	Shader::List shaders;
-	shaders[Shader::Vertex] = vs;
-	shaders[Shader::Fragment] = fs;
-	ProgramHandle program = context->createProgram(shaders);
+		len = fsSource.size();
+		Commands::CreateShader* cfs = renderer.appendCommand<Commands::CreateShader>(cvs, len);
+		cfs->shaderType = Shader::Fragment;
+		cfs->handle = renderer.alloc<ShaderHandle>();	
+		cfs->source = commandPacket::getAuxiliaryMemory(cfs);
+		memcpy(commandPacket::getAuxiliaryMemory(cfs), &fsSource[0], len);
+		cfs->source[len] = '\0';
+
+		auto createProg = renderer.appendCommand<Commands::CreateProgram>(cfs);
+		program = renderer.alloc<ProgramHandle>();
+
+		Shader::List shaders;
+		shaders[Shader::Vertex] = cvs->handle;
+		shaders[Shader::Fragment] = cfs->handle;
+		
+		createProg->shaders = shaders;
+		createProg->handle = program;
+	}
+	
+	renderer.submit();
+
+	getGlErrorString();
 
 	context->tempUseProgram(program);
-	context->tempUseVertexBuffer(foxVertices);
-	context->tempUseIdxBuffer(foxIndices);
+
+	getGlErrorString();
 
 	glUniformMatrix4fv(2, 1, GL_FALSE, (GLfloat*)&worldMat);
 	glUniformMatrix4fv(3, 1, GL_FALSE, (GLfloat*)&viewMat);
 	glUniformMatrix4fv(4, 1, GL_FALSE, (GLfloat*)&projMat);
 	glUniform3fv(5, 1, (GLfloat*)&lightPosition);
-
-	getGlErrorString();
 
 	float angle = 0.f;
 

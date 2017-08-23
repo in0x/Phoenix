@@ -14,14 +14,14 @@ namespace Phoenix
 
 		virtual uint32_t getMaxTextureUnits() = 0;
 		virtual uint32_t getMaxUniformCount() = 0;
-	
-		virtual VertexBufferHandle allocVertexBuffer() = 0;
-		virtual IndexBufferHandle allocIndexBuffer() = 0;
-		virtual ShaderHandle allocShader() = 0;
-		virtual ProgramHandle allocProgram() = 0;
-		virtual TextureHandle allocTexture() = 0;
-		virtual FrameBufferHandle allocFrameBuffer() = 0;
-		virtual UniformHandle allocUniform() = 0;
+
+		virtual void alloc(VertexBufferHandle& out) = 0;
+		virtual void alloc(IndexBufferHandle& out) = 0;
+		virtual void alloc(ShaderHandle& out) = 0;
+		virtual void alloc(ProgramHandle& out) = 0;
+		virtual void alloc(TextureHandle& out) = 0;
+		virtual void alloc(FrameBufferHandle& out) = 0;
+		virtual void alloc(UniformHandle& out) = 0;
 
 		virtual void createVertexBuffer(VertexBufferHandle handle, const VertexBufferFormat& format) = 0;
 		virtual void createIndexBuffer(IndexBufferHandle handle, size_t size, uint32_t count, const void* data) = 0;
