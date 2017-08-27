@@ -1,14 +1,32 @@
-#include <Windows.h>
 #include <cassert>
 #include <fstream>
 #include "Tests/MathTests.hpp"
 #include "Core/obj.hpp"
 #include "Core/Math/PhiMath.hpp"
 #include "Core/Win32Window.hpp"
-#include "Core/StringTokenizer.hpp"
 #include "Core/Logger.hpp"
 #include "Core/Render/WGlRenderContext.hpp"
 #include "Core/Render/Renderer.hpp"
+#include "Core/Clock.hpp"
+
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
+#define PLATFORM_WINDOWS
+#endif
+
+#ifdef PLATFORM_WINDOWS
+#include "Core/PlatformWindows.hpp"
+#endif
+
+/*
+TODO:
+* Support uniforms (renderer = shared, context = platform-specific implementation)
+* Crashes when closed by closing window via taskbar
+* Implement linear allocator
+* Implement dynamic array
+
+* The solution to being stateless is really just to set everything that isnt specified
+* to a default
+*/
 
 char* getCMDOption(char** start, char** end, const std::string& option)
 {
@@ -21,22 +39,6 @@ char* getCMDOption(char** start, char** end, const std::string& option)
 
 	return nullptr;
 }
-
-/*
-TODO:
-	* Support uniforms (renderer = shared, context = platform-specific implementation)
-	* Implement stategroups, commands, drawitem compilation 
-	* Crashes when closed by closing window via taskbar
-	* Implement linear allocator
-	* Implement dynamic array
-
-	* The solution to being stateless is really just to set everything that isnt specified
-	* to a default
-
-	* Commands store a function pointer to their dispatch function that the backend can call.
-	* This allows for adding commands without having the change any interfaces.
-	* Commands should be pod so that we can operate on their memory easily
-*/
 
 std::string loadText(const char* path)
 {
@@ -62,19 +64,7 @@ std::string loadText(const char* path)
 
 void run()
 {
-
-#ifdef ENABLE_VIRTUAL_TERMINAL_PROCESSING
-	// NOTE(Phil): Enables ansi color codes being interpreted by the console.
-	// I need a place to put this so its only called when we are on Windows.
-	{
-		// Set output mode to handle virtual terminal sequences
-		HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-		DWORD dwMode = 0;
-		GetConsoleMode(hOut, &dwMode);
-		dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-		SetConsoleMode(hOut, dwMode);
-	}
-#endif
+	initPlatform();
 
 	using namespace Phoenix;
 
