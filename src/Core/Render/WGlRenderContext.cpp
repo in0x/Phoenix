@@ -121,9 +121,9 @@ namespace Phoenix
 		return glType[type];
 	}
 
-// NOTE(Phil): Danger, this assumes that all handles use uint16_t for their index
-// this may change with resources that need less slots, so I need a way to get the
-// data type of the handle.
+	// NOTE(Phil): Danger, this assumes that all handles use uint16_t for their index
+	// this may change with resources that need less slots, so I need a way to get the
+	// data type of the handle.
 #define IMPL_ALLOC_FUNC(HandleType, ContainerName) \
 	void WGlRenderContext::alloc(HandleType& out) \
 	{ \
@@ -139,15 +139,15 @@ namespace Phoenix
 	} \
 
 	IMPL_ALLOC_FUNC(VertexBufferHandle, m_vertexBuffers)
-	IMPL_ALLOC_FUNC(IndexBufferHandle, m_indexBuffers)
-	IMPL_ALLOC_FUNC(ShaderHandle, m_shaders)
-	IMPL_ALLOC_FUNC(ProgramHandle, m_programs)
+		IMPL_ALLOC_FUNC(IndexBufferHandle, m_indexBuffers)
+		IMPL_ALLOC_FUNC(ShaderHandle, m_shaders)
+		IMPL_ALLOC_FUNC(ProgramHandle, m_programs)
 
-	EMPTY_ALLOC_FUNC(TextureHandle)
-	EMPTY_ALLOC_FUNC(FrameBufferHandle)
-	EMPTY_ALLOC_FUNC(UniformHandle)
+		EMPTY_ALLOC_FUNC(TextureHandle)
+		EMPTY_ALLOC_FUNC(FrameBufferHandle)
+		EMPTY_ALLOC_FUNC(UniformHandle)
 
-	void WGlRenderContext::createVertexBuffer(VertexBufferHandle handle, const VertexBufferFormat& format)
+		void WGlRenderContext::createVertexBuffer(VertexBufferHandle handle, const VertexBufferFormat& format)
 	{
 		GlVertexBuffer& buffer = m_vertexBuffers[handle.idx];
 		glGenVertexArrays(1, &buffer.m_id);
@@ -191,7 +191,7 @@ namespace Phoenix
 			 GL_FRAGMENT_SHADER,
 			 GL_COMPUTE_SHADER,
 		};
-		
+
 		return glType[type];
 	}
 
@@ -269,7 +269,7 @@ namespace Phoenix
 
 		printShaderLog(shader.m_id);
 	}
-	
+
 	void WGlRenderContext::createProgram(ProgramHandle handle, const Shader::List& shaders)
 	{
 		GlProgram& program = m_programs[handle.idx];
@@ -294,7 +294,7 @@ namespace Phoenix
 				}
 			}
 			else
-			{			
+			{
 				Logger::error("Trying to access invalid shader");
 			}
 
@@ -324,9 +324,58 @@ namespace Phoenix
 		Logger::warning(__LOCATION_INFO__ "not implemented!");
 	}
 
-	void WGlRenderContext::createUniform(UniformHandle handle, const char* name, Uniform::Type type)
+	void getUniformSetter(Uniform::Type type)
+	{
+
+	}
+
+	void WGlRenderContext::createUniform(UniformHandle handle, const char* name, Uniform::Type type, const void* data)
 	{
 		Logger::warning(__LOCATION_INFO__ "not implemented!");
+	}
+
+	void WGlRenderContext::setUniform(UniformHandle handle, const void* data)
+	{
+		GlUniform uniform = m_uniforms[handle.idx];
+
+		switch (uniform.m_type)
+		{
+		case Uniform::Float:
+		{
+			glUniform1fv(uniform.m_location, 1, static_cast<const GLfloat*>(data));
+			break;
+		}
+		case Uniform::Int:
+		{
+			glUniform1iv(uniform.m_location, 1, static_cast<const GLint*>(data));
+			break;
+		}
+		case Uniform::Vec3:
+		{
+			glUniform3fv(uniform.m_location, 1, static_cast<const GLfloat*>(data));
+			break;
+		}
+		case Uniform::Vec4:
+		{
+			glUniform4fv(uniform.m_location, 1, static_cast<const GLfloat*>(data));
+			break;
+		}
+		case Uniform::Mat3:
+		{
+			glUniformMatrix3fv(uniform.m_location, 1, false, static_cast<const GLfloat*>(data));
+			break;
+		}
+		case Uniform::Mat4:
+		{
+			glUniformMatrix4fv(uniform.m_location, 1, false, static_cast<const GLfloat*>(data));
+			break;
+		}
+		default:
+		{
+			Logger::error("Invalid uniform type used to set value");
+			break;
+		}
+		};
 	}
 
 	void WGlRenderContext::WGlRenderContext::setVertexBuffer(VertexBufferHandle vb)
@@ -335,34 +384,34 @@ namespace Phoenix
 		glBindVertexArray(buffer.m_id);
 	}
 
-	void WGlRenderContext::WGlRenderContext::setIndexBuffer(IndexBufferHandle ib) 
+	void WGlRenderContext::WGlRenderContext::setIndexBuffer(IndexBufferHandle ib)
 	{
 		GlIndexBuffer buffer = m_indexBuffers[ib.idx];
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.m_id);
 	}
 
-	void WGlRenderContext::WGlRenderContext::setProgram(ProgramHandle prog) 
+	void WGlRenderContext::WGlRenderContext::setProgram(ProgramHandle prog)
 	{
 		GlProgram program = m_programs[prog.idx];
 		glUseProgram(program.m_id);
 	}
 
-	void WGlRenderContext::setDepth(Depth::Type depth) 
+	void WGlRenderContext::setDepth(Depth::Type depth)
 	{
 		Logger::warning(__LOCATION_INFO__ "not implemented!");
 	}
 
-	void WGlRenderContext::setRaster(Raster::Type raster) 
+	void WGlRenderContext::setRaster(Raster::Type raster)
 	{
 		Logger::warning(__LOCATION_INFO__ "not implemented!");
 	}
 
-	void WGlRenderContext::setBlend(Blend::Type blend) 
+	void WGlRenderContext::setBlend(Blend::Type blend)
 	{
 		Logger::warning(__LOCATION_INFO__ "not implemented!");
 	}
 
-	void WGlRenderContext::setStencil(Stencil::Type stencil) 
+	void WGlRenderContext::setStencil(Stencil::Type stencil)
 	{
 		Logger::warning(__LOCATION_INFO__ "not implemented!");
 	}

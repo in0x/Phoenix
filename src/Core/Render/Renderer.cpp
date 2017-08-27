@@ -4,7 +4,7 @@
 namespace Phoenix
 {
 	namespace commandPacket
-	{		
+	{
 		CommandPacket* getNextCommandPacket(CommandPacket packet)
 		{
 			return reinterpret_cast<CommandPacket*>(reinterpret_cast<char*>(packet) + OFFSET_NEXT_COMMAND_PACKET);
@@ -82,6 +82,14 @@ namespace Phoenix
 		{
 			auto dc = static_cast<const Commands::CreateProgram*>(command);
 			rc->createProgram(dc->handle, dc->shaders);
+		}
+
+		void uniformCreate(IRenderContext* rc, const void* command)
+		{
+			auto dc = static_cast<const Commands::CreateUniform*>(command);
+
+			//Uniform::Type dataType;
+			//const void* data;
 		}
 	}
 

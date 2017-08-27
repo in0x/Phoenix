@@ -100,6 +100,15 @@ namespace Phoenix
 			Shader::List shaders;
 			ProgramHandle handle;
 		};
+
+		struct CreateUniform
+		{
+			SUBMITTABLE();
+
+			const void* data;
+			Uniform::Type dataType;
+			UniformHandle handle;
+		};
 	}
 
 	/*

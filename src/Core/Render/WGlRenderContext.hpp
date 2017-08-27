@@ -32,8 +32,8 @@ namespace Phoenix
 
 	struct GlUniform
 	{
-		Uniform::Type m_type;
-
+		Uniform::Type m_type; // Storing setter function directly would be better
+		GLuint m_location;
 	};
 
 	class WGlRenderContext : public IRenderContext
@@ -61,7 +61,7 @@ namespace Phoenix
 		virtual void createProgram(ProgramHandle handle, const Shader::List& shaders) override;
 		virtual void createTexture() override;
 		virtual void createFrameBuffer() override;
-		virtual void createUniform(UniformHandle handle, const char* name, Uniform::Type type) override;
+		virtual void createUniform(UniformHandle handle, const char* name, Uniform::Type type, const void* data) override;
 
 		virtual void setVertexBuffer(VertexBufferHandle vb) override;
 		virtual void setIndexBuffer(IndexBufferHandle ib) override;
@@ -70,6 +70,7 @@ namespace Phoenix
 		virtual void setRaster(Raster::Type raster) override;
 		virtual void setBlend(Blend::Type blend) override;
 		virtual void setStencil(Stencil::Type stencil) override;
+		void setUniform(UniformHandle handle, const void* data);
 
 		virtual void drawLinear(Primitive::Type primitive, uint32_t count, uint32_t start) override;
 		virtual void drawIndexed(Primitive::Type primitive, uint32_t count, uint32_t start) override;
@@ -81,6 +82,7 @@ namespace Phoenix
 		std::vector<GlIndexBuffer> m_indexBuffers;
 		std::vector<GlShader> m_shaders;
 		std::vector<GlProgram> m_programs;
+		std::vector<GlUniform> m_uniforms;
 
 		HWND m_owningWindow;
 		HGLRC m_renderContext;
