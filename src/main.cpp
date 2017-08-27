@@ -164,12 +164,7 @@ void run()
 	}
 	
 	renderer.submit();
-
-	getGlErrorString();
-
 	context->tempUseProgram(program);
-
-	getGlErrorString();
 
 	glUniformMatrix4fv(2, 1, GL_FALSE, (GLfloat*)&worldMat);
 	glUniformMatrix4fv(3, 1, GL_FALSE, (GLfloat*)&viewMat);
@@ -178,10 +173,10 @@ void run()
 
 	float angle = 0.f;
 
+	checkGlError();
+
 	while (window.isOpen())
 	{
-		getGlErrorString(); 
-
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_MULTISAMPLE);
 

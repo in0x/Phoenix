@@ -30,6 +30,29 @@ std::string getGlErrorString()
 	}
 }
 
+void checkGlError()
+{
+	GLenum err(glGetError());
+
+	switch (err)
+	{
+	case GL_NO_ERROR:
+		return;
+	case GL_INVALID_OPERATION:
+		assert(false);
+	case GL_INVALID_ENUM:
+		assert(false);
+	case GL_INVALID_VALUE:
+		assert(false);
+	case GL_OUT_OF_MEMORY:
+		assert(false);
+	case GL_INVALID_FRAMEBUFFER_OPERATION:
+		assert(false);
+	default:
+		assert(false);
+	}
+}
+
 #include <vector>
 
 void err_cb(GLenum        source,

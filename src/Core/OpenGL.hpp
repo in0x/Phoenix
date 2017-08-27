@@ -4,6 +4,7 @@
 #include <string>
 
 std::string getGlErrorString();
+void checkGlError();
 
 void err_cb(GLenum        source,
 	GLenum        type,
