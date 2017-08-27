@@ -85,6 +85,9 @@
     <ClInclude Include="..\src\Core\Render\Renderer.hpp">
       <Filter>Render</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Core\PlatformWindows.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Core\Math\Matrix3.cpp">
