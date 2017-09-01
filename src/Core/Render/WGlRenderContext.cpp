@@ -332,6 +332,11 @@ namespace Phoenix
 	void WGlRenderContext::createUniform(UniformHandle handle, const char* name, Uniform::Type type, const void* data)
 	{
 		Logger::warning(__LOCATION_INFO__ "not implemented!");
+
+		// When creating a shader, get all info via introspection -> all uniform names. 
+		// Create uniform info independently of context. Use shader info when bound to see what uniforms can be used
+
+		// The user specifies which uniforms to bind using the StateGroup
 	}
 
 	void WGlRenderContext::setUniform(UniformHandle handle, const void* data)
@@ -436,11 +441,5 @@ namespace Phoenix
 	void WGlRenderContext::WGlRenderContext::drawIndexed(Primitive::Type primitive, uint32_t count, uint32_t start)
 	{
 		glDrawElements(getPrimitiveEnum(primitive), count, GL_UNSIGNED_INT, (GLvoid*)(sizeof(GLubyte) * start));
-	}
-
-	void WGlRenderContext::tempUseProgram(ProgramHandle handle)
-	{
-		GlProgram program = m_programs[handle.idx];
-		glUseProgram(program.m_id);
 	}
 }

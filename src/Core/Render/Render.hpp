@@ -6,8 +6,24 @@
 
 #undef max
 
+// Goals:
+// Command-based: The user submits commands that specify the desired action
+// and required data which is then executed using the GPU. Commands can be 
+// stored in buckets, which in turn can be sorted in order to group commands
+// with similar data so as to reduce state changes.
+//
+// Stateless: To prevent the pitfalls of stateful APIs such as OpenGL, where
+// a state set by previous call can affect the next call, the system should be
+// stateless: Options set by the previous draw call should not have an effect on 
+// the next. 
+
 namespace Phoenix
 {
+	namespace RenderConstants
+	{
+		constexpr uint32_t c_maxUniformNameLenght = 128;
+	}
+
 #define HANDLE(name, size) \
 		class name \
 		{ \
@@ -25,6 +41,25 @@ namespace Phoenix
 	HANDLE(FrameBufferHandle, uint16_t);
 	HANDLE(UniformHandle, uint16_t);
 	HANDLE(TextureListHandle, uint16_t);
+
+	class IRenderContext;
+
+	typedef void(*SubmitFptr)(IRenderContext*, const void*);
+
+	template <class T>
+	struct is_submittable
+	{
+		template <typename U> static std::true_type check(decltype(U::SubmitFunc)*);
+		template <typename> static std::false_type check(...);
+
+		typedef decltype(check<T>(0)) result;
+
+	public:
+		static const bool value = result::value;
+	};
+
+#define SUBMITTABLE() \
+		const static SubmitFptr SubmitFunc \
 
 	namespace AttributeProperty
 	{
@@ -191,6 +226,12 @@ namespace Phoenix
 			Count
 		};
 	}
+
+	struct UniformInfo
+	{
+		char name[RenderConstants::c_maxUniformNameLenght];
+		Uniform::Type type;
+	};
 
 	namespace Primitive
 	{

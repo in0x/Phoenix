@@ -2,15 +2,27 @@
 #include "Render.hpp"
 #include "../Logger.hpp"
 
-namespace Phoenix
+namespace Phoenix 
 {
+	// Splitup in frontend that handles all the shared stuff, such as creating handles, caching uniforms etc.
+	// IRenderContext is backend which is used via commands. Allows us to pull alloc functions out RenderContext
+	// where they dont belong.
+
 	// A RenderContext represents an object that can be used to perform actions 
 	// on rendering API (e.g. OpenGL or DirectX).  
-	class IRenderContext
+	class IRenderContext // Maybe this can be replaced with Non-virtual interface -> Allows for a place for UniformCache
 	{
 	public: 
 		virtual ~IRenderContext() {}
 		virtual void init() = 0;
+
+		template <class T>
+		T alloc()
+		{
+			T handle;
+			alloc(handle);
+			return handle;
+		}
 
 		virtual uint32_t getMaxTextureUnits() = 0;
 		virtual uint32_t getMaxUniformCount() = 0;
@@ -41,7 +53,7 @@ namespace Phoenix
 
 		virtual void drawLinear(Primitive::Type primitive, uint32_t count, uint32_t start) = 0;
 		virtual void drawIndexed(Primitive::Type primitive, uint32_t count, uint32_t start) = 0;
-	
+
 		//TODO(Phil): Destruction functions / release of resources on self destruction
 
 		virtual void swapBuffer() = 0;

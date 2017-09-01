@@ -75,8 +75,6 @@ namespace Phoenix
 		virtual void drawLinear(Primitive::Type primitive, uint32_t count, uint32_t start) override;
 		virtual void drawIndexed(Primitive::Type primitive, uint32_t count, uint32_t start) override;
 
-		void tempUseProgram(ProgramHandle handle);
-
 	private:
 		std::vector<GlVertexBuffer> m_vertexBuffers; // These vectors need replacing when I create custom allocators
 		std::vector<GlIndexBuffer> m_indexBuffers;

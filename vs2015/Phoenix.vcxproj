@@ -183,10 +183,13 @@
     <ClInclude Include="..\src\Core\ObjStructs.hpp" />
     <ClInclude Include="..\src\Core\OpenGL.hpp" />
     <ClInclude Include="..\src\Core\PlatformWindows.hpp" />
+    <ClInclude Include="..\src\Core\Render\CommandPacket.hpp" />
+    <ClInclude Include="..\src\Core\Render\Commands.hpp" />
     <ClInclude Include="..\src\Core\Render\IRenderContext.hpp" />
     <ClInclude Include="..\src\Core\Render\Render.hpp" />
-    <ClInclude Include="..\src\Core\Render\Renderer.hpp" />
+    <ClInclude Include="..\src\Core\Render\CommandBucket.hpp" />
     <ClInclude Include="..\src\Core\Render\Research.hpp" />
+    <ClInclude Include="..\src\Core\Render\UniformCache.hpp" />
     <ClInclude Include="..\src\Core\Render\WGlRenderContext.hpp" />
     <ClInclude Include="..\src\Core\StringTokenizer.hpp" />
     <ClInclude Include="..\src\Core\Transform.h" />
@@ -224,7 +227,10 @@
     <ClCompile Include="..\src\Core\obj.cpp" />
     <ClCompile Include="..\src\Core\ObjIndexer.cpp" />
     <ClCompile Include="..\src\Core\OpenGL.cpp" />
-    <ClCompile Include="..\src\Core\Render\Renderer.cpp" />
+    <ClCompile Include="..\src\Core\Render\CommandBucket.cpp" />
+    <ClCompile Include="..\src\Core\Render\CommandPacket.cpp" />
+    <ClCompile Include="..\src\Core\Render\Commands.cpp" />
+    <ClCompile Include="..\src\Core\Render\UniformCache.cpp" />
     <ClCompile Include="..\src\Core\Render\WGlRenderContext.cpp" />
     <ClCompile Include="..\src\Core\StringTokenizer.cpp" />
     <ClCompile Include="..\src\Core\Transform.cpp" />

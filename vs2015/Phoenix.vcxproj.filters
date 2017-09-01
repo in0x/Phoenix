@@ -82,11 +82,20 @@
     <ClInclude Include="..\src\Core\Render\Render.hpp">
       <Filter>Render</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Core\Render\Renderer.hpp">
-      <Filter>Render</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Core\PlatformWindows.hpp">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Render\UniformCache.hpp">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Render\CommandBucket.hpp">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Render\Commands.hpp">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Render\CommandPacket.hpp">
+      <Filter>Render</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -151,7 +160,16 @@
     <ClCompile Include="..\src\Core\Logger.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Core\Render\Renderer.cpp">
+    <ClCompile Include="..\src\Core\Render\CommandBucket.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Core\Render\CommandPacket.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Core\Render\Commands.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Core\Render\UniformCache.cpp">
       <Filter>Render</Filter>
     </ClCompile>
   </ItemGroup>

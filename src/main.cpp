@@ -1,13 +1,17 @@
 #include <cassert>
 #include <fstream>
+
 #include "Tests/MathTests.hpp"
+
 #include "Core/obj.hpp"
 #include "Core/Math/PhiMath.hpp"
 #include "Core/Win32Window.hpp"
 #include "Core/Logger.hpp"
+
 #include "Core/Render/WGlRenderContext.hpp"
-#include "Core/Render/Renderer.hpp"
-#include "Core/Clock.hpp"
+#include "Core/Render/CommandBucket.hpp"
+#include "Core/Render/Commands.hpp"
+#include "Core/Render/CommandPacket.hpp"
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
 #define PLATFORM_WINDOWS
@@ -94,9 +98,9 @@ void run()
 	Matrix4 projMat = perspectiveRH(70, (float)config.width / (float)config.height, 1, 100);
 	Vec3 lightPosition = Vec3(-5, 3, 5);
 
-	std::unique_ptr<WGlRenderContext> context = std::make_unique<WGlRenderContext>(window.getNativeHandle());
+	std::unique_ptr<IRenderContext> context = std::make_unique<WGlRenderContext>(window.getNativeHandle());
 	context->init();
-	Renderer renderer(context.get(), 16);
+	CommandBucket commandBucket(16);
 	
 	VertexBufferHandle foxVertices;
 	IndexBufferHandle foxIndices;
@@ -108,13 +112,13 @@ void run()
 		foxLayout.add({ AttributeProperty::Normal, AttributeType::Float, 3 },
 		{ sizeof(Vec3), fox->normals.size(), fox->normals.data() });
 
-		foxVertices = renderer.alloc<VertexBufferHandle>();
-		auto cvb = renderer.addCommand<Commands::CreateVertexBuffer>();
+		foxVertices = context->alloc<VertexBufferHandle>();
+		auto cvb = commandBucket.addCommand<Commands::CreateVertexBuffer>();
 		cvb->format = foxLayout;
 		cvb->handle = foxVertices;
 	
-		foxIndices = renderer.alloc<IndexBufferHandle>();
-		auto cib = renderer.addCommand<Commands::CreateIndexBuffer>();
+		foxIndices = context->alloc<IndexBufferHandle>();
+		auto cib = commandBucket.addCommand<Commands::CreateIndexBuffer>();
 		cib->size = sizeof(unsigned int);
 		cib->count = fox->indices.size();
 		cib->data = fox->indices.data();
@@ -127,23 +131,23 @@ void run()
 		std::string fsSource = loadText("Shaders/diffuse.frag");
 
 		size_t len = vsSource.size();
-		Commands::CreateShader* cvs = renderer.addCommand<Commands::CreateShader>(len);	
+		Commands::CreateShader* cvs = commandBucket.addCommand<Commands::CreateShader>(len);	
 		cvs->shaderType = Shader::Vertex;
-		cvs->handle = renderer.alloc<ShaderHandle>(); 
+		cvs->handle = context->alloc<ShaderHandle>(); 
 		cvs->source = commandPacket::getAuxiliaryMemory(cvs);
 		memcpy(commandPacket::getAuxiliaryMemory(cvs), &vsSource[0], len);
 		cvs->source[len] = '\0';
 
 		len = fsSource.size();
-		Commands::CreateShader* cfs = renderer.appendCommand<Commands::CreateShader>(cvs, len);
+		Commands::CreateShader* cfs = commandBucket.appendCommand<Commands::CreateShader>(cvs, len);
 		cfs->shaderType = Shader::Fragment;
-		cfs->handle = renderer.alloc<ShaderHandle>();	
+		cfs->handle = context->alloc<ShaderHandle>();	
 		cfs->source = commandPacket::getAuxiliaryMemory(cfs);
 		memcpy(commandPacket::getAuxiliaryMemory(cfs), &fsSource[0], len);
 		cfs->source[len] = '\0';
 
-		auto createProg = renderer.appendCommand<Commands::CreateProgram>(cfs);
-		program = renderer.alloc<ProgramHandle>();
+		auto createProg = commandBucket.appendCommand<Commands::CreateProgram>(cfs);
+		program = context->alloc<ProgramHandle>();
 
 		Shader::List shaders;
 		shaders[Shader::Vertex] = cvs->handle;
@@ -153,9 +157,10 @@ void run()
 		createProg->handle = program;
 	}
 	
-	renderer.submit();
-	context->tempUseProgram(program);
+	commandBucket.submit(context.get());
 
+	context->setProgram(program);
+	
 	glUniformMatrix4fv(2, 1, GL_FALSE, (GLfloat*)&worldMat);
 	glUniformMatrix4fv(3, 1, GL_FALSE, (GLfloat*)&viewMat);
 	glUniformMatrix4fv(4, 1, GL_FALSE, (GLfloat*)&projMat);
@@ -179,14 +184,18 @@ void run()
 
 		glUniformMatrix4fv(2, 1, GL_FALSE, (GLfloat*)&rotMat);
 
-		auto dc = renderer.addCommand<Commands::DrawIndexed>();
+		auto dc = commandBucket.addCommand<Commands::DrawIndexed>();
+		
 		dc->vertexBuffer = foxVertices;
 		dc->indexBuffer = foxIndices;
 		dc->primitives = Primitive::Triangles;
 		dc->start = 0;
 		dc->count = fox->indices.size();
 
-		renderer.submit();
+		dc->state.program = program;
+
+		commandBucket.submit(context.get());
+		context->swapBuffer();
 
 		glDisable(GL_MULTISAMPLE);
 		glDisable(GL_DEPTH_TEST);
