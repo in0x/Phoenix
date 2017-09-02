@@ -1,19 +1,28 @@
-#include "WGlRenderContext.hpp"
+#include "WGlRenderBackend.hpp"
 #include "../OpenGL.hpp"
 #include "../Logger.hpp"
 #include <assert.h>
 
 namespace Phoenix
 {
-
-	WGlRenderContext::WGlRenderContext(HWND owningWindow)
-		: m_owningWindow(owningWindow)
+	WGlRenderBackend::WGlRenderBackend()
+		: m_owningWindow(nullptr)
 		, m_renderContext(0)
 	{
 	}
 
-	void WGlRenderContext::WGlRenderContext::init()
+	void WGlRenderBackend::WGlRenderBackend::init(RenderInit* initValues)
 	{
+		auto wglInitValues = dynamic_cast<WGlRenderInit*>(initValues);
+
+		if (!wglInitValues)
+		{
+			Logger::error("Passed RenderInit of invalid type");
+			assert(false);
+		}
+
+		m_owningWindow = wglInitValues->m_owningWindow;
+
 		PIXELFORMATDESCRIPTOR pfd =
 		{
 			sizeof(PIXELFORMATDESCRIPTOR),
@@ -73,25 +82,25 @@ namespace Phoenix
 		Logger::log(glslVersion);
 	}
 
-	WGlRenderContext::~WGlRenderContext()
+	WGlRenderBackend::~WGlRenderBackend()
 	{
 		wglMakeCurrent(NULL, NULL);
 		wglDeleteContext(m_renderContext);
 	}
 
-	void WGlRenderContext::WGlRenderContext::swapBuffer()
+	void WGlRenderBackend::WGlRenderBackend::swapBuffer()
 	{
 		SwapBuffers(m_deviceContext);
 	}
 
-	uint32_t WGlRenderContext::getMaxTextureUnits()
+	uint32_t WGlRenderBackend::getMaxTextureUnits()
 	{
 		GLint maxTextureUnits;
 		glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxTextureUnits);
 		return static_cast<uint32_t>(maxTextureUnits);
 	}
 
-	uint32_t WGlRenderContext::getMaxUniformCount()
+	uint32_t WGlRenderBackend::getMaxUniformCount()
 	{
 		GLint maxUniforms;
 		glGetIntegerv(GL_MAX_UNIFORM_LOCATIONS, &maxUniforms);
@@ -121,33 +130,7 @@ namespace Phoenix
 		return glType[type];
 	}
 
-	// NOTE(Phil): Danger, this assumes that all handles use uint16_t for their index
-	// this may change with resources that need less slots, so I need a way to get the
-	// data type of the handle.
-#define IMPL_ALLOC_FUNC(HandleType, ContainerName) \
-	void WGlRenderContext::alloc(HandleType& out) \
-	{ \
-		ContainerName.emplace_back(); \
-		auto& buffer = ContainerName.back(); \
-		out.idx = static_cast<uint16_t>(ContainerName.size() - 1); \
-	} \
-
-#define EMPTY_ALLOC_FUNC(HandleType) \
-	void WGlRenderContext::alloc(HandleType& out) \
-	{ \
-		Logger::warning(S2(__LOCATION_INFO__) "not implemented!"); \
-	} \
-
-	IMPL_ALLOC_FUNC(VertexBufferHandle, m_vertexBuffers)
-		IMPL_ALLOC_FUNC(IndexBufferHandle, m_indexBuffers)
-		IMPL_ALLOC_FUNC(ShaderHandle, m_shaders)
-		IMPL_ALLOC_FUNC(ProgramHandle, m_programs)
-
-		EMPTY_ALLOC_FUNC(TextureHandle)
-		EMPTY_ALLOC_FUNC(FrameBufferHandle)
-		EMPTY_ALLOC_FUNC(UniformHandle)
-
-		void WGlRenderContext::createVertexBuffer(VertexBufferHandle handle, const VertexBufferFormat& format)
+	void WGlRenderBackend::createVertexBuffer(VertexBufferHandle handle, const VertexBufferFormat& format)
 	{
 		GlVertexBuffer& buffer = m_vertexBuffers[handle.idx];
 		glGenVertexArrays(1, &buffer.m_id);
@@ -173,7 +156,7 @@ namespace Phoenix
 		}
 	}
 
-	void WGlRenderContext::createIndexBuffer(IndexBufferHandle handle, size_t size, uint32_t count, const void* data)
+	void WGlRenderBackend::createIndexBuffer(IndexBufferHandle handle, size_t size, uint32_t count, const void* data)
 	{
 		GlIndexBuffer& buffer = m_indexBuffers[handle.idx];
 
@@ -250,7 +233,7 @@ namespace Phoenix
 		}
 	}
 
-	void WGlRenderContext::createShader(ShaderHandle handle, const char* source, Shader::Type shaderType)
+	void WGlRenderBackend::createShader(ShaderHandle handle, const char* source, Shader::Type shaderType)
 	{
 		GlShader& shader = m_shaders[handle.idx];
 
@@ -260,8 +243,6 @@ namespace Phoenix
 			return;
 		}
 
-		handle.idx = static_cast<uint16_t>(m_shaders.size() - 1);
-
 		shader.m_shaderType = getShaderEnum(shaderType);
 		shader.m_id = glCreateShader(shader.m_shaderType);
 		glShaderSource(shader.m_id, 1, (const char**)&source, NULL);
@@ -270,7 +251,7 @@ namespace Phoenix
 		printShaderLog(shader.m_id);
 	}
 
-	void WGlRenderContext::createProgram(ProgramHandle handle, const Shader::List& shaders)
+	void WGlRenderBackend::createProgram(ProgramHandle handle, const Shader::List& shaders)
 	{
 		GlProgram& program = m_programs[handle.idx];
 
@@ -310,16 +291,15 @@ namespace Phoenix
 		}
 
 		program.m_id = progHandle;
-		handle.idx = static_cast<uint16_t>(m_programs.size() - 1);
 		return;
 	}
 
-	void WGlRenderContext::createTexture()
+	void WGlRenderBackend::createTexture()
 	{
 		Logger::warning(__LOCATION_INFO__ "not implemented!");
 	}
 
-	void WGlRenderContext::createFrameBuffer()
+	void WGlRenderBackend::createFrameBuffer()
 	{
 		Logger::warning(__LOCATION_INFO__ "not implemented!");
 	}
@@ -329,7 +309,7 @@ namespace Phoenix
 
 	}
 
-	void WGlRenderContext::createUniform(UniformHandle handle, const char* name, Uniform::Type type, const void* data)
+	void WGlRenderBackend::createUniform(UniformHandle handle, const char* name, Uniform::Type type, const void* data)
 	{
 		Logger::warning(__LOCATION_INFO__ "not implemented!");
 
@@ -339,7 +319,7 @@ namespace Phoenix
 		// The user specifies which uniforms to bind using the StateGroup
 	}
 
-	void WGlRenderContext::setUniform(UniformHandle handle, const void* data)
+	void WGlRenderBackend::setUniform(UniformHandle handle, const void* data)
 	{
 		GlUniform uniform = m_uniforms[handle.idx];
 
@@ -383,40 +363,40 @@ namespace Phoenix
 		};
 	}
 
-	void WGlRenderContext::WGlRenderContext::setVertexBuffer(VertexBufferHandle vb)
+	void WGlRenderBackend::WGlRenderBackend::setVertexBuffer(VertexBufferHandle vb)
 	{
 		GlVertexBuffer buffer = m_vertexBuffers[vb.idx];
 		glBindVertexArray(buffer.m_id);
 	}
 
-	void WGlRenderContext::WGlRenderContext::setIndexBuffer(IndexBufferHandle ib)
+	void WGlRenderBackend::WGlRenderBackend::setIndexBuffer(IndexBufferHandle ib)
 	{
 		GlIndexBuffer buffer = m_indexBuffers[ib.idx];
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.m_id);
 	}
 
-	void WGlRenderContext::WGlRenderContext::setProgram(ProgramHandle prog)
+	void WGlRenderBackend::WGlRenderBackend::setProgram(ProgramHandle prog)
 	{
 		GlProgram program = m_programs[prog.idx];
 		glUseProgram(program.m_id);
 	}
 
-	void WGlRenderContext::setDepth(Depth::Type depth)
+	void WGlRenderBackend::setDepth(Depth::Type depth)
 	{
 		Logger::warning(__LOCATION_INFO__ "not implemented!");
 	}
 
-	void WGlRenderContext::setRaster(Raster::Type raster)
+	void WGlRenderBackend::setRaster(Raster::Type raster)
 	{
 		Logger::warning(__LOCATION_INFO__ "not implemented!");
 	}
 
-	void WGlRenderContext::setBlend(Blend::Type blend)
+	void WGlRenderBackend::setBlend(Blend::Type blend)
 	{
 		Logger::warning(__LOCATION_INFO__ "not implemented!");
 	}
 
-	void WGlRenderContext::setStencil(Stencil::Type stencil)
+	void WGlRenderBackend::setStencil(Stencil::Type stencil)
 	{
 		Logger::warning(__LOCATION_INFO__ "not implemented!");
 	}
@@ -433,12 +413,12 @@ namespace Phoenix
 		return glType[type];
 	}
 
-	void WGlRenderContext::WGlRenderContext::drawLinear(Primitive::Type primitive, uint32_t count, uint32_t start)
+	void WGlRenderBackend::WGlRenderBackend::drawLinear(Primitive::Type primitive, uint32_t count, uint32_t start)
 	{
 		glDrawArrays(getPrimitiveEnum(primitive), start, count);
 	}
 
-	void WGlRenderContext::WGlRenderContext::drawIndexed(Primitive::Type primitive, uint32_t count, uint32_t start)
+	void WGlRenderBackend::WGlRenderBackend::drawIndexed(Primitive::Type primitive, uint32_t count, uint32_t start)
 	{
 		glDrawElements(getPrimitiveEnum(primitive), count, GL_UNSIGNED_INT, (GLvoid*)(sizeof(GLubyte) * start));
 	}

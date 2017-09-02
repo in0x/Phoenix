@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <vector>
 #include "Windows.h"
-#include "IRenderContext.hpp"
+#include "IRenderBackend.hpp"
 #include "../OpenGL.hpp"
 
 namespace Phoenix
@@ -36,24 +36,28 @@ namespace Phoenix
 		GLuint m_location;
 	};
 
-	class WGlRenderContext : public IRenderContext
+	class WGlRenderInit : public RenderInit
 	{
 	public:
-		explicit WGlRenderContext(HWND owningWindow);
-		virtual ~WGlRenderContext();
-		virtual void init() override;
+		explicit WGlRenderInit(HWND owningWindow) 
+			: RenderInit(RenderApi::Gl)
+			, m_owningWindow(owningWindow)
+		{
+		}
+
+		HWND m_owningWindow;
+	};
+
+	class WGlRenderBackend : public IRenderBackend
+	{
+	public:
+		WGlRenderBackend();
+		virtual ~WGlRenderBackend();
+		virtual void init(RenderInit* initValues) override;
 		virtual void swapBuffer() override;
 
 		virtual uint32_t getMaxTextureUnits() override;
 		virtual uint32_t getMaxUniformCount() override;
-
-		virtual void alloc(VertexBufferHandle& out) override;
-		virtual void alloc(IndexBufferHandle& out) override;
-		virtual void alloc(ShaderHandle& out) override;
-		virtual void alloc(ProgramHandle& out) override;
-		virtual void alloc(TextureHandle& out) override;
-		virtual void alloc(FrameBufferHandle& out) override;
-		virtual void alloc(UniformHandle& out) override;
 
 		virtual void createVertexBuffer(VertexBufferHandle handle, const VertexBufferFormat& format) override;
 		virtual void createIndexBuffer(IndexBufferHandle handle, size_t size, uint32_t count, const void* data) override;
@@ -76,11 +80,11 @@ namespace Phoenix
 		virtual void drawIndexed(Primitive::Type primitive, uint32_t count, uint32_t start) override;
 
 	private:
-		std::vector<GlVertexBuffer> m_vertexBuffers; // These vectors need replacing when I create custom allocators
-		std::vector<GlIndexBuffer> m_indexBuffers;
-		std::vector<GlShader> m_shaders;
-		std::vector<GlProgram> m_programs;
-		std::vector<GlUniform> m_uniforms;
+		GlVertexBuffer m_vertexBuffers[RenderConstants::c_maxVertexBuffers]; // These vectors need replacing when I create custom allocators
+		GlIndexBuffer m_indexBuffers[RenderConstants::c_maxIndexBuffers];
+		GlShader m_shaders[RenderConstants::c_maxShaders];
+		GlProgram m_programs[RenderConstants::c_maxPrograms];
+		GlUniform m_uniforms[RenderConstants::c_maxUniforms];
 
 		HWND m_owningWindow;
 		HGLRC m_renderContext;

@@ -1,13 +1,13 @@
 #pragma once
 
 #include "Commands.hpp"
-#include "IRenderContext.hpp"
+#include "IRenderBackend.hpp"
 
 namespace Phoenix
 {
 	namespace SubmitFunctions
 	{
-		void indexedDraw(IRenderContext* rc, const void* command)
+		void indexedDraw(IRenderBackend* rc, const void* command)
 		{
 			auto dc = static_cast<const Commands::DrawIndexed*>(command);
 
@@ -17,7 +17,7 @@ namespace Phoenix
 			rc->drawIndexed(dc->primitives, dc->count, dc->start);
 		}
 
-		void linearDraw(IRenderContext* rc, const void* command)
+		void linearDraw(IRenderBackend* rc, const void* command)
 		{
 			auto dc = static_cast<const Commands::DrawLinear*>(command);
 
@@ -26,31 +26,31 @@ namespace Phoenix
 			rc->drawLinear(dc->primitives, dc->count, dc->start);
 		}
 
-		void vertexBufferCreate(IRenderContext* rc, const void* command)
+		void vertexBufferCreate(IRenderBackend* rc, const void* command)
 		{
 			auto dc = static_cast<const Commands::CreateVertexBuffer*>(command);
 			rc->createVertexBuffer(dc->handle, dc->format);
 		}
 
-		void indexBufferCreate(IRenderContext* rc, const void* command)
+		void indexBufferCreate(IRenderBackend* rc, const void* command)
 		{
 			auto dc = static_cast<const Commands::CreateIndexBuffer*>(command);
 			rc->createIndexBuffer(dc->handle, dc->size, dc->count, dc->data);
 		}
 
-		void shaderCreate(IRenderContext* rc, const void* command)
+		void shaderCreate(IRenderBackend* rc, const void* command)
 		{
 			auto dc = static_cast<const Commands::CreateShader*>(command);
 			rc->createShader(dc->handle, dc->source, dc->shaderType);
 		}
 
-		void programCreate(IRenderContext* rc, const void* command)
+		void programCreate(IRenderBackend* rc, const void* command)
 		{
 			auto dc = static_cast<const Commands::CreateProgram*>(command);
 			rc->createProgram(dc->handle, dc->shaders);
 		}
 
-		void uniformCreate(IRenderContext* rc, const void* command)
+		void uniformCreate(IRenderBackend* rc, const void* command)
 		{
 			auto dc = static_cast<const Commands::CreateUniform*>(command);
 

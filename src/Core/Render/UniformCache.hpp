@@ -2,7 +2,8 @@
 
 #include <map>
 #include <limits>
-#include "Render.hpp"
+#include "RenderDefinitions.hpp"
+
 
 namespace Phoenix
 {
@@ -10,10 +11,10 @@ namespace Phoenix
 	// When updating a uniform, look up if the location is cached, else fetch it from
 	// the program.
 
-	namespace uniformCache
+	class UniformCache
 	{
-		void init(IRenderContext* rc);
+		void init(IRenderBackend* rc);
 		uint32_t getUniformLocation(ProgramHandle program, UniformHandle uniform);
 		const uint32_t* getUniformLocationIfCached(ProgramHandle program, UniformHandle uniform);
-	}
+	};
 }

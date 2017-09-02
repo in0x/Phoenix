@@ -8,10 +8,10 @@
 #include "Core/Win32Window.hpp"
 #include "Core/Logger.hpp"
 
-#include "Core/Render/WGlRenderContext.hpp"
+#include "Core/Render/RenderFrontend.hpp"
+#include "Core/Render/WGlRenderBackend.hpp"
 #include "Core/Render/CommandBucket.hpp"
 #include "Core/Render/Commands.hpp"
-#include "Core/Render/CommandPacket.hpp"
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
 #define PLATFORM_WINDOWS
@@ -98,69 +98,37 @@ void run()
 	Matrix4 projMat = perspectiveRH(70, (float)config.width / (float)config.height, 1, 100);
 	Vec3 lightPosition = Vec3(-5, 3, 5);
 
-	std::unique_ptr<IRenderContext> context = std::make_unique<WGlRenderContext>(window.getNativeHandle());
-	context->init();
-	CommandBucket commandBucket(16);
+	WGlRenderInit renderInit(window.getNativeHandle());
+	RenderFrontend::init(&renderInit);
+	CommandBucket drawBucket(16);
+
+	VertexBufferFormat foxLayout;
+	foxLayout.add({ AttributeProperty::Position, AttributeType::Float, 3 },
+	{ sizeof(Vec3), fox->vertices.size(), fox->vertices.data() });
+
+	foxLayout.add({ AttributeProperty::Normal, AttributeType::Float, 3 },
+	{ sizeof(Vec3), fox->normals.size(), fox->normals.data() });
+
+	VertexBufferHandle foxVertices = RenderFrontend::createVertexBuffer(foxLayout);
+
+	IndexBufferHandle foxIndices = RenderFrontend::createIndexBuffer(sizeof(unsigned int), fox->indices.size(), fox->indices.data());
+
 	
-	VertexBufferHandle foxVertices;
-	IndexBufferHandle foxIndices;
-	{
-		VertexBufferFormat foxLayout;
-		foxLayout.add({ AttributeProperty::Position, AttributeType::Float, 3 },
-		{ sizeof(Vec3), fox->vertices.size(), fox->vertices.data() });
+	std::string vsSource = loadText("Shaders/diffuse.vert");
+	ShaderHandle vs = RenderFrontend::createShader(vsSource.c_str(), vsSource.size(), Shader::Vertex);
 
-		foxLayout.add({ AttributeProperty::Normal, AttributeType::Float, 3 },
-		{ sizeof(Vec3), fox->normals.size(), fox->normals.data() });
+	std::string fsSource = loadText("Shaders/diffuse.frag");
+	ShaderHandle fs = RenderFrontend::createShader(fsSource.c_str(), fsSource.size(), Shader::Fragment);
 
-		foxVertices = context->alloc<VertexBufferHandle>();
-		auto cvb = commandBucket.addCommand<Commands::CreateVertexBuffer>();
-		cvb->format = foxLayout;
-		cvb->handle = foxVertices;
-	
-		foxIndices = context->alloc<IndexBufferHandle>();
-		auto cib = commandBucket.addCommand<Commands::CreateIndexBuffer>();
-		cib->size = sizeof(unsigned int);
-		cib->count = fox->indices.size();
-		cib->data = fox->indices.data();
-		cib->handle = foxIndices;
-	}
+	Shader::List shaders;
+	shaders[Shader::Vertex] = vs;
+	shaders[Shader::Fragment] = fs;
+	ProgramHandle program = RenderFrontend::createProgram(shaders);
 
-	ProgramHandle program;
-	{
-		std::string vsSource = loadText("Shaders/diffuse.vert");
-		std::string fsSource = loadText("Shaders/diffuse.frag");
+	RenderFrontend::submit();
 
-		size_t len = vsSource.size();
-		Commands::CreateShader* cvs = commandBucket.addCommand<Commands::CreateShader>(len);	
-		cvs->shaderType = Shader::Vertex;
-		cvs->handle = context->alloc<ShaderHandle>(); 
-		cvs->source = commandPacket::getAuxiliaryMemory(cvs);
-		memcpy(commandPacket::getAuxiliaryMemory(cvs), &vsSource[0], len);
-		cvs->source[len] = '\0';
+	RenderFrontend::tempSetProgram(program);
 
-		len = fsSource.size();
-		Commands::CreateShader* cfs = commandBucket.appendCommand<Commands::CreateShader>(cvs, len);
-		cfs->shaderType = Shader::Fragment;
-		cfs->handle = context->alloc<ShaderHandle>();	
-		cfs->source = commandPacket::getAuxiliaryMemory(cfs);
-		memcpy(commandPacket::getAuxiliaryMemory(cfs), &fsSource[0], len);
-		cfs->source[len] = '\0';
-
-		auto createProg = commandBucket.appendCommand<Commands::CreateProgram>(cfs);
-		program = context->alloc<ProgramHandle>();
-
-		Shader::List shaders;
-		shaders[Shader::Vertex] = cvs->handle;
-		shaders[Shader::Fragment] = cfs->handle;
-		
-		createProg->shaders = shaders;
-		createProg->handle = program;
-	}
-	
-	commandBucket.submit(context.get());
-
-	context->setProgram(program);
-	
 	glUniformMatrix4fv(2, 1, GL_FALSE, (GLfloat*)&worldMat);
 	glUniformMatrix4fv(3, 1, GL_FALSE, (GLfloat*)&viewMat);
 	glUniformMatrix4fv(4, 1, GL_FALSE, (GLfloat*)&projMat);
@@ -184,8 +152,8 @@ void run()
 
 		glUniformMatrix4fv(2, 1, GL_FALSE, (GLfloat*)&rotMat);
 
-		auto dc = commandBucket.addCommand<Commands::DrawIndexed>();
-		
+		auto dc = drawBucket.addCommand<Commands::DrawIndexed>();
+
 		dc->vertexBuffer = foxVertices;
 		dc->indexBuffer = foxIndices;
 		dc->primitives = Primitive::Triangles;
@@ -194,9 +162,9 @@ void run()
 
 		dc->state.program = program;
 
-		commandBucket.submit(context.get());
-		context->swapBuffer();
-
+		drawBucket.submit(RenderFrontend::getBackend());
+		RenderFrontend::swapBuffers();
+		
 		glDisable(GL_MULTISAMPLE);
 		glDisable(GL_DEPTH_TEST);
 

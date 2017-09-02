@@ -4,12 +4,12 @@
 #include <typeindex>
 #include <typeinfo>
 
-#include "Render.hpp"
+#include "RenderDefinitions.hpp"
 #include "CommandPacket.hpp"
 
 namespace Phoenix
 {
-	class IRenderContext;
+	class IRenderBackend;
 
 	// NOTE(Phil): Uses global new as a place 
 	// holder, will switch over to fixed memory 
@@ -57,7 +57,7 @@ namespace Phoenix
 			return commandPacket::getCommand<NewCommand>(packet);
 		}
 
-		void submit(IRenderContext* rc) // TODO(Phil): Because packets are newed they currently still leak.
+		void submit(IRenderBackend* rc) // TODO(Phil): Because packets are newed they currently still leak.
 		{
 			for (size_t i = 0; i < m_currentIndex; ++i)
 			{

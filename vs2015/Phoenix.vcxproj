@@ -185,12 +185,13 @@
     <ClInclude Include="..\src\Core\PlatformWindows.hpp" />
     <ClInclude Include="..\src\Core\Render\CommandPacket.hpp" />
     <ClInclude Include="..\src\Core\Render\Commands.hpp" />
-    <ClInclude Include="..\src\Core\Render\IRenderContext.hpp" />
-    <ClInclude Include="..\src\Core\Render\Render.hpp" />
+    <ClInclude Include="..\src\Core\Render\IRenderBackend.hpp" />
+    <ClInclude Include="..\src\Core\Render\RenderFrontend.hpp" />
+    <ClInclude Include="..\src\Core\Render\RenderDefinitions.hpp" />
     <ClInclude Include="..\src\Core\Render\CommandBucket.hpp" />
     <ClInclude Include="..\src\Core\Render\Research.hpp" />
     <ClInclude Include="..\src\Core\Render\UniformCache.hpp" />
-    <ClInclude Include="..\src\Core\Render\WGlRenderContext.hpp" />
+    <ClInclude Include="..\src\Core\Render\WGlRenderBackend.hpp" />
     <ClInclude Include="..\src\Core\StringTokenizer.hpp" />
     <ClInclude Include="..\src\Core\Transform.h" />
     <ClInclude Include="..\src\Core\Math\PhiMath.hpp" />
@@ -230,8 +231,9 @@
     <ClCompile Include="..\src\Core\Render\CommandBucket.cpp" />
     <ClCompile Include="..\src\Core\Render\CommandPacket.cpp" />
     <ClCompile Include="..\src\Core\Render\Commands.cpp" />
+    <ClCompile Include="..\src\Core\Render\RenderFrontend.cpp" />
     <ClCompile Include="..\src\Core\Render\UniformCache.cpp" />
-    <ClCompile Include="..\src\Core\Render\WGlRenderContext.cpp" />
+    <ClCompile Include="..\src\Core\Render\WGlRenderBackend.cpp" />
     <ClCompile Include="..\src\Core\StringTokenizer.cpp" />
     <ClCompile Include="..\src\Core\Transform.cpp" />
     <ClCompile Include="..\src\Core\Win32Window.cpp" />

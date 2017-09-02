@@ -22,6 +22,14 @@ namespace Phoenix
 	namespace RenderConstants
 	{
 		constexpr uint32_t c_maxUniformNameLenght = 128;
+		constexpr uint32_t c_maxVertexBuffers = std::numeric_limits<uint16_t>::max();
+		constexpr uint32_t c_maxIndexBuffers = std::numeric_limits<uint16_t>::max();
+		constexpr uint32_t c_maxShaders = std::numeric_limits<uint16_t>::max();
+		constexpr uint32_t c_maxPrograms = std::numeric_limits<uint16_t>::max();
+		constexpr uint32_t c_maxTextures = std::numeric_limits<uint16_t>::max();
+		constexpr uint32_t c_maxFrameBuffers = std::numeric_limits<uint16_t>::max();
+		constexpr uint32_t c_maxUniforms = std::numeric_limits<uint16_t>::max();
+		constexpr uint32_t c_maxTextureLists = std::numeric_limits<uint16_t>::max();
 	}
 
 #define HANDLE(name, size) \
@@ -42,9 +50,9 @@ namespace Phoenix
 	HANDLE(UniformHandle, uint16_t);
 	HANDLE(TextureListHandle, uint16_t);
 
-	class IRenderContext;
+	class IRenderBackend;
 
-	typedef void(*SubmitFptr)(IRenderContext*, const void*);
+	typedef void(*SubmitFptr)(IRenderBackend*, const void*);
 
 	template <class T>
 	struct is_submittable
@@ -60,6 +68,34 @@ namespace Phoenix
 
 #define SUBMITTABLE() \
 		const static SubmitFptr SubmitFunc \
+
+	namespace RenderApi
+	{
+		enum Type
+		{
+			Gl,
+			None
+		};
+	}
+
+	// Should be subclassed to pass to specific RenderContext implementations
+	class RenderInit
+	{
+	public:
+		RenderApi::Type getApiType()
+		{
+			return m_apiType;
+		}
+
+	protected:
+		RenderInit(RenderApi::Type apiType = RenderApi::None)
+			: m_apiType(apiType)
+		{}
+
+		virtual ~RenderInit() {}
+
+		RenderApi::Type m_apiType;
+	};
 
 	namespace AttributeProperty
 	{
@@ -285,18 +321,22 @@ namespace Phoenix
 		// Unfiforms can also use a Resourcelist like mechanism
 		ProgramHandle program;
 	};
-	
-	//struct DrawItem
-	//{
-	//	// StateGroup + Command = DrawItem
-	//	void* pCommand;
-	//	SubmitFptr draw; // Drawfuncs should be registered to a table somewhere and then fetched via lookup using data from the command (i.e. a key (bitmask))
-	//	StateGroup state;
-	//};
 
-	//template<class T>
-	//DrawItem* compile(const StateGroup* stateGroupStack, uint32_t stateGroupCount, T command)
-	//{
-	//
-	//}
+	typedef StateGroup* StateGroupStack;
+	// Somehow make sure that when the user gets a stategroup stack one default is there per default
+
+	// Compiles all StateGroups into one complete StateGroup. Interpretation
+	// walks from left to right -> A setting at the front overrides a setting at the back.
+	inline StateGroup compile(StateGroupStack states, uint32_t stateCount)
+	{
+		StateGroup state;
+
+		for (size_t i = 0; i < stateCount; ++i)
+		{
+			const StateGroup& current = states[i];
+			// Set each setting if not set already;
+		}
+
+		return state;
+	}
 }
