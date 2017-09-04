@@ -8,6 +8,7 @@ namespace Phoenix
 	WGlRenderBackend::WGlRenderBackend()
 		: m_owningWindow(nullptr)
 		, m_renderContext(0)
+		, m_uniformCount(0)
 	{
 	}
 
@@ -201,6 +202,7 @@ namespace Phoenix
 		default:
 		{
 			Logger::error("Trying to convert invalid GlEnum to Shader::Type ");
+			assert(false);
 			return Shader::Type::Count;
 		}
 		}
@@ -291,7 +293,8 @@ namespace Phoenix
 		}
 
 		program.m_id = progHandle;
-		return;
+		
+		registerActiveUniforms(program);
 	}
 
 	void WGlRenderBackend::createTexture()
@@ -304,19 +307,90 @@ namespace Phoenix
 		Logger::warning(__LOCATION_INFO__ "not implemented!");
 	}
 
-	void getUniformSetter(Uniform::Type type)
+	Uniform::Type toUniformType(GLenum glType)
 	{
-
+		switch (glType)
+		{
+		case GL_FLOAT:
+		{
+			return Uniform::Float;
+		} break;
+		case GL_INT:
+		{
+			return Uniform::Int;
+		} break;
+		case GL_FLOAT_VEC3:
+		{
+			return Uniform::Vec3;
+		} break;
+		case GL_FLOAT_VEC4:
+		{
+			return Uniform::Vec4;
+		} break;
+		case GL_FLOAT_MAT3:
+		{
+			return Uniform::Mat3;
+		} break;
+		case GL_FLOAT_MAT4:
+		{
+			return Uniform::Mat4;
+		} break;
+		default:
+		{
+			Logger::error("Trying to convert invalid GlEnum to Uniform::Type");
+			return Uniform::Count;
+			assert(false);
+		} break;
+		}
 	}
 
-	void WGlRenderBackend::createUniform(UniformHandle handle, const char* name, Uniform::Type type, const void* data)
+	void WGlRenderBackend::registerActiveUniforms(GlProgram& program)
 	{
-		Logger::warning(__LOCATION_INFO__ "not implemented!");
+		GLint count;
+		GLint size;
+		GLenum type;
 
-		// When creating a shader, get all info via introspection -> all uniform names. 
-		// Create uniform info independently of context. Use shader info when bound to see what uniforms can be used
+		const GLsizei bufSize = RenderConstants::c_maxUniformNameLenght;
+		GLchar name[bufSize];
+		GLsizei length;
 
-		// The user specifies which uniforms to bind using the StateGroup
+		glGetProgramiv(program.m_id, GL_ACTIVE_UNIFORMS, &count);
+		
+		for (GLint i = 0; i < count; ++i)
+		{
+			glGetActiveUniform(program.m_id, (GLuint)i, bufSize, &length, &size, &type, name);
+			
+			UniformHandle handle = addUniform();
+
+			GlUniform& uniform = m_uniforms[handle.idx];
+			uniform.m_type = toUniformType(type);
+			uniform.m_location = i;
+			program.m_uniforms[name] = handle;
+		}
+	}
+
+	UniformHandle WGlRenderBackend::addUniform()
+	{
+		UniformHandle handle;
+		handle.idx = m_uniformCount++;
+		return handle;
+	}
+
+	void WGlRenderBackend::createUniform(ProgramHandle programHandle, UniformHandle& uniformHandle, const char* name, Uniform::Type type, const void* data)
+	{
+		GlProgram& program = m_programs[programHandle.idx];
+
+		if (program.m_uniforms.find(name) != program.m_uniforms.end())
+		{
+			uniformHandle.idx = program.m_uniforms[name].idx;
+			return;
+		}
+		else
+		{
+			uniformHandle.idx = UniformHandle::invalidValue;
+			Logger::error("Requested uniform does not exist in specified program");
+			return;
+		}
 	}
 
 	void WGlRenderBackend::setUniform(UniformHandle handle, const void* data)
@@ -328,38 +402,32 @@ namespace Phoenix
 		case Uniform::Float:
 		{
 			glUniform1fv(uniform.m_location, 1, static_cast<const GLfloat*>(data));
-			break;
-		}
+		} break;
 		case Uniform::Int:
 		{
 			glUniform1iv(uniform.m_location, 1, static_cast<const GLint*>(data));
-			break;
-		}
+		} break;
 		case Uniform::Vec3:
 		{
 			glUniform3fv(uniform.m_location, 1, static_cast<const GLfloat*>(data));
-			break;
-		}
+		} break;
 		case Uniform::Vec4:
 		{
 			glUniform4fv(uniform.m_location, 1, static_cast<const GLfloat*>(data));
-			break;
-		}
+		} break;
 		case Uniform::Mat3:
 		{
 			glUniformMatrix3fv(uniform.m_location, 1, false, static_cast<const GLfloat*>(data));
-			break;
-		}
+		} break;
 		case Uniform::Mat4:
 		{
 			glUniformMatrix4fv(uniform.m_location, 1, false, static_cast<const GLfloat*>(data));
-			break;
-		}
+		} break;
 		default:
 		{
 			Logger::error("Invalid uniform type used to set value");
-			break;
-		}
+			assert(false);	
+		} break;
 		};
 	}
 
@@ -403,7 +471,7 @@ namespace Phoenix
 
 	GLenum getPrimitiveEnum(Primitive::Type type)
 	{
-		static const GLuint glType[3] =
+		static const GLuint glType[] =
 		{
 			GL_POINTS,
 			GL_LINES,

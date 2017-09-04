@@ -25,8 +25,8 @@
 TODO:
 * Support uniforms (renderer = shared, context = platform-specific implementation)
 * Crashes when closed by closing window via taskbar
-* Implement linear allocator
-* Implement dynamic array
+* Implement linear allocator -> REALLY IMPORTANT SO RENDER COMMANDS STOP LEAKING
+* Implement dynamic array -> I'm not using that many vectors so this isn't very high prio.
 
 * The solution to being stateless is really just to set everything that isnt specified
 * to a default
@@ -112,7 +112,6 @@ void run()
 	VertexBufferHandle foxVertices = RenderFrontend::createVertexBuffer(foxLayout);
 
 	IndexBufferHandle foxIndices = RenderFrontend::createIndexBuffer(sizeof(unsigned int), fox->indices.size(), fox->indices.data());
-
 	
 	std::string vsSource = loadText("Shaders/diffuse.vert");
 	ShaderHandle vs = RenderFrontend::createShader(vsSource.c_str(), vsSource.size(), Shader::Vertex);
@@ -125,7 +124,10 @@ void run()
 	shaders[Shader::Fragment] = fs;
 	ProgramHandle program = RenderFrontend::createProgram(shaders);
 
-	RenderFrontend::submit();
+	UniformHandle mmat = RenderFrontend::createUniform(program, "modelTf", Uniform::Mat4, nullptr);
+	UniformHandle vmat = RenderFrontend::createUniform(program, "viewTf", Uniform::Mat4, nullptr);
+	UniformHandle pmat = RenderFrontend::createUniform(program, "projectionTf", Uniform::Mat4, nullptr);
+	UniformHandle lit = RenderFrontend::createUniform(program, "lightPosition", Uniform::Vec3, nullptr);
 
 	RenderFrontend::tempSetProgram(program);
 

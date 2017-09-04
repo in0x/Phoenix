@@ -34,5 +34,13 @@ namespace Phoenix
 		/*
 			private:
 				IRenderBackend* m_pRenderContext;*/
-	//};
+				//};
+
+	/*void UniformCache::addUniform(ProgramHandle program, UniformHandle uniform, UniformInfo info)
+	{
+	}
+	
+	bool UniformCache::getUniform(ProgramHandle program, const char* name, CachedUniform* outInfo)
+	{
+	}*/
 }

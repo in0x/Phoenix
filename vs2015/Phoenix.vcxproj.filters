@@ -70,14 +70,8 @@
     <ClInclude Include="..\src\Core\StringTokenizer.hpp">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Core\Render\Research.hpp">
-      <Filter>Render</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Core\PlatformWindows.hpp">
       <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Core\Render\UniformCache.hpp">
-      <Filter>Render</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Core\Render\CommandBucket.hpp">
       <Filter>Render</Filter>
@@ -167,9 +161,6 @@
       <Filter>Render</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Core\Render\Commands.cpp">
-      <Filter>Render</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Core\Render\UniformCache.cpp">
       <Filter>Render</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Core\Render\WGlRenderBackend.cpp">

@@ -22,14 +22,6 @@ namespace Phoenix
 	namespace RenderConstants
 	{
 		constexpr uint32_t c_maxUniformNameLenght = 128;
-		constexpr uint32_t c_maxVertexBuffers = std::numeric_limits<uint16_t>::max();
-		constexpr uint32_t c_maxIndexBuffers = std::numeric_limits<uint16_t>::max();
-		constexpr uint32_t c_maxShaders = std::numeric_limits<uint16_t>::max();
-		constexpr uint32_t c_maxPrograms = std::numeric_limits<uint16_t>::max();
-		constexpr uint32_t c_maxTextures = std::numeric_limits<uint16_t>::max();
-		constexpr uint32_t c_maxFrameBuffers = std::numeric_limits<uint16_t>::max();
-		constexpr uint32_t c_maxUniforms = std::numeric_limits<uint16_t>::max();
-		constexpr uint32_t c_maxTextureLists = std::numeric_limits<uint16_t>::max();
 	}
 
 #define HANDLE(name, size) \
@@ -39,6 +31,18 @@ namespace Phoenix
 			static const size invalidValue = std::numeric_limits<size>::max(); \
 			size idx = invalidValue; \
 			bool isValid() const { return idx != invalidValue; } \
+			static constexpr size maxValue() { return std::numeric_limits<size>::max() - 1; } \
+		} \
+
+#define HANDLE_CUSTOM_MAXVAL(name, size, maxVal) \
+		static_assert(maxVal < std::numeric_limits<size>::max(), "Handle maxVal has to be smaller than largest value of type size"); \
+		class name \
+		{ \
+		public: \
+			static const size invalidValue = std::numeric_limits<size>::max(); \
+			size idx = invalidValue; \
+			bool isValid() const { return idx != invalidValue; } \
+			static constexpr size maxValue() { return maxVal; } \
 		} \
 
 	HANDLE(VertexBufferHandle, uint16_t);
@@ -267,6 +271,7 @@ namespace Phoenix
 	{
 		char name[RenderConstants::c_maxUniformNameLenght];
 		Uniform::Type type;
+		UniformHandle handle;
 	};
 
 	namespace Primitive

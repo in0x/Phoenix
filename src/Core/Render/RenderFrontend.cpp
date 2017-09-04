@@ -11,14 +11,13 @@ namespace Phoenix
 {
 	namespace RenderFrontend
 	{
-		static UniformCache s_uniformCache;
-		static CommandBucket s_bucket = CommandBucket(1024);
-		static std::unique_ptr<IRenderBackend> s_renderBackend;
+		//static UniformCache s_uniformCache;
+		static std::unique_ptr<IRenderBackend> s_renderBackend = nullptr;
 
-		uint32_t m_vertexBuffers = 0;
-		uint32_t m_indexBuffers = 0;
-		uint32_t m_shaders = 0;
-		uint32_t m_programs = 0;
+		static uint32_t s_vertexBuffers = 0;
+		static uint32_t s_indexBuffers = 0;
+		static uint32_t s_shaders = 0;
+		static uint32_t s_programs = 0;
 
 		void init(RenderInit* renderInit)
 		{
@@ -37,11 +36,6 @@ namespace Phoenix
 					break;
 				}
 			}
-		}
-
-		void submit()
-		{
-			s_bucket.submit(s_renderBackend.get());
 		}
 
 		void swapBuffers()
@@ -67,11 +61,9 @@ namespace Phoenix
 		VertexBufferHandle createVertexBuffer(const VertexBufferFormat& format)
 		{
 			VertexBufferHandle handle;
-			handle.idx = ++m_vertexBuffers;
+			handle.idx = s_vertexBuffers++;
 
-			auto cvb = s_bucket.addCommand<Commands::CreateVertexBuffer>();
-			cvb->format = format;
-			cvb->handle = handle;
+			s_renderBackend->createVertexBuffer(handle, format);
 
 			return handle;
 		}
@@ -79,13 +71,9 @@ namespace Phoenix
 		IndexBufferHandle createIndexBuffer(size_t size, uint32_t count, const void* data)
 		{
 			IndexBufferHandle handle;
-			handle.idx = ++m_indexBuffers;
+			handle.idx = s_indexBuffers++;
 
-			auto cib = s_bucket.addCommand<Commands::CreateIndexBuffer>();
-			cib->size = size;
-			cib->count = count;
-			cib->data = data;
-			cib->handle = handle;
+			s_renderBackend->createIndexBuffer(handle, size, count, data);
 
 			return handle;
 		}
@@ -93,30 +81,28 @@ namespace Phoenix
 		ShaderHandle createShader(const char* source, size_t strlen, Shader::Type shaderType)
 		{
 			ShaderHandle handle;
-			handle.idx = ++m_shaders;
+			handle.idx = s_shaders++;
 
-			Commands::CreateShader* cs = s_bucket.addCommand<Commands::CreateShader>(strlen);
-			cs->shaderType = shaderType;
-			cs->handle = handle;
-			cs->source = commandPacket::getAuxiliaryMemory(cs);
-			memcpy(commandPacket::getAuxiliaryMemory(cs), source, strlen);
-			cs->source[strlen] = '\0';
-
+			s_renderBackend->createShader(handle, source, shaderType);
+			
 			return handle;
 		}
 
 		ProgramHandle createProgram(const Shader::List& shaders)
 		{
 			ProgramHandle handle;
-			handle.idx = ++m_programs;
+			handle.idx = s_programs++;
 
-			auto createProg = s_bucket.addCommand<Commands::CreateProgram>();
-			
-			createProg->shaders = shaders;
-			createProg->handle = handle;
-
+			s_renderBackend->createProgram(handle, shaders);
+		
 			return handle;
 		}
 
+		UniformHandle createUniform(ProgramHandle program, const char* name, Uniform::Type type, const void* data)
+		{
+			UniformHandle handle;
+			s_renderBackend->createUniform(program, handle, name, type, nullptr); // TODO(Phil): Need to fix data ptr being passed here.
+			return handle;
+		}
 	};
 }

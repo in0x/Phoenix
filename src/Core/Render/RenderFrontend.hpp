@@ -1,19 +1,13 @@
-#pragma once
 
 #include "RenderDefinitions.hpp"
 
 namespace Phoenix
 {
-	// Splitup in frontend that handles all the shared stuff, such as creating handles, caching uniforms etc.
-	// IRenderContext is backend which is used via commands. Allows us to pull alloc functions out RenderContext
-	// where they dont belong.
-
 	class IRenderBackend;
 
-	namespace RenderFrontend
+	namespace RenderFrontend 
 	{
 		void init(RenderInit* renderInit);
-		void submit();
 		void swapBuffers();
 		void exit();
 
@@ -28,14 +22,30 @@ namespace Phoenix
 		
 		ProgramHandle createProgram(const Shader::List& shaders);
 
-		//void createUniform(UniformHandle handle, const char* name, Uniform::Type type, const void* data);
+		UniformHandle createUniform(ProgramHandle program, const char* name, Uniform::Type type, const void* data);
 	};
 
-	// The user shouldn't have to work with commands at the game logic level,
-	// i.e. ForwardRenderer takes in Renderables and produces commands for them.
-
-	class ForwardRenderer
+	class IRenderer
 	{
+	public:
+		virtual ~IRenderer() {};
+		virtual void submit() = 0;
+	};
 
+	class ForwardRenderer : public IRenderer
+	{
+	public:
+		// Get all lights
+		// Get all Renderables
+		// Produce commands
+		// Hand self to Frontend
+		// Frontend submits 
+
+		virtual void submit() override
+		{
+		}
+
+	private:
+		// CommandBucket m_bucket;
 	};
 }

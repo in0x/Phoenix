@@ -1,7 +1,7 @@
 #pragma once
 
-#include <stdint.h>
 #include <vector>
+#include <map>
 #include "Windows.h"
 #include "IRenderBackend.hpp"
 #include "../OpenGL.hpp"
@@ -10,7 +10,7 @@ namespace Phoenix
 {
 	struct GlVertexBuffer
 	{
-		VertexBufferFormat m_format; // This format can later be used to check the layout when binding to a shader.
+		VertexBufferFormat m_format; 
 		GLuint m_id;
 	};
 
@@ -28,11 +28,12 @@ namespace Phoenix
 	struct GlProgram
 	{
 		GLuint m_id;
+		std::map<std::string, UniformHandle> m_uniforms;
 	};
 
 	struct GlUniform
 	{
-		Uniform::Type m_type; // Storing setter function directly would be better
+		Uniform::Type m_type; 
 		GLuint m_location;
 	};
 
@@ -47,6 +48,11 @@ namespace Phoenix
 
 		HWND m_owningWindow;
 	};
+
+	namespace 
+	{
+		static constexpr size_t MAX_BUFFERS = 1024;
+	}
 
 	class WGlRenderBackend : public IRenderBackend
 	{
@@ -64,8 +70,8 @@ namespace Phoenix
 		virtual void createShader(ShaderHandle handle, const char* source, Shader::Type shaderType) override;
 		virtual void createProgram(ProgramHandle handle, const Shader::List& shaders) override;
 		virtual void createTexture() override;
-		virtual void createFrameBuffer() override;
-		virtual void createUniform(UniformHandle handle, const char* name, Uniform::Type type, const void* data) override;
+		virtual void createFrameBuffer() override;		
+		virtual void createUniform(ProgramHandle programHandle, UniformHandle& uniformHandle, const char* name, Uniform::Type type, const void* data) override;
 
 		virtual void setVertexBuffer(VertexBufferHandle vb) override;
 		virtual void setIndexBuffer(IndexBufferHandle ib) override;
@@ -80,14 +86,19 @@ namespace Phoenix
 		virtual void drawIndexed(Primitive::Type primitive, uint32_t count, uint32_t start) override;
 
 	private:
-		GlVertexBuffer m_vertexBuffers[RenderConstants::c_maxVertexBuffers]; // These vectors need replacing when I create custom allocators
-		GlIndexBuffer m_indexBuffers[RenderConstants::c_maxIndexBuffers];
-		GlShader m_shaders[RenderConstants::c_maxShaders];
-		GlProgram m_programs[RenderConstants::c_maxPrograms];
-		GlUniform m_uniforms[RenderConstants::c_maxUniforms];
+		GlVertexBuffer m_vertexBuffers[VertexBufferHandle::maxValue()]; 
+		GlIndexBuffer m_indexBuffers[IndexBufferHandle::maxValue()];
+		GlShader m_shaders[ShaderHandle::maxValue()];
+		GlProgram m_programs[ProgramHandle::maxValue()];
+		GlUniform m_uniforms[UniformHandle::maxValue()];
 
 		HWND m_owningWindow;
 		HGLRC m_renderContext;
 		HDC m_deviceContext;
+
+		size_t m_uniformCount;
+
+		UniformHandle addUniform();
+		void registerActiveUniforms(GlProgram& program);
 	};
 }
