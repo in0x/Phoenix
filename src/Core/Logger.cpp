@@ -24,21 +24,24 @@ namespace Phoenix
 
 		class LogOut
 		{
-			bool m_bLogToConsole;
-			bool m_bLogToFile;
 			std::ofstream m_file;
-
+			
 		public:
 			LogOut(bool bLogToConsole, bool bLogToFile);
 			~LogOut();
 			void Log(const std::string& msg);
 			void Warning(const std::string& msg);
 			void Error(const std::string& msg);
+
+			bool m_bLogToConsole;
+			bool m_bLogToFile;
+			bool m_bUseAnsiColors; // A better solution is to have a fixed pre-/post-amble that can include things like the color code.
 		};
 
 		LogOut::LogOut(bool bLogToConsole, bool bLogToFile)
 			: m_bLogToConsole(bLogToConsole)
 			, m_bLogToFile(bLogToFile)
+			, m_bUseAnsiColors(false)
 		{
 			if (m_bLogToFile)
 			{
@@ -60,11 +63,16 @@ namespace Phoenix
 		{
 			if (m_bLogToConsole)
 			{
-				std::cout << "\033[" << ColorCode::LIGHT_GREEN << "m" << msg << "\n";
+				if (m_bUseAnsiColors)
+				{
+					std::cout << "\033[" << ColorCode::LIGHT_GREEN << "m";
+				}
+				
+				std::cout << msg << "\n";
 			}
 			if (m_bLogToFile)
 			{
-				m_file << "0x1B[32mLOG: " << msg << "\n";
+				m_file << "LOG: " << msg << "\n";
 			}
 		}
 
@@ -72,9 +80,12 @@ namespace Phoenix
 		{
 			if (m_bLogToConsole)
 			{
-				std::cout << "\033[" << ColorCode::LIGHT_YELLOW << "m" << msg << "\n";
-				// printf("%c[%dmHELLO!\n", 0x1B, 32);
-				// 0x1B[32m
+				if (m_bUseAnsiColors)
+				{
+					std::cout << "\033[" << ColorCode::LIGHT_YELLOW << "m";
+				}
+
+				std::cout << msg << "\n";
 			}
 			if (m_bLogToFile)
 			{
@@ -86,7 +97,12 @@ namespace Phoenix
 		{
 			if (m_bLogToConsole)
 			{
-				std::cout << "\033[" << ColorCode::LIGHT_RED << "m" << msg << "\n";
+				if (m_bUseAnsiColors)
+				{
+					std::cout << "\033[" << ColorCode::LIGHT_RED << "m";
+				}
+
+				std::cout << msg << "\n";
 			}
 			if (m_bLogToFile)
 			{
@@ -131,6 +147,11 @@ namespace Phoenix
 		void error(const std::string& msg)
 		{
 			get().Error(msg);
+		}
+
+		void setAnsiColorEnabled(bool enabled)
+		{
+			get().m_bUseAnsiColors = enabled;
 		}
 	}
 }

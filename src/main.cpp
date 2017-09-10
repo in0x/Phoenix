@@ -13,13 +13,7 @@
 #include "Core/Render/CommandBucket.hpp"
 #include "Core/Render/Commands.hpp"
 
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
-#define PLATFORM_WINDOWS
-#endif
-
-#ifdef PLATFORM_WINDOWS
 #include "Core/PlatformWindows.hpp"
-#endif
 
 /*
 TODO:
@@ -68,12 +62,13 @@ std::string loadText(const char* path)
 
 void run()
 {
-	initPlatform();
-
 	using namespace Phoenix;
 
 	Logger::init(true, false);
-
+	Logger::setAnsiColorEnabled(Platform::enableConsoleAnsiColors());
+	
+	SetProcessDPIAware();
+	
 	Tests::RunMathTests();
 
 	std::unique_ptr<Mesh> fox = loadObj("Fox/", "RedFox.obj");

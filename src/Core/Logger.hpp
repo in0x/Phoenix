@@ -7,6 +7,7 @@ namespace Phoenix
 	namespace Logger
 	{	
 		void init(bool bLogToConsole, bool bLogToFile);
+		void setAnsiColorEnabled(bool enabled);
 		void exit();
 
 		void log(const std::string& msg);
