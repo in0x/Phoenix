@@ -65,7 +65,7 @@ void run()
 	using namespace Phoenix;
 
 	Logger::init(true, false);
-	Logger::setAnsiColorEnabled(Platform::enableConsoleAnsiColors());
+	Logger::setAnsiColorEnabled(Platform::enableConsoleColor(true));
 	
 	SetProcessDPIAware();
 	
