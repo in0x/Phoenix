@@ -26,6 +26,8 @@ namespace Phoenix
 		UniformHandle createUniform(ProgramHandle program, const char* name, Uniform::Type type, const void* data = nullptr, size_t dataSize = 0);
 
 		void setUniform(UniformHandle handle, const void* data, size_t dataSize);
+
+		void drawIndexed(VertexBufferHandle vb, IndexBufferHandle ib, Primitive::Type primitives, uint32_t start, uint32_t count, StateGroup& state);
 	};
 
 	class IRenderer

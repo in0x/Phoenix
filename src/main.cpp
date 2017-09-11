@@ -10,8 +10,6 @@
 
 #include "Core/Render/RenderFrontend.hpp"
 #include "Core/Render/WGlRenderBackend.hpp"
-#include "Core/Render/CommandBucket.hpp"
-#include "Core/Render/Commands.hpp"
 
 #include "Core/PlatformWindows.hpp"
 
@@ -95,7 +93,6 @@ void run()
 
 	WGlRenderInit renderInit(window.getNativeHandle());
 	RenderFrontend::init(&renderInit);
-	CommandBucket drawBucket(16);
 
 	VertexBufferFormat foxLayout;
 	foxLayout.add({ AttributeProperty::Position, AttributeType::Float, 3 },
@@ -130,13 +127,7 @@ void run()
 	//UniformHandle lit = RenderFrontend::createUniform(program, "lightPosition", Uniform::Vec3, nullptr, 0);
 
 	RenderFrontend::submitCommands();
-	RenderFrontend::tempSetProgram(program);
-
-	/*glUniformMatrix4fv(2, 1, GL_FALSE, (GLfloat*)&worldMat);
-	glUniformMatrix4fv(3, 1, GL_FALSE, (GLfloat*)&viewMat);
-	glUniformMatrix4fv(4, 1, GL_FALSE, (GLfloat*)&projMat);
-	glUniform3fv(5, 1, (GLfloat*)&lightPosition);*/
-
+	
 	float angle = 0.f;
 
 	checkGlError();
@@ -153,19 +144,13 @@ void run()
 		angle += 0.025f;
 		Matrix4 rotMat = Matrix4::rotation(0.f, angle, 0.f);
 
-		//glUniformMatrix4fv(2, 1, GL_FALSE, (GLfloat*)&rotMat);
-
-		auto dc = drawBucket.addCommand<Commands::DrawIndexed>();
-
-		dc->vertexBuffer = foxVertices;
-		dc->indexBuffer = foxIndices;
-		dc->primitives = Primitive::Triangles;
-		dc->start = 0;
-		dc->count = fox->indices.size();
-
-		dc->state.program = program;
-
-		drawBucket.submit(RenderFrontend::getBackend());
+		RenderFrontend::setUniform(mmat, &rotMat, sizeof(Matrix4));
+		
+		StateGroup state;
+		state.program = program;
+		RenderFrontend::drawIndexed(foxVertices, foxIndices, Primitive::Triangles, 0, fox->indices.size(), state);
+		
+		RenderFrontend::submitCommands();
 		RenderFrontend::swapBuffers();
 		
 		glDisable(GL_MULTISAMPLE);

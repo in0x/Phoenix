@@ -21,8 +21,8 @@ namespace Phoenix
 		virtual void createProgram(ProgramHandle handle, const Shader::List& shaders) = 0;
 		virtual void createTexture() = 0;
 		virtual void createFrameBuffer() = 0;
-		virtual void createUniform(ProgramHandle programHandle, UniformHandle uniformHandle, const char* name, Uniform::Type type) = 0;
-		
+		virtual void createUniform(ProgramHandle programHandle, UniformHandle& uniformHandle, const char* name, Uniform::Type type) = 0;
+
 		virtual void setVertexBuffer(VertexBufferHandle vb) = 0;
 		virtual void setIndexBuffer(IndexBufferHandle ib) = 0;
 		virtual void setProgram(ProgramHandle prog) = 0; 

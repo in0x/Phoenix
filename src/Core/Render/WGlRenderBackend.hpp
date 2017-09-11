@@ -34,6 +34,7 @@ namespace Phoenix
 	{
 		Uniform::Type m_type; 
 		GLuint m_location;
+		GLint m_size;
 		ProgramHandle m_program;
 	};
 
@@ -71,7 +72,7 @@ namespace Phoenix
 		virtual void createProgram(ProgramHandle handle, const Shader::List& shaders) override;
 		virtual void createTexture() override;
 		virtual void createFrameBuffer() override;		
-		virtual void createUniform(ProgramHandle programHandle, UniformHandle uniformHandle, const char* name, Uniform::Type type) override;
+		virtual void createUniform(ProgramHandle programHandle, UniformHandle& uniformHandle, const char* name, Uniform::Type type) override;
 
 		virtual void setVertexBuffer(VertexBufferHandle vb) override;
 		virtual void setIndexBuffer(IndexBufferHandle ib) override;

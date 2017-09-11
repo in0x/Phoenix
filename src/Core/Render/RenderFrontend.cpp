@@ -80,9 +80,7 @@ namespace Phoenix
 			VertexBufferHandle handle;
 			handle.idx = s->vertexBuffers++;
 
-			auto cvb = s->bucket.addCommand<Commands::CreateVertexBuffer>();
-			cvb->format = format;
-			cvb->handle = handle;
+			s->renderBackend->createVertexBuffer(handle, format);
 
 			return handle;
 		}
@@ -92,11 +90,7 @@ namespace Phoenix
 			IndexBufferHandle handle;
 			handle.idx = s->indexBuffers++;
 
-			auto cib = s->bucket.addCommand<Commands::CreateIndexBuffer>();
-			cib->size = size;
-			cib->count = count;
-			cib->data = data;
-			cib->handle = handle;
+			s->renderBackend->createIndexBuffer(handle, size, count, data);
 
 			return handle;
 		}
@@ -105,14 +99,8 @@ namespace Phoenix
 		{
 			ShaderHandle handle;
 			handle.idx = s->shaders++;
-			size_t strLen = strlen(source);
 
-			Commands::CreateShader* cs = s->bucket.addCommand<Commands::CreateShader>(strLen);
-			cs->shaderType = shaderType;
-			cs->handle = handle;
-			cs->source = commandPacket::getAuxiliaryMemory(cs);
-			memcpy(commandPacket::getAuxiliaryMemory(cs), source, strLen);
-			cs->source[strLen] = '\0';
+			s->renderBackend->createShader(handle, source, shaderType);
 
 			return handle;
 		}
@@ -122,10 +110,7 @@ namespace Phoenix
 			ProgramHandle handle;
 			handle.idx = s->programs++;
 
-			auto createProg = s->bucket.addCommand<Commands::CreateProgram>();
-
-			createProg->shaders = shaders;
-			createProg->handle = handle;
+			s->renderBackend->createProgram(handle, shaders);
 
 			return handle;
 		}
@@ -135,33 +120,42 @@ namespace Phoenix
 			UniformHandle handle;
 			handle.idx = s->uniforms++;
 
-			size_t nameLen = strlen(name);
-			auto create = s->bucket.addCommand<Commands::CreateUniform>(nameLen + dataSize);
+			s->renderBackend->createUniform(program, handle, name, type);
 
-			create->program = program;
-			create->handle = handle;
-			create->dataType = type;
-
-			create->name = commandPacket::getAuxiliaryMemory(create);
-			memcpy(create->name, name, nameLen);
-			create->name[nameLen] = '\0';
-
-			if (data != nullptr)
+			if (handle.isValid() && data != nullptr)
 			{
 				setUniform(handle, data, dataSize);
 			}
-
+		
 			return handle;
 		}
 
 		void setUniform(UniformHandle handle, const void* data, size_t dataSize)
 		{
+			if (!handle.isValid())
+			{
+				Logger::error("Attempted to set value of invalid uniform");
+				return;
+			}
+			
 			auto set = s->bucket.addCommand<Commands::SetUniform>(dataSize);
 
 			set->handle = handle;
-
 			set->data = commandPacket::getAuxiliaryMemory(set);
 			memcpy(commandPacket::getAuxiliaryMemory(set), data, dataSize);
+		}
+		
+		void drawIndexed(VertexBufferHandle vb, IndexBufferHandle ib, Primitive::Type primitives, uint32_t start, uint32_t count, StateGroup& state)
+		{
+			auto dc = s->bucket.addCommand<Commands::DrawIndexed>();
+
+			dc->vertexBuffer = vb;
+			dc->indexBuffer = ib;
+			dc->primitives = Primitive::Triangles;
+			dc->start = 0;
+			dc->count = count;
+
+			dc->state = state;
 		}
 	};
 }

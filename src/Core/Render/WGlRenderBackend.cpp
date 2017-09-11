@@ -341,7 +341,7 @@ namespace Phoenix
 		}
 	}
 
-	void WGlRenderBackend::createUniform(ProgramHandle programHandle, UniformHandle uniformHandle, const char* name, Uniform::Type type)
+	void WGlRenderBackend::createUniform(ProgramHandle programHandle, UniformHandle& uniformHandle, const char* name, Uniform::Type type)
 	{
 		GlProgram& program = m_programs[programHandle.idx]; 
 		GLint location = glGetUniformLocation(program.m_id, name);
@@ -367,6 +367,7 @@ namespace Phoenix
 				uniform.m_type = type;
 				uniform.m_location = location;
 				uniform.m_program = programHandle;
+				uniform.m_size = size;
 
 				return;
 			}
@@ -374,14 +375,12 @@ namespace Phoenix
 
 		checkGlError();
 
-		uniformHandle.idx = UniformHandle::invalidValue; // TODO(Phil): Since we are async this doesnt work anymore.
+		uniformHandle.idx = UniformHandle::invalidValue; 
 		Logger::error("Requested uniform does not exist in specified program");
 		return;
 	}
 
-#include "../Math/PhiMath.hpp"
-
-	void WGlRenderBackend::setUniform(UniformHandle handle, const void* data)
+	void WGlRenderBackend::setUniform(UniformHandle handle, const void* data) 
 	{
 		GlUniform& uniform = m_uniforms[handle.idx];
 		glUseProgram(m_programs[uniform.m_program.idx].m_id);
@@ -390,32 +389,28 @@ namespace Phoenix
 		{
 		case Uniform::Float:
 		{
-			glUniform1fv(uniform.m_location, 1, static_cast<const GLfloat*>(data));
+			glUniform1fv(uniform.m_location, uniform.m_size, static_cast<const GLfloat*>(data));
 		} break;
 		case Uniform::Int:
 		{
-			glUniform1iv(uniform.m_location, 1, static_cast<const GLint*>(data));
+			glUniform1iv(uniform.m_location, uniform.m_size, static_cast<const GLint*>(data));
 		} break;
 		case Uniform::Vec3:
 		{
-			glUniform3fv(uniform.m_location, 1, static_cast<const GLfloat*>(data));
+			glUniform3fv(uniform.m_location, uniform.m_size, static_cast<const GLfloat*>(data));
+			checkGlError();
 		} break;
 		case Uniform::Vec4:
 		{
-			glUniform4fv(uniform.m_location, 1, static_cast<const GLfloat*>(data));
+			glUniform4fv(uniform.m_location, uniform.m_size, static_cast<const GLfloat*>(data));
 		} break;
 		case Uniform::Mat3:
 		{
-			glUniformMatrix3fv(uniform.m_location, 1, false, static_cast<const GLfloat*>(data));
+			glUniformMatrix3fv(uniform.m_location, uniform.m_size, false, static_cast<const GLfloat*>(data));
 		} break;
 		case Uniform::Mat4:
 		{
-			const Phoenix::Matrix4* f = static_cast<const Phoenix::Matrix4*>(data);
-			//glUniformMatrix4fv(uniform.m_location, 1, false, static_cast<const GLfloat*>(data));
-			GLfloat* fuck = (GLfloat*)(f);
-
-			glUniformMatrix4fv(uniform.m_location, 1, GL_FALSE, fuck);
-			checkGlError();
+			glUniformMatrix4fv(uniform.m_location, uniform.m_size, false, static_cast<const GLfloat*>(data));
 		} break;
 		default:
 		{
