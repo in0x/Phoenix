@@ -350,7 +350,7 @@ namespace Phoenix
 		if (-1 != location)
 		{
 			GLint count;
-			GLint size;
+			GLint size; // TOOO(Phil): I should store size in the Uniform Object.
 			GLenum glType;
 
 			const GLsizei bufSize = RenderConstants::c_maxUniformNameLenght;
@@ -366,6 +366,7 @@ namespace Phoenix
 				GlUniform& uniform = m_uniforms[uniformHandle.idx];
 				uniform.m_type = type;
 				uniform.m_location = location;
+				uniform.m_program = programHandle;
 
 				return;
 			}
@@ -382,7 +383,8 @@ namespace Phoenix
 
 	void WGlRenderBackend::setUniform(UniformHandle handle, const void* data)
 	{
-		GlUniform uniform = m_uniforms[handle.idx];
+		GlUniform& uniform = m_uniforms[handle.idx];
+		glUseProgram(m_programs[uniform.m_program.idx].m_id);
 
 		switch (uniform.m_type)
 		{

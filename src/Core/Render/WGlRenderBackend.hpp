@@ -34,6 +34,7 @@ namespace Phoenix
 	{
 		Uniform::Type m_type; 
 		GLuint m_location;
+		ProgramHandle m_program;
 	};
 
 	class WGlRenderInit : public RenderInit
