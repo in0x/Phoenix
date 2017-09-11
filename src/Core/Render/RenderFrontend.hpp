@@ -8,6 +8,7 @@ namespace Phoenix
 	namespace RenderFrontend 
 	{
 		void init(RenderInit* renderInit);
+		void submitCommands();
 		void swapBuffers();
 		void exit();
 
@@ -18,11 +19,13 @@ namespace Phoenix
 		
 		IndexBufferHandle createIndexBuffer(size_t size, uint32_t count, const void* data);
 		
-		ShaderHandle createShader(const char* source, size_t strlen, Shader::Type shaderType);
+		ShaderHandle createShader(const char* source, Shader::Type shaderType);
 		
 		ProgramHandle createProgram(const Shader::List& shaders);
 
-		UniformHandle createUniform(ProgramHandle program, const char* name, Uniform::Type type, const void* data);
+		UniformHandle createUniform(ProgramHandle program, const char* name, Uniform::Type type, const void* data = nullptr, size_t dataSize = 0);
+
+		void setUniform(UniformHandle handle, const void* data, size_t dataSize);
 	};
 
 	class IRenderer

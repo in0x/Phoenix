@@ -109,27 +109,33 @@ void run()
 	IndexBufferHandle foxIndices = RenderFrontend::createIndexBuffer(sizeof(unsigned int), fox->indices.size(), fox->indices.data());
 	
 	std::string vsSource = loadText("Shaders/diffuse.vert");
-	ShaderHandle vs = RenderFrontend::createShader(vsSource.c_str(), vsSource.size(), Shader::Vertex);
+	ShaderHandle vs = RenderFrontend::createShader(vsSource.c_str(), Shader::Vertex);
 
 	std::string fsSource = loadText("Shaders/diffuse.frag");
-	ShaderHandle fs = RenderFrontend::createShader(fsSource.c_str(), fsSource.size(), Shader::Fragment);
+	ShaderHandle fs = RenderFrontend::createShader(fsSource.c_str(), Shader::Fragment);
 
 	Shader::List shaders;
 	shaders[Shader::Vertex] = vs;
 	shaders[Shader::Fragment] = fs;
 	ProgramHandle program = RenderFrontend::createProgram(shaders);
 
-	UniformHandle mmat = RenderFrontend::createUniform(program, "modelTf", Uniform::Mat4, nullptr);
-	UniformHandle vmat = RenderFrontend::createUniform(program, "viewTf", Uniform::Mat4, nullptr);
-	UniformHandle pmat = RenderFrontend::createUniform(program, "projectionTf", Uniform::Mat4, nullptr);
-	UniformHandle lit = RenderFrontend::createUniform(program, "lightPosition", Uniform::Vec3, nullptr);
+	UniformHandle mmat = RenderFrontend::createUniform(program, "modelTf", Uniform::Mat4, &worldMat, sizeof(Matrix4));
+	UniformHandle vmat = RenderFrontend::createUniform(program, "viewTf", Uniform::Mat4, &viewMat, sizeof(Matrix4));
+	UniformHandle pmat = RenderFrontend::createUniform(program, "projectionTf", Uniform::Mat4, &projMat, sizeof(Matrix4));
+	UniformHandle lit = RenderFrontend::createUniform(program, "lightPosition", Uniform::Vec3, &lightPosition, sizeof(Vec3));
 
+	//UniformHandle mmat = RenderFrontend::createUniform(program, "modelTf", Uniform::Mat4, nullptr, 0);
+	//UniformHandle vmat = RenderFrontend::createUniform(program, "viewTf", Uniform::Mat4, nullptr, 0);
+	//UniformHandle pmat = RenderFrontend::createUniform(program, "projectionTf", Uniform::Mat4, nullptr, 0);
+	//UniformHandle lit = RenderFrontend::createUniform(program, "lightPosition", Uniform::Vec3, nullptr, 0);
+
+	RenderFrontend::submitCommands();
 	RenderFrontend::tempSetProgram(program);
 
-	glUniformMatrix4fv(2, 1, GL_FALSE, (GLfloat*)&worldMat);
+	/*glUniformMatrix4fv(2, 1, GL_FALSE, (GLfloat*)&worldMat);
 	glUniformMatrix4fv(3, 1, GL_FALSE, (GLfloat*)&viewMat);
 	glUniformMatrix4fv(4, 1, GL_FALSE, (GLfloat*)&projMat);
-	glUniform3fv(5, 1, (GLfloat*)&lightPosition);
+	glUniform3fv(5, 1, (GLfloat*)&lightPosition);*/
 
 	float angle = 0.f;
 
@@ -147,7 +153,7 @@ void run()
 		angle += 0.025f;
 		Matrix4 rotMat = Matrix4::rotation(0.f, angle, 0.f);
 
-		glUniformMatrix4fv(2, 1, GL_FALSE, (GLfloat*)&rotMat);
+		//glUniformMatrix4fv(2, 1, GL_FALSE, (GLfloat*)&rotMat);
 
 		auto dc = drawBucket.addCommand<Commands::DrawIndexed>();
 
@@ -169,6 +175,7 @@ void run()
 	}
 
 	Logger::exit();
+	RenderFrontend::exit();
 }
 
 int main(int argc, char** argv)

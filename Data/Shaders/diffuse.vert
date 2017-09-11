@@ -1,12 +1,12 @@
 #version 430 core
 
-layout (location = 0) in vec3 position;
-layout (location = 1) in vec3 normal;
+in vec3 position;
+in vec3 normal;
 
-layout (location = 2) uniform mat4 modelTf;
-layout (location = 3) uniform mat4 viewTf;
-layout (location = 4) uniform mat4 projectionTf;
-layout (location = 5) uniform vec3 lightPosition;
+uniform mat4 modelTf;
+uniform mat4 viewTf;
+uniform mat4 projectionTf;
+uniform vec3 lightPosition;
 
 out VS_OUT_STRUCT 
 {

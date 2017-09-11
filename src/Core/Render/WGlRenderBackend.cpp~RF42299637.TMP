@@ -408,11 +408,9 @@ namespace Phoenix
 		} break;
 		case Uniform::Mat4:
 		{
-			const Phoenix::Matrix4* f = static_cast<const Phoenix::Matrix4*>(data);
+			auto f = static_cast<const Phoenix::Matrix4*>(data);
 			//glUniformMatrix4fv(uniform.m_location, 1, false, static_cast<const GLfloat*>(data));
-			GLfloat* fuck = (GLfloat*)(f);
-
-			glUniformMatrix4fv(uniform.m_location, 1, GL_FALSE, fuck);
+			glUniformMatrix4fv(uniform.m_location, 1, false, (GLfloat*)(f));
 			checkGlError();
 		} break;
 		default:
