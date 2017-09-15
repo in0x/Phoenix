@@ -50,10 +50,11 @@ namespace Phoenix
 			return OFFSET_COMMAND + sizeof(T) + auxMemorySize;
 		};
 
-		template <class T>
-		CommandPacket create(size_t auxMemorySize)
+		template <class T, class Allocator>
+		CommandPacket create(size_t auxMemorySize, Allocator& allocator)
 		{
-			return ::operator new(getSize<T>(auxMemorySize));
+			//return ::operator new(getSize<T>(auxMemorySize));
+			return allocator.allocate(getSize<T>(auxMemorySize));
 		}
 
 		template <class T>

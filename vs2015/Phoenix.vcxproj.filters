@@ -94,6 +94,9 @@
     <ClInclude Include="..\src\Core\Render\RenderFrontend.hpp">
       <Filter>Render</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Core\Memory\StackAllocator.hpp">
+      <Filter>Memory</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Core\Math\Matrix3.cpp">
@@ -182,6 +185,9 @@
     </Filter>
     <Filter Include="Render">
       <UniqueIdentifier>{ab39b72c-2d1c-4535-9d5f-272eb2d8e422}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Memory">
+      <UniqueIdentifier>{42545344-5e18-4d91-8b9a-ac5919517f16}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

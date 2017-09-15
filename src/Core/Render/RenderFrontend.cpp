@@ -33,7 +33,7 @@ namespace Phoenix
 				}
 			}
 
-			CommandBucket bucket = CommandBucket(1024);
+			CommandBucket bucket{ 1024, 4096 };
 			std::unique_ptr<IRenderBackend> renderBackend = nullptr;
 
 			uint32_t vertexBuffers = 0;

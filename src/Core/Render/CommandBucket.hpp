@@ -6,6 +6,7 @@
 
 #include "RenderDefinitions.hpp"
 #include "CommandPacket.hpp"
+#include "../Memory/StackAllocator.hpp"
 
 namespace Phoenix
 {
@@ -17,8 +18,9 @@ namespace Phoenix
 	class CommandBucket
 	{
 	public:
-		CommandBucket(uint32_t maxCommands)
-			: m_currentIndex(0)
+		CommandBucket(uint32_t maxCommands, size_t memorySizeBytes)
+			: m_memory(memorySizeBytes)
+			, m_currentIndex(0)
 			, m_commands(maxCommands)
 		{}
 
@@ -27,7 +29,7 @@ namespace Phoenix
 		{
 			static_assert(is_submittable<Command>::value, "Commands require a SubmitFunc.");
 			
-			CommandPacket packet = commandPacket::create<Command>(auxMemorySize);
+			CommandPacket packet = commandPacket::create<Command>(auxMemorySize, m_memory);
 
 			// store key and pointer to the data
 			{
@@ -47,7 +49,7 @@ namespace Phoenix
 		{
 			static_assert(is_submittable<NewCommand>::value, "Commands require a SubmitFunc.");
 
-			CommandPacket packet = commandPacket::create<NewCommand>(auxMemorySize);
+			CommandPacket packet = commandPacket::create<NewCommand>(auxMemorySize, m_memory);
 
 			commandPacket::setNextCommandPacket<OldCommand>(command, packet);
 
@@ -75,9 +77,11 @@ namespace Phoenix
 			}
 
 			m_currentIndex = 0;
+			m_memory.clear();
 		}
 
 	private:
+		StackAllocator m_memory;
 		size_t m_currentIndex;
 		std::vector<void*> m_commands;
 	};
