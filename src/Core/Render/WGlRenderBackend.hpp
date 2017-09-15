@@ -82,6 +82,9 @@ namespace Phoenix
 		virtual void setBlend(Blend::Type blend) override;
 		virtual void setStencil(Stencil::Type stencil) override;
 		virtual void setUniform(UniformHandle handle, const void* data) override;
+		virtual void setState(const StateGroup& state) override;
+
+		virtual void clearFrameBuffer(FrameBufferHandle handle, Buffer::Type bitToClear, RGBA clearColor) override;
 
 		virtual void drawLinear(Primitive::Type primitive, uint32_t count, uint32_t start) override;
 		virtual void drawIndexed(Primitive::Type primitive, uint32_t count, uint32_t start) override;

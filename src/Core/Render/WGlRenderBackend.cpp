@@ -5,6 +5,8 @@
 
 namespace Phoenix
 {
+#define glChecked(x) x; checkGlError();\
+
 	WGlRenderBackend::WGlRenderBackend()
 		: m_owningWindow(nullptr)
 		, m_renderContext(0)
@@ -440,7 +442,18 @@ namespace Phoenix
 
 	void WGlRenderBackend::setDepth(Depth::Type depth)
 	{
-		Logger::warning(__LOCATION_INFO__ "not implemented!");
+		switch (depth)
+		{
+		case Depth::Enable:
+		{
+			glEnable(GL_DEPTH_TEST);
+		} break;
+		case Depth::Disable:
+		{
+			glDisable(GL_DEPTH_TEST);
+		} break;
+		default: break;
+		}
 	}
 
 	void WGlRenderBackend::setRaster(Raster::Type raster)
@@ -470,13 +483,43 @@ namespace Phoenix
 		return glType[type];
 	}
 
-	void WGlRenderBackend::WGlRenderBackend::drawLinear(Primitive::Type primitive, uint32_t count, uint32_t start)
+	void WGlRenderBackend::setState(const StateGroup& state)
+	{
+		setProgram(state.program);
+		setDepth(state.depth);
+		//setBlend(state.blend);
+		//setStencil(state.stencil);
+		//setRaster(state.raster);
+	}
+
+	void WGlRenderBackend::drawLinear(Primitive::Type primitive, uint32_t count, uint32_t start)
 	{
 		glDrawArrays(getPrimitiveEnum(primitive), start, count);
 	}
 
-	void WGlRenderBackend::WGlRenderBackend::drawIndexed(Primitive::Type primitive, uint32_t count, uint32_t start)
+	void WGlRenderBackend::drawIndexed(Primitive::Type primitive, uint32_t count, uint32_t start)
 	{
 		glDrawElements(getPrimitiveEnum(primitive), count, GL_UNSIGNED_INT, (GLvoid*)(sizeof(GLubyte) * start));
+	}
+
+	void WGlRenderBackend::clearFrameBuffer(FrameBufferHandle handle, Buffer::Type bitToClear, RGBA clearColor)
+	{
+		// TODO(PHIL): use actual frambuffer here, 0 is default for window
+		
+		switch (bitToClear)
+		{
+		case Buffer::Color:
+		{ 		
+			glClearBufferfv(GL_COLOR, 0, (GLfloat*)&clearColor);
+		} break;
+		case Buffer::Depth:
+		{
+			glClear(GL_DEPTH_BUFFER_BIT);
+		} break;
+		case Buffer::Stencil:
+		{ 
+			glClear(GL_STENCIL_BUFFER_BIT);
+		} break;
+		}
 	}
 }

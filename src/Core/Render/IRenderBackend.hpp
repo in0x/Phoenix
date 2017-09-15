@@ -31,6 +31,9 @@ namespace Phoenix
 		virtual void setBlend(Blend::Type blend) = 0;
 		virtual void setStencil(Stencil::Type stencil) = 0;
 		virtual void setUniform(UniformHandle handle, const void* data) = 0;
+		virtual void setState(const StateGroup& state) = 0;
+
+		virtual void clearFrameBuffer(FrameBufferHandle handle, Buffer::Type bitToClear, RGBA clearColor) = 0;
 
 		virtual void drawLinear(Primitive::Type primitive, uint32_t count, uint32_t start) = 0;
 		virtual void drawIndexed(Primitive::Type primitive, uint32_t count, uint32_t start) = 0;

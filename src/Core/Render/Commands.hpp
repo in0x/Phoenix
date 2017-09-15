@@ -44,5 +44,14 @@ namespace Phoenix
 			UniformHandle handle;
 			const void* data;
 		};
+
+		struct ClearBuffer
+		{
+			SUBMITTABLE();
+
+			RGBA color;
+			Buffer::Type toClear;
+			FrameBufferHandle handle;
+		};
 	}
 }

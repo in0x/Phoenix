@@ -267,13 +267,6 @@ namespace Phoenix
 		};
 	}
 
-	struct UniformInfo
-	{
-		char name[RenderConstants::c_maxUniformNameLenght];
-		Uniform::Type type;
-		UniformHandle handle;
-	};
-
 	namespace Primitive
 	{
 		enum Type
@@ -304,7 +297,8 @@ namespace Phoenix
 	{
 		enum Type
 		{
-			Placeholder
+			Enable,
+			Disable
 		};
 	}
 
@@ -315,6 +309,21 @@ namespace Phoenix
 			Placeholder
 		};
 	}
+
+	namespace Buffer
+	{
+		enum Type
+		{
+			Color,
+			Depth,
+			Stencil 
+		};
+	}
+
+	struct RGBA
+	{
+		float r, g, b, a;
+	};
 
 	struct StateGroup
 	{

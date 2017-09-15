@@ -15,7 +15,6 @@
 
 /*
 TODO:
-* Support uniforms (renderer = shared, context = platform-specific implementation)
 * Crashes when closed by closing window via taskbar
 * Implement linear allocator -> REALLY IMPORTANT SO RENDER COMMANDS STOP LEAKING
 * Implement dynamic array -> I'm not using that many vectors so this isn't very high prio.
@@ -58,6 +57,60 @@ std::string loadText(const char* path)
 	}
 }
 
+namespace Phoenix
+{
+	struct RenderMesh
+	{
+		VertexBufferHandle vb;
+		IndexBufferHandle ib;
+		uint32_t numVertices;
+		uint32_t numIndices;
+	};
+
+	ProgramHandle loadProgram(const char* vsPath, const char* fsPath)
+	{
+		std::string vsSource = loadText(vsPath);
+		ShaderHandle vs = RenderFrontend::createShader(vsSource.c_str(), Shader::Vertex);
+
+		std::string fsSource = loadText(fsPath);
+		ShaderHandle fs = RenderFrontend::createShader(fsSource.c_str(), Shader::Fragment);
+
+		Shader::List shaders;
+		shaders[Shader::Vertex] = vs;
+		shaders[Shader::Fragment] = fs;
+		return RenderFrontend::createProgram(shaders);
+	}
+	
+	RenderMesh loadRenderMesh(Mesh* mesh)
+	{
+		RenderMesh renderMesh;
+		
+		VertexBufferFormat layout;
+		layout.add({ AttributeProperty::Position, AttributeType::Float, 3 },
+		{ sizeof(Vec3), mesh->vertices.size(), mesh->vertices.data() });
+
+		layout.add({ AttributeProperty::Normal, AttributeType::Float, 3 },
+		{ sizeof(Vec3), mesh->normals.size(), mesh->normals.data() });
+
+		renderMesh.vb = RenderFrontend::createVertexBuffer(layout);
+
+		renderMesh.ib = RenderFrontend::createIndexBuffer(sizeof(unsigned int), mesh->indices.size(), mesh->indices.data());
+
+		renderMesh.numVertices = mesh->vertices.size();
+		renderMesh.numIndices = mesh->indices.size();
+
+		return renderMesh;
+	}
+
+	void draw(RenderMesh* renderMesh, ProgramHandle program)
+	{
+		StateGroup state;
+		state.program = program;
+		state.depth = Depth::Enable;
+		RenderFrontend::drawIndexed(renderMesh->vb, renderMesh->ib, Primitive::Triangles, 0, renderMesh->numIndices, state);
+	}
+}
+
 void run()
 {
 	using namespace Phoenix;
@@ -86,76 +139,42 @@ void run()
 		return;
 	}
 
+	WGlRenderInit renderInit(window.getNativeHandle());
+	RenderFrontend::init(&renderInit);
+
+	RenderMesh renderMesh = loadRenderMesh(fox.get());
+	ProgramHandle program = loadProgram("Shaders/diffuse.vert", "Shaders/diffuse.frag");
+	
 	Matrix4 worldMat = Matrix4::identity();
 	Matrix4 viewMat = lookAtRH(Vec3{ 2, 2, -7 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 });
 	Matrix4 projMat = perspectiveRH(70, (float)config.width / (float)config.height, 1, 100);
 	Vec3 lightPosition = Vec3(-5, 3, 5);
-
-	WGlRenderInit renderInit(window.getNativeHandle());
-	RenderFrontend::init(&renderInit);
-
-	VertexBufferFormat foxLayout;
-	foxLayout.add({ AttributeProperty::Position, AttributeType::Float, 3 },
-	{ sizeof(Vec3), fox->vertices.size(), fox->vertices.data() });
-
-	foxLayout.add({ AttributeProperty::Normal, AttributeType::Float, 3 },
-	{ sizeof(Vec3), fox->normals.size(), fox->normals.data() });
-
-	VertexBufferHandle foxVertices = RenderFrontend::createVertexBuffer(foxLayout);
-
-	IndexBufferHandle foxIndices = RenderFrontend::createIndexBuffer(sizeof(unsigned int), fox->indices.size(), fox->indices.data());
 	
-	std::string vsSource = loadText("Shaders/diffuse.vert");
-	ShaderHandle vs = RenderFrontend::createShader(vsSource.c_str(), Shader::Vertex);
-
-	std::string fsSource = loadText("Shaders/diffuse.frag");
-	ShaderHandle fs = RenderFrontend::createShader(fsSource.c_str(), Shader::Fragment);
-
-	Shader::List shaders;
-	shaders[Shader::Vertex] = vs;
-	shaders[Shader::Fragment] = fs;
-	ProgramHandle program = RenderFrontend::createProgram(shaders);
-
+	// Having to specify the program when creating a uniform is annoying as you would have to create a new one with each program for e.g. worldMatrix.
 	UniformHandle mmat = RenderFrontend::createUniform(program, "modelTf", Uniform::Mat4, &worldMat, sizeof(Matrix4));
 	UniformHandle vmat = RenderFrontend::createUniform(program, "viewTf", Uniform::Mat4, &viewMat, sizeof(Matrix4));
 	UniformHandle pmat = RenderFrontend::createUniform(program, "projectionTf", Uniform::Mat4, &projMat, sizeof(Matrix4));
 	UniformHandle lit = RenderFrontend::createUniform(program, "lightPosition", Uniform::Vec3, &lightPosition, sizeof(Vec3));
 
-	//UniformHandle mmat = RenderFrontend::createUniform(program, "modelTf", Uniform::Mat4, nullptr, 0);
-	//UniformHandle vmat = RenderFrontend::createUniform(program, "viewTf", Uniform::Mat4, nullptr, 0);
-	//UniformHandle pmat = RenderFrontend::createUniform(program, "projectionTf", Uniform::Mat4, nullptr, 0);
-	//UniformHandle lit = RenderFrontend::createUniform(program, "lightPosition", Uniform::Vec3, nullptr, 0);
-
-	RenderFrontend::submitCommands();
-	
 	float angle = 0.f;
 
 	checkGlError();
 
 	while (window.isOpen())
 	{
-		glEnable(GL_DEPTH_TEST);
-		glEnable(GL_MULTISAMPLE);
-
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		GLfloat color[] = { 1.f, 1.f, 1.f, 1.f };
-		glClearBufferfv(GL_COLOR, 0, color);
+		RenderFrontend::clearFrameBuffer({}, Buffer::Color, { 1.f, 1.f, 1.f, 1.f });
+		RenderFrontend::clearFrameBuffer({}, Buffer::Depth, { });
 
 		angle += 0.025f;
 		Matrix4 rotMat = Matrix4::rotation(0.f, angle, 0.f);
 
 		RenderFrontend::setUniform(mmat, &rotMat, sizeof(Matrix4));
 		
-		StateGroup state;
-		state.program = program;
-		RenderFrontend::drawIndexed(foxVertices, foxIndices, Primitive::Triangles, 0, fox->indices.size(), state);
+		draw(&renderMesh, program);
 		
 		RenderFrontend::submitCommands();
 		RenderFrontend::swapBuffers();
 		
-		glDisable(GL_MULTISAMPLE);
-		glDisable(GL_DEPTH_TEST);
-
 		window.processMessages();
 	}
 

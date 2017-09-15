@@ -65,11 +65,6 @@ namespace Phoenix
 			s = nullptr;
 		}
 
-		void tempSetProgram(ProgramHandle handle)
-		{
-			s->renderBackend->setProgram(handle);
-		}
-
 		IRenderBackend* getBackend()
 		{
 			return s->renderBackend.get();
@@ -156,6 +151,15 @@ namespace Phoenix
 			dc->count = count;
 
 			dc->state = state;
+		}
+
+		void clearFrameBuffer(FrameBufferHandle frame, Buffer::Type bitToClear, RGBA color)
+		{
+			auto dc = s->bucket.addCommand<Commands::ClearBuffer>();
+
+			dc->handle = frame;
+			dc->toClear = bitToClear;
+			dc->color = color;
 		}
 	};
 }
