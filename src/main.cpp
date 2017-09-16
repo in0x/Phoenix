@@ -57,6 +57,9 @@ std::string loadText(const char* path)
 	}
 }
 
+#include "Core/Memory/PoolAllocator.hpp"
+#include "Core/Memory/StackAllocator.hpp"
+
 namespace Phoenix
 {
 	struct RenderMesh
@@ -114,6 +117,32 @@ namespace Phoenix
 void run()
 {
 	using namespace Phoenix;
+
+	//{
+	//	char memory[1024];
+	//	//FreeList pool(memory, memory + 1024, 32, 32, 2);
+	//	PoolAllocator pool(32, 32, 2);
+
+	//	void* blocks[32];
+	//	for (size_t i = 0; i < 32; ++i)
+	//	{
+	//		blocks[i] = pool.allocate();
+	//	}
+
+	//	assert(pool.allocate() == nullptr);
+	//	pool.free(blocks[16]);
+	//	assert(pool.allocate() != nullptr);
+
+	//}
+
+	//{
+	//	StackAllocator stack(1024);
+
+	//	for (size_t i = 0; i < 32; ++i)
+	//	{
+	//		stack.allocate(32, 2);
+	//	}
+	//}
 
 	Logger::init(true, false);
 	Logger::setAnsiColorEnabled(Platform::enableConsoleColor(true));

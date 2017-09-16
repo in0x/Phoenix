@@ -179,6 +179,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Core\Math\MathStreamOverloads.hpp" />
+    <ClInclude Include="..\src\Core\Memory\MemUtil.hpp" />
+    <ClInclude Include="..\src\Core\Memory\PoolAllocator.hpp" />
     <ClInclude Include="..\src\Core\Memory\StackAllocator.hpp" />
     <ClInclude Include="..\src\Core\ObjIndexer.hpp" />
     <ClInclude Include="..\src\Core\ObjStructs.hpp" />

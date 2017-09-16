@@ -1,5 +1,6 @@
 #pragma once
 
+#include "MemUtil.hpp"
 #include <cassert>
 
 namespace Phoenix
@@ -19,20 +20,6 @@ namespace Phoenix
 
 	int t = 0;
 	long u = union_cast<long>(t);*/
-
-	//class LinearAllocator
-	//{
-	//	explicit LinearAllocator(size_t size);
-
-	//	~LinearAllocator();
-
-	//	LinearAllocator& operator=(const StackAllocator&) = delete;
-
-	//	LinearAllocator(const StackAllocator&) = delete;
-
-	//	LinearAllocator(const StackAllocator&&) = delete;
-
-	//};
 
 	class StackAllocator
 	{
@@ -85,17 +72,9 @@ namespace Phoenix
 
 		size_t fullSize = size + alignment;
 
-		assert(m_top + fullSize < m_end);
+		assert((m_top + fullSize) < m_end);
 
-		uintptr_t raw = reinterpret_cast<uintptr_t>(m_top);
-
-		size_t mask = alignment - 1;
-		uintptr_t misalignment = raw & mask;
-		ptrdiff_t adjust = alignment - misalignment;
-		assert(adjust < 256); // min 1 byte extra
-
-		char* aligned = reinterpret_cast<char*>(raw + adjust);
-		aligned[-1] = static_cast<char>(adjust);
+		char* aligned = alignAddressAndStore(m_top, alignment);
 
 		m_top += fullSize;
 
@@ -107,6 +86,8 @@ namespace Phoenix
 		assert(memory != nullptr);
 
 		char* alignedMem = reinterpret_cast<char*>(memory);
+
+		assert((m_start <= alignedMem && m_end >= alignedMem)); 
 
 		uintptr_t alignedAddress = reinterpret_cast<uintptr_t>(memory);
 		ptrdiff_t adjustment = static_cast<ptrdiff_t>(alignedMem[-1]);
