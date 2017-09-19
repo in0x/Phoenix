@@ -78,7 +78,7 @@ namespace Phoenix
 		std::string fsSource = loadText(fsPath);
 		ShaderHandle fs = RenderFrontend::createShader(fsSource.c_str(), Shader::Fragment);
 
-		Shader::List shaders;
+		Shader::List shaders = Shader::createList();
 		shaders[Shader::Vertex] = vs;
 		shaders[Shader::Fragment] = fs;
 		return RenderFrontend::createProgram(shaders);

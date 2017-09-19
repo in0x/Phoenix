@@ -263,6 +263,11 @@ namespace Phoenix
 		// Some shaders may be omitteted if they are not required to create a valid shader program.
 		//using List = ShaderHandle[Shader::Type::Count];
 		using List = std::array<ShaderHandle, Shader::Type::Count>;
+		inline List createList()
+		{
+			ShaderHandle invalidHandle = createShaderHandle();
+			return{ invalidHandle, invalidHandle, invalidHandle, invalidHandle };
+		}
 	}
 
 	namespace Uniform
