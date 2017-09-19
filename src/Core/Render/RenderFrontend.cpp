@@ -72,7 +72,7 @@ namespace Phoenix
 
 		VertexBufferHandle createVertexBuffer(const VertexBufferFormat& format)
 		{
-			VertexBufferHandle handle;
+			VertexBufferHandle handle = createVertexBufferHandle();
 			handle.idx = s->vertexBuffers++;
 
 			s->renderBackend->createVertexBuffer(handle, format);
@@ -82,7 +82,7 @@ namespace Phoenix
 
 		IndexBufferHandle createIndexBuffer(size_t size, uint32_t count, const void* data)
 		{
-			IndexBufferHandle handle;
+			IndexBufferHandle handle = createIndexBufferHandle();
 			handle.idx = s->indexBuffers++;
 
 			s->renderBackend->createIndexBuffer(handle, size, count, data);
@@ -92,7 +92,7 @@ namespace Phoenix
 
 		ShaderHandle createShader(const char* source, Shader::Type shaderType)
 		{
-			ShaderHandle handle;
+			ShaderHandle handle = createShaderHandle();
 			handle.idx = s->shaders++;
 
 			s->renderBackend->createShader(handle, source, shaderType);
@@ -102,7 +102,7 @@ namespace Phoenix
 
 		ProgramHandle createProgram(const Shader::List& shaders)
 		{
-			ProgramHandle handle;
+			ProgramHandle handle = createProgramHandle();
 			handle.idx = s->programs++;
 
 			s->renderBackend->createProgram(handle, shaders);
@@ -112,7 +112,7 @@ namespace Phoenix
 
 		UniformHandle createUniform(ProgramHandle program, const char* name, Uniform::Type type, const void* data, size_t dataSize)
 		{
-			UniformHandle handle;
+			UniformHandle handle = createUniformHandle();
 			handle.idx = s->uniforms++;
 
 			s->renderBackend->createUniform(program, handle, name, type);

@@ -29,9 +29,15 @@ namespace Phoenix
 		{ \
 		public: \
 			static const size invalidValue = std::numeric_limits<size>::max(); \
-			size idx = invalidValue; \
+			size idx; \
 			bool isValid() const { return idx != invalidValue; } \
 			static constexpr size maxValue() { return std::numeric_limits<size>::max() - 1; } \
+		}; \
+		inline name create##name(size value = name::invalidValue)\
+		{ \
+			name handle; \
+			handle.idx = value; \
+			return handle; \
 		} \
 
 #define HANDLE_CUSTOM_MAXVAL(name, size, maxVal) \
@@ -40,9 +46,15 @@ namespace Phoenix
 		{ \
 		public: \
 			static const size invalidValue = std::numeric_limits<size>::max(); \
-			size idx = invalidValue; \
+			size idx; \
 			bool isValid() const { return idx != invalidValue; } \
 			static constexpr size maxValue() { return maxVal; } \
+		}; \
+		inline name create##name(size value = name::invalidValue)\
+		{ \
+			name handle; \
+			handle.idx = value; \
+			return handle; \
 		} \
 
 	HANDLE(VertexBufferHandle, uint16_t);
