@@ -5,6 +5,9 @@
 #include "UniformCache.hpp"
 #include "Commands.hpp"
 
+#include "../Memory/PoolAllocator.hpp"
+#include "../Math/PhiMath.hpp"
+
 #include <memory>
 #include <cassert>
 
@@ -31,9 +34,14 @@ namespace Phoenix
 					break;
 				}
 				}
+
+				uint32_t maxUniforms = renderBackend->getMaxUniformCount();
+				renderBackend->getMaxTextureUnits();
+				uniformMemory.create(sizeof(Matrix4), renderBackend->getMaxUniformCount(), alignof(Matrix4));
 			}
 
 			CommandBucket bucket{ 1024, 4096 };
+			PoolAllocator uniformMemory;
 			std::unique_ptr<IRenderBackend> renderBackend = nullptr;
 
 			uint32_t vertexBuffers = 0;
