@@ -38,10 +38,10 @@ namespace Phoenix { namespace Tests
 		assert(false);
 	}*/
 
-	void RunMathTests();
-	void LegacyTests();
-	void Vec3Tests();
-	void Matrix4Tests();
-	void PlaneTests();
+	void runMathTests();
+	void legacyTests();
+	void vec3Tests();
+	void matrix4Tests();
+	void planeTests();
 }
 }

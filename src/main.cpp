@@ -148,8 +148,8 @@ void run()
 	Logger::setAnsiColorEnabled(Platform::enableConsoleColor(true));
 	
 	SetProcessDPIAware();
-	
-	Tests::RunMathTests();
+
+	Tests::runMathTests();
 
 	std::unique_ptr<Mesh> fox = loadObj("Fox/", "RedFox.obj");
 

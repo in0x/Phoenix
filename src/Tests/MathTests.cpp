@@ -7,15 +7,15 @@
 
 namespace Phoenix { namespace Tests
 {
-	void RunMathTests()
+	void runMathTests()
 	{
-		LegacyTests();
-		Vec3Tests();
-		Matrix4Tests();
-		PlaneTests();
+		legacyTests();
+		vec3Tests();
+		matrix4Tests();
+		planeTests();
 	}
 
-	void LegacyTests()
+	void legacyTests()
 	{
 		std::cout << lookAtRH(Vec3{ 0,0,2 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 }) << '\n';
 		std::cout << perspectiveRH(90.f, 1920.f / 1080.f, 0.5f, 20.f) << '\n';
@@ -43,7 +43,7 @@ namespace Phoenix { namespace Tests
 		assert(angles == qAngles);*/
 	}
 
-	void Vec3Tests()
+	void vec3Tests()
 	{
 		Vec3 a{ 1,0,0 };
 		Vec3 b{ 0,1,0 };
@@ -55,7 +55,7 @@ namespace Phoenix { namespace Tests
 		assert(Vec3(0, 1, 0).reflect(Vec3(0.5, 0.5, 0)) == Vec3(-0.5, 0.5, 0));
 	}
 
-	void Matrix4Tests()
+	void matrix4Tests()
 	{
 		assert(Matrix4::identity().transpose() == Matrix4::identity());
 		assert(Matrix4::identity().determinant() == 1.f);
@@ -91,7 +91,7 @@ namespace Phoenix { namespace Tests
 		assert((Vec3(1, 1, 1) *= mult) == Vec3(6, 3, 6));
 	}
 
-	void PlaneTests()
+	void planeTests()
 	{
 		Plane p1{ { 0,0,0 }, { 0,0,1 }, { 1,0,0 } };
 
