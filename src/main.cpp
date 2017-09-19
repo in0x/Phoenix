@@ -2,6 +2,7 @@
 #include <fstream>
 
 #include "Tests/MathTests.hpp"
+#include "Tests/MemoryTests.hpp"
 
 #include "Core/obj.hpp"
 #include "Core/Math/PhiMath.hpp"
@@ -118,38 +119,13 @@ void run()
 {
 	using namespace Phoenix;
 
-	//{
-	//	char memory[1024];
-	//	//FreeList pool(memory, memory + 1024, 32, 32, 2);
-	//	PoolAllocator pool(32, 32, 2);
-
-	//	void* blocks[32];
-	//	for (size_t i = 0; i < 32; ++i)
-	//	{
-	//		blocks[i] = pool.allocate();
-	//	}
-
-	//	assert(pool.allocate() == nullptr);
-	//	pool.free(blocks[16]);
-	//	assert(pool.allocate() != nullptr);
-
-	//}
-
-	//{
-	//	StackAllocator stack(1024);
-
-	//	for (size_t i = 0; i < 32; ++i)
-	//	{
-	//		stack.allocate(32, 2);
-	//	}
-	//}
-
 	Logger::init(true, false);
 	Logger::setAnsiColorEnabled(Platform::enableConsoleColor(true));
 	
 	SetProcessDPIAware();
 
 	Tests::runMathTests();
+	Tests::runMemoryTests();
 
 	std::unique_ptr<Mesh> fox = loadObj("Fox/", "RedFox.obj");
 

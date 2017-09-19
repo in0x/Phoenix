@@ -103,6 +103,12 @@
     <ClInclude Include="..\src\Core\Memory\MemUtil.hpp">
       <Filter>Memory</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Core\Memory\FreeList.hpp">
+      <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Tests\MemoryTests.hpp">
+      <Filter>Test</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Core\Math\Matrix3.cpp">
@@ -163,9 +169,6 @@
     <ClCompile Include="..\src\Core\Logger.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Core\Render\CommandBucket.cpp">
-      <Filter>Render</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Core\Render\CommandPacket.cpp">
       <Filter>Render</Filter>
     </ClCompile>
@@ -177,6 +180,18 @@
     </ClCompile>
     <ClCompile Include="..\src\Core\Render\RenderFrontend.cpp">
       <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Core\Memory\StackAllocator.cpp">
+      <Filter>Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Core\Memory\PoolAllocator.cpp">
+      <Filter>Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Core\Memory\FreeList.cpp">
+      <Filter>Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Tests\MemoryTests.cpp">
+      <Filter>Test</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -179,6 +179,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Core\Math\MathStreamOverloads.hpp" />
+    <ClInclude Include="..\src\Core\Memory\FreeList.hpp" />
     <ClInclude Include="..\src\Core\Memory\MemUtil.hpp" />
     <ClInclude Include="..\src\Core\Memory\PoolAllocator.hpp" />
     <ClInclude Include="..\src\Core\Memory\StackAllocator.hpp" />
@@ -212,6 +213,7 @@
     <ClInclude Include="..\src\Core\PhiSTL.hpp" />
     <ClInclude Include="..\src\Core\Win32Window.hpp" />
     <ClInclude Include="..\src\Tests\MathTests.hpp" />
+    <ClInclude Include="..\src\Tests\MemoryTests.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Core\Clock.cpp" />
@@ -226,10 +228,12 @@
     <ClCompile Include="..\src\Core\Math\Vec2.cpp" />
     <ClCompile Include="..\src\Core\Math\Vec3.cpp" />
     <ClCompile Include="..\src\Core\Math\Vec4.cpp" />
+    <ClCompile Include="..\src\Core\Memory\FreeList.cpp" />
+    <ClCompile Include="..\src\Core\Memory\PoolAllocator.cpp" />
+    <ClCompile Include="..\src\Core\Memory\StackAllocator.cpp" />
     <ClCompile Include="..\src\Core\obj.cpp" />
     <ClCompile Include="..\src\Core\ObjIndexer.cpp" />
     <ClCompile Include="..\src\Core\OpenGL.cpp" />
-    <ClCompile Include="..\src\Core\Render\CommandBucket.cpp" />
     <ClCompile Include="..\src\Core\Render\CommandPacket.cpp" />
     <ClCompile Include="..\src\Core\Render\Commands.cpp" />
     <ClCompile Include="..\src\Core\Render\RenderFrontend.cpp" />
@@ -239,6 +243,7 @@
     <ClCompile Include="..\src\Core\Win32Window.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\Tests\MathTests.cpp" />
+    <ClCompile Include="..\src\Tests\MemoryTests.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
