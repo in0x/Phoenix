@@ -54,7 +54,7 @@ namespace Phoenix
 		CommandPacket create(size_t auxMemorySize, Allocator& allocator)
 		{
 			//return ::operator new(getSize<T>(auxMemorySize));
-			return allocator.allocate(getSize<T>(auxMemorySize));
+			return allocator.allocate(getSize<T>(auxMemorySize), platformMaxAlignment());
 		}
 
 		template <class T>
