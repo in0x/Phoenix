@@ -62,10 +62,9 @@ namespace Phoenix
 	HANDLE(ShaderHandle, uint16_t);
 	HANDLE(ProgramHandle, uint16_t);
 	HANDLE(TextureHandle, uint16_t);
-	HANDLE(FrameBufferHandle, uint16_t);
-	HANDLE(UniformHandle, uint16_t);
-	HANDLE(TextureListHandle, uint16_t);
-
+	HANDLE(FrameBufferHandle, uint8_t);
+	HANDLE(UniformHandle, uint8_t);
+	
 	class IRenderBackend;
 
 	typedef void(*SubmitFptr)(IRenderBackend*, const void*);
