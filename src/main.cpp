@@ -17,8 +17,12 @@
 /*
 TODO:
 * Crashes when closed by closing window via taskbar
-* Implement linear allocator -> REALLY IMPORTANT SO RENDER COMMANDS STOP LEAKING
+* Implement Uniforms
+* Implement Textures
+* Implement FrameBuffers
 * Implement dynamic array -> I'm not using that many vectors so this isn't very high prio.
+* Provide default stategroup and ensure that it works
+* Provide printf style logging
 
 * The solution to being stateless is really just to set everything that isnt specified
 * to a default
@@ -105,14 +109,6 @@ namespace Phoenix
 
 		return renderMesh;
 	}
-
-	void draw(RenderMesh* renderMesh, ProgramHandle program)
-	{
-		StateGroup state;
-		state.program = program;
-		state.depth = Depth::Enable;
-		RenderFrontend::drawIndexed(renderMesh->vb, renderMesh->ib, Primitive::Triangles, 0, renderMesh->numIndices, state);
-	}
 }
 
 void run()
@@ -144,7 +140,7 @@ void run()
 		return;
 	}
 
-	WGlRenderInit renderInit(window.getNativeHandle());
+	WGlRenderInit renderInit(window.getNativeHandle(), 4096);
 	RenderFrontend::init(&renderInit);
 
 	RenderMesh renderMesh = loadRenderMesh(fox.get());
@@ -155,11 +151,12 @@ void run()
 	Matrix4 projMat = perspectiveRH(70, (float)config.width / (float)config.height, 1, 100);
 	Vec3 lightPosition = Vec3(-5, 3, 5);
 	
-	// Having to specify the program when creating a uniform is annoying as you would have to create a new one with each program for e.g. worldMatrix.
-	UniformHandle mmat = RenderFrontend::createUniform(program, "modelTf", Uniform::Mat4, &worldMat, sizeof(Matrix4));
-	UniformHandle vmat = RenderFrontend::createUniform(program, "viewTf", Uniform::Mat4, &viewMat, sizeof(Matrix4));
-	UniformHandle pmat = RenderFrontend::createUniform(program, "projectionTf", Uniform::Mat4, &projMat, sizeof(Matrix4));
-	UniformHandle lit = RenderFrontend::createUniform(program, "lightPosition", Uniform::Vec3, &lightPosition, sizeof(Vec3));
+	UniformHandle mmat = RenderFrontend::createUniform("modelTf", Uniform::Mat4, &worldMat, sizeof(Matrix4));
+	UniformHandle vmat = RenderFrontend::createUniform("viewTf", Uniform::Mat4, &viewMat, sizeof(Matrix4));
+	UniformHandle pmat = RenderFrontend::createUniform("projectionTf", Uniform::Mat4, &projMat, sizeof(Matrix4));
+	UniformHandle lit = RenderFrontend::createUniform("lightPosition", Uniform::Vec3, &lightPosition, sizeof(Vec3));
+
+	auto uniforms = RenderFrontend::createUniformList(mmat, vmat, pmat);
 
 	float angle = 0.f;
 
@@ -175,8 +172,13 @@ void run()
 
 		RenderFrontend::setUniform(mmat, &rotMat, sizeof(Matrix4));
 		
-		draw(&renderMesh, program);
-		
+		StateGroup state;
+		state.program = program;
+		state.depth = Depth::Enable;
+		state.uniforms = uniforms;
+
+		RenderFrontend::drawIndexed(renderMesh.vb, renderMesh.ib, Primitive::Triangles, 0, renderMesh.numIndices, state);
+
 		RenderFrontend::submitCommands();
 		RenderFrontend::swapBuffers();
 		

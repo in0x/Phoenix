@@ -102,9 +102,12 @@ namespace Phoenix
 			return m_apiType;
 		}
 
+		size_t m_resourceListMemoryBytes;
+
 	protected:
-		RenderInit(RenderApi::Type apiType = RenderApi::None)
+		RenderInit(size_t resourceListMemoryBytes, RenderApi::Type apiType = RenderApi::None)
 			: m_apiType(apiType)
+			, m_resourceListMemoryBytes(resourceListMemoryBytes)
 		{}
 
 		virtual ~RenderInit() {}
@@ -297,7 +300,7 @@ namespace Phoenix
 
 		void add(const void* data, size_t size)
 		{
-			const char* ptr = reinterpret_cast<const char*>(data);
+			const char* ptr = static_cast<const char*>(data);
 
 			for (size_t i = 0; i < size; ++i)
 			{
@@ -403,6 +406,16 @@ namespace Phoenix
 		float r, g, b, a;
 	};
 
+	template <class Resource> 
+	struct ResourceList
+	{
+		Resource* m_resources;
+		size_t m_count;
+	};
+
+	struct UniformInfo;
+	typedef ResourceList<const UniformInfo*> UniformList;
+
 	struct StateGroup
 	{
 		Blend::Type blend;
@@ -410,7 +423,7 @@ namespace Phoenix
 		Depth::Type depth;
 		Stencil::Type stencil;
 		// Textures -> TextureListHandle
-		// Unfiforms can also use a Resourcelist like mechanism
+		UniformList uniforms;
 		ProgramHandle program;
 	};
 

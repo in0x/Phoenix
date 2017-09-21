@@ -1,15 +1,15 @@
 #include "RenderFrontend.hpp"
 
 #include "WGlRenderBackend.hpp"
+#include "UniformStore.hpp"
 #include "CommandBucket.hpp"
-#include "UniformCache.hpp"
 #include "Commands.hpp"
 
-#include "../Memory/PoolAllocator.hpp"
+#include "../Memory/StackAllocator.hpp"
 #include "../Math/PhiMath.hpp"
 
 #include <memory>
-#include <cassert>
+#include <assert.h>
 
 namespace Phoenix
 {
@@ -18,6 +18,8 @@ namespace Phoenix
 		struct Members
 		{
 			Members(RenderInit* renderInit)
+				: store(1024) // Temp
+				, resourceListMemory(renderInit->m_resourceListMemoryBytes)
 			{
 				switch (renderInit->getApiType())
 				{
@@ -37,11 +39,11 @@ namespace Phoenix
 
 				uint32_t maxUniforms = renderBackend->getMaxUniformCount();
 				renderBackend->getMaxTextureUnits();
-				uniformMemory.create(sizeof(Matrix4), renderBackend->getMaxUniformCount(), alignof(Matrix4));
 			}
 
 			CommandBucket bucket{ 1024, 4096 };
-			PoolAllocator uniformMemory;
+			UniformStore store;
+			StackAllocator resourceListMemory;
 			std::unique_ptr<IRenderBackend> renderBackend = nullptr;
 
 			uint32_t vertexBuffers = 0;
@@ -76,6 +78,16 @@ namespace Phoenix
 		IRenderBackend* getBackend()
 		{
 			return s->renderBackend.get();
+		}
+
+		void* allocResourceList(size_t size, size_t alignment)
+		{
+			return s->resourceListMemory.allocate(size, alignment);
+		}
+
+		const UniformInfo& getInfo(UniformHandle handle)
+		{
+			return s->store.get(handle);
 		}
 
 		VertexBufferHandle createVertexBuffer(const VertexBufferFormat& format)
@@ -118,18 +130,19 @@ namespace Phoenix
 			return handle;
 		}
 
-		UniformHandle createUniform(ProgramHandle program, const char* name, Uniform::Type type, const void* data, size_t dataSize)
+		UniformHandle createUniform(const char* name, Uniform::Type type, const void* data, size_t dataSize)
 		{
 			UniformHandle handle = createUniformHandle();
 			handle.idx = s->uniforms++;
 
-			s->renderBackend->createUniform(program, handle, name, type);
+			s->renderBackend->createUniform(handle, name, type);
+			s->store.create(handle, type, name, data, dataSize);
 
 			if (handle.isValid() && data != nullptr)
 			{
 				setUniform(handle, data, dataSize);
 			}
-		
+
 			return handle;
 		}
 
@@ -141,11 +154,7 @@ namespace Phoenix
 				return;
 			}
 			
-			auto set = s->bucket.addCommand<Commands::SetUniform>(dataSize);
-
-			set->handle = handle;
-			set->data = commandPacket::getAuxiliaryMemory(set);
-			memcpy(commandPacket::getAuxiliaryMemory(set), data, dataSize);
+			s->store.update(handle, data, dataSize);
 		}
 		
 		void drawIndexed(VertexBufferHandle vb, IndexBufferHandle ib, Primitive::Type primitives, uint32_t start, uint32_t count, StateGroup& state)

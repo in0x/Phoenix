@@ -19,10 +19,10 @@ namespace Phoenix
 	{
 	public:
 		CommandBucket(uint32_t maxCommands, size_t memorySizeBytes)
-			: m_currentIndex(0)
+			: m_memory(memorySizeBytes)
+			, m_currentIndex(0)
 			, m_commands(maxCommands)
 		{
-			m_memory.create(memorySizeBytes);
 		}
 
 		template <class Command>

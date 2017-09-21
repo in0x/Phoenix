@@ -1,15 +1,32 @@
 #include "WGlRenderBackend.hpp"
+#include "UniformStore.hpp"
+
 #include "../OpenGL.hpp"
 #include "../Logger.hpp"
+#include "../Math/PhiMath.hpp"
+
 #include <assert.h>
 
 namespace Phoenix
 {
 #define glChecked(x) x; checkGlError();\
 
+	struct State
+	{
+		VertexBufferHandle vb;
+		IndexBufferHandle ib;
+		ProgramHandle program;
+		Depth::Type depth;
+		Raster::Type raster;
+		Blend::Type blend;
+		Stencil::Type stencil;
+		ResourceList<UniformHandle> boundUniforms;
+	};
+
 	WGlRenderBackend::WGlRenderBackend()
 		: m_owningWindow(nullptr)
 		, m_renderContext(0)
+		, m_uniformCount(0)
 	{
 	}
 
@@ -95,14 +112,14 @@ namespace Phoenix
 		SwapBuffers(m_deviceContext);
 	}
 
-	uint32_t WGlRenderBackend::getMaxTextureUnits()
+	uint32_t WGlRenderBackend::getMaxTextureUnits() const
 	{
 		GLint maxTextureUnits;
 		glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxTextureUnits);
 		return static_cast<uint32_t>(maxTextureUnits);
 	}
 
-	uint32_t WGlRenderBackend::getMaxUniformCount()
+	uint32_t WGlRenderBackend::getMaxUniformCount() const
 	{
 		GLint maxUniforms;
 		glGetIntegerv(GL_MAX_UNIFORM_LOCATIONS, &maxUniforms);
@@ -294,6 +311,7 @@ namespace Phoenix
 		}
 
 		program.m_id = progHandle;
+		registerActiveUniforms(handle);
 	}
 
 	void WGlRenderBackend::createTexture()
@@ -343,59 +361,61 @@ namespace Phoenix
 		}
 	}
 
-	void WGlRenderBackend::createUniform(ProgramHandle programHandle, UniformHandle& uniformHandle, const char* name, Uniform::Type type)
+	UniformHandle WGlRenderBackend::addUniform()
 	{
-		GlProgram& program = m_programs[programHandle.idx]; 
-		GLint location = glGetUniformLocation(program.m_id, name);
-		checkGlError();
-
-		if (-1 != location)
-		{
-			GLint count;
-			GLint size; // TOOO(Phil): I should store size in the Uniform Object.
-			GLenum glType;
-
-			const GLsizei bufSize = RenderConstants::c_maxUniformNameLenght;
-			GLchar glName[bufSize];
-			GLsizei length;
-			
-			glGetActiveUniform(program.m_id, (GLuint)location, bufSize, &length, &size, &glType, glName);
-			
-			checkGlError();
-
-			if (toUniformType(glType) == type)
-			{
-				GlUniform& uniform = m_uniforms[uniformHandle.idx];
-				uniform.m_type = type;
-				uniform.m_location = location;
-				uniform.m_program = programHandle;
-				uniform.m_size = size;
-
-				return;
-			}
-		}
-
-		checkGlError();
-
-		uniformHandle.idx = UniformHandle::invalidValue; 
-		Logger::error("Requested uniform does not exist in specified program");
-		return;
+		UniformHandle handle = createUniformHandle();
+		handle.idx = m_uniformCount++;
+		return handle;
 	}
 
-	void WGlRenderBackend::setUniform(UniformHandle handle, const void* data) 
+	void WGlRenderBackend::registerActiveUniforms(ProgramHandle programHandle)
 	{
-		GlUniform& uniform = m_uniforms[handle.idx];
-		glUseProgram(m_programs[uniform.m_program.idx].m_id);
+		GlProgram& program = m_programs[programHandle.idx];
 
+		GLint count;
+		GLint size;
+		GLenum type;
+
+		const GLsizei bufSize = RenderConstants::c_maxUniformNameLenght;
+		GLchar name[bufSize];
+		GLsizei length;
+
+		glGetProgramiv(program.m_id, GL_ACTIVE_UNIFORMS, &count);
+
+		for (GLint i = 0; i < count; ++i)
+		{
+			glGetActiveUniform(program.m_id, (GLuint)i, bufSize, &length, &size, &type, name);
+
+			UniformHandle handle = addUniform();
+
+			GlUniform& uniform = m_uniforms[handle.idx];
+			uniform.m_type = toUniformType(type);
+			uniform.m_location = i;
+			uniform.m_size = 1;
+
+			HashFNVIterative<> hash;
+			hash.add(name, strlen(name));
+			hash.add(&programHandle.idx, sizeof(decltype(programHandle.idx)));
+			
+			m_uniformMap[hash()] = handle;
+		}
+	}
+
+	void WGlRenderBackend::createUniform(UniformHandle& uniformHandle, const char* name, Uniform::Type type)
+	{
+	}
+
+
+	void WGlRenderBackend::setUniform(ProgramHandle programHandle, UniformHandle uniformHandle, const void* data) 
+	{
+		GlUniform& uniform = m_uniforms[uniformHandle.idx];
+		
 		switch (uniform.m_type)
 		{
-		case Uniform::Float:
+		case Uniform::Mat4:
 		{
-			glUniform1fv(uniform.m_location, uniform.m_size, static_cast<const GLfloat*>(data));
-		} break;
-		case Uniform::Int:
-		{
-			glUniform1iv(uniform.m_location, uniform.m_size, static_cast<const GLint*>(data));
+			const Matrix4* m = static_cast<const Matrix4*>(data);
+			glUniformMatrix4fv(uniform.m_location, uniform.m_size, false, static_cast<const GLfloat*>(data));
 		} break;
 		case Uniform::Vec3:
 		{
@@ -406,13 +426,18 @@ namespace Phoenix
 		{
 			glUniform4fv(uniform.m_location, uniform.m_size, static_cast<const GLfloat*>(data));
 		} break;
+
 		case Uniform::Mat3:
 		{
 			glUniformMatrix3fv(uniform.m_location, uniform.m_size, false, static_cast<const GLfloat*>(data));
 		} break;
-		case Uniform::Mat4:
+		case Uniform::Float:
 		{
-			glUniformMatrix4fv(uniform.m_location, uniform.m_size, false, static_cast<const GLfloat*>(data));
+			glUniform1fv(uniform.m_location, uniform.m_size, static_cast<const GLfloat*>(data));
+		} break;
+		case Uniform::Int:
+		{
+			glUniform1iv(uniform.m_location, uniform.m_size, static_cast<const GLint*>(data));
 		} break;
 		default:
 		{
@@ -420,6 +445,8 @@ namespace Phoenix
 			assert(false);
 		} break;
 		};
+
+		checkGlError();
 	}
 
 	void WGlRenderBackend::WGlRenderBackend::setVertexBuffer(VertexBufferHandle vb)
@@ -483,10 +510,46 @@ namespace Phoenix
 		return glType[type];
 	}
 
+	void WGlRenderBackend::bindUniforms(ProgramHandle boundProgram, const UniformList uniforms)
+	{
+		// NOTE(Phil): At some point, the bound uniforms should be cashed so that we don't constantly
+		// recopy their data.
+
+		size_t count = uniforms.m_count;
+
+		for (size_t i = 0; i < count; ++i)
+		{
+			const UniformInfo* info = uniforms.m_resources[i];
+			Hash_t name = info->nameHash;
+			Hash_t hashWithProgram = hashBytes(&boundProgram.idx, sizeof(decltype(ProgramHandle::idx)), name);
+			
+			if (m_uniformMap.find(hashWithProgram) != m_uniformMap.end())
+			{
+				UniformHandle handle = m_uniformMap[hashWithProgram];
+				
+				if (m_uniforms[handle.idx].m_type == info->type)
+				{
+					setUniform(boundProgram, handle, info->data);
+				}
+				else
+				{
+					Logger::error("Uniform exists in program, but type is mismatched");
+				}
+			}
+			else
+			{
+				Logger::error("Uniform does not exist in specified program");
+			}
+		}
+
+		checkGlError();
+	}
+
 	void WGlRenderBackend::setState(const StateGroup& state)
 	{
 		setProgram(state.program);
 		setDepth(state.depth);
+		bindUniforms(state.program, state.uniforms);
 		//setBlend(state.blend);
 		//setStencil(state.stencil);
 		//setRaster(state.raster);

@@ -5,35 +5,7 @@ namespace Phoenix
 {
 	class IRenderBackend;
 
-	/*
-		Uniforms:
-			When creating a program, store a map of all active uniforms and their location
-			Store a uniform, its name, its datatype and its data in a seperate frontend cache
-		
-			When drawing, for all submitted uniforms, if not already uploaded, check if the uniform
-			exists in the programs uniform map and if yes, upload the data
-
-			We use two caches
-				One that gets stored when creating a uniform using the frontend
-				And one for each program that is used for a series of drawcalls (lets us temporarily check if we have already updated it)
-
-			Really should get a memory allocator for uniform data
-	
-	*/
-
-	struct UniformInfo
-	{
-		char name[RenderConstants::c_maxUniformNameLenght];
-		Uniform::Type type;
-		UniformHandle handle;
-		void* data;
-	};
-
-	class UniformStore
-	{
-		UniformInfo* m_uniforms;
-
-	};
+	struct UniformInfo;
 
 	namespace RenderFrontend 
 	{
@@ -52,7 +24,52 @@ namespace Phoenix
 		
 		ProgramHandle createProgram(const Shader::List& shaders);
 
-		UniformHandle createUniform(ProgramHandle program, const char* name, Uniform::Type type, const void* data = nullptr, size_t dataSize = 0);
+		UniformHandle createUniform(const char* name, Uniform::Type type, const void* data = nullptr, size_t dataSize = 0);
+
+		void* allocResourceList(size_t size, size_t alignment);
+		
+		template<class Resource, class... Resources>
+		ResourceList<Resource> createResourceList(Resources... resources)
+		{
+			void* mem = allocResourceList(sizeof...(resources) * sizeof(Resource), alignof(Resource));
+			
+			ResourceList<Resource> list;
+			list.m_resources = reinterpret_cast<Resource*>(mem);
+			list.m_count = sizeof...(resources);
+			return list;
+		}
+
+		const UniformInfo& getInfo(UniformHandle handle);
+
+		/*template<class Info, class... Infos>
+		void fill(Info info, UniformList& list, size_t index)
+		{
+			list.m_resources[index] = &getInfo(handle);
+		}
+
+		template<class Info, class... Infos>
+		void fill(Info info, Infos infos, UniformList& list, size_t index)
+		{
+
+		}*/
+
+		template<class... Infos>
+		UniformList createUniformList(Infos... resources)
+		{
+			UniformList list = createResourceList<const UniformInfo*>(resources...);
+
+			UniformHandle handles[] = { resources... };
+
+			size_t i = 0;
+			for (UniformHandle handle : handles)
+			{
+				//const UniformInfo* ptr = ;
+				list.m_resources[i] = &(getInfo(handle));
+				++i;
+			}
+
+			return list;
+		}
 
 		void setUniform(UniformHandle handle, const void* data, size_t dataSize);
 

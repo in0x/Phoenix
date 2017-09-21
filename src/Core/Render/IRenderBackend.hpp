@@ -12,8 +12,8 @@ namespace Phoenix
 		virtual ~IRenderBackend() {}
 		virtual void init(RenderInit* initValues) = 0;
 
-		virtual uint32_t getMaxTextureUnits() = 0;
-		virtual uint32_t getMaxUniformCount() = 0;
+		virtual uint32_t getMaxTextureUnits() const = 0;
+		virtual uint32_t getMaxUniformCount() const = 0;
 
 		virtual void createVertexBuffer(VertexBufferHandle handle, const VertexBufferFormat& format) = 0;
 		virtual void createIndexBuffer(IndexBufferHandle handle, size_t size, uint32_t count, const void* data) = 0;
@@ -21,7 +21,7 @@ namespace Phoenix
 		virtual void createProgram(ProgramHandle handle, const Shader::List& shaders) = 0;
 		virtual void createTexture() = 0;
 		virtual void createFrameBuffer() = 0;
-		virtual void createUniform(ProgramHandle programHandle, UniformHandle& uniformHandle, const char* name, Uniform::Type type) = 0;
+		virtual void createUniform(UniformHandle& uniformHandle, const char* name, Uniform::Type type) = 0;
 
 		virtual void setVertexBuffer(VertexBufferHandle vb) = 0;
 		virtual void setIndexBuffer(IndexBufferHandle ib) = 0;
@@ -30,7 +30,7 @@ namespace Phoenix
 		virtual void setRaster(Raster::Type raster) = 0;
 		virtual void setBlend(Blend::Type blend) = 0;
 		virtual void setStencil(Stencil::Type stencil) = 0;
-		virtual void setUniform(UniformHandle handle, const void* data) = 0;
+		virtual void setUniform(ProgramHandle programHandle, UniformHandle uniformHandle, const void* data) = 0;
 		virtual void setState(const StateGroup& state) = 0;
 
 		virtual void clearFrameBuffer(FrameBufferHandle handle, Buffer::Type bitToClear, RGBA clearColor) = 0;
