@@ -109,6 +109,9 @@
     <ClInclude Include="..\src\Tests\MemoryTests.hpp">
       <Filter>Test</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Core\Render\UniformStore.hpp">
+      <Filter>Render</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Core\Math\Matrix3.cpp">
@@ -192,6 +195,9 @@
     </ClCompile>
     <ClCompile Include="..\src\Tests\MemoryTests.cpp">
       <Filter>Test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Core\Render\UniformStore.cpp">
+      <Filter>Render</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

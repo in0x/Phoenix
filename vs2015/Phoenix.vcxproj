@@ -193,6 +193,7 @@
     <ClInclude Include="..\src\Core\Render\RenderFrontend.hpp" />
     <ClInclude Include="..\src\Core\Render\RenderDefinitions.hpp" />
     <ClInclude Include="..\src\Core\Render\CommandBucket.hpp" />
+    <ClInclude Include="..\src\Core\Render\UniformStore.hpp" />
     <ClInclude Include="..\src\Core\Render\WGlRenderBackend.hpp" />
     <ClInclude Include="..\src\Core\StringTokenizer.hpp" />
     <ClInclude Include="..\src\Core\Transform.h" />
@@ -237,6 +238,7 @@
     <ClCompile Include="..\src\Core\Render\CommandPacket.cpp" />
     <ClCompile Include="..\src\Core\Render\Commands.cpp" />
     <ClCompile Include="..\src\Core\Render\RenderFrontend.cpp" />
+    <ClCompile Include="..\src\Core\Render\UniformStore.cpp" />
     <ClCompile Include="..\src\Core\Render\WGlRenderBackend.cpp" />
     <ClCompile Include="..\src\Core\StringTokenizer.cpp" />
     <ClCompile Include="..\src\Core\Transform.cpp" />
