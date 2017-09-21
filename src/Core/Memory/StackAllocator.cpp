@@ -22,10 +22,7 @@ namespace Phoenix
 	int t = 0;
 	long u = union_cast<long>(t);*/
 
-	StackAllocator::StackAllocator()
-	{}
-
-	void StackAllocator::create(size_t size)
+	StackAllocator::StackAllocator(size_t size)
 	{
 		m_start = reinterpret_cast<char*>(operator new(size));
 		m_end = m_start + size;
@@ -44,16 +41,13 @@ namespace Phoenix
 		m_top = m_start;
 	}
 
-	void* StackAllocator::allocate(size_t size, size_t alignment/* = alignof(std::max_align_t)*/)
+	void* StackAllocator::allocate(size_t size, const Alignment& alignment)
 	{
-		assert(alignment >= 1);
-		assert((alignment & (alignment - 1)) == 0); // power of 2
-
-		size_t fullSize = size + alignment;
+		size_t fullSize = size + alignment.m_value;
 
 		assert((m_top + fullSize) < m_end);
 
-		char* aligned = alignAddressAndStore(m_top, alignment);
+		char* aligned = alignAddressAndStore(m_top, alignment.m_value);
 
 		m_top += fullSize;
 

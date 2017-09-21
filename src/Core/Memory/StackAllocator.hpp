@@ -1,16 +1,16 @@
 #pragma once
 
-#include <cstddef>
+#include "MemUtil.hpp"
 
 namespace Phoenix
 {
+	class Alignment;
+
 	class StackAllocator
 	{
 	public:
-		StackAllocator();
+		StackAllocator(size_t size);
 		
-		void create(size_t size);
-
 		~StackAllocator();
 
 		StackAllocator& operator=(const StackAllocator&) = delete;
@@ -19,7 +19,7 @@ namespace Phoenix
 
 		StackAllocator(const StackAllocator&&) = delete;
 
-		void* allocate(size_t size, size_t alignment = alignof(std::max_align_t));
+		void* allocate(size_t size, const Alignment& alignment);
 	
 		void free(void* memory);
 		

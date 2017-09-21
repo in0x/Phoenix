@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include <assert.h>
+#include <cstddef>
 
 namespace Phoenix
 {
@@ -43,24 +44,47 @@ namespace Phoenix
 		uint32_t m_numAllocs;
 	};
 
-	/*template <class T>
-	T* alloc(StackAllocator& allocator)
+	class Alignment
+	{
+	public:
+
+		Alignment(size_t value)
+		{
+			assert(value >= 1);
+			assert((value & (value - 1)) == 0);
+			
+			m_value = value;
+		}
+
+		bool fitsInto(const Alignment& larger) const
+		{
+			return larger.m_value >= m_value;
+		}
+		
+		size_t m_value;
+	};
+
+	inline Alignment platformMaxAlignment()
+	{
+		return{ alignof(std::max_align_t) };
+	}
+
+	template <class T, class Allocator>
+	T* alloc(Allocator& allocator)
 	{
 		return new (allocator.allocate(sizeof(T), alignof(T))) T;
 	}
 
-	template <class T>
+	template <class T, class Allocator>
 	T* alloc(Allocator& allocator, T& t)
 	{
 		return new (allocator.allocate(sizeof(T), alignof(T))) T(t);
 	}
 
-	template <class T>
+	template <class T, class Allocator>
 	void dealloc(Allocator& allocator, T& t)
 	{
 		t.~T();
 		allocator.free(&t);
-	}*/
-
-	//static_assert(false, "TODO(Phil): Find error in templates.");
+	}
 }

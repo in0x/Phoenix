@@ -2,24 +2,21 @@
 
 #include "PoolAllocator.hpp"
 
+#include <assert.h>
+#include <string.h>
+
 namespace Phoenix
 {
-	PoolAllocator::PoolAllocator() {}
-
-	void PoolAllocator::create(size_t blockSize, size_t numBlocks, size_t maxAlignment)
+	PoolAllocator::PoolAllocator(size_t blockSize, size_t numBlocks, Alignment maxAlignment)
+		: m_blockSize(blockSize)
+		, m_alignment(maxAlignment)
 	{
-		assert(maxAlignment >= 1);
-		assert((maxAlignment & (maxAlignment - 1)) == 0); // power of 2
-
-		m_blockSize = blockSize;
-		m_alignment = maxAlignment;
-
-		size_t required = blockSize * numBlocks + maxAlignment;
+		size_t required = blockSize * numBlocks + maxAlignment.m_value;
 
 		m_start = reinterpret_cast<char*>(operator new(required));
 		m_end = m_start + required;
 
-		m_freeList = FreeList(m_start, m_end, blockSize, numBlocks, maxAlignment);
+		m_freeList = FreeList(m_start, m_end, blockSize, numBlocks, maxAlignment.m_value);
 	}
 
 	PoolAllocator::~PoolAllocator()
@@ -28,11 +25,9 @@ namespace Phoenix
 		operator delete(m_start);
 	}
 
-	void* PoolAllocator::allocate()
+	void* PoolAllocator::allocate(size_t size, Alignment alignment)
 	{
-		/*void* memory = m_freeList.allocate();
-		assert(memory != nullptr):
-		return memory;*/
+		assert(alignment.fitsInto(m_alignment));
 		return m_freeList.allocate();
 	}
 
