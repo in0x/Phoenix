@@ -269,6 +269,68 @@ namespace Phoenix
 		}
 	}
 
+	typedef uint64_t Hash_t;
+
+	inline Hash_t hashBytes(const void* data, size_t size, uint64_t offset = 14695981039346656037, uint64_t prime = 1099511628211)
+	{
+		const char* ptr = reinterpret_cast<const char*>(data);
+		Hash_t hash = offset;
+		
+		for (size_t i = 0; i < size; ++i)
+		{
+			Hash_t next = static_cast<Hash_t>(ptr[i]);
+			hash = (hash ^ next) * prime;
+		}
+
+		return hash;
+	}
+
+	template<uint64_t offset = 14695981039346656037, uint64_t prime = 1099511628211>
+	struct HashFNVIterative
+	{
+		Hash_t m_hash;
+	
+	public:
+		HashFNVIterative()
+			: m_hash(offset)
+		{}
+
+		void add(const void* data, size_t size)
+		{
+			const char* ptr = reinterpret_cast<const char*>(data);
+
+			for (size_t i = 0; i < size; ++i)
+			{
+				Hash_t next = static_cast<Hash_t>(ptr[i]);
+				m_hash = (m_hash ^ next) * prime;
+			}
+		}
+
+		Hash_t operator()()
+		{
+			return m_hash;
+		}
+	};
+
+	template <class T>
+	struct HashFNV
+	{
+		Hash_t operator()(const T& obj)
+		{
+			auto hash = std::hash<T>();
+			return static_cast<uint64_t>(hash(obj));
+		}
+	};
+
+	template <>
+	struct HashFNV<const char*>
+	{
+		Hash_t operator()(const char* str)
+		{
+			return hashBytes(str, strlen(str));
+		}
+	};
+
 	namespace Uniform
 	{
 		enum Type
