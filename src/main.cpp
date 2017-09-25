@@ -130,7 +130,7 @@ int main(int argc, char** argv)
 	Tests::runMathTests();
 	Tests::runMemoryTests();
 
-	std::unique_ptr<Mesh> fox = loadObj("Fox/", "RedFox.obj");
+	std::unique_ptr<Mesh> fox = loadObj("Models/Fox/", "RedFox.obj");
 
 	assert(fox != nullptr);
 
