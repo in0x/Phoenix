@@ -94,40 +94,55 @@ namespace Phoenix
 
 		VertexBufferHandle createVertexBuffer(const VertexBufferFormat& format)
 		{
-			VertexBufferHandle handle = createVertexBufferHandle();
+			VertexBufferHandle handle;
 			handle.idx = s->vertexBuffers++;
 
-			s->renderBackend->createVertexBuffer(handle, format);
+			auto cvb = s->bucket.addCommand<Commands::CreateVertexBuffer>();
+			cvb->format = format;
+			cvb->handle = handle;
 
 			return handle;
 		}
 
 		IndexBufferHandle createIndexBuffer(size_t size, uint32_t count, const void* data)
 		{
-			IndexBufferHandle handle = createIndexBufferHandle();
+			IndexBufferHandle handle;
 			handle.idx = s->indexBuffers++;
 
-			s->renderBackend->createIndexBuffer(handle, size, count, data);
+			auto cib = s->bucket.addCommand<Commands::CreateIndexBuffer>();
+			cib->size = size;
+			cib->count = count;
+			cib->data = data;
+			cib->handle = handle;
 
 			return handle;
 		}
 
 		ShaderHandle createShader(const char* source, Shader::Type shaderType)
 		{
-			ShaderHandle handle = createShaderHandle();
+			ShaderHandle handle;
 			handle.idx = s->shaders++;
+			size_t strLen = strlen(source);
 
-			s->renderBackend->createShader(handle, source, shaderType);
+			Commands::CreateShader* cs = s->bucket.addCommand<Commands::CreateShader>(strLen);
+			cs->shaderType = shaderType;
+			cs->handle = handle;
+			cs->source = commandPacket::getAuxiliaryMemory(cs);
+			memcpy(commandPacket::getAuxiliaryMemory(cs), source, strLen);
+			cs->source[strLen] = '\0';
 
 			return handle;
 		}
 
 		ProgramHandle createProgram(const Shader::List& shaders)
 		{
-			ProgramHandle handle = createProgramHandle();
+			ProgramHandle handle;
 			handle.idx = s->programs++;
 
-			s->renderBackend->createProgram(handle, shaders);
+			auto createProg = s->bucket.addCommand<Commands::CreateProgram>();
+
+			createProg->shaders = shaders;
+			createProg->handle = handle;
 
 			return handle;
 		}

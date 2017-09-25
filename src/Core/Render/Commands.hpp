@@ -37,14 +37,6 @@ namespace Phoenix
 			StateGroup state;
 		};
 
-		struct SetUniform
-		{
-			SUBMITTABLE();
-
-			UniformHandle handle;
-			const void* data;
-		};
-
 		struct ClearBuffer
 		{
 			SUBMITTABLE();
@@ -52,6 +44,49 @@ namespace Phoenix
 			RGBA color;
 			Buffer::Type toClear;
 			FrameBufferHandle handle;
+		};
+
+		struct CreateVertexBuffer
+		{
+			SUBMITTABLE();
+
+			VertexBufferFormat format;
+			VertexBufferHandle handle;
+		};
+
+		struct CreateIndexBuffer
+		{
+			SUBMITTABLE();
+
+			size_t size;
+			uint32_t count;
+			const void* data;
+			IndexBufferHandle handle;
+		};
+
+		struct CreateShader
+		{
+			SUBMITTABLE();
+
+			char* source;
+			Shader::Type shaderType;
+			ShaderHandle handle;
+		};
+
+		struct CreateProgram
+		{
+			SUBMITTABLE();
+
+			Shader::List shaders;
+			ProgramHandle handle;
+		};
+
+		struct SetUniform
+		{
+			SUBMITTABLE();
+
+			UniformHandle handle;
+			const void* data;
 		};
 	}
 }
