@@ -35,7 +35,7 @@ namespace Phoenix
 			iter = asFree;
 		}
 
-		ptrdiff_t diff = reinterpret_cast<char*>(memEnd) - reinterpret_cast<char*>(iter);
+		ptrdiff_t diff = static_cast<char*>(memEnd) - reinterpret_cast<char*>(iter);
 		assert(blockSize == diff);
 		iter->m_next = nullptr;
 	}
@@ -54,7 +54,8 @@ namespace Phoenix
 
 	void FreeList::free(void* block)
 	{
-		// Assume that user already checked block is in memory bounds.
+		// NOTE(Phil): User should check if block is in 
+		// memory bounds, e.g. PoolAllocator.
 		FreeList* head = static_cast<FreeList*>(block);
 		head->m_next = m_next;
 		m_next = head;

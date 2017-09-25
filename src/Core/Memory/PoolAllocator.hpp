@@ -8,7 +8,7 @@ namespace Phoenix
 	class PoolAllocator
 	{
 	public:
-		PoolAllocator(size_t blockSize, size_t numBlocks, Alignment maxAlignment);
+		explicit PoolAllocator(size_t blockSize, size_t numBlocks, Alignment maxAlignment);
 
 		~PoolAllocator();
 

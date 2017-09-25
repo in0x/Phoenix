@@ -13,7 +13,7 @@ namespace Phoenix
 	{
 		size_t required = blockSize * numBlocks + maxAlignment.m_value;
 
-		m_start = reinterpret_cast<char*>(operator new(required));
+		m_start = static_cast<char*>(operator new(required));
 		m_end = m_start + required;
 
 		m_freeList = FreeList(m_start, m_end, blockSize, numBlocks, maxAlignment.m_value);
@@ -33,8 +33,9 @@ namespace Phoenix
 
 	void PoolAllocator::free(void* memory)
 	{
-		char* blockAddr = reinterpret_cast<char*>(memory);
+		char* blockAddr = static_cast<char*>(memory);
 		assert((m_start <= blockAddr && m_end >= blockAddr));
+		assert(((blockAddr - m_start) % m_alignment.m_value) == 0);
 
 		m_freeList.free(memory);
 	}

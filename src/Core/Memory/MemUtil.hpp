@@ -10,8 +10,8 @@ namespace Phoenix
 	{
 		uintptr_t ptr = reinterpret_cast<uintptr_t>(raw);
 
-		size_t mask = alignment - 1;
-		uintptr_t misalignment = ptr & mask;
+		size_t mask = (alignment - 1);
+		uintptr_t misalignment = (ptr & mask);
 		return alignment - misalignment;
 	}
 
@@ -47,13 +47,11 @@ namespace Phoenix
 	class Alignment
 	{
 	public:
-
 		Alignment(size_t value)
+			: m_value(value)
 		{
 			assert(value >= 1);
-			assert((value & (value - 1)) == 0);
-			
-			m_value = value;
+			assert((value & (value - 1)) == 0);	
 		}
 
 		bool fitsInto(const Alignment& larger) const
@@ -61,7 +59,7 @@ namespace Phoenix
 			return larger.m_value >= m_value;
 		}
 		
-		size_t m_value;
+		const size_t m_value;
 	};
 
 	inline Alignment platformMaxAlignment()
