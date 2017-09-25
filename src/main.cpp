@@ -17,7 +17,6 @@
 /*
 TODO:
 * Crashes when closed by closing window via taskbar
-* Implement Uniforms
 * Implement Textures
 * Implement FrameBuffers
 * Implement dynamic array -> I'm not using that many vectors so this isn't very high prio.
@@ -57,7 +56,7 @@ std::string loadText(const char* path)
 	}
 	else
 	{
-		Phoenix::Logger::error("Failed to load shader");
+		Phoenix::Logger::error("Failed to load shader file");
 		return nullptr;
 	}
 }
@@ -111,7 +110,7 @@ namespace Phoenix
 	}
 }
 
-void run()
+int main(int argc, char** argv)
 {
 	using namespace Phoenix;
 
@@ -137,7 +136,7 @@ void run()
 	if (!window.isOpen())
 	{
 		Logger::error("Failed to initialize Win32Window");
-		return;
+		return -1;
 	}
 
 	WGlRenderInit renderInit(window.getNativeHandle(), 4096);
@@ -155,9 +154,8 @@ void run()
 	UniformHandle vmat = RenderFrontend::createUniform("viewTf", Uniform::Mat4, &viewMat, sizeof(Matrix4));
 	UniformHandle pmat = RenderFrontend::createUniform("projectionTf", Uniform::Mat4, &projMat, sizeof(Matrix4));
 	UniformHandle lit = RenderFrontend::createUniform("lightPosition", Uniform::Vec3, &lightPosition, sizeof(Vec3));
-
+	
 	auto uniforms = RenderFrontend::createUniformList(mmat, vmat, pmat);
-
 	float angle = 0.f;
 
 	checkGlError();
@@ -176,7 +174,6 @@ void run()
 		state.program = program;
 		state.depth = Depth::Enable;
 		state.uniforms = uniforms;
-
 		RenderFrontend::drawIndexed(renderMesh.vb, renderMesh.ib, Primitive::Triangles, 0, renderMesh.numIndices, state);
 
 		RenderFrontend::submitCommands();
@@ -187,11 +184,7 @@ void run()
 
 	Logger::exit();
 	RenderFrontend::exit();
-}
 
-int main(int argc, char** argv)
-{
-	run();
 	return 0;
 }
 

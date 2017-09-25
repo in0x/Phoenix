@@ -12,9 +12,6 @@ namespace Phoenix
 {
 	class IRenderBackend;
 
-	// NOTE(Phil): Uses global new as a place 
-	// holder, will switch over to fixed memory 
-	// when linear allocator is implemented. 
 	class CommandBucket
 	{
 	public:

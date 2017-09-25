@@ -226,7 +226,8 @@ namespace Phoenix
 		}
 	}
 
-	void printShaderLog(GLuint shader)
+	// Returns wether an error occured during shader compilation.
+	bool getAndLogShaderLog(GLuint shader)
 	{
 		if (glIsShader(shader))
 		{
@@ -242,6 +243,7 @@ namespace Phoenix
 			if (infoLogLength > 0)
 			{
 				Logger::error(infoLog);
+				return true;
 			}
 
 			delete[] infoLog;
@@ -250,7 +252,10 @@ namespace Phoenix
 		else
 		{
 			Logger::error(std::to_string(shader) + " is not a shader\n");
+			return true;
 		}
+
+		return false;
 	}
 
 	void WGlRenderBackend::createShader(ShaderHandle handle, const char* source, Shader::Type shaderType)
@@ -268,7 +273,11 @@ namespace Phoenix
 		glShaderSource(shader.m_id, 1, (const char**)&source, NULL);
 		glCompileShader(shader.m_id);
 
-		printShaderLog(shader.m_id);
+		if (getAndLogShaderLog(shader.m_id))
+		{
+			// NOTE(Phil): Set handle invalid. Use references for handles.
+			assert(false);
+		}
 	}
 
 	void WGlRenderBackend::createProgram(ProgramHandle handle, const Shader::List& shaders)
@@ -512,7 +521,7 @@ namespace Phoenix
 
 	void WGlRenderBackend::bindUniforms(ProgramHandle boundProgram, const UniformList uniforms)
 	{
-		// NOTE(Phil): At some point, the bound uniforms should be cashed so that we don't constantly
+		// NOTE(Phil): At some point, the bound uniforms should be cached so that we don't constantly
 		// recopy their data.
 
 		size_t count = uniforms.m_count;

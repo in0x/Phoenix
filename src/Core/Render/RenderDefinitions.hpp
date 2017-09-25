@@ -276,7 +276,7 @@ namespace Phoenix
 
 	inline Hash_t hashBytes(const void* data, size_t size, uint64_t offset = 14695981039346656037, uint64_t prime = 1099511628211)
 	{
-		const char* ptr = reinterpret_cast<const char*>(data);
+		const char* ptr = static_cast<const char*>(data);
 		Hash_t hash = offset;
 		
 		for (size_t i = 0; i < size; ++i)

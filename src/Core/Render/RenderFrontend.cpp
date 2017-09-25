@@ -135,7 +135,7 @@ namespace Phoenix
 			UniformHandle handle = createUniformHandle();
 			handle.idx = s->uniforms++;
 
-			s->renderBackend->createUniform(handle, name, type);
+			s->renderBackend->createUniform(handle, name, type); // NOTE(Phil): This is useless for now.
 			s->store.create(handle, type, name, data, dataSize);
 
 			if (handle.isValid() && data != nullptr)
