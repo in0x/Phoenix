@@ -14,8 +14,6 @@ namespace Phoenix
 		void swapBuffers();
 		void exit();
 	
-		IRenderBackend* getBackend();
-
 		VertexBufferHandle createVertexBuffer(const VertexBufferFormat& format);
 		
 		IndexBufferHandle createIndexBuffer(size_t size, uint32_t count, const void* data);
