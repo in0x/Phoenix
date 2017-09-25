@@ -27,47 +27,11 @@ TODO:
 * to a default
 */
 
-char* getCMDOption(char** start, char** end, const std::string& option)
-{
-	char** iter = std::find(start, end, option);
-
-	if (iter != end && ++iter != end)
-	{
-		return *iter;
-	}
-
-	return nullptr;
-}
-
-std::string loadText(const char* path)
-{
-	std::string fileString;
-	std::ifstream fileStream(path);
-	
-	if (fileStream)
-	{
-		fileString.assign(std::istreambuf_iterator<char>(fileStream), std::istreambuf_iterator<char>());
-		fileString.erase(std::remove_if(fileString.begin(), fileString.end(),
-			[](const char c) {
-			return !(c >= 0 && c < 128);
-		}), fileString.end());
-	
-		return fileString;
-	}
-	else
-	{
-		Phoenix::Logger::error("Failed to load shader file");
-		return nullptr;
-	}
-}
-
-#include "Core/Memory/PoolAllocator.hpp"
-#include "Core/Memory/StackAllocator.hpp"
-
 namespace Phoenix
 {
 	struct RenderMesh
 	{
+		Matrix4 modelMat;
 		VertexBufferHandle vb;
 		IndexBufferHandle ib;
 		uint32_t numVertices;
@@ -76,10 +40,10 @@ namespace Phoenix
 
 	ProgramHandle loadProgram(const char* vsPath, const char* fsPath)
 	{
-		std::string vsSource = loadText(vsPath);
+		std::string vsSource = Platform::loadText(vsPath);
 		ShaderHandle vs = RenderFrontend::createShader(vsSource.c_str(), Shader::Vertex);
 
-		std::string fsSource = loadText(fsPath);
+		std::string fsSource = Platform::loadText(fsPath);
 		ShaderHandle fs = RenderFrontend::createShader(fsSource.c_str(), Shader::Fragment);
 
 		Shader::List shaders = Shader::createList();
@@ -88,26 +52,70 @@ namespace Phoenix
 		return RenderFrontend::createProgram(shaders);
 	}
 	
-	RenderMesh loadRenderMesh(Mesh* mesh)
+	RenderMesh loadRenderMesh(const Mesh& mesh)
 	{
 		RenderMesh renderMesh;
 		
+		renderMesh.modelMat = Matrix4::identity();
+
 		VertexBufferFormat layout;
 		layout.add({ AttributeProperty::Position, AttributeType::Float, 3 },
-		{ sizeof(Vec3), mesh->vertices.size(), mesh->vertices.data() });
+		{ sizeof(Vec3), mesh.vertices.size(), mesh.vertices.data() });
 
 		layout.add({ AttributeProperty::Normal, AttributeType::Float, 3 },
-		{ sizeof(Vec3), mesh->normals.size(), mesh->normals.data() });
+		{ sizeof(Vec3), mesh.normals.size(), mesh.normals.data() });
 
 		renderMesh.vb = RenderFrontend::createVertexBuffer(layout);
 
-		renderMesh.ib = RenderFrontend::createIndexBuffer(sizeof(unsigned int), mesh->indices.size(), mesh->indices.data());
+		renderMesh.ib = RenderFrontend::createIndexBuffer(sizeof(unsigned int), mesh.indices.size(), mesh.indices.data());
 
-		renderMesh.numVertices = mesh->vertices.size();
-		renderMesh.numIndices = mesh->indices.size();
+		renderMesh.numVertices = mesh.vertices.size();
+		renderMesh.numIndices = mesh.indices.size();
 
 		return renderMesh;
 	}
+
+	struct PlaceholderRenderer
+	{
+		PlaceholderRenderer(const Matrix4& view, const Matrix4& projection, const Vec3& lightPos)
+			: m_modelMat(RenderFrontend::createUniform("modelTf", Uniform::Mat4, &Matrix4::identity(), sizeof(Matrix4)))
+			, m_viewMat(RenderFrontend::createUniform("viewTf", Uniform::Mat4, &view, sizeof(Matrix4)))
+			, m_projectionMat(RenderFrontend::createUniform("projectionTf", Uniform::Mat4, &projection, sizeof(Matrix4)))
+			, m_lightPos(RenderFrontend::createUniform("lightPosition", Uniform::Vec3, &lightPos, sizeof(Vec3)))
+			, m_uniformList(RenderFrontend::createUniformList(m_modelMat, m_viewMat, m_projectionMat))
+		{
+		}
+
+		void submit(const RenderMesh& mesh, ProgramHandle program)
+		{
+			RenderFrontend::setUniform(m_modelMat, &mesh.modelMat, sizeof(Matrix4));
+
+			StateGroup state;
+			state.program = program;
+			state.depth = Depth::Enable;
+			state.uniforms = m_uniformList;
+			RenderFrontend::drawIndexed(mesh.vb, mesh.ib, Primitive::Triangles, 0, mesh.numIndices, state);
+		}
+
+		void clear()
+		{
+			RenderFrontend::clearFrameBuffer({}, Buffer::Color, { 1.f, 1.f, 1.f, 1.f });
+			RenderFrontend::clearFrameBuffer({}, Buffer::Depth, {});
+			RenderFrontend::submitCommands();
+		}
+
+		void render()
+		{
+			RenderFrontend::submitCommands();
+			RenderFrontend::swapBuffers();
+		}
+
+		UniformHandle m_modelMat;
+		UniformHandle m_viewMat;
+		UniformHandle m_projectionMat;
+		UniformHandle m_lightPos;
+		UniformList m_uniformList;
+	};
 }
 
 int main(int argc, char** argv)
@@ -142,43 +150,25 @@ int main(int argc, char** argv)
 	WGlRenderInit renderInit(window.getNativeHandle(), 4096);
 	RenderFrontend::init(&renderInit);
 
-	RenderMesh renderMesh = loadRenderMesh(fox.get());
+	RenderMesh renderMesh = loadRenderMesh(*fox);
 	ProgramHandle program = loadProgram("Shaders/diffuse.vert", "Shaders/diffuse.frag");
-	
-	Matrix4 worldMat = Matrix4::identity();
-	Matrix4 viewMat = lookAtRH(Vec3{ 2, 2, -7 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 });
-	Matrix4 projMat = perspectiveRH(70, (float)config.width / (float)config.height, 1, 100);
-	Vec3 lightPosition = Vec3(-5, 3, 5);
-	
-	UniformHandle mmat = RenderFrontend::createUniform("modelTf", Uniform::Mat4, &worldMat, sizeof(Matrix4));
-	UniformHandle vmat = RenderFrontend::createUniform("viewTf", Uniform::Mat4, &viewMat, sizeof(Matrix4));
-	UniformHandle pmat = RenderFrontend::createUniform("projectionTf", Uniform::Mat4, &projMat, sizeof(Matrix4));
-	UniformHandle lit = RenderFrontend::createUniform("lightPosition", Uniform::Vec3, &lightPosition, sizeof(Vec3));
-	
-	auto uniforms = RenderFrontend::createUniformList(mmat, vmat, pmat);
+
+	PlaceholderRenderer renderer(lookAtRH(Vec3{ 2, 2, -7 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 }),
+								 perspectiveRH(70, (float)config.width / (float)config.height, 1, 100),
+								 Vec3(-5, 3, 5));
 	float angle = 0.f;
 
 	checkGlError();
 
 	while (window.isOpen())
 	{
-		RenderFrontend::clearFrameBuffer({}, Buffer::Color, { 1.f, 1.f, 1.f, 1.f });
-		RenderFrontend::clearFrameBuffer({}, Buffer::Depth, { });
-
 		angle += 0.025f;
-		Matrix4 rotMat = Matrix4::rotation(0.f, angle, 0.f);
+		renderMesh.modelMat = Matrix4::rotation(0.f, angle, 0.f);
 
-		RenderFrontend::setUniform(mmat, &rotMat, sizeof(Matrix4));
-		
-		StateGroup state;
-		state.program = program;
-		state.depth = Depth::Enable;
-		state.uniforms = uniforms;
-		RenderFrontend::drawIndexed(renderMesh.vb, renderMesh.ib, Primitive::Triangles, 0, renderMesh.numIndices, state);
+		renderer.clear();
+		renderer.submit(renderMesh, program);
+		renderer.render();
 
-		RenderFrontend::submitCommands();
-		RenderFrontend::swapBuffers();
-		
 		window.processMessages();
 	}
 

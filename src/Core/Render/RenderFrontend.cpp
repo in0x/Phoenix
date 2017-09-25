@@ -21,6 +21,8 @@ namespace Phoenix
 				: store(1024) // Temp
 				, resourceListMemory(renderInit->m_resourceListMemoryBytes)
 			{
+				Logger::log("RenderFrontend uniform store still uses a fixed size, this needs to be fixed");
+
 				switch (renderInit->getApiType())
 				{
 				case RenderApi::Gl:
