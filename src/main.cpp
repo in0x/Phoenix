@@ -6,13 +6,13 @@
 
 #include "Core/obj.hpp"
 #include "Core/Math/PhiMath.hpp"
-#include "Core/Win32Window.hpp"
+#include "Core/Windows/Win32Window.hpp"
 #include "Core/Logger.hpp"
 
 #include "Core/Render/RenderFrontend.hpp"
 #include "Core/Render/WGlRenderBackend.hpp"
 
-#include "Core/PlatformWindows.hpp"
+#include "Core/Windows/PlatformWindows.hpp"
 
 /*
 TODO:
@@ -22,6 +22,7 @@ TODO:
 * Implement dynamic array -> I'm not using that many vectors so this isn't very high prio.
 * Provide default stategroup and ensure that it works
 * Provide printf style logging
+* Figure out how overall memory acquisition will work
 
 * The sort keys are produced by the system that inserts into the buckets, i.e. the mesherenderer,
 * uirenderer etc. This allows them to all use a different pattern. The bucket then just does a 

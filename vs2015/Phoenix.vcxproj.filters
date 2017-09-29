@@ -52,9 +52,6 @@
     <ClInclude Include="..\src\Core\Transform.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Core\Win32Window.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Core\OpenGL.hpp">
       <Filter>Core</Filter>
     </ClInclude>
@@ -68,9 +65,6 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Core\StringTokenizer.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Core\PlatformWindows.hpp">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Core\Render\CommandBucket.hpp">
@@ -112,6 +106,15 @@
     <ClInclude Include="..\src\Core\Render\UniformStore.hpp">
       <Filter>Render</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Core\Windows\PlatformWindows.hpp">
+      <Filter>Core\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Windows\Win32GLContext.hpp">
+      <Filter>Core\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Windows\Win32Window.hpp">
+      <Filter>Core\Windows</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Core\Math\Matrix3.cpp">
@@ -151,9 +154,6 @@
       <Filter>Math</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Core\Transform.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Core\Win32Window.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Core\Math\MathStreamOverloads.cpp">
@@ -199,6 +199,12 @@
     <ClCompile Include="..\src\Core\Render\UniformStore.cpp">
       <Filter>Render</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Core\Windows\Win32GLContext.cpp">
+      <Filter>Core\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Core\Windows\Win32Window.cpp">
+      <Filter>Core\Windows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Math">
@@ -215,6 +221,9 @@
     </Filter>
     <Filter Include="Memory">
       <UniqueIdentifier>{42545344-5e18-4d91-8b9a-ac5919517f16}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Windows">
+      <UniqueIdentifier>{84e9d105-d250-4006-b109-e33573068b95}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

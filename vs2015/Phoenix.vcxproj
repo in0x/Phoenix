@@ -186,7 +186,6 @@
     <ClInclude Include="..\src\Core\ObjIndexer.hpp" />
     <ClInclude Include="..\src\Core\ObjStructs.hpp" />
     <ClInclude Include="..\src\Core\OpenGL.hpp" />
-    <ClInclude Include="..\src\Core\PlatformWindows.hpp" />
     <ClInclude Include="..\src\Core\Render\CommandPacket.hpp" />
     <ClInclude Include="..\src\Core\Render\Commands.hpp" />
     <ClInclude Include="..\src\Core\Render\IRenderBackend.hpp" />
@@ -212,7 +211,9 @@
     <ClInclude Include="..\src\Core\Math\Vec3.hpp" />
     <ClInclude Include="..\src\Core\Math\Vec4.hpp" />
     <ClInclude Include="..\src\Core\PhiSTL.hpp" />
-    <ClInclude Include="..\src\Core\Win32Window.hpp" />
+    <ClInclude Include="..\src\Core\Windows\PlatformWindows.hpp" />
+    <ClInclude Include="..\src\Core\Windows\Win32GLContext.hpp" />
+    <ClInclude Include="..\src\Core\Windows\Win32Window.hpp" />
     <ClInclude Include="..\src\Tests\MathTests.hpp" />
     <ClInclude Include="..\src\Tests\MemoryTests.hpp" />
   </ItemGroup>
@@ -242,7 +243,8 @@
     <ClCompile Include="..\src\Core\Render\WGlRenderBackend.cpp" />
     <ClCompile Include="..\src\Core\StringTokenizer.cpp" />
     <ClCompile Include="..\src\Core\Transform.cpp" />
-    <ClCompile Include="..\src\Core\Win32Window.cpp" />
+    <ClCompile Include="..\src\Core\Windows\Win32GLContext.cpp" />
+    <ClCompile Include="..\src\Core\Windows\Win32Window.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\Tests\MathTests.cpp" />
     <ClCompile Include="..\src\Tests\MemoryTests.cpp" />

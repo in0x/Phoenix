@@ -1,5 +1,5 @@
 #include "Win32Window.hpp"
-#include "Logger.hpp"
+#include "../Logger.hpp"
 
 namespace Phoenix
 {
