@@ -11,7 +11,7 @@ namespace Phoenix
 	{
 		namespace
 		{
-			enum ColorCode
+			enum EColorCode
 			{
 				RED = 31,
 				GREEN = 32,
@@ -65,7 +65,7 @@ namespace Phoenix
 			{
 				if (m_bUseAnsiColors)
 				{
-					std::cout << "\033[" << ColorCode::LIGHT_GREEN << "m";
+					std::cout << "\033[" << EColorCode::LIGHT_GREEN << "m";
 				}
 				
 				std::cout << msg << "\n";
@@ -82,7 +82,7 @@ namespace Phoenix
 			{
 				if (m_bUseAnsiColors)
 				{
-					std::cout << "\033[" << ColorCode::LIGHT_YELLOW << "m";
+					std::cout << "\033[" << EColorCode::LIGHT_YELLOW << "m";
 				}
 
 				std::cout << msg << "\n";
@@ -99,7 +99,7 @@ namespace Phoenix
 			{
 				if (m_bUseAnsiColors)
 				{
-					std::cout << "\033[" << ColorCode::LIGHT_RED << "m";
+					std::cout << "\033[" << EColorCode::LIGHT_RED << "m";
 				}
 
 				std::cout << msg << "\n";

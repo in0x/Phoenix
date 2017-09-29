@@ -17,26 +17,26 @@ namespace Phoenix
 
 		virtual void createVertexBuffer(VertexBufferHandle handle, const VertexBufferFormat& format) = 0;
 		virtual void createIndexBuffer(IndexBufferHandle handle, size_t size, uint32_t count, const void* data) = 0;
-		virtual void createShader(ShaderHandle handle, const char* source, Shader::Type shaderType) = 0;
-		virtual void createProgram(ProgramHandle handle, const Shader::List& shaders) = 0;
+		virtual void createShader(ShaderHandle handle, const char* source, EShader::Type shaderType) = 0;
+		virtual void createProgram(ProgramHandle handle, const EShader::List& shaders) = 0;
 		virtual void createTexture() = 0;
 		virtual void createFrameBuffer() = 0;
-		virtual void createUniform(UniformHandle& uniformHandle, const char* name, Uniform::Type type) = 0;
+		virtual void createUniform(UniformHandle& uniformHandle, const char* name, EUniform::Type type) = 0;
 
 		virtual void setVertexBuffer(VertexBufferHandle vb) = 0;
 		virtual void setIndexBuffer(IndexBufferHandle ib) = 0;
 		virtual void setProgram(ProgramHandle prog) = 0; 
-		virtual void setDepth(Depth::Type depth) = 0;
-		virtual void setRaster(Raster::Type raster) = 0;
-		virtual void setBlend(Blend::Type blend) = 0;
-		virtual void setStencil(Stencil::Type stencil) = 0;
+		virtual void setDepth(EDepth::Type depth) = 0;
+		virtual void setRaster(ERaster::Type raster) = 0;
+		virtual void setBlend(EBlend::Type blend) = 0;
+		virtual void setStencil(EStencil::Type stencil) = 0;
 		virtual void setUniform(ProgramHandle programHandle, UniformHandle uniformHandle, const void* data) = 0;
 		virtual void setState(const StateGroup& state) = 0;
 
-		virtual void clearFrameBuffer(FrameBufferHandle handle, Buffer::Type bitToClear, RGBA clearColor) = 0;
+		virtual void clearFrameBuffer(FrameBufferHandle handle, EBuffer::Type bitToClear, RGBA clearColor) = 0;
 
-		virtual void drawLinear(Primitive::Type primitive, uint32_t count, uint32_t start) = 0;
-		virtual void drawIndexed(Primitive::Type primitive, uint32_t count, uint32_t start) = 0;
+		virtual void drawLinear(EPrimitive::Type primitive, uint32_t count, uint32_t start) = 0;
+		virtual void drawIndexed(EPrimitive::Type primitive, uint32_t count, uint32_t start) = 0;
 
 		//TODO(Phil): Destruction functions / release of resources on self destruction
 

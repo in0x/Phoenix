@@ -19,7 +19,7 @@ namespace Phoenix
 			uint32_t start;
 			uint32_t count;
 
-			Primitive::Type primitives;
+			EPrimitive::Type primitives;
 			VertexBufferHandle vertexBuffer;
 			IndexBufferHandle indexBuffer;
 			StateGroup state;
@@ -32,7 +32,7 @@ namespace Phoenix
 			uint32_t start;
 			uint32_t count;
 
-			Primitive::Type primitives;
+			EPrimitive::Type primitives;
 			VertexBufferHandle vertexBuffer;
 			StateGroup state;
 		};
@@ -42,7 +42,7 @@ namespace Phoenix
 			SUBMITTABLE();
 
 			RGBA color;
-			Buffer::Type toClear;
+			EBuffer::Type toClear;
 			FrameBufferHandle handle;
 		};
 
@@ -69,7 +69,7 @@ namespace Phoenix
 			SUBMITTABLE();
 
 			char* source;
-			Shader::Type shaderType;
+			EShader::Type shaderType;
 			ShaderHandle handle;
 		};
 
@@ -77,7 +77,7 @@ namespace Phoenix
 		{
 			SUBMITTABLE();
 
-			Shader::List shaders;
+			EShader::List shaders;
 			ProgramHandle handle;
 		};
 

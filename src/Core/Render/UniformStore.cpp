@@ -13,7 +13,7 @@ namespace Phoenix
 	{
 	}
 
-	const UniformInfo& UniformStore::create(UniformHandle handle, Uniform::Type type, const char* name, const void* data, size_t size)
+	const UniformInfo& UniformStore::create(UniformHandle handle, EUniform::Type type, const char* name, const void* data, size_t size)
 	{
 		assert(handle.isValid());
 		assert(handle.idx < m_uniforms.size());

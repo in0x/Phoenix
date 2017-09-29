@@ -95,9 +95,9 @@ namespace Phoenix { namespace Tests
 	{
 		Plane p1{ { 0,0,0 }, { 0,0,1 }, { 1,0,0 } };
 
-		assert(p1.getSideOn({ 0, 0, 0 }) == Plane::Side::ON);
-		assert(p1.getSideOn({ 0, 1, 0 }) == Plane::Side::FRONT);
-		assert(p1.getSideOn({ 0,-1, 0 }) == Plane::Side::BACK);
+		assert(p1.getSideOn({ 0, 0, 0 }) == Plane::ESide::ON);
+		assert(p1.getSideOn({ 0, 1, 0 }) == Plane::ESide::FRONT);
+		assert(p1.getSideOn({ 0,-1, 0 }) == Plane::ESide::BACK);
 
 		assert(p1.distance({ 0, 0, 0 }) == 0);
 		assert(std::abs(p1.distance({ 0, 10, 0 })) == 10);
@@ -106,9 +106,9 @@ namespace Phoenix { namespace Tests
 
 		Plane p2{ { 0,0,0 }, { 1,0,0 }, { 0,1,0 } };
 
-		assert(p2.getSideOn({ 0, 0, 0 }) == Plane::Side::ON);
-		assert(p2.getSideOn({ 0, 0, 1 }) == Plane::Side::FRONT);
-		assert(p2.getSideOn({ 0, 0,-1 }) == Plane::Side::BACK);
+		assert(p2.getSideOn({ 0, 0, 0 }) == Plane::ESide::ON);
+		assert(p2.getSideOn({ 0, 0, 1 }) == Plane::ESide::FRONT);
+		assert(p2.getSideOn({ 0, 0,-1 }) == Plane::ESide::BACK);
 
 		assert(p2.distance({ 0, 0, 0 }) == 0);
 		assert(std::abs(p2.distance({ 0, 10, 0 })) == 0);

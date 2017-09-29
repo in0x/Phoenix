@@ -84,7 +84,7 @@ namespace Phoenix
 #define SUBMITTABLE() \
 		const static SubmitFptr SubmitFunc \
 
-	namespace RenderApi
+	namespace ERenderApi
 	{
 		enum Type
 		{
@@ -97,7 +97,7 @@ namespace Phoenix
 	class RenderInit
 	{
 	public:
-		RenderApi::Type getApiType()
+		ERenderApi::Type getApiType()
 		{
 			return m_apiType;
 		}
@@ -105,17 +105,17 @@ namespace Phoenix
 		size_t m_resourceListMemoryBytes;
 
 	protected:
-		RenderInit(size_t resourceListMemoryBytes, RenderApi::Type apiType = RenderApi::None)
+		RenderInit(size_t resourceListMemoryBytes, ERenderApi::Type apiType = ERenderApi::None)
 			: m_apiType(apiType)
 			, m_resourceListMemoryBytes(resourceListMemoryBytes)
 		{}
 
 		virtual ~RenderInit() {}
 
-		RenderApi::Type m_apiType;
+		ERenderApi::Type m_apiType;
 	};
 
-	namespace AttributeProperty
+	namespace EAttributeProperty
 	{
 		enum Value
 		{
@@ -128,7 +128,7 @@ namespace Phoenix
 		};
 	}
 
-	namespace AttributeType
+	namespace EAttributeType
 	{
 		enum Value
 		{
@@ -141,9 +141,9 @@ namespace Phoenix
 	}
 
 	// NOTE(Phil): This should be moved.
-	inline const char* attribTypeToName(AttributeProperty::Value type)
+	inline const char* attribTypeToName(EAttributeProperty::Value type)
 	{
-		static const char* const names[AttributeProperty::Count] =
+		static const char* const names[EAttributeProperty::Count] =
 		{
 			"Position",
 			"Normal",
@@ -164,20 +164,20 @@ namespace Phoenix
 		struct Decl
 		{
 			Decl()
-				: m_property(AttributeProperty::Count)
-				, m_type(AttributeType::Count)
+				: m_property(EAttributeProperty::Count)
+				, m_type(EAttributeType::Count)
 				, m_numElements(0)
 			{}
 
 
-			Decl(AttributeProperty::Value type, AttributeType::Value size, uint8_t numElement)
+			Decl(EAttributeProperty::Value type, EAttributeType::Value size, uint8_t numElement)
 				: m_property(type)
 				, m_type(size)
 				, m_numElements(numElement)
 			{}
 
-			AttributeProperty::Value m_property; // The kind of property the attrib sets (position, normal, color, etc.)
-			AttributeType::Value m_type; // The datatype of the property (float, int, etc.)
+			EAttributeProperty::Value m_property; // The kind of property the attrib sets (position, normal, color, etc.)
+			EAttributeType::Value m_type; // The datatype of the property (float, int, etc.)
 			uint8_t m_numElements; // The number of elements (e.g. 3 for a Vec3)
 		};
 
@@ -236,10 +236,10 @@ namespace Phoenix
 		}
 
 	private:
-		std::array<VertexAttrib, AttributeProperty::Count> m_attribs;
+		std::array<VertexAttrib, EAttributeProperty::Count> m_attribs;
 		size_t m_index;
 
-		VertexAttrib* has(AttributeProperty::Value attribType)
+		VertexAttrib* has(EAttributeProperty::Value attribType)
 		{
 			for (auto& attrib : m_attribs)
 			{
@@ -250,7 +250,7 @@ namespace Phoenix
 		}
 	};
 
-	namespace Shader
+	namespace EShader
 	{
 		enum Type
 		{
@@ -264,7 +264,7 @@ namespace Phoenix
 		// A set of shaders to be compiled into a program. 
 		// Some shaders may be omitteted if they are not required to create a valid shader program.
 		//using List = ShaderHandle[Shader::Type::Count];
-		using List = std::array<ShaderHandle, Shader::Type::Count>;
+		using List = std::array<ShaderHandle, EShader::Type::Count>;
 		inline List createList()
 		{
 			ShaderHandle invalidHandle = createShaderHandle();
@@ -334,7 +334,7 @@ namespace Phoenix
 		}
 	};
 
-	namespace Uniform
+	namespace EUniform
 	{
 		enum Type
 		{
@@ -348,7 +348,7 @@ namespace Phoenix
 		};
 	}
 
-	namespace Primitive
+	namespace EPrimitive
 	{
 		enum Type
 		{
@@ -358,7 +358,7 @@ namespace Phoenix
 		};
 	};
 
-	namespace Blend
+	namespace EBlend
 	{
 		enum Type
 		{
@@ -366,7 +366,7 @@ namespace Phoenix
 		};
 	}
 
-	namespace Raster
+	namespace ERaster
 	{
 		enum Type
 		{
@@ -374,7 +374,7 @@ namespace Phoenix
 		};
 	}
 
-	namespace Depth
+	namespace EDepth
 	{
 		enum Type
 		{
@@ -383,7 +383,7 @@ namespace Phoenix
 		};
 	}
 
-	namespace Stencil
+	namespace EStencil
 	{
 		enum Type
 		{
@@ -391,7 +391,7 @@ namespace Phoenix
 		};
 	}
 
-	namespace Buffer
+	namespace EBuffer
 	{
 		enum Type
 		{
@@ -418,10 +418,10 @@ namespace Phoenix
 
 	struct StateGroup
 	{
-		Blend::Type blend;
-		Raster::Type raster;
-		Depth::Type depth;
-		Stencil::Type stencil;
+		EBlend::Type blend;
+		ERaster::Type raster;
+		EDepth::Type depth;
+		EStencil::Type stencil;
 		// Textures -> TextureListHandle
 		UniformList uniforms;
 		ProgramHandle program;

@@ -16,10 +16,10 @@ namespace Phoenix
 		VertexBufferHandle vb;
 		IndexBufferHandle ib;
 		ProgramHandle program;
-		Depth::Type depth;
-		Raster::Type raster;
-		Blend::Type blend;
-		Stencil::Type stencil;
+		EDepth::Type depth;
+		ERaster::Type raster;
+		EBlend::Type blend;
+		EStencil::Type stencil;
 		ResourceList<UniformHandle> boundUniforms;
 	};
 
@@ -136,9 +136,9 @@ namespace Phoenix
 		return vbo;
 	}
 
-	GLuint attribSizeToGl(AttributeType::Value type)
+	GLuint attribSizeToGl(EAttributeType::Value type)
 	{
-		static const GLuint glType[AttributeType::Count] =
+		static const GLuint glType[EAttributeType::Count] =
 		{
 			GL_DOUBLE,
 			GL_FLOAT,
@@ -184,9 +184,9 @@ namespace Phoenix
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, size * count, data, GL_STATIC_DRAW); // TODO(Phil): Check what GL_DYNAMIC_DRAW does
 	};
 
-	GLenum getShaderEnum(Shader::Type type)
+	GLenum getShaderEnum(EShader::Type type)
 	{
-		static const GLuint glType[Shader::Type::Count] =
+		static const GLuint glType[EShader::Type::Count] =
 		{
 			 GL_VERTEX_SHADER,
 			 GL_GEOMETRY_SHADER,
@@ -197,31 +197,31 @@ namespace Phoenix
 		return glType[type];
 	}
 
-	Shader::Type getShaderType(GLenum shaderEnum)
+	EShader::Type getShaderType(GLenum shaderEnum)
 	{
 		switch (shaderEnum)
 		{
 		case GL_VERTEX_SHADER:
 		{
-			return Shader::Type::Vertex;
+			return EShader::Type::Vertex;
 		}
 		case GL_FRAGMENT_SHADER:
 		{
-			return Shader::Type::Fragment;
+			return EShader::Type::Fragment;
 		}
 		case GL_COMPUTE_SHADER:
 		{
-			return Shader::Type::Compute;
+			return EShader::Type::Compute;
 		}
 		case GL_GEOMETRY_SHADER:
 		{
-			return Shader::Type::Geometry;
+			return EShader::Type::Geometry;
 		}
 		default:
 		{
 			Logger::error("Trying to convert invalid GlEnum to Shader::Type ");
 			assert(false);
-			return Shader::Type::Count;
+			return EShader::Type::Count;
 		}
 		}
 	}
@@ -258,7 +258,7 @@ namespace Phoenix
 		return false;
 	}
 
-	void WGlRenderBackend::createShader(ShaderHandle handle, const char* source, Shader::Type shaderType)
+	void WGlRenderBackend::createShader(ShaderHandle handle, const char* source, EShader::Type shaderType)
 	{
 		GlShader& shader = m_shaders[handle.idx];
 
@@ -280,7 +280,7 @@ namespace Phoenix
 		}
 	}
 
-	void WGlRenderBackend::createProgram(ProgramHandle handle, const Shader::List& shaders)
+	void WGlRenderBackend::createProgram(ProgramHandle handle, const EShader::List& shaders)
 	{
 		GlProgram& program = m_programs[handle.idx];
 
@@ -333,38 +333,38 @@ namespace Phoenix
 		Logger::warning(__LOCATION_INFO__ "not implemented!");
 	}
 
-	Uniform::Type toUniformType(GLenum glType)
+	EUniform::Type toUniformType(GLenum glType)
 	{
 		switch (glType)
 		{
 		case GL_FLOAT:
 		{
-			return Uniform::Float;
+			return EUniform::Float;
 		} break;
 		case GL_INT:
 		{
-			return Uniform::Int;
+			return EUniform::Int;
 		} break;
 		case GL_FLOAT_VEC3:
 		{
-			return Uniform::Vec3;
+			return EUniform::Vec3;
 		} break;
 		case GL_FLOAT_VEC4:
 		{
-			return Uniform::Vec4;
+			return EUniform::Vec4;
 		} break;
 		case GL_FLOAT_MAT3:
 		{
-			return Uniform::Mat3;
+			return EUniform::Mat3;
 		} break;
 		case GL_FLOAT_MAT4:
 		{
-			return Uniform::Mat4;
+			return EUniform::Mat4;
 		} break;
 		default:
 		{
 			Logger::error("Trying to convert invalid GlEnum to Uniform::Type");
-			return Uniform::Count;
+			return EUniform::Count;
 			assert(false);
 		} break;
 		}
@@ -410,7 +410,7 @@ namespace Phoenix
 		}
 	}
 
-	void WGlRenderBackend::createUniform(UniformHandle& uniformHandle, const char* name, Uniform::Type type)
+	void WGlRenderBackend::createUniform(UniformHandle& uniformHandle, const char* name, EUniform::Type type)
 	{
 	}
 
@@ -421,30 +421,30 @@ namespace Phoenix
 		
 		switch (uniform.m_type)
 		{
-		case Uniform::Mat4:
+		case EUniform::Mat4:
 		{
 			const Matrix4* m = static_cast<const Matrix4*>(data);
 			glUniformMatrix4fv(uniform.m_location, uniform.m_size, false, static_cast<const GLfloat*>(data));
 		} break;
-		case Uniform::Vec3:
+		case EUniform::Vec3:
 		{
 			glUniform3fv(uniform.m_location, uniform.m_size, static_cast<const GLfloat*>(data));
 			checkGlError();
 		} break;
-		case Uniform::Vec4:
+		case EUniform::Vec4:
 		{
 			glUniform4fv(uniform.m_location, uniform.m_size, static_cast<const GLfloat*>(data));
 		} break;
 
-		case Uniform::Mat3:
+		case EUniform::Mat3:
 		{
 			glUniformMatrix3fv(uniform.m_location, uniform.m_size, false, static_cast<const GLfloat*>(data));
 		} break;
-		case Uniform::Float:
+		case EUniform::Float:
 		{
 			glUniform1fv(uniform.m_location, uniform.m_size, static_cast<const GLfloat*>(data));
 		} break;
-		case Uniform::Int:
+		case EUniform::Int:
 		{
 			glUniform1iv(uniform.m_location, uniform.m_size, static_cast<const GLint*>(data));
 		} break;
@@ -476,15 +476,15 @@ namespace Phoenix
 		glUseProgram(program.m_id);
 	}
 
-	void WGlRenderBackend::setDepth(Depth::Type depth)
+	void WGlRenderBackend::setDepth(EDepth::Type depth)
 	{
 		switch (depth)
 		{
-		case Depth::Enable:
+		case EDepth::Enable:
 		{
 			glEnable(GL_DEPTH_TEST);
 		} break;
-		case Depth::Disable:
+		case EDepth::Disable:
 		{
 			glDisable(GL_DEPTH_TEST);
 		} break;
@@ -492,22 +492,22 @@ namespace Phoenix
 		}
 	}
 
-	void WGlRenderBackend::setRaster(Raster::Type raster)
+	void WGlRenderBackend::setRaster(ERaster::Type raster)
 	{
 		Logger::warning(__LOCATION_INFO__ "not implemented!");
 	}
 
-	void WGlRenderBackend::setBlend(Blend::Type blend)
+	void WGlRenderBackend::setBlend(EBlend::Type blend)
 	{
 		Logger::warning(__LOCATION_INFO__ "not implemented!");
 	}
 
-	void WGlRenderBackend::setStencil(Stencil::Type stencil)
+	void WGlRenderBackend::setStencil(EStencil::Type stencil)
 	{
 		Logger::warning(__LOCATION_INFO__ "not implemented!");
 	}
 
-	GLenum getPrimitiveEnum(Primitive::Type type)
+	GLenum getPrimitiveEnum(EPrimitive::Type type)
 	{
 		static const GLuint glType[] =
 		{
@@ -564,31 +564,31 @@ namespace Phoenix
 		//setRaster(state.raster);
 	}
 
-	void WGlRenderBackend::drawLinear(Primitive::Type primitive, uint32_t count, uint32_t start)
+	void WGlRenderBackend::drawLinear(EPrimitive::Type primitive, uint32_t count, uint32_t start)
 	{
 		glDrawArrays(getPrimitiveEnum(primitive), start, count);
 	}
 
-	void WGlRenderBackend::drawIndexed(Primitive::Type primitive, uint32_t count, uint32_t start)
+	void WGlRenderBackend::drawIndexed(EPrimitive::Type primitive, uint32_t count, uint32_t start)
 	{
 		glDrawElements(getPrimitiveEnum(primitive), count, GL_UNSIGNED_INT, (GLvoid*)(sizeof(GLubyte) * start));
 	}
 
-	void WGlRenderBackend::clearFrameBuffer(FrameBufferHandle handle, Buffer::Type bitToClear, RGBA clearColor)
+	void WGlRenderBackend::clearFrameBuffer(FrameBufferHandle handle, EBuffer::Type bitToClear, RGBA clearColor)
 	{
 		// TODO(PHIL): use actual frambuffer here, 0 is default for window
 		
 		switch (bitToClear)
 		{
-		case Buffer::Color:
+		case EBuffer::Color:
 		{ 		
 			glClearBufferfv(GL_COLOR, 0, (GLfloat*)&clearColor);
 		} break;
-		case Buffer::Depth:
+		case EBuffer::Depth:
 		{
 			glClear(GL_DEPTH_BUFFER_BIT);
 		} break;
-		case Buffer::Stencil:
+		case EBuffer::Stencil:
 		{ 
 			glClear(GL_STENCIL_BUFFER_BIT);
 		} break;

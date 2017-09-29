@@ -28,7 +28,7 @@ namespace Phoenix
 	{
 		//char name[RenderConstants::c_maxUniformNameLenght]; // Storing these hashed makes much more sense
 		Hash_t nameHash;
-		Uniform::Type type;
+		EUniform::Type type;
 		void* data;
 		size_t size;
 	};
@@ -38,7 +38,7 @@ namespace Phoenix
 	public:
 		explicit UniformStore(size_t count);
 
-		const UniformInfo& create(UniformHandle handle, Uniform::Type type, const char* name, const void* data, size_t size);
+		const UniformInfo& create(UniformHandle handle, EUniform::Type type, const char* name, const void* data, size_t size);
 
 		const UniformInfo& get(UniformHandle handle);
 

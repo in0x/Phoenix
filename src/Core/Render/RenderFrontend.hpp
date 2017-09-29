@@ -7,30 +7,30 @@ namespace Phoenix
 
 	struct UniformInfo;
 
-	namespace RenderFrontend 
+	namespace RenderFrontend
 	{
 		void init(RenderInit* renderInit);
 		void submitCommands();
 		void swapBuffers();
 		void exit();
-	
-		VertexBufferHandle createVertexBuffer(const VertexBufferFormat& format);
-		
-		IndexBufferHandle createIndexBuffer(size_t size, uint32_t count, const void* data);
-		
-		ShaderHandle createShader(const char* source, Shader::Type shaderType);
-		
-		ProgramHandle createProgram(const Shader::List& shaders);
 
-		UniformHandle createUniform(const char* name, Uniform::Type type, const void* data = nullptr, size_t dataSize = 0);
+		VertexBufferHandle createVertexBuffer(const VertexBufferFormat& format);
+
+		IndexBufferHandle createIndexBuffer(size_t size, uint32_t count, const void* data);
+
+		ShaderHandle createShader(const char* source, EShader::Type shaderType);
+
+		ProgramHandle createProgram(const EShader::List& shaders);
+
+		UniformHandle createUniform(const char* name, EUniform::Type type, const void* data = nullptr, size_t dataSize = 0);
 
 		void* allocResourceList(size_t size, size_t alignment);
-		
+
 		template<class Resource, class... Resources>
 		ResourceList<Resource> createResourceList(Resources... resources)
 		{
 			void* mem = allocResourceList(sizeof...(resources) * sizeof(Resource), alignof(Resource));
-			
+
 			ResourceList<Resource> list;
 			list.m_resources = reinterpret_cast<Resource*>(mem);
 			list.m_count = sizeof...(resources);
@@ -71,9 +71,9 @@ namespace Phoenix
 
 		void setUniform(UniformHandle handle, const void* data, size_t dataSize);
 
-		void drawIndexed(VertexBufferHandle vb, IndexBufferHandle ib, Primitive::Type primitives, uint32_t start, uint32_t count, StateGroup& state);
+		void drawIndexed(VertexBufferHandle vb, IndexBufferHandle ib, EPrimitive::Type primitives, uint32_t start, uint32_t count, StateGroup& state);
 
-		void clearFrameBuffer(FrameBufferHandle frame, Buffer::Type bitToClear, RGBA color);
+		void clearFrameBuffer(FrameBufferHandle frame, EBuffer::Type bitToClear, RGBA color);
 	};
 
 	/*class IRenderer
@@ -106,3 +106,36 @@ namespace Phoenix
 
 	//};
 }
+
+
+// NOTE(Phil): Sketch to replace Frontend
+
+//#include "CommandBucket.hpp"
+//#include "Commands.hpp"
+//
+//namespace Phoenix
+//{
+//	// Open questions:
+//	// * Where does UniformStore go? One per submitbucket?
+//
+//	CommandBucket createBucket();
+//
+//	// Utility creation functions that take bucket and insert command
+//	VertexBufferHandle createVertexBuffer(CommandBucket& bucket, const VertexBufferFormat& format)
+//	{
+//		VertexBufferHandle handle = createVertexBufferHandle();
+//		
+//		auto cvb = bucket.addCommand<Commands::CreateVertexBuffer>();
+//		cvb->format = format;
+//		cvb->handle = handle;
+//
+//		return handle;
+//	}
+//
+//	// Seperate buckets for allocation and submission, Machinery does this, look up again why,
+//	// think it has to do with sorting.
+//	class CreateBucket;
+//	class SubmitBucket;
+//	CreateBucket allocCreateBucket();
+//	SubmitBucket allocSubmitBucket();
+//}

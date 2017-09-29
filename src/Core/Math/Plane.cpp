@@ -78,16 +78,16 @@ namespace Phoenix
 		return dot(point);
 	}
 
-	Plane::Side Plane::getSideOn(const Vec3& point) const
+	Plane::ESide Plane::getSideOn(const Vec3& point) const
 	{
 		auto dist = distance(point);
 		
 		if (dist < 0.f)
-			return Side::BACK;
+			return ESide::BACK;
 		else if (dist > 0.f)
-			return Side::FRONT;
+			return ESide::FRONT;
 		
-		return Side::ON;
+		return ESide::ON;
 	}
 
 	Vec3 Plane::reflect(const Vec3& point) const

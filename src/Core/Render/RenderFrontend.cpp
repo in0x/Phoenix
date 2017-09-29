@@ -25,13 +25,13 @@ namespace Phoenix
 
 				switch (renderInit->getApiType())
 				{
-				case RenderApi::Gl:
+				case ERenderApi::Gl:
 				{
 					renderBackend = std::make_unique<WGlRenderBackend>();
 					renderBackend->init(renderInit);
 					break;
 				}
-				case RenderApi::None:
+				case ERenderApi::None:
 				default:
 				{
 					Logger::error("Invalid RenderApi type");
@@ -89,7 +89,7 @@ namespace Phoenix
 
 		VertexBufferHandle createVertexBuffer(const VertexBufferFormat& format)
 		{
-			VertexBufferHandle handle;
+			VertexBufferHandle handle = createVertexBufferHandle();
 			handle.idx = s->vertexBuffers++;
 
 			auto cvb = s->bucket.addCommand<Commands::CreateVertexBuffer>();
@@ -101,7 +101,7 @@ namespace Phoenix
 
 		IndexBufferHandle createIndexBuffer(size_t size, uint32_t count, const void* data)
 		{
-			IndexBufferHandle handle;
+			IndexBufferHandle handle = createIndexBufferHandle();
 			handle.idx = s->indexBuffers++;
 
 			auto cib = s->bucket.addCommand<Commands::CreateIndexBuffer>();
@@ -113,9 +113,9 @@ namespace Phoenix
 			return handle;
 		}
 
-		ShaderHandle createShader(const char* source, Shader::Type shaderType)
+		ShaderHandle createShader(const char* source, EShader::Type shaderType)
 		{
-			ShaderHandle handle;
+			ShaderHandle handle = createShaderHandle();
 			handle.idx = s->shaders++;
 			size_t strLen = strlen(source);
 
@@ -129,9 +129,9 @@ namespace Phoenix
 			return handle;
 		}
 
-		ProgramHandle createProgram(const Shader::List& shaders)
+		ProgramHandle createProgram(const EShader::List& shaders)
 		{
-			ProgramHandle handle;
+			ProgramHandle handle = createProgramHandle();
 			handle.idx = s->programs++;
 
 			auto createProg = s->bucket.addCommand<Commands::CreateProgram>();
@@ -142,7 +142,7 @@ namespace Phoenix
 			return handle;
 		}
 
-		UniformHandle createUniform(const char* name, Uniform::Type type, const void* data, size_t dataSize)
+		UniformHandle createUniform(const char* name, EUniform::Type type, const void* data, size_t dataSize)
 		{
 			UniformHandle handle = createUniformHandle();
 			handle.idx = s->uniforms++;
@@ -169,20 +169,20 @@ namespace Phoenix
 			s->store.update(handle, data, dataSize);
 		}
 		
-		void drawIndexed(VertexBufferHandle vb, IndexBufferHandle ib, Primitive::Type primitives, uint32_t start, uint32_t count, StateGroup& state)
+		void drawIndexed(VertexBufferHandle vb, IndexBufferHandle ib, EPrimitive::Type primitives, uint32_t start, uint32_t count, StateGroup& state)
 		{
 			auto dc = s->bucket.addCommand<Commands::DrawIndexed>();
 
 			dc->vertexBuffer = vb;
 			dc->indexBuffer = ib;
-			dc->primitives = Primitive::Triangles;
+			dc->primitives = EPrimitive::Triangles;
 			dc->start = 0;
 			dc->count = count;
 
 			dc->state = state;
 		}
 
-		void clearFrameBuffer(FrameBufferHandle frame, Buffer::Type bitToClear, RGBA color)
+		void clearFrameBuffer(FrameBufferHandle frame, EBuffer::Type bitToClear, RGBA color)
 		{
 			auto dc = s->bucket.addCommand<Commands::ClearBuffer>();
 

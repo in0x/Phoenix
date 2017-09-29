@@ -45,14 +45,14 @@ namespace Phoenix
 	ProgramHandle loadProgram(const char* vsPath, const char* fsPath)
 	{
 		std::string vsSource = Platform::loadText(vsPath);
-		ShaderHandle vs = RenderFrontend::createShader(vsSource.c_str(), Shader::Vertex);
+		ShaderHandle vs = RenderFrontend::createShader(vsSource.c_str(), EShader::Vertex);
 
 		std::string fsSource = Platform::loadText(fsPath);
-		ShaderHandle fs = RenderFrontend::createShader(fsSource.c_str(), Shader::Fragment);
+		ShaderHandle fs = RenderFrontend::createShader(fsSource.c_str(), EShader::Fragment);
 
-		Shader::List shaders = Shader::createList();
-		shaders[Shader::Vertex] = vs;
-		shaders[Shader::Fragment] = fs;
+		EShader::List shaders = EShader::createList();
+		shaders[EShader::Vertex] = vs;
+		shaders[EShader::Fragment] = fs;
 		return RenderFrontend::createProgram(shaders);
 	}
 	
@@ -63,10 +63,10 @@ namespace Phoenix
 		renderMesh.modelMat = Matrix4::identity();
 
 		VertexBufferFormat layout;
-		layout.add({ AttributeProperty::Position, AttributeType::Float, 3 },
+		layout.add({ EAttributeProperty::Position, EAttributeType::Float, 3 },
 		{ sizeof(Vec3), mesh.vertices.size(), mesh.vertices.data() });
 
-		layout.add({ AttributeProperty::Normal, AttributeType::Float, 3 },
+		layout.add({ EAttributeProperty::Normal, EAttributeType::Float, 3 },
 		{ sizeof(Vec3), mesh.normals.size(), mesh.normals.data() });
 
 		renderMesh.vb = RenderFrontend::createVertexBuffer(layout);
@@ -82,10 +82,10 @@ namespace Phoenix
 	struct PlaceholderRenderer
 	{
 		PlaceholderRenderer(const Matrix4& view, const Matrix4& projection, const Vec3& lightPos)
-			: m_modelMat(RenderFrontend::createUniform("modelTf", Uniform::Mat4, &Matrix4::identity(), sizeof(Matrix4)))
-			, m_viewMat(RenderFrontend::createUniform("viewTf", Uniform::Mat4, &view, sizeof(Matrix4)))
-			, m_projectionMat(RenderFrontend::createUniform("projectionTf", Uniform::Mat4, &projection, sizeof(Matrix4)))
-			, m_lightPos(RenderFrontend::createUniform("lightPosition", Uniform::Vec3, &lightPos, sizeof(Vec3)))
+			: m_modelMat(RenderFrontend::createUniform("modelTf", EUniform::Mat4, &Matrix4::identity(), sizeof(Matrix4)))
+			, m_viewMat(RenderFrontend::createUniform("viewTf", EUniform::Mat4, &view, sizeof(Matrix4)))
+			, m_projectionMat(RenderFrontend::createUniform("projectionTf", EUniform::Mat4, &projection, sizeof(Matrix4)))
+			, m_lightPos(RenderFrontend::createUniform("lightPosition", EUniform::Vec3, &lightPos, sizeof(Vec3)))
 			, m_uniformList(RenderFrontend::createUniformList(m_modelMat, m_viewMat, m_projectionMat))
 		{
 		}
@@ -96,15 +96,15 @@ namespace Phoenix
 
 			StateGroup state;
 			state.program = program;
-			state.depth = Depth::Enable;
+			state.depth = EDepth::Enable;
 			state.uniforms = m_uniformList;
-			RenderFrontend::drawIndexed(mesh.vb, mesh.ib, Primitive::Triangles, 0, mesh.numIndices, state);
+			RenderFrontend::drawIndexed(mesh.vb, mesh.ib, EPrimitive::Triangles, 0, mesh.numIndices, state);
 		}
 
 		void clear()
 		{
-			RenderFrontend::clearFrameBuffer({}, Buffer::Color, { 1.f, 1.f, 1.f, 1.f });
-			RenderFrontend::clearFrameBuffer({}, Buffer::Depth, {});
+			RenderFrontend::clearFrameBuffer({}, EBuffer::Color, { 1.f, 1.f, 1.f, 1.f });
+			RenderFrontend::clearFrameBuffer({}, EBuffer::Depth, {});
 			RenderFrontend::submitCommands();
 		}
 

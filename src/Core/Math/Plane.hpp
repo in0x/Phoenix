@@ -15,7 +15,7 @@ namespace Phoenix
 	{
 	public:
 		
-		enum class Side
+		enum class ESide
 		{
 			FRONT, // Halfspace toward which normal points
 			BACK,
@@ -32,7 +32,7 @@ namespace Phoenix
 		void normalize();
 		float dot(const Vec3& point) const;
 
-		Side getSideOn(const Vec3& point) const;
+		ESide getSideOn(const Vec3& point) const;
 		float distance(const Vec3& point) const;
 		Vec3 reflect(const Vec3& point) const;
 

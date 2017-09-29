@@ -32,7 +32,7 @@ namespace Phoenix
 
 	struct GlUniform
 	{
-		Uniform::Type m_type; 
+		EUniform::Type m_type; 
 		GLuint m_location;
 		GLint m_size;
 		ProgramHandle m_program;
@@ -42,7 +42,7 @@ namespace Phoenix
 	{
 	public:
 		explicit WGlRenderInit(HWND owningWindow, size_t resourceListMemoryBytes)
-			: RenderInit(resourceListMemoryBytes, RenderApi::Gl)
+			: RenderInit(resourceListMemoryBytes, ERenderApi::Gl)
 			, m_owningWindow(owningWindow)
 		{
 		}
@@ -63,26 +63,26 @@ namespace Phoenix
 
 		virtual void createVertexBuffer(VertexBufferHandle handle, const VertexBufferFormat& format) override;
 		virtual void createIndexBuffer(IndexBufferHandle handle, size_t size, uint32_t count, const void* data) override;
-		virtual void createShader(ShaderHandle handle, const char* source, Shader::Type shaderType) override;
-		virtual void createProgram(ProgramHandle handle, const Shader::List& shaders) override;
+		virtual void createShader(ShaderHandle handle, const char* source, EShader::Type shaderType) override;
+		virtual void createProgram(ProgramHandle handle, const EShader::List& shaders) override;
 		virtual void createTexture() override;
 		virtual void createFrameBuffer() override;		
-		virtual void createUniform(UniformHandle& uniformHandle, const char* name, Uniform::Type type) override;
+		virtual void createUniform(UniformHandle& uniformHandle, const char* name, EUniform::Type type) override;
 
 		virtual void setVertexBuffer(VertexBufferHandle vb) override;
 		virtual void setIndexBuffer(IndexBufferHandle ib) override;
 		virtual void setProgram(ProgramHandle prog) override;
-		virtual void setDepth(Depth::Type depth) override;
-		virtual void setRaster(Raster::Type raster) override;
-		virtual void setBlend(Blend::Type blend) override;
-		virtual void setStencil(Stencil::Type stencil) override;
+		virtual void setDepth(EDepth::Type depth) override;
+		virtual void setRaster(ERaster::Type raster) override;
+		virtual void setBlend(EBlend::Type blend) override;
+		virtual void setStencil(EStencil::Type stencil) override;
 		virtual void setUniform(ProgramHandle programHandle, UniformHandle uniformHandle, const void* data) override;
 		virtual void setState(const StateGroup& state) override;
 
-		virtual void clearFrameBuffer(FrameBufferHandle handle, Buffer::Type bitToClear, RGBA clearColor) override;
+		virtual void clearFrameBuffer(FrameBufferHandle handle, EBuffer::Type bitToClear, RGBA clearColor) override;
 
-		virtual void drawLinear(Primitive::Type primitive, uint32_t count, uint32_t start) override;
-		virtual void drawIndexed(Primitive::Type primitive, uint32_t count, uint32_t start) override;
+		virtual void drawLinear(EPrimitive::Type primitive, uint32_t count, uint32_t start) override;
+		virtual void drawIndexed(EPrimitive::Type primitive, uint32_t count, uint32_t start) override;
 
 	private:
 		GlVertexBuffer m_vertexBuffers[VertexBufferHandle::maxValue()];
