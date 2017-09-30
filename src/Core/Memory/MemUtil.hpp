@@ -6,6 +6,21 @@
 
 namespace Phoenix
 {
+#define MEGABYTE(x) 1000000 * x
+#define GIGABYTE(x) 1000000000 * x
+
+	struct Megabyte
+	{
+		explicit Megabyte(size_t bytes)
+			: size(1000000 * bytes)
+		{
+		}
+
+		size_t size;
+	};
+
+	// TODO(Phil): ^ Which one is better? Struct should allow size_t conversion probably.
+
 	inline ptrdiff_t getAdjustment(char* raw, size_t alignment)
 	{
 		uintptr_t ptr = reinterpret_cast<uintptr_t>(raw);
