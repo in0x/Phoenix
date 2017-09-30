@@ -22,7 +22,7 @@ namespace Phoenix
 			EPrimitive::Type primitives;
 			VertexBufferHandle vertexBuffer;
 			IndexBufferHandle indexBuffer;
-			StateGroup state;
+			CStateGroup state;
 		};
 
 		struct DrawLinear
@@ -34,7 +34,7 @@ namespace Phoenix
 
 			EPrimitive::Type primitives;
 			VertexBufferHandle vertexBuffer;
-			StateGroup state;
+			CStateGroup state;
 		};
 
 		struct ClearBuffer

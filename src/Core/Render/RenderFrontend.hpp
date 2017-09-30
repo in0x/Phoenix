@@ -24,12 +24,21 @@ namespace Phoenix
 
 		UniformHandle createUniform(const char* name, EUniform::Type type, const void* data = nullptr, size_t dataSize = 0);
 
-		void* allocResourceList(size_t size, size_t alignment);
+		void* allocResource(size_t size, size_t alignment);
+
+		void freeResource(void* memory);
+	
+		template <class Resource>
+		void destroyResourceList(ResourceList<Resource>& list)
+		{
+			list.m_count = 0;
+			freeResource(list.m_resources);
+		}
 
 		template<class Resource, class... Resources>
 		ResourceList<Resource> createResourceList(Resources... resources)
 		{
-			void* mem = allocResourceList(sizeof...(resources) * sizeof(Resource), alignof(Resource));
+			void* mem = allocResource(sizeof...(resources) * sizeof(Resource), alignof(Resource));
 
 			ResourceList<Resource> list;
 			list.m_resources = reinterpret_cast<Resource*>(mem);

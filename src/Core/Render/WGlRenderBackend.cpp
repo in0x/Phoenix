@@ -519,26 +519,24 @@ namespace Phoenix
 		return glType[type];
 	}
 
-	void WGlRenderBackend::bindUniforms(ProgramHandle boundProgram, const UniformList uniforms)
+	void WGlRenderBackend::bindUniforms(ProgramHandle boundProgram, const UniformInfo* uniforms, size_t count)
 	{
 		// NOTE(Phil): At some point, the bound uniforms should be cached so that we don't constantly
 		// recopy their data.
 
-		size_t count = uniforms.m_count;
-
 		for (size_t i = 0; i < count; ++i)
 		{
-			const UniformInfo* info = uniforms.m_resources[i];
-			Hash_t name = info->nameHash;
+			const UniformInfo& info = uniforms[i];
+			Hash_t name = info.nameHash;
 			Hash_t hashWithProgram = hashBytes(&boundProgram.idx, sizeof(decltype(ProgramHandle::idx)), name);
 			
 			if (m_uniformMap.find(hashWithProgram) != m_uniformMap.end())
 			{
 				UniformHandle handle = m_uniformMap[hashWithProgram];
 				
-				if (m_uniforms[handle.idx].m_type == info->type)
+				if (m_uniforms[handle.idx].m_type == info.type)
 				{
-					setUniform(boundProgram, handle, info->data);
+					setUniform(boundProgram, handle, info.data);
 				}
 				else
 				{
@@ -554,11 +552,11 @@ namespace Phoenix
 		checkGlError();
 	}
 
-	void WGlRenderBackend::setState(const StateGroup& state)
+	void WGlRenderBackend::setState(const CStateGroup& state)
 	{
 		setProgram(state.program);
 		setDepth(state.depth);
-		bindUniforms(state.program, state.uniforms);
+		bindUniforms(state.program, state.uniforms, state.uniformCount);
 		//setBlend(state.blend);
 		//setStencil(state.stencil);
 		//setRaster(state.raster);

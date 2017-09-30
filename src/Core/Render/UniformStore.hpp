@@ -26,7 +26,7 @@ namespace Phoenix
 
 	struct UniformInfo
 	{
-		//char name[RenderConstants::c_maxUniformNameLenght]; // Storing these hashed makes much more sense
+		char name[RenderConstants::c_maxUniformNameLenght]; 
 		Hash_t nameHash;
 		EUniform::Type type;
 		void* data;

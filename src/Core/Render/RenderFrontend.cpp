@@ -43,7 +43,7 @@ namespace Phoenix
 				renderBackend->getMaxTextureUnits();
 			}
 
-			CommandBucket bucket{ 1024, 4096 };
+			CommandBucket bucket{ 1024, MEGABYTE(24) };
 			UniformStore store;
 			StackAllocator resourceListMemory;
 			std::unique_ptr<IRenderBackend> renderBackend = nullptr;
@@ -77,9 +77,14 @@ namespace Phoenix
 			s = nullptr;
 		}
 
-		void* allocResourceList(size_t size, size_t alignment)
+		void* allocResource(size_t size, size_t alignment)
 		{
 			return s->resourceListMemory.allocate(size, alignment);
+		}
+
+		void freeResource(void* memory)
+		{
+			s->resourceListMemory.free(memory);
 		}
 
 		const UniformInfo& getInfo(UniformHandle handle)
@@ -168,10 +173,42 @@ namespace Phoenix
 			
 			s->store.update(handle, data, dataSize);
 		}
+
+		size_t uniformMem(const StateGroup& state)
+		{
+			return state.uniforms.m_count * sizeof(UniformInfo);
+		}
+
+		size_t resourceMem(const StateGroup& state)
+		{
+			size_t uniforms = uniformMem(state);
+			return uniforms;
+		}
+
+		void copyState(CStateGroup& cmdState, void* memory, const StateGroup& state)
+		{
+			cmdState.blend = state.blend;
+			cmdState.depth = state.depth;
+			cmdState.program = state.program;
+			cmdState.raster = state.raster;
+			cmdState.stencil = state.stencil;
+			cmdState.uniformCount = state.uniforms.m_count;
+			cmdState.uniforms = static_cast<UniformInfo*>(memory);
+			char* writeLocation = reinterpret_cast<char*>(cmdState.uniforms);
+
+			for (int i = 0; i < state.uniforms.m_count; ++i)
+			{
+				memcpy(writeLocation, state.uniforms.m_resources[i], sizeof(UniformInfo));
+
+				UniformInfo* dbgInspect = reinterpret_cast<UniformInfo*>(writeLocation);
+
+				writeLocation += sizeof(UniformInfo);
+			}
+		}
 		
 		void drawIndexed(VertexBufferHandle vb, IndexBufferHandle ib, EPrimitive::Type primitives, uint32_t start, uint32_t count, StateGroup& state)
 		{
-			auto dc = s->bucket.addCommand<Commands::DrawIndexed>();
+			auto dc = s->bucket.addCommand<Commands::DrawIndexed>(resourceMem(state));
 
 			dc->vertexBuffer = vb;
 			dc->indexBuffer = ib;
@@ -179,7 +216,8 @@ namespace Phoenix
 			dc->start = 0;
 			dc->count = count;
 
-			dc->state = state;
+			void* memory = commandPacket::getAuxiliaryMemory(dc);
+			copyState(dc->state, memory, state);
 		}
 
 		void clearFrameBuffer(FrameBufferHandle frame, EBuffer::Type bitToClear, RGBA color)

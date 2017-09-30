@@ -77,7 +77,7 @@ namespace Phoenix
 		virtual void setBlend(EBlend::Type blend) override;
 		virtual void setStencil(EStencil::Type stencil) override;
 		virtual void setUniform(ProgramHandle programHandle, UniformHandle uniformHandle, const void* data) override;
-		virtual void setState(const StateGroup& state) override;
+		virtual void setState(const CStateGroup& state) override;
 
 		virtual void clearFrameBuffer(FrameBufferHandle handle, EBuffer::Type bitToClear, RGBA clearColor) override;
 
@@ -99,6 +99,6 @@ namespace Phoenix
 
 		UniformHandle WGlRenderBackend::addUniform();	
 		void registerActiveUniforms(ProgramHandle programHandle);
-		void bindUniforms(ProgramHandle boundProgram, const UniformList uniforms);
+		void bindUniforms(ProgramHandle boundProgram, const UniformInfo* uniforms, size_t count);
 	};
 }

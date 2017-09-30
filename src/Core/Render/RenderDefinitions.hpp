@@ -427,6 +427,17 @@ namespace Phoenix
 		ProgramHandle program;
 	};
 
+	struct CStateGroup
+	{
+		EBlend::Type blend;
+		ERaster::Type raster;
+		EDepth::Type depth;
+		EStencil::Type stencil;
+		ProgramHandle program;
+		UniformInfo* uniforms;
+		size_t uniformCount;
+	};
+
 	typedef StateGroup* StateGroupStack;
 	// Somehow make sure that when the user gets a stategroup stack one default is there per default
 

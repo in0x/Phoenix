@@ -28,6 +28,9 @@ namespace Phoenix
 		info.size = size;
 		info.type = type;
 		info.nameHash = HashFNV<const char*>()(name);
+		
+		assert(RenderConstants::c_maxUniformNameLenght >= strlen(name));
+		strcpy(info.name, name);
 
 		return info;
 	}

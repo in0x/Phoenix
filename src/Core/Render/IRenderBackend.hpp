@@ -31,7 +31,7 @@ namespace Phoenix
 		virtual void setBlend(EBlend::Type blend) = 0;
 		virtual void setStencil(EStencil::Type stencil) = 0;
 		virtual void setUniform(ProgramHandle programHandle, UniformHandle uniformHandle, const void* data) = 0;
-		virtual void setState(const StateGroup& state) = 0;
+		virtual void setState(const CStateGroup& state) = 0;
 
 		virtual void clearFrameBuffer(FrameBufferHandle handle, EBuffer::Type bitToClear, RGBA clearColor) = 0;
 
