@@ -46,7 +46,38 @@ namespace Phoenix
 		IndexBufferHandle ib;
 		uint32_t numVertices;
 		uint32_t numIndices;
+		UniformHandle modelMatHandle;
 	};
+
+	RenderMesh createPlaneMesh()
+	{
+		RenderMesh mesh;
+
+		// LD, RD, RU, LU
+		Vec3 vertices[] = { Vec3{-0.5, -0.5, 0}, Vec3{0.5, -0.5, 0}, Vec3{0.5, 0.5, 0}, Vec3{-0.5, 0.5, 0} };
+		Vec3 normals[] = { Vec3{ 0, 0, 1 }, Vec3{ 0, 0, 1 }, Vec3{ 0, 0, 1 }, Vec3{ 0, 0, 1 } };
+		uint32_t indices[] = { 0, 1, 2, 0, 2, 3 };
+
+		VertexBufferFormat layout;
+		layout.add({ EAttributeProperty::Position, EAttributeType::Float, 3, },
+		{ sizeof(Vec3), 4, &vertices });
+
+		layout.add({ EAttributeProperty::Normal, EAttributeType::Float, 3, },
+		{ sizeof(Vec3), 4, &normals });
+
+		mesh.vb = RenderFrontend::createVertexBuffer(layout);
+		mesh.numVertices = 4;
+		mesh.ib = RenderFrontend::createIndexBuffer(sizeof(unsigned int), 6, &indices);
+		mesh.numIndices = 6;
+
+		mesh.modelMat = Matrix4::translation(0, 0, 5);
+		mesh.modelMatHandle = RenderFrontend::createUniform("modelTf", EUniform::Mat4, &mesh.modelMat, sizeof(Matrix4));
+		RenderFrontend::submitCommands();
+	
+		mesh.modelMat = Matrix4::identity();
+
+		return mesh;
+	}
 
 	ProgramHandle loadProgram(const char* vsPath, const char* fsPath)
 	{
@@ -61,11 +92,11 @@ namespace Phoenix
 		shaders[EShader::Fragment] = fs;
 		return RenderFrontend::createProgram(shaders);
 	}
-	
+
 	RenderMesh loadRenderMesh(const Mesh& mesh)
 	{
 		RenderMesh renderMesh;
-		
+
 		renderMesh.modelMat = Matrix4::identity();
 
 		VertexBufferFormat layout;
@@ -76,11 +107,13 @@ namespace Phoenix
 		{ sizeof(Vec3), mesh.normals.size(), mesh.normals.data() });
 
 		renderMesh.vb = RenderFrontend::createVertexBuffer(layout);
-
 		renderMesh.ib = RenderFrontend::createIndexBuffer(sizeof(unsigned int), mesh.indices.size(), mesh.indices.data());
+		renderMesh.modelMatHandle = RenderFrontend::createUniform("modelTf", EUniform::Mat4, &renderMesh.modelMat, sizeof(Matrix4));
 
 		renderMesh.numVertices = mesh.vertices.size();
 		renderMesh.numIndices = mesh.indices.size();
+
+		RenderFrontend::submitCommands();
 
 		return renderMesh;
 	}
@@ -88,28 +121,30 @@ namespace Phoenix
 	struct PlaceholderRenderer
 	{
 		PlaceholderRenderer(const Matrix4& view, const Matrix4& projection, const Vec3& lightPos)
-			: m_modelMat(RenderFrontend::createUniform("modelTf", EUniform::Mat4, &Matrix4::identity(), sizeof(Matrix4)))
-			, m_viewMat(RenderFrontend::createUniform("viewTf", EUniform::Mat4, &view, sizeof(Matrix4)))
+			: m_viewMat(RenderFrontend::createUniform("viewTf", EUniform::Mat4, &view, sizeof(Matrix4)))
 			, m_projectionMat(RenderFrontend::createUniform("projectionTf", EUniform::Mat4, &projection, sizeof(Matrix4)))
 			, m_lightPos(RenderFrontend::createUniform("lightPosition", EUniform::Vec3, &lightPos, sizeof(Vec3)))
-			, m_uniformList(RenderFrontend::createUniformList(m_modelMat, m_viewMat, m_projectionMat))
 		{
 		}
 
 		void submit(const RenderMesh& mesh, ProgramHandle program)
 		{
-			RenderFrontend::setUniform(m_modelMat, &mesh.modelMat, sizeof(Matrix4));
+			RenderFrontend::setUniform(mesh.modelMatHandle, &mesh.modelMat, sizeof(Matrix4));
 
 			StateGroup state;
 			state.program = program;
 			state.depth = EDepth::Enable;
-			state.uniforms = m_uniformList;
+
+			// NOTE(Phil): It would be nicer if there was a function to add a uniform list to a state group that doesnt return handle.
+			// Then when the stategroup is destroyed we can also destroy the uniform list.
+			state.uniforms = RenderFrontend::createUniformList(mesh.modelMatHandle, m_viewMat, m_projectionMat);
 			RenderFrontend::drawIndexed(mesh.vb, mesh.ib, EPrimitive::Triangles, 0, mesh.numIndices, state);
+			RenderFrontend::destroyResourceList(state.uniforms);
 		}
 
 		void clear()
 		{
-			RenderFrontend::clearFrameBuffer({}, EBuffer::Color, { 1.f, 1.f, 1.f, 1.f });
+			RenderFrontend::clearFrameBuffer({}, EBuffer::Color, { 0.f, 0.f, 0.f, 1.f });
 			RenderFrontend::clearFrameBuffer({}, EBuffer::Depth, {});
 			RenderFrontend::submitCommands();
 		}
@@ -120,11 +155,9 @@ namespace Phoenix
 			RenderFrontend::swapBuffers();
 		}
 
-		UniformHandle m_modelMat;
 		UniformHandle m_viewMat;
 		UniformHandle m_projectionMat;
 		UniformHandle m_lightPos;
-		UniformList m_uniformList;
 	};
 }
 
@@ -134,7 +167,7 @@ int main(int argc, char** argv)
 
 	Logger::init(true, false);
 	Logger::setAnsiColorEnabled(Platform::enableConsoleColor(true));
-	
+
 	SetProcessDPIAware();
 
 	Tests::runMathTests();
@@ -161,22 +194,27 @@ int main(int argc, char** argv)
 	RenderFrontend::init(&renderInit);
 
 	RenderMesh renderMesh = loadRenderMesh(*fox);
+	RenderMesh planeMesh = createPlaneMesh();
 	ProgramHandle program = loadProgram("Shaders/diffuse.vert", "Shaders/diffuse.frag");
 
-	PlaceholderRenderer renderer(lookAtRH(Vec3{ 2, 2, -7 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 }),
-								 perspectiveRH(70, (float)config.width / (float)config.height, 1, 100),
-								 Vec3(-5, 3, 5));
+	PlaceholderRenderer renderer(lookAtRH(Vec3{ 0, 0, 5 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 }),
+		perspectiveRH(70, (float)config.width / (float)config.height, 1, 100),
+		Vec3(-5, 3, 5));
+
 	float angle = 0.f;
 
 	checkGlError();
 
 	while (window.isOpen())
 	{
-		angle += 0.025f;
+		angle += 0.5f;
 		renderMesh.modelMat = Matrix4::rotation(0.f, angle, 0.f);
 
 		renderer.clear();
-		renderer.submit(renderMesh, program);
+
+		renderer.submit(renderMesh, program); 
+		renderer.submit(planeMesh, program);
+
 		renderer.render();
 
 		window.processMessages();
