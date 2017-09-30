@@ -15,6 +15,9 @@
 #include "Core/Windows/PlatformWindows.hpp"
 
 /*
+CURRENT TASK:
+* Implement FrameBuffers
+
 TODO:
 * Crashes when closed by closing window via taskbar
 * Implement Textures
@@ -23,9 +26,11 @@ TODO:
 * Provide default stategroup and ensure that it works
 * Provide printf style logging
 * Figure out how overall memory acquisition will work
+* Input
+* Moveable camera
 
 * The sort keys are produced by the system that inserts into the buckets, i.e. the mesherenderer,
-* uirenderer etc. This allows them to all use a different pattern. The bucket then just does a 
+* uirenderer etc. This allows them to all use a different pattern. The bucket then just does a
 * transparent sort based on the bits in the key.
 
 * The solution to being stateless is really just to set everything that isnt specified
