@@ -188,8 +188,8 @@ namespace Phoenix
 		FILE* file = fopen(path.c_str(), "r");
 
 		if (!file)
-		{
-			Logger::error("Failed to open OBJ file " + path);
+		{	
+			Logger::errorf("Failed to open OBJ file %s", path.c_str());
 			fclose(file);
 		}
 

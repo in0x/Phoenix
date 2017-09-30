@@ -1,26 +1,20 @@
 #pragma once
 
-#include <fstream>
-
 namespace Phoenix
 {
 	namespace Logger
 	{	
-		void init(bool bLogToConsole, bool bLogToFile);
+		void init(bool bLogToConsole, bool bLogToFile, size_t maxMsgLength);
 		void setAnsiColorEnabled(bool enabled);
 		void exit();
 
-		void log(const std::string& msg);
-		void warning(const std::string& msg);
-		void error(const std::string& msg);
+		void log(const char* msg);
+		void warning(const char* msg);
+		void error(const char* msg);
 
-		//template <class... Args>
-		//void log(const char* format, Args... args)
-		//{
-		//	size_t bufferSize = snprintf(nullptr, 0, format, args...);
-		//	std::string buffer(bufferSize, ' ');
-		//	snprintf(buffer.data(), bufferSize + 1, format, args...);
-		//}
+		void logf(const char* format, ...);
+		void warningf(const char* format, ...);
+		void errorf(const char* format, ...);
 
 #define S1(x) #x
 #define S2(x) S1(x)

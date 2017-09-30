@@ -251,7 +251,7 @@ namespace Phoenix
 
 		else
 		{
-			Logger::error(std::to_string(shader) + " is not a shader\n");
+			Logger::errorf("ID %d is not a shader", shader);
 			return true;
 		}
 
