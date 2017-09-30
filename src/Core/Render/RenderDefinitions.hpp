@@ -272,16 +272,16 @@ namespace Phoenix
 		}
 	}
 
-	typedef uint64_t Hash_t;
+	typedef uint64_t Hash;
 
-	inline Hash_t hashBytes(const void* data, size_t size, uint64_t offset = 14695981039346656037, uint64_t prime = 1099511628211)
+	inline Hash hashBytes(const void* data, size_t size, uint64_t offset = 14695981039346656037, uint64_t prime = 1099511628211)
 	{
 		const char* ptr = static_cast<const char*>(data);
-		Hash_t hash = offset;
+		Hash hash = offset;
 		
 		for (size_t i = 0; i < size; ++i)
 		{
-			Hash_t next = static_cast<Hash_t>(ptr[i]);
+			Hash next = static_cast<Hash>(ptr[i]);
 			hash = (hash ^ next) * prime;
 		}
 
@@ -291,7 +291,7 @@ namespace Phoenix
 	template<uint64_t offset = 14695981039346656037, uint64_t prime = 1099511628211>
 	struct HashFNVIterative
 	{
-		Hash_t m_hash;
+		Hash m_hash;
 	
 	public:
 		HashFNVIterative()
@@ -304,12 +304,12 @@ namespace Phoenix
 
 			for (size_t i = 0; i < size; ++i)
 			{
-				Hash_t next = static_cast<Hash_t>(ptr[i]);
+				Hash next = static_cast<Hash>(ptr[i]);
 				m_hash = (m_hash ^ next) * prime;
 			}
 		}
 
-		Hash_t operator()()
+		Hash operator()()
 		{
 			return m_hash;
 		}
@@ -318,7 +318,7 @@ namespace Phoenix
 	template <class T>
 	struct HashFNV
 	{
-		Hash_t operator()(const T& obj)
+		Hash operator()(const T& obj)
 		{
 			auto hash = std::hash<T>();
 			return static_cast<uint64_t>(hash(obj));
@@ -328,7 +328,7 @@ namespace Phoenix
 	template <>
 	struct HashFNV<const char*>
 	{
-		Hash_t operator()(const char* str)
+		Hash operator()(const char* str)
 		{
 			return hashBytes(str, strlen(str));
 		}

@@ -527,8 +527,8 @@ namespace Phoenix
 		for (size_t i = 0; i < count; ++i)
 		{
 			const UniformInfo& info = uniforms[i];
-			Hash_t name = info.nameHash;
-			Hash_t hashWithProgram = hashBytes(&boundProgram.idx, sizeof(decltype(ProgramHandle::idx)), name);
+			Hash name = info.nameHash;
+			Hash hashWithProgram = hashBytes(&boundProgram.idx, sizeof(decltype(ProgramHandle::idx)), name);
 			
 			if (m_uniformMap.find(hashWithProgram) != m_uniformMap.end())
 			{

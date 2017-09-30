@@ -95,7 +95,7 @@ namespace Phoenix
 		HGLRC m_renderContext;
 		HDC m_deviceContext;
 		size_t m_uniformCount;
-		std::map<Hash_t, UniformHandle>	 m_uniformMap;
+		std::map<Hash, UniformHandle>	 m_uniformMap;
 
 		UniformHandle WGlRenderBackend::addUniform();	
 		void registerActiveUniforms(ProgramHandle programHandle);
