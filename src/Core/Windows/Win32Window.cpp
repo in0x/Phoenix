@@ -23,7 +23,7 @@ namespace Phoenix
 				ChangeDisplaySettings(nullptr, 0);
 
 			DestroyWindow(window);
-			UnregisterClass(name.c_str(), GetModuleHandle(nullptr));
+			UnregisterClass(L"Phoenix::Win32Window", GetModuleHandle(nullptr));
 		}
 	};
 
@@ -50,7 +50,7 @@ namespace Phoenix
 		windowClass.hCursor = 0;
 		windowClass.hbrBackground = 0;
 		windowClass.lpszMenuName = nullptr;
-		windowClass.lpszClassName = config.windowName.c_str();
+		windowClass.lpszClassName = L"Phoenix::Win32Window";/*config.windowName.c_str()*/;
 
 		if (s_windowCount == 0)
 		{
@@ -103,7 +103,7 @@ namespace Phoenix
 
 		self->window = CreateWindowEx(
 			exWindStyle,
-			self->name.c_str(),
+			L"Phoenix::Win32Window",
 			self->name.c_str(),
 			WS_CLIPSIBLINGS | WS_CLIPCHILDREN | windStyle,
 			self->left, self->top,
@@ -121,7 +121,12 @@ namespace Phoenix
 		}
 
 		self->msg.message = ~WM_QUIT;
-		ShowWindow(self->window, SW_SHOW);
+
+		if (config.autoShow)
+		{
+			ShowWindow(self->window, SW_SHOW);
+		}
+
 		s_windowCount++;
 	}
 
