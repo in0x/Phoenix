@@ -28,6 +28,7 @@ TODO:
 * Figure out how overall memory acquisition will work
 * Input
 * Moveable camera
+* I should startup glew independently of the backend
 
 * The sort keys are produced by the system that inserts into the buckets, i.e. the mesherenderer,
 * uirenderer etc. This allows them to all use a different pattern. The bucket then just does a
@@ -165,7 +166,7 @@ int main(int argc, char** argv)
 {
 	using namespace Phoenix;
 
-	Logger::init(true, false);
+	Logger::init(true, false, 1024);
 	Logger::setAnsiColorEnabled(Platform::enableConsoleColor(true));
 
 	SetProcessDPIAware();
@@ -181,7 +182,8 @@ int main(int argc, char** argv)
 		800, 600,
 		0,0,
 		std::wstring(L"Phoenix"),
-		false };
+		false,
+		true };
 
 	Win32Window window(config);
 	if (!window.isOpen())
@@ -190,7 +192,7 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
-	WGlRenderInit renderInit(window.getNativeHandle(), 4096);
+	WGlRenderInit renderInit(window.getNativeHandle(), 4096, 4);
 	RenderFrontend::init(&renderInit);
 
 	RenderMesh renderMesh = loadRenderMesh(*fox);

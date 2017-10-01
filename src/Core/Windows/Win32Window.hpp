@@ -13,6 +13,7 @@ namespace Phoenix
 		unsigned int top;
 		std::wstring windowName;
 		bool fullscreen;
+		bool autoShow;
 		bool closed;
 	};
 

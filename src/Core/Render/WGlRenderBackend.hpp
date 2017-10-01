@@ -41,13 +41,15 @@ namespace Phoenix
 	class WGlRenderInit : public RenderInit
 	{
 	public:
-		explicit WGlRenderInit(HWND owningWindow, size_t resourceListMemoryBytes)
+		explicit WGlRenderInit(HWND owningWindow, size_t resourceListMemoryBytes, uint8_t msaaSamples = 0)
 			: RenderInit(resourceListMemoryBytes, ERenderApi::Gl)
 			, m_owningWindow(owningWindow)
+			, m_msaaSamples(msaaSamples)
 		{
 		}
 
 		HWND m_owningWindow;
+		uint8_t m_msaaSamples;
 	};
 
 	class WGlRenderBackend : public IRenderBackend
@@ -85,20 +87,31 @@ namespace Phoenix
 		virtual void drawIndexed(EPrimitive::Type primitive, uint32_t count, uint32_t start) override;
 
 	private:
+		UniformHandle WGlRenderBackend::addUniform();
+		
+		void registerActiveUniforms(ProgramHandle programHandle);
+		
+		void bindUniforms(ProgramHandle boundProgram, const UniformInfo* uniforms, size_t count);
+
+		void initBasic(const WGlRenderInit& initValues);
+		
+		void initGlew();
+
+		void checkMsaaSupport(const WGlRenderInit& initValues);
+		
+		void initWithMSAA(const WGlRenderInit& initValues);
+
 		GlVertexBuffer m_vertexBuffers[VertexBufferHandle::maxValue()];
 		GlIndexBuffer m_indexBuffers[IndexBufferHandle::maxValue()];
 		GlShader m_shaders[ShaderHandle::maxValue()];
 		GlProgram m_programs[ProgramHandle::maxValue()];
 		GlUniform m_uniforms[UniformHandle::maxValue()];
 
+		std::map<Hash, UniformHandle> m_uniformMap;
 		HWND m_owningWindow;
 		HGLRC m_renderContext;
 		HDC m_deviceContext;
 		size_t m_uniformCount;
-		std::map<Hash, UniformHandle>	 m_uniformMap;
-
-		UniformHandle WGlRenderBackend::addUniform();	
-		void registerActiveUniforms(ProgramHandle programHandle);
-		void bindUniforms(ProgramHandle boundProgram, const UniformInfo* uniforms, size_t count);
+		uint8_t m_msaaSupport;
 	};
 }
