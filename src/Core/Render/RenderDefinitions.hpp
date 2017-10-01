@@ -24,7 +24,7 @@ namespace Phoenix
 		constexpr uint32_t c_maxUniformNameLenght = 128;
 	}
 
-#define HANDLE(name, size) \
+#define PHI_HANDLE(name, size) \
 		class name \
 		{ \
 		public: \
@@ -40,7 +40,7 @@ namespace Phoenix
 			return handle; \
 		} \
 
-#define HANDLE_CUSTOM_MAXVAL(name, size, maxVal) \
+#define PHI_HANDLE_CUSTOM_MAXVAL(name, size, maxVal) \
 		static_assert(maxVal < std::numeric_limits<size>::max(), "Handle maxVal has to be smaller than largest value of type size"); \
 		class name \
 		{ \
@@ -57,13 +57,13 @@ namespace Phoenix
 			return handle; \
 		} \
 
-	HANDLE(VertexBufferHandle, uint16_t);
-	HANDLE(IndexBufferHandle, uint16_t);
-	HANDLE(ShaderHandle, uint16_t);
-	HANDLE(ProgramHandle, uint16_t);
-	HANDLE(TextureHandle, uint16_t);
-	HANDLE(FrameBufferHandle, uint8_t);
-	HANDLE(UniformHandle, uint8_t);
+	PHI_HANDLE(VertexBufferHandle, uint16_t);
+	PHI_HANDLE(IndexBufferHandle, uint16_t);
+	PHI_HANDLE(ShaderHandle, uint16_t);
+	PHI_HANDLE(ProgramHandle, uint16_t);
+	PHI_HANDLE(TextureHandle, uint16_t);
+	PHI_HANDLE(FrameBufferHandle, uint8_t);
+	PHI_HANDLE(UniformHandle, uint8_t);
 	
 	class IRenderBackend;
 
