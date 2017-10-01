@@ -30,9 +30,9 @@ namespace Phoenix
 		public:
 			LogOut(bool bLogToConsole, bool bLogToFile, size_t maxMsgLength);
 			~LogOut();
-			void Log(const const char* msg);
-			void Warning(const const char* msg);
-			void Error(const const char* msg);
+			void Log(const char* msg);
+			void Warning(const char* msg);
+			void Error(const char* msg);
 
 			char* m_msgBuffer;
 			size_t m_msgBufferSize; 
