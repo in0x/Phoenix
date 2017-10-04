@@ -53,6 +53,7 @@ namespace Phoenix
 			uint32_t shaders = 0;
 			uint32_t programs = 0;
 			uint32_t uniforms = 0;
+			uint32_t textures = 0;
 		};
 
 		static std::unique_ptr<Members> s = nullptr;
@@ -204,6 +205,22 @@ namespace Phoenix
 
 				writeLocation += sizeof(UniformInfo);
 			}
+		}
+
+		TextureHandle createTexture(const TextureDesc& desc, const char* name)
+		{
+			TextureHandle handle = createTextureHandle();
+			handle.idx = s->textures++;
+			size_t strLen = strlen(name);
+
+			Commands::createTexture* ct = s->bucket.addCommand<Commands::createTexture>(strLen);
+			ct->desc = desc;
+
+			ct->name = commandPacket::getAuxiliaryMemory(ct);
+			memcpy(commandPacket::getAuxiliaryMemory(ct), name, strLen);
+			ct->name[strLen] = '\0';
+
+			return handle;
 		}
 		
 		void drawIndexed(VertexBufferHandle vb, IndexBufferHandle ib, EPrimitive::Type primitives, uint32_t start, uint32_t count, StateGroup& state)

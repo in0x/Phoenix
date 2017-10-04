@@ -68,7 +68,7 @@ namespace Phoenix
 			return result;
 		}
 
-		BOOL enableConsoleColor(BOOL enabled)
+		bool enableConsoleColor(BOOL enabled)
 		{
 			BOOL result = FALSE;
 
@@ -104,7 +104,7 @@ namespace Phoenix
 				}
 			}
 
-			return result;
+			return result == TRUE;
 		}
 
 		char* getCMDOption(char** start, char** end, const std::string& option)

@@ -109,11 +109,17 @@
     <ClInclude Include="..\src\Core\Windows\PlatformWindows.hpp">
       <Filter>Core\Windows</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Core\Windows\Win32GLContext.hpp">
-      <Filter>Core\Windows</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Core\Windows\Win32Window.hpp">
       <Filter>Core\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\STB\stb_easy_font.h">
+      <Filter>STB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\STB\stb_image.h">
+      <Filter>STB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Texture.hpp">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -199,11 +205,11 @@
     <ClCompile Include="..\src\Core\Render\UniformStore.cpp">
       <Filter>Render</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Core\Windows\Win32GLContext.cpp">
-      <Filter>Core\Windows</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Core\Windows\Win32Window.cpp">
       <Filter>Core\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Core\Texture.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -224,6 +230,9 @@
     </Filter>
     <Filter Include="Core\Windows">
       <UniqueIdentifier>{84e9d105-d250-4006-b109-e33573068b95}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="STB">
+      <UniqueIdentifier>{982bc338-05d0-424a-a6eb-deec0681d852}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

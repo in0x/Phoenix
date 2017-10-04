@@ -87,14 +87,14 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)\..\data\$(Platform)\</OutDir>
+    <OutDir>$(SolutionDir)\..\data\Builds\$(Platform)\</OutDir>
     <IntDir>\..\tmp\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)_$(Platform)_$(Configuration)</TargetName>
     <ExecutablePath>$(VC_ExecutablePath_x86);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(FxCopDir);$(PATH);</ExecutablePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)\..\data\$(Platform)\</OutDir>
+    <OutDir>$(SolutionDir)\..\data\Builds\$(Platform)\</OutDir>
     <IntDir>\..\tmp\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)_$(Platform)_$(Configuration)</TargetName>
   </PropertyGroup>
@@ -195,6 +195,7 @@
     <ClInclude Include="..\src\Core\Render\UniformStore.hpp" />
     <ClInclude Include="..\src\Core\Render\WGlRenderBackend.hpp" />
     <ClInclude Include="..\src\Core\StringTokenizer.hpp" />
+    <ClInclude Include="..\src\Core\Texture.hpp" />
     <ClInclude Include="..\src\Core\Transform.h" />
     <ClInclude Include="..\src\Core\Math\PhiMath.hpp" />
     <ClInclude Include="..\src\Core\obj.hpp" />
@@ -212,8 +213,9 @@
     <ClInclude Include="..\src\Core\Math\Vec4.hpp" />
     <ClInclude Include="..\src\Core\PhiSTL.hpp" />
     <ClInclude Include="..\src\Core\Windows\PlatformWindows.hpp" />
-    <ClInclude Include="..\src\Core\Windows\Win32GLContext.hpp" />
     <ClInclude Include="..\src\Core\Windows\Win32Window.hpp" />
+    <ClInclude Include="..\src\STB\stb_easy_font.h" />
+    <ClInclude Include="..\src\STB\stb_image.h" />
     <ClInclude Include="..\src\Tests\MathTests.hpp" />
     <ClInclude Include="..\src\Tests\MemoryTests.hpp" />
   </ItemGroup>
@@ -242,8 +244,8 @@
     <ClCompile Include="..\src\Core\Render\UniformStore.cpp" />
     <ClCompile Include="..\src\Core\Render\WGlRenderBackend.cpp" />
     <ClCompile Include="..\src\Core\StringTokenizer.cpp" />
+    <ClCompile Include="..\src\Core\Texture.cpp" />
     <ClCompile Include="..\src\Core\Transform.cpp" />
-    <ClCompile Include="..\src\Core\Windows\Win32GLContext.cpp" />
     <ClCompile Include="..\src\Core\Windows\Win32Window.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\Tests\MathTests.cpp" />

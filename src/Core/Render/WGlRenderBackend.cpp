@@ -22,7 +22,8 @@ namespace Phoenix
 		ERaster::Type raster;
 		EBlend::Type blend;
 		EStencil::Type stencil;
-		ResourceList<UniformHandle> boundUniforms;
+		UniformList boundUniforms;
+		TextureList boundTextures;
 	};
 
 	WGlRenderBackend::WGlRenderBackend()
@@ -77,10 +78,10 @@ namespace Phoenix
 		HDC hDC = GetDC(initValues.m_owningWindow);
 
 		int pixelFormat;
-		bool valid;
+		int valid;
 		UINT numFormats;
 		float fAttributes[] = { 0,0 };
-		
+
 		int iAttributes[] = { WGL_DRAW_TO_WINDOW_ARB,GL_TRUE,
 			WGL_SUPPORT_OPENGL_ARB,GL_TRUE,
 			WGL_ACCELERATION_ARB,WGL_FULL_ACCELERATION_ARB,
@@ -90,7 +91,7 @@ namespace Phoenix
 			WGL_STENCIL_BITS_ARB,0,
 			WGL_DOUBLE_BUFFER_ARB,GL_TRUE,
 			WGL_SAMPLE_BUFFERS_ARB,GL_TRUE,
-			WGL_SAMPLES_ARB, 32,                      
+			WGL_SAMPLES_ARB, 32,
 			0,0 };
 
 		for (uint8_t maxMsaaSupport = 32; maxMsaaSupport >= 2; maxMsaaSupport /= 2)
@@ -98,7 +99,7 @@ namespace Phoenix
 			iAttributes[19] = maxMsaaSupport;
 			valid = wglChoosePixelFormatARB(hDC, iAttributes, fAttributes, 1, &pixelFormat, &numFormats);
 
-			if (valid && numFormats >= 1)
+			if ((valid != 0) && numFormats >= 1)
 			{
 				m_msaaSupport = maxMsaaSupport;
 				return;
@@ -270,11 +271,11 @@ namespace Phoenix
 			WGL_SAMPLES_ARB, initValues.m_msaaSamples,
 			0
 		};
-		
+
 		m_owningWindow = initValues.m_owningWindow;
 		m_deviceContext = GetDC(m_owningWindow);
 		wglChoosePixelFormatARB(m_deviceContext, attributes, nullptr, 1, &chosenPixelFormat, &numPixelCounts);
-		
+
 		if (SetPixelFormat(m_deviceContext, chosenPixelFormat, &pfd))
 		{
 			// Try to set that pixel format
@@ -357,7 +358,7 @@ namespace Phoenix
 		glBindVertexArray(buffer.m_id);
 
 		size_t attribCount = format.size();
-		for (size_t location = 0; location < attribCount; ++location)
+		for (GLuint location = 0; location < attribCount; ++location)
 		{
 			const VertexAttrib::Data& data = format.at(location)->m_data;
 			const VertexAttrib::Decl& decl = format.at(location)->m_decl;
@@ -524,9 +525,44 @@ namespace Phoenix
 		registerActiveUniforms(handle);
 	}
 
-	void WGlRenderBackend::createTexture()
+	GLenum toGlFormat(ETextureFormat::Type format)
 	{
-		Logger::warning(__LOCATION_INFO__ "not implemented!");
+		static GLenum formats[] = { GL_TEXTURE_1D, GL_TEXTURE_2D, GL_TEXTURE_3D, GL_TEXTURE_CUBE_MAP };
+		return formats[format];
+	}
+
+	GLint toGlComponents(ETextureComponents::Type components)
+	{
+		static GLenum glComponents[] = { GL_RED, GL_RG, GL_RGB, GL_RGBA, GL_DEPTH_COMPONENT };
+		return glComponents[components];
+	}
+
+	void WGlRenderBackend::createTexture(TextureHandle handle, const TextureDesc& description, const char* name)
+	{
+		GlTexture& tex = m_textures[handle.idx];
+
+		GLenum format = toGlFormat(description.format);
+		GLenum components = toGlComponents(description.components);
+		
+		tex.m_format = format;
+
+		glGenTextures(1, &tex.m_id);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(format, tex.m_id);
+
+		glTexImage2D(format,
+					0,
+					components,
+					description.width, description.height,
+					0,
+					components,
+					GL_UNSIGNED_BYTE,
+					description.data);
+
+		glTexParameteri(format, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(format, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameterf(format, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameterf(format, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	}
 
 	void WGlRenderBackend::createFrameBuffer()
@@ -534,18 +570,12 @@ namespace Phoenix
 		Logger::warning(__LOCATION_INFO__ "not implemented!");
 	}
 
+	// NOTE(Phil): Textures return type int because the locations map to 
+	// texture units.
 	EUniform::Type toUniformType(GLenum glType)
 	{
 		switch (glType)
 		{
-		case GL_FLOAT:
-		{
-			return EUniform::Float;
-		} break;
-		case GL_INT:
-		{
-			return EUniform::Int;
-		} break;
 		case GL_FLOAT_VEC3:
 		{
 			return EUniform::Vec3;
@@ -558,17 +588,47 @@ namespace Phoenix
 		{
 			return EUniform::Mat3;
 		} break;
+		case GL_INT:
+		case GL_SAMPLER_1D:
+		case GL_SAMPLER_2D:
+		case GL_SAMPLER_3D:
+		case GL_SAMPLER_CUBE:
+		{
+			return EUniform::Int;
+		} break;
 		case GL_FLOAT_MAT4:
 		{
 			return EUniform::Mat4;
 		} break;
+		case GL_FLOAT:
+		{
+			return EUniform::Float;
+		} break;
 		default:
 		{
 			Logger::error("Trying to convert invalid GlEnum to Uniform::Type");
-			return EUniform::Count;
 			assert(false);
+			return EUniform::Count;
 		} break;
 		}
+	}
+
+	bool checkIsBasicUniform(GLenum typeVal)
+	{
+		return (typeVal == GL_FLOAT
+			 || typeVal == GL_INT
+			 || typeVal == GL_FLOAT_VEC3
+			 || typeVal == GL_FLOAT_VEC4
+			 || typeVal == GL_FLOAT_MAT3
+			 || typeVal == GL_FLOAT_MAT4);
+	}
+
+	bool checkIsSampler(GLenum typeVal)
+	{
+		return (typeVal == GL_TEXTURE_2D
+			 || typeVal == GL_TEXTURE_3D
+			 || typeVal == GL_TEXTURE_CUBE_MAP
+			 || typeVal == GL_TEXTURE_1D);
 	}
 
 	UniformHandle WGlRenderBackend::addUniform()
@@ -578,7 +638,7 @@ namespace Phoenix
 		return handle;
 	}
 
-	void WGlRenderBackend::registerActiveUniforms(ProgramHandle programHandle)
+	void WGlRenderBackend::registerActiveUniforms(ProgramHandle programHandle) // Might be able to store texture using ::Int, seems to store Texture Slot
 	{
 		GlProgram& program = m_programs[programHandle.idx];
 
@@ -606,7 +666,7 @@ namespace Phoenix
 			HashFNVIterative<> hash;
 			hash.add(name, strlen(name));
 			hash.add(&programHandle.idx, sizeof(decltype(programHandle.idx)));
-			
+
 			m_uniformMap[hash()] = handle;
 		}
 	}
@@ -616,10 +676,10 @@ namespace Phoenix
 	}
 
 
-	void WGlRenderBackend::setUniform(ProgramHandle programHandle, UniformHandle uniformHandle, const void* data) 
+	void WGlRenderBackend::setUniform(ProgramHandle programHandle, UniformHandle uniformHandle, const void* data)
 	{
 		GlUniform& uniform = m_uniforms[uniformHandle.idx];
-		
+
 		switch (uniform.m_type)
 		{
 		case EUniform::Mat4:
@@ -730,11 +790,11 @@ namespace Phoenix
 			const UniformInfo& info = uniforms[i];
 			Hash name = info.nameHash;
 			Hash hashWithProgram = hashBytes(&boundProgram.idx, sizeof(decltype(ProgramHandle::idx)), name);
-			
+
 			if (m_uniformMap.find(hashWithProgram) != m_uniformMap.end())
 			{
 				UniformHandle handle = m_uniformMap[hashWithProgram];
-				
+
 				if (m_uniforms[handle.idx].m_type == info.type)
 				{
 					setUniform(boundProgram, handle, info.data);
@@ -776,11 +836,11 @@ namespace Phoenix
 	void WGlRenderBackend::clearFrameBuffer(FrameBufferHandle handle, EBuffer::Type bitToClear, RGBA clearColor)
 	{
 		// TODO(PHIL): use actual frambuffer here, 0 is default for window
-		
+
 		switch (bitToClear)
 		{
 		case EBuffer::Color:
-		{ 		
+		{
 			glClearBufferfv(GL_COLOR, 0, (GLfloat*)&clearColor);
 		} break;
 		case EBuffer::Depth:
@@ -788,7 +848,7 @@ namespace Phoenix
 			glClear(GL_DEPTH_BUFFER_BIT);
 		} break;
 		case EBuffer::Stencil:
-		{ 
+		{
 			glClear(GL_STENCIL_BUFFER_BIT);
 		} break;
 		}

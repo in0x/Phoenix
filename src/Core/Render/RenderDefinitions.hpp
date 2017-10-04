@@ -21,7 +21,7 @@ namespace Phoenix
 {
 	namespace RenderConstants
 	{
-		constexpr uint32_t c_maxUniformNameLenght = 128;
+		constexpr uint32_t c_maxUniformNameLenght = 64;
 	}
 
 #define PHI_HANDLE(name, size) \
@@ -57,18 +57,18 @@ namespace Phoenix
 			return handle; \
 		} \
 
-	PHI_HANDLE(VertexBufferHandle, uint16_t);
-	PHI_HANDLE(IndexBufferHandle, uint16_t);
-	PHI_HANDLE(ShaderHandle, uint16_t);
-	PHI_HANDLE(ProgramHandle, uint16_t);
-	PHI_HANDLE(TextureHandle, uint16_t);
-	PHI_HANDLE(FrameBufferHandle, uint8_t);
-	PHI_HANDLE(UniformHandle, uint8_t);
+	PHI_HANDLE_CUSTOM_MAXVAL(VertexBufferHandle, uint16_t, 2048);
+	PHI_HANDLE_CUSTOM_MAXVAL(IndexBufferHandle, uint16_t, 2048);
+	PHI_HANDLE_CUSTOM_MAXVAL(ShaderHandle, uint16_t, 1024);
+	PHI_HANDLE_CUSTOM_MAXVAL(ProgramHandle, uint16_t, 512);
+	PHI_HANDLE_CUSTOM_MAXVAL(TextureHandle, uint16_t, 512);
+	PHI_HANDLE_CUSTOM_MAXVAL(FrameBufferHandle, uint8_t, 128);
+	PHI_HANDLE_CUSTOM_MAXVAL(UniformHandle, uint16_t, 512);
 	
 	class IRenderBackend;
 
 	typedef void(*SubmitFptr)(IRenderBackend*, const void*);
-
+	
 	template <class T>
 	struct is_submittable
 	{
@@ -401,6 +401,41 @@ namespace Phoenix
 		};
 	}
 
+	namespace ETextureFormat
+	{
+		enum Type
+		{
+			Tex1D,
+			Tex2D,
+			Tex3D,
+			CubeMap
+		};
+	}
+
+	namespace ETextureComponents
+	{
+		enum Type
+		{
+			R,
+			RG,
+			RGB,
+			RGBA,
+			DEPTH
+		};
+	}
+
+	struct TextureDesc
+	{
+		const void* data;
+		uint32_t width;
+		uint32_t height;
+		ETextureFormat::Type format;
+		ETextureComponents::Type components;
+		uint16_t depth;             
+		uint8_t numMips;            
+		uint8_t bitsPerPixel;       
+	};
+
 	struct RGBA
 	{
 		float r, g, b, a;
@@ -415,6 +450,8 @@ namespace Phoenix
 
 	struct UniformInfo;
 	typedef ResourceList<const UniformInfo*> UniformList;
+
+	typedef ResourceList<TextureHandle> TextureList;
 
 	struct StateGroup
 	{

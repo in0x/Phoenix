@@ -38,6 +38,13 @@ namespace Phoenix
 		ProgramHandle m_program;
 	};
 
+	struct GlTexture
+	{
+		GLuint m_id;
+		GLenum m_format;
+		char m_name[RenderConstants::c_maxUniformNameLenght];
+	};
+
 	class WGlRenderInit : public RenderInit
 	{
 	public:
@@ -67,7 +74,7 @@ namespace Phoenix
 		virtual void createIndexBuffer(IndexBufferHandle handle, size_t size, uint32_t count, const void* data) override;
 		virtual void createShader(ShaderHandle handle, const char* source, EShader::Type shaderType) override;
 		virtual void createProgram(ProgramHandle handle, const EShader::List& shaders) override;
-		virtual void createTexture() override;
+		virtual void createTexture(TextureHandle handle, const TextureDesc& description, const char* name) override;
 		virtual void createFrameBuffer() override;		
 		virtual void createUniform(UniformHandle& uniformHandle, const char* name, EUniform::Type type) override;
 
@@ -106,8 +113,11 @@ namespace Phoenix
 		GlShader m_shaders[ShaderHandle::maxValue()];
 		GlProgram m_programs[ProgramHandle::maxValue()];
 		GlUniform m_uniforms[UniformHandle::maxValue()];
+		GlTexture m_textures[TextureHandle::maxValue()];
 
 		std::map<Hash, UniformHandle> m_uniformMap;
+		std::map<Hash, TextureHandle> m_textureMap;
+
 		HWND m_owningWindow;
 		HGLRC m_renderContext;
 		HDC m_deviceContext;

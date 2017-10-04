@@ -8,6 +8,7 @@
 #include "Core/Math/PhiMath.hpp"
 #include "Core/Windows/Win32Window.hpp"
 #include "Core/Logger.hpp"
+#include "Core/Texture.hpp"
 
 #include "Core/Render/RenderFrontend.hpp"
 #include "Core/Render/WGlRenderBackend.hpp"
@@ -16,7 +17,7 @@
 
 /*
 CURRENT TASK:
-* Implement FrameBuffers
+* Implement Textures
 
 TODO:
 * Crashes when closed by closing window via taskbar
@@ -28,6 +29,7 @@ TODO:
 * Figure out how overall memory acquisition will work
 * Input
 * Moveable camera
+* Standardized preamble for each log: TIME | SEVERITY | -> msg
 * I should startup glew independently of the backend
 
 * The sort keys are produced by the system that inserts into the buckets, i.e. the mesherenderer,
@@ -57,6 +59,7 @@ namespace Phoenix
 		// LD, RD, RU, LU
 		Vec3 vertices[] = { Vec3{-0.5, -0.5, 0}, Vec3{0.5, -0.5, 0}, Vec3{0.5, 0.5, 0}, Vec3{-0.5, 0.5, 0} };
 		Vec3 normals[] = { Vec3{ 0, 0, 1 }, Vec3{ 0, 0, 1 }, Vec3{ 0, 0, 1 }, Vec3{ 0, 0, 1 } };
+		Vec2 uv[] = { Vec2{0,0}, Vec2{1,0}, Vec2{1,1}, Vec2{0,1} };
 		uint32_t indices[] = { 0, 1, 2, 0, 2, 3 };
 
 		VertexBufferFormat layout;
@@ -65,6 +68,9 @@ namespace Phoenix
 
 		layout.add({ EAttributeProperty::Normal, EAttributeType::Float, 3, },
 		{ sizeof(Vec3), 4, &normals });
+
+		layout.add({ EAttributeProperty::TexCoord, EAttributeType::Float, 2 },
+		{ sizeof(Vec2), 4, &uv });
 
 		mesh.vb = RenderFrontend::createVertexBuffer(layout);
 		mesh.numVertices = 4;
@@ -160,6 +166,34 @@ namespace Phoenix
 		UniformHandle m_projectionMat;
 		UniformHandle m_lightPos;
 	};
+
+	TextureDesc createDesc(const Texture& texture, ETextureFormat::Type format)
+	{
+		TextureDesc desc;
+		desc.width = texture.m_width;
+		desc.height = texture.m_height;
+
+		switch (texture.m_components)
+		{
+			case 4:
+			{ desc.components = ETextureComponents::RGBA; } break;
+			case 3:
+			{ desc.components = ETextureComponents::RGB; } break;
+			case 2:
+			{ desc.components = ETextureComponents::RG; } break;
+			case 1:
+			{ desc.components = ETextureComponents::R; } break;
+			default: { assert(false); } break;
+			// I guess depth is user decided?
+		}
+
+		desc.format = format;
+		desc.data = texture.m_data;
+		desc.bitsPerPixel = 8 * texture.m_components;
+
+		// Mips?
+		return desc;
+	}
 }
 
 int main(int argc, char** argv)
@@ -199,6 +233,8 @@ int main(int argc, char** argv)
 	RenderMesh planeMesh = createPlaneMesh();
 	ProgramHandle program = loadProgram("Shaders/diffuse.vert", "Shaders/diffuse.frag");
 
+	ProgramHandle textureProgram = loadProgram("Shaders/textured.vert", "Shaders/textured.frag");
+
 	PlaceholderRenderer renderer(lookAtRH(Vec3{ 0, 0, 5 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 }),
 		perspectiveRH(70, (float)config.width / (float)config.height, 1, 100),
 		Vec3(-5, 3, 5));
@@ -207,14 +243,19 @@ int main(int argc, char** argv)
 
 	checkGlError();
 
+	Texture einTex;
+	einTex.load("Textures/ein.png");
+	TextureHandle tex = RenderFrontend::createTexture(createDesc(einTex, ETextureFormat::Tex2D), "tex");
+	
 	while (window.isOpen())
 	{
 		angle += 0.5f;
-		renderMesh.modelMat = Matrix4::rotation(0.f, angle, 0.f);
+		//renderMesh.modelMat = Matrix4::rotation(0.f, angle, 0.f);
+		//planeMesh.modelMat = Matrix4::rotation(0.f, angle, 0.f);
 
 		renderer.clear();
 
-		renderer.submit(renderMesh, program); 
+		//renderer.submit(renderMesh, program); 
 		renderer.submit(planeMesh, program);
 
 		renderer.render();
@@ -227,5 +268,4 @@ int main(int argc, char** argv)
 
 	return 0;
 }
-
 

@@ -24,6 +24,8 @@ namespace Phoenix
 
 		UniformHandle createUniform(const char* name, EUniform::Type type, const void* data = nullptr, size_t dataSize = 0);
 
+		TextureHandle createTexture(const TextureDesc& desc, const char* name);
+
 		void* allocResource(size_t size, size_t alignment);
 
 		void freeResource(void* memory);
@@ -47,18 +49,6 @@ namespace Phoenix
 		}
 
 		const UniformInfo& getInfo(UniformHandle handle);
-
-		/*template<class Info, class... Infos>
-		void fill(Info info, UniformList& list, size_t index)
-		{
-			list.m_resources[index] = &getInfo(handle);
-		}
-
-		template<class Info, class... Infos>
-		void fill(Info info, Infos infos, UniformList& list, size_t index)
-		{
-
-		}*/
 
 		template<class... Infos>
 		UniformList createUniformList(Infos... resources)

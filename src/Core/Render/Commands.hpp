@@ -88,5 +88,14 @@ namespace Phoenix
 			UniformHandle handle;
 			const void* data;
 		};
+
+		struct createTexture
+		{
+			SUBMITTABLE();
+
+			TextureDesc desc;
+			char* name;
+			TextureHandle handle;
+		};
 	}
 }

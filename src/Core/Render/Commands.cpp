@@ -55,6 +55,12 @@ namespace Phoenix
 			auto dc = static_cast<const Commands::CreateProgram*>(command);
 			rc->createProgram(dc->handle, dc->shaders);
 		}
+
+		void textureCreate(IRenderBackend* rc, const void* command)
+		{
+			auto dc = static_cast<const Commands::createTexture*>(command);
+			rc->createTexture(dc->handle, dc->desc, dc->name);
+		}
 	}
 
 	const SubmitFptr Commands::DrawIndexed::SubmitFunc = SubmitFunctions::indexedDraw;
@@ -64,4 +70,5 @@ namespace Phoenix
 	const SubmitFptr Commands::CreateIndexBuffer::SubmitFunc = SubmitFunctions::indexBufferCreate;
 	const SubmitFptr Commands::CreateShader::SubmitFunc = SubmitFunctions::shaderCreate;
 	const SubmitFptr Commands::CreateProgram::SubmitFunc = SubmitFunctions::programCreate;
+	const SubmitFptr Commands::createTexture::SubmitFunc = SubmitFunctions::textureCreate;
 }
