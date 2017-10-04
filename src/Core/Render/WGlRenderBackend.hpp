@@ -48,8 +48,8 @@ namespace Phoenix
 	class WGlRenderInit : public RenderInit
 	{
 	public:
-		explicit WGlRenderInit(HWND owningWindow, size_t resourceListMemoryBytes, uint8_t msaaSamples = 0)
-			: RenderInit(resourceListMemoryBytes, ERenderApi::Gl)
+		explicit WGlRenderInit(HWND owningWindow, uint8_t msaaSamples = 0)
+			: RenderInit(ERenderApi::Gl)
 			, m_owningWindow(owningWindow)
 			, m_msaaSamples(msaaSamples)
 		{

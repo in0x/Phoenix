@@ -5,7 +5,6 @@
 #include "CommandBucket.hpp"
 #include "Commands.hpp"
 
-#include "../Memory/StackAllocator.hpp"
 #include "../Math/PhiMath.hpp"
 
 #include <memory>
@@ -19,7 +18,6 @@ namespace Phoenix
 		{
 			Members(RenderInit* renderInit)
 				: store(1024) // Temp
-				, resourceListMemory(renderInit->m_resourceListMemoryBytes)
 			{
 				Logger::log("RenderFrontend uniform store still uses a fixed size, this needs to be fixed");
 
@@ -45,7 +43,6 @@ namespace Phoenix
 
 			CommandBucket bucket{ 1024, MEGABYTE(24) };
 			UniformStore store;
-			StackAllocator resourceListMemory;
 			std::unique_ptr<IRenderBackend> renderBackend = nullptr;
 
 			uint32_t vertexBuffers = 0;
@@ -76,16 +73,6 @@ namespace Phoenix
 		void exit()
 		{
 			s = nullptr;
-		}
-
-		void* allocResource(size_t size, size_t alignment)
-		{
-			return s->resourceListMemory.allocate(size, alignment);
-		}
-
-		void freeResource(void* memory)
-		{
-			s->resourceListMemory.free(memory);
 		}
 
 		const UniformInfo& getInfo(UniformHandle handle)
@@ -153,7 +140,6 @@ namespace Phoenix
 			UniformHandle handle = createUniformHandle();
 			handle.idx = s->uniforms++;
 
-			s->renderBackend->createUniform(handle, name, type); // NOTE(Phil): This is useless for now.
 			s->store.create(handle, type, name, data, dataSize);
 
 			if (handle.isValid() && data != nullptr)
@@ -177,7 +163,7 @@ namespace Phoenix
 
 		size_t uniformMem(const StateGroup& state)
 		{
-			return state.uniforms.m_count * sizeof(UniformInfo);
+			return state.uniformCount * sizeof(UniformInfo);
 		}
 
 		size_t resourceMem(const StateGroup& state)
@@ -193,16 +179,14 @@ namespace Phoenix
 			cmdState.program = state.program;
 			cmdState.raster = state.raster;
 			cmdState.stencil = state.stencil;
-			cmdState.uniformCount = state.uniforms.m_count;
+			cmdState.uniformCount = state.uniformCount;
 			cmdState.uniforms = static_cast<UniformInfo*>(memory);
 			char* writeLocation = reinterpret_cast<char*>(cmdState.uniforms);
 
-			for (int i = 0; i < state.uniforms.m_count; ++i)
+			for (size_t i = 0; i < state.uniformCount; ++i)
 			{
-				memcpy(writeLocation, state.uniforms.m_resources[i], sizeof(UniformInfo));
-
-				UniformInfo* dbgInspect = reinterpret_cast<UniformInfo*>(writeLocation);
-
+				const UniformInfo& info = getInfo(state.uniforms[i]);
+				memcpy(writeLocation, &info, sizeof(UniformInfo));
 				writeLocation += sizeof(UniformInfo);
 			}
 		}

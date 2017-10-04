@@ -26,48 +26,6 @@ namespace Phoenix
 
 		TextureHandle createTexture(const TextureDesc& desc, const char* name);
 
-		void* allocResource(size_t size, size_t alignment);
-
-		void freeResource(void* memory);
-	
-		template <class Resource>
-		void destroyResourceList(ResourceList<Resource>& list)
-		{
-			list.m_count = 0;
-			freeResource(list.m_resources);
-		}
-
-		template<class Resource, class... Resources>
-		ResourceList<Resource> createResourceList(Resources... resources)
-		{
-			void* mem = allocResource(sizeof...(resources) * sizeof(Resource), alignof(Resource));
-
-			ResourceList<Resource> list;
-			list.m_resources = reinterpret_cast<Resource*>(mem);
-			list.m_count = sizeof...(resources);
-			return list;
-		}
-
-		const UniformInfo& getInfo(UniformHandle handle);
-
-		template<class... Infos>
-		UniformList createUniformList(Infos... resources)
-		{
-			UniformList list = createResourceList<const UniformInfo*>(resources...);
-
-			UniformHandle handles[] = { resources... };
-
-			size_t i = 0;
-			for (UniformHandle handle : handles)
-			{
-				//const UniformInfo* ptr = ;
-				list.m_resources[i] = &(getInfo(handle));
-				++i;
-			}
-
-			return list;
-		}
-
 		void setUniform(UniformHandle handle, const void* data, size_t dataSize);
 
 		void drawIndexed(VertexBufferHandle vb, IndexBufferHandle ib, EPrimitive::Type primitives, uint32_t start, uint32_t count, StateGroup& state);

@@ -102,12 +102,9 @@ namespace Phoenix
 			return m_apiType;
 		}
 
-		size_t m_resourceListMemoryBytes;
-
 	protected:
-		RenderInit(size_t resourceListMemoryBytes, ERenderApi::Type apiType = ERenderApi::None)
+		RenderInit(ERenderApi::Type apiType = ERenderApi::None)
 			: m_apiType(apiType)
-			, m_resourceListMemoryBytes(resourceListMemoryBytes)
 		{}
 
 		virtual ~RenderInit() {}
@@ -460,7 +457,9 @@ namespace Phoenix
 		EDepth::Type depth;
 		EStencil::Type stencil;
 		// Textures -> TextureListHandle
-		UniformList uniforms;
+		//UniformList uniforms; // Remove this, add direct buffer pointer and num, and copy them over
+		UniformHandle* uniforms;
+		size_t uniformCount;
 		ProgramHandle program;
 	};
 

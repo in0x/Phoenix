@@ -1,6 +1,5 @@
 #pragma once
 #include "RenderDefinitions.hpp"
-#include "../Logger.hpp"
 
 namespace Phoenix 
 {

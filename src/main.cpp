@@ -144,9 +144,13 @@ namespace Phoenix
 
 			// NOTE(Phil): It would be nicer if there was a function to add a uniform list to a state group that doesnt return handle.
 			// Then when the stategroup is destroyed we can also destroy the uniform list.
-			state.uniforms = RenderFrontend::createUniformList(mesh.modelMatHandle, m_viewMat, m_projectionMat);
+			//state.uniforms = RenderFrontend::createUniformList(mesh.modelMatHandle, m_viewMat, m_projectionMat);
+			UniformHandle uniforms[] = { mesh.modelMatHandle, m_viewMat, m_projectionMat };
+			state.uniforms = uniforms;
+			state.uniformCount = 3;
+
 			RenderFrontend::drawIndexed(mesh.vb, mesh.ib, EPrimitive::Triangles, 0, mesh.numIndices, state);
-			RenderFrontend::destroyResourceList(state.uniforms);
+			//RenderFrontend::destroyResourceList(state.uniforms);
 		}
 
 		void clear()
@@ -226,7 +230,7 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
-	WGlRenderInit renderInit(window.getNativeHandle(), 4096, 4);
+	WGlRenderInit renderInit(window.getNativeHandle(), 4);
 	RenderFrontend::init(&renderInit);
 
 	RenderMesh renderMesh = loadRenderMesh(*fox);
@@ -250,12 +254,13 @@ int main(int argc, char** argv)
 	while (window.isOpen())
 	{
 		angle += 0.5f;
-		//renderMesh.modelMat = Matrix4::rotation(0.f, angle, 0.f);
-		//planeMesh.modelMat = Matrix4::rotation(0.f, angle, 0.f);
 
 		renderer.clear();
 
+		//renderMesh.modelMat = Matrix4::rotation(0.f, angle, 0.f);
 		//renderer.submit(renderMesh, program); 
+
+		//planeMesh.modelMat = Matrix4::rotation(0.f, angle, 0.f);
 		renderer.submit(planeMesh, program);
 
 		renderer.render();
