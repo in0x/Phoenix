@@ -78,14 +78,6 @@ namespace Phoenix
 		virtual void createFrameBuffer() override;		
 		virtual void createUniform(UniformHandle& uniformHandle, const char* name, EUniform::Type type) override;
 
-		virtual void setVertexBuffer(VertexBufferHandle vb) override;
-		virtual void setIndexBuffer(IndexBufferHandle ib) override;
-		virtual void setProgram(ProgramHandle prog) override;
-		virtual void setDepth(EDepth::Type depth) override;
-		virtual void setRaster(ERaster::Type raster) override;
-		virtual void setBlend(EBlend::Type blend) override;
-		virtual void setStencil(EStencil::Type stencil) override;
-		virtual void setUniform(ProgramHandle programHandle, UniformHandle uniformHandle, const void* data) override;
 		virtual void setState(const CStateGroup& state) override;
 
 		virtual void clearFrameBuffer(FrameBufferHandle handle, EBuffer::Type bitToClear, RGBA clearColor) override;
@@ -108,6 +100,13 @@ namespace Phoenix
 		
 		void initWithMSAA(const WGlRenderInit& initValues);
 
+		void setVertexBuffer(VertexBufferHandle vb);
+		void setIndexBuffer(IndexBufferHandle ib);
+		void setProgram(ProgramHandle prog);
+		void setDepth(EDepth::Type depth);
+		void setRaster(ERaster::Type raster);
+		void setBlend(EBlend::Type blend);
+		void setStencil(EStencil::Type stencil);
 		GlVertexBuffer m_vertexBuffers[VertexBufferHandle::maxValue()];
 		GlIndexBuffer m_indexBuffers[IndexBufferHandle::maxValue()];
 		GlShader m_shaders[ShaderHandle::maxValue()];
@@ -116,8 +115,7 @@ namespace Phoenix
 		GlTexture m_textures[TextureHandle::maxValue()];
 
 		std::map<Hash, UniformHandle> m_uniformMap;
-		std::map<Hash, TextureHandle> m_textureMap;
-
+		
 		HWND m_owningWindow;
 		HGLRC m_renderContext;
 		HDC m_deviceContext;

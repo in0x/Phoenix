@@ -61,10 +61,29 @@ namespace Phoenix
 	PHI_HANDLE_CUSTOM_MAXVAL(IndexBufferHandle, uint16_t, 2048);
 	PHI_HANDLE_CUSTOM_MAXVAL(ShaderHandle, uint16_t, 1024);
 	PHI_HANDLE_CUSTOM_MAXVAL(ProgramHandle, uint16_t, 512);
-	PHI_HANDLE_CUSTOM_MAXVAL(TextureHandle, uint16_t, 512);
+	//PHI_HANDLE_CUSTOM_MAXVAL(TextureHandle, uint16_t, 512);
 	PHI_HANDLE_CUSTOM_MAXVAL(FrameBufferHandle, uint8_t, 128);
 	PHI_HANDLE_CUSTOM_MAXVAL(UniformHandle, uint16_t, 512);
 	
+	class TextureHandle
+	{
+	public:
+		uint16_t textureIdx;
+		UniformHandle uniformHandle;
+
+		static const uint16_t invalidValue = std::numeric_limits<uint16_t>::max();
+		bool isValid() const { return textureIdx != invalidValue && uniformHandle.isValid(); } 
+		static constexpr uint16_t maxValue() { return 512; } 
+	};
+
+	inline TextureHandle createTextureHandle(uint16_t texIdx = TextureHandle::invalidValue, uint16_t uniformIdx = UniformHandle::invalidValue)
+	{
+		TextureHandle handle;
+		handle.textureIdx = texIdx;
+		handle.uniformHandle.idx = uniformIdx;
+		return handle;
+	}
+
 	class IRenderBackend;
 
 	typedef void(*SubmitFptr)(IRenderBackend*, const void*);
@@ -111,6 +130,8 @@ namespace Phoenix
 
 		ERenderApi::Type m_apiType;
 	};
+
+	// Begin VertexBuffer.h
 
 	namespace EAttributeProperty
 	{
@@ -204,6 +225,7 @@ namespace Phoenix
 		Data m_data;
 	};
 
+
 	// Describes the layout and content of a buffer used as input for a vertex shader.
 	class VertexBufferFormat
 	{
@@ -247,6 +269,8 @@ namespace Phoenix
 		}
 	};
 
+	// end VertexBuffer.h
+
 	namespace EShader
 	{
 		enum Type
@@ -285,6 +309,8 @@ namespace Phoenix
 		return hash;
 	}
 
+	// begin Hash.h
+	
 	template<uint64_t offset = 14695981039346656037, uint64_t prime = 1099511628211>
 	struct HashFNVIterative
 	{
@@ -331,6 +357,8 @@ namespace Phoenix
 		}
 	};
 
+	// end Hash.h
+	
 	namespace EUniform
 	{
 		enum Type
@@ -398,26 +426,33 @@ namespace Phoenix
 		};
 	}
 
-	namespace ETextureFormat
+	namespace ETexture
 	{
-		enum Type
+		enum Format
 		{
 			Tex1D,
 			Tex2D,
 			Tex3D,
 			CubeMap
 		};
-	}
-
-	namespace ETextureComponents
-	{
-		enum Type
+		
+		enum Components
 		{
 			R,
 			RG,
 			RGB,
 			RGBA,
 			DEPTH
+		};
+
+		enum MinFilter
+		{
+			Nearest,
+			Linear,
+			NearestMipMapNearest, // NOTE(Phil): These will probably change again when i implement mipmaps
+			NearestMipMapLinear,
+			LinearMipMapLinear,
+			LinearMipMapNearest
 		};
 	}
 
@@ -426,8 +461,8 @@ namespace Phoenix
 		const void* data;
 		uint32_t width;
 		uint32_t height;
-		ETextureFormat::Type format;
-		ETextureComponents::Type components;
+		ETexture::Format format;
+		ETexture::Components components;
 		uint16_t depth;             
 		uint8_t numMips;            
 		uint8_t bitsPerPixel;       
@@ -438,26 +473,16 @@ namespace Phoenix
 		float r, g, b, a;
 	};
 
-	template <class Resource> 
-	struct ResourceList
-	{
-		Resource* m_resources;
-		size_t m_count;
-	};
-
 	struct UniformInfo;
-	typedef ResourceList<const UniformInfo*> UniformList;
-
-	typedef ResourceList<TextureHandle> TextureList;
-
+	
 	struct StateGroup
 	{
 		EBlend::Type blend;
 		ERaster::Type raster;
 		EDepth::Type depth;
 		EStencil::Type stencil;
-		// Textures -> TextureListHandle
-		//UniformList uniforms; // Remove this, add direct buffer pointer and num, and copy them over
+		TextureHandle* textures;
+		size_t textureCount;
 		UniformHandle* uniforms;
 		size_t uniformCount;
 		ProgramHandle program;
@@ -472,6 +497,9 @@ namespace Phoenix
 		ProgramHandle program;
 		UniformInfo* uniforms;
 		size_t uniformCount;
+		UniformInfo* textureLocations;
+		TextureHandle* textures;
+		size_t textureCount;
 	};
 
 	typedef StateGroup* StateGroupStack;

@@ -22,20 +22,12 @@ namespace Phoenix
 		virtual void createFrameBuffer() = 0;
 		virtual void createUniform(UniformHandle& uniformHandle, const char* name, EUniform::Type type) = 0;
 
-		virtual void setVertexBuffer(VertexBufferHandle vb) = 0;
-		virtual void setIndexBuffer(IndexBufferHandle ib) = 0;
-		virtual void setProgram(ProgramHandle prog) = 0; 
-		virtual void setDepth(EDepth::Type depth) = 0;
-		virtual void setRaster(ERaster::Type raster) = 0;
-		virtual void setBlend(EBlend::Type blend) = 0;
-		virtual void setStencil(EStencil::Type stencil) = 0;
-		virtual void setUniform(ProgramHandle programHandle, UniformHandle uniformHandle, const void* data) = 0;
 		virtual void setState(const CStateGroup& state) = 0;
 
 		virtual void clearFrameBuffer(FrameBufferHandle handle, EBuffer::Type bitToClear, RGBA clearColor) = 0;
 
-		virtual void drawLinear(EPrimitive::Type primitive, uint32_t count, uint32_t start) = 0;
-		virtual void drawIndexed(EPrimitive::Type primitive, uint32_t count, uint32_t start) = 0;
+		virtual void drawLinear(VertexBufferHandle vertexbuffer, EPrimitive::Type primitive, uint32_t count, uint32_t start) = 0;
+		virtual void drawIndexed(VertexBufferHandle vertexBuffer, IndexBufferHandle indexBuffer, EPrimitive::Type primitive, uint32_t count, uint32_t start) = 0;
 
 		//TODO(Phil): Destruction functions / release of resources on self destruction
 

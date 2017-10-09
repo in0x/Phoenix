@@ -11,19 +11,16 @@ namespace Phoenix
 		{
 			auto dc = static_cast<const Commands::DrawIndexed*>(command);
 
-			rc->setVertexBuffer(dc->vertexBuffer);
-			rc->setIndexBuffer(dc->indexBuffer);
 			rc->setState(dc->state);
-			rc->drawIndexed(dc->primitives, dc->count, dc->start);
+			rc->drawIndexed(dc->vertexBuffer, dc->indexBuffer, dc->primitives, dc->count, dc->start);
 		}
 
 		void linearDraw(IRenderBackend* rc, const void* command)
 		{
 			auto dc = static_cast<const Commands::DrawLinear*>(command);
 
-			rc->setVertexBuffer(dc->vertexBuffer);
 			rc->setState(dc->state);
-			rc->drawLinear(dc->primitives, dc->count, dc->start);
+			rc->drawLinear(dc->vertexBuffer, dc->primitives, dc->count, dc->start);
 		}
 	
 		void clearBuffer(IRenderBackend* rc, const void* command)

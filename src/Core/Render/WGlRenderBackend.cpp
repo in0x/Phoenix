@@ -823,13 +823,16 @@ namespace Phoenix
 		//setRaster(state.raster);
 	}
 
-	void WGlRenderBackend::drawLinear(EPrimitive::Type primitive, uint32_t count, uint32_t start)
+	void WGlRenderBackend::drawLinear(VertexBufferHandle vertexbuffer, EPrimitive::Type primitive, uint32_t count, uint32_t start)
 	{
+		setVertexBuffer(vertexbuffer);
 		glDrawArrays(getPrimitiveEnum(primitive), start, count);
 	}
 
-	void WGlRenderBackend::drawIndexed(EPrimitive::Type primitive, uint32_t count, uint32_t start)
+	void WGlRenderBackend::drawIndexed(VertexBufferHandle vertexBuffer, IndexBufferHandle indexBuffer, EPrimitive::Type primitive, uint32_t count, uint32_t start)
 	{
+		setVertexBuffer(vertexBuffer);
+		setIndexBuffer(indexBuffer);
 		glDrawElements(getPrimitiveEnum(primitive), count, GL_UNSIGNED_INT, (GLvoid*)(sizeof(GLubyte) * start));
 	}
 
