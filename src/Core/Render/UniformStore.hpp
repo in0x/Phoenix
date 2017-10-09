@@ -38,13 +38,13 @@ namespace Phoenix
 	public:
 		explicit UniformStore(size_t count);
 
-		const UniformInfo& create(UniformHandle handle, EUniform::Type type, const char* name, const void* data, size_t size);
+		const UniformInfo& create(size_t id, EUniform::Type type, const char* name, const void* data, size_t size);
 
-		const UniformInfo& get(UniformHandle handle);
+		const UniformInfo& get(size_t id);
 
-		void update(UniformHandle handle, const void* data, size_t size);
+		void update(size_t id, const void* data, size_t size);
 
-		void destroy(UniformHandle handle);
+		void destroy(size_t id);
 
 	private:
 		PoolAllocator m_memory;

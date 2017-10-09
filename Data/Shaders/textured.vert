@@ -1,6 +1,7 @@
 #version 430 core
 
 in vec3 position;
+//in vec3 normals;
 in vec2 uv;
 
 uniform mat4 modelTf;

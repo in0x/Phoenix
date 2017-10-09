@@ -13,16 +13,16 @@ namespace Phoenix
 	{
 	}
 
-	const UniformInfo& UniformStore::create(UniformHandle handle, EUniform::Type type, const char* name, const void* data, size_t size)
+	const UniformInfo& UniformStore::create(size_t id, EUniform::Type type, const char* name, const void* data, size_t size)
 	{
-		assert(handle.isValid());
-		assert(handle.idx < m_uniforms.size());
-		assert(m_uniforms[handle.idx].data == nullptr);
+		assert(UniformHandle::invalidValue != id);
+		assert(id < m_uniforms.size());
+		assert(m_uniforms[id].data == nullptr);
 
 		void* dataPtr = m_memory.allocate(size, alignof(Matrix4));
 		memcpy(dataPtr, data, size);
 
-		UniformInfo& info = m_uniforms[handle.idx];
+		UniformInfo& info = m_uniforms[id];
 
 		info.data = dataPtr;
 		info.size = size;
@@ -35,34 +35,35 @@ namespace Phoenix
 		return info;
 	}
 
-	const UniformInfo& UniformStore::get(UniformHandle handle)
+	const UniformInfo& UniformStore::get(size_t id)
 	{
-		assert(handle.isValid());
-		assert(handle.idx < m_uniforms.size());
+		assert(UniformHandle::invalidValue != id);
+		assert(id < m_uniforms.size());
 
-		UniformInfo& info = m_uniforms[handle.idx];
+		UniformInfo& info = m_uniforms[id];
 		assert(info.data != nullptr);
 
 		return info;
 	}
 
-	void UniformStore::update(UniformHandle handle, const void* data, size_t size)
+	void UniformStore::update(size_t id, const void* data, size_t size)
 	{
-		assert(handle.isValid());
-		assert(handle.idx < m_uniforms.size());
+		assert(UniformHandle::invalidValue != id);
+		assert(id < m_uniforms.size());
 
-		UniformInfo& info = m_uniforms[handle.idx];
+		UniformInfo& info = m_uniforms[id];
 
 		assert(info.data != nullptr);
 		memcpy(info.data, data, size);
 	}
 
-	void UniformStore::destroy(UniformHandle handle)
+	void UniformStore::destroy(size_t id)
 	{
-		assert(handle.isValid());
-		assert(handle.idx < m_uniforms.size());
+		assert(UniformHandle::invalidValue != id);
+		assert(id < m_uniforms.size());
 
-		UniformInfo& info = m_uniforms[handle.idx];
+		UniformInfo& info = m_uniforms[id];
+		assert(info.data != nullptr);
 		m_memory.free(info.data);
 	}
 }

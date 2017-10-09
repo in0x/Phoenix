@@ -13,4 +13,5 @@ void main()
 {
 	vec4 texel = texture(tex, vs_in.texCoords);
 	color = texel;
+	//color = vec4(vs_in.texCoords, 0, 1) + texel;
 }

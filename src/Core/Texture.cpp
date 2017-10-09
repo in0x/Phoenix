@@ -36,7 +36,7 @@ namespace Phoenix
 		int components = 0;
 
 		m_data = stbi_load(path, &width, &height, &components, 0);
-
+		
 		if (nullptr == m_data)
 		{
 			Logger::errorf("Failed to load texture with error: %s", stbi_failure_reason());

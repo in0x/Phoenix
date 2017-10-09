@@ -13,24 +13,12 @@ namespace Phoenix
 {
 #define glChecked(x) x; checkGlError();\
 
-	struct State
-	{
-		VertexBufferHandle vb;
-		IndexBufferHandle ib;
-		ProgramHandle program;
-		EDepth::Type depth;
-		ERaster::Type raster;
-		EBlend::Type blend;
-		EStencil::Type stencil;
-		UniformList boundUniforms;
-		TextureList boundTextures;
-	};
-
 	WGlRenderBackend::WGlRenderBackend()
 		: m_owningWindow(nullptr)
 		, m_renderContext(0)
 		, m_uniformCount(0)
 		, m_msaaSupport(0)
+		, m_activeTextures(0)
 	{
 	}
 
@@ -334,7 +322,8 @@ namespace Phoenix
 		glGenBuffers(1, &vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glBufferData(GL_ARRAY_BUFFER, typeSize * elementCount, data, GL_STATIC_DRAW); // TODO(Phil): Check what GL_DYNAMIC_DRAW does																			  
-																					  // TODO(Phil): Check for errors here.
+					
+		checkGlError();
 		return vbo;
 	}
 
@@ -525,13 +514,13 @@ namespace Phoenix
 		registerActiveUniforms(handle);
 	}
 
-	GLenum toGlFormat(ETextureFormat::Type format)
+	GLenum toGlFormat(ETexture::Format format)
 	{
 		static GLenum formats[] = { GL_TEXTURE_1D, GL_TEXTURE_2D, GL_TEXTURE_3D, GL_TEXTURE_CUBE_MAP };
 		return formats[format];
 	}
 
-	GLint toGlComponents(ETextureComponents::Type components)
+	GLint toGlComponents(ETexture::Components components)
 	{
 		static GLenum glComponents[] = { GL_RED, GL_RG, GL_RGB, GL_RGBA, GL_DEPTH_COMPONENT };
 		return glComponents[components];
@@ -539,7 +528,7 @@ namespace Phoenix
 
 	void WGlRenderBackend::createTexture(TextureHandle handle, const TextureDesc& description, const char* name)
 	{
-		GlTexture& tex = m_textures[handle.idx];
+		GlTexture& tex = m_textures[handle.textureIdx];
 
 		GLenum format = toGlFormat(description.format);
 		GLenum components = toGlComponents(description.components);
@@ -550,6 +539,15 @@ namespace Phoenix
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(format, tex.m_id);
 
+		if (description.width % 2 == 0)
+		{
+			glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+		}
+		else
+		{
+			glPixelStorei(GL_UNPACK_ALIGNMENT, 1); 
+		}
+
 		glTexImage2D(format,
 					0,
 					components,
@@ -559,7 +557,7 @@ namespace Phoenix
 					GL_UNSIGNED_BYTE,
 					description.data);
 
-		glTexParameteri(format, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(format, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); // TODO(Phil): Implement Abstraction for this
 		glTexParameteri(format, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glTexParameterf(format, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameterf(format, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -675,11 +673,8 @@ namespace Phoenix
 	{
 	}
 
-
-	void WGlRenderBackend::setUniform(ProgramHandle programHandle, UniformHandle uniformHandle, const void* data)
+	void WGlRenderBackend::setUniformImpl(const GlUniform& uniform, const void* data)
 	{
-		GlUniform& uniform = m_uniforms[uniformHandle.idx];
-
 		switch (uniform.m_type)
 		{
 		case EUniform::Mat4:
@@ -719,13 +714,13 @@ namespace Phoenix
 		checkGlError();
 	}
 
-	void WGlRenderBackend::WGlRenderBackend::setVertexBuffer(VertexBufferHandle vb)
+	void WGlRenderBackend::setVertexBuffer(VertexBufferHandle vb)
 	{
 		GlVertexBuffer buffer = m_vertexBuffers[vb.idx];
 		glBindVertexArray(buffer.m_id);
 	}
 
-	void WGlRenderBackend::WGlRenderBackend::setIndexBuffer(IndexBufferHandle ib)
+	void WGlRenderBackend::setIndexBuffer(IndexBufferHandle ib)
 	{
 		GlIndexBuffer buffer = m_indexBuffers[ib.idx];
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.m_id);
@@ -780,6 +775,21 @@ namespace Phoenix
 		return glType[type];
 	}
 
+	decltype(UniformHandle::idx) WGlRenderBackend::getUniform(ProgramHandle boundProgram, const UniformInfo& info) const
+	{
+		Hash name = info.nameHash;
+		Hash hashWithProgram = hashBytes(&boundProgram.idx, sizeof(decltype(ProgramHandle::idx)), name);
+
+		if (m_uniformMap.find(hashWithProgram) != m_uniformMap.end())
+		{
+			return m_uniformMap.at(hashWithProgram).idx;
+		}
+		else
+		{
+			return UniformHandle::invalidValue;
+		}
+	}
+
 	void WGlRenderBackend::bindUniforms(ProgramHandle boundProgram, const UniformInfo* uniforms, size_t count)
 	{
 		// NOTE(Phil): At some point, the bound uniforms should be cached so that we don't constantly
@@ -788,28 +798,61 @@ namespace Phoenix
 		for (size_t i = 0; i < count; ++i)
 		{
 			const UniformInfo& info = uniforms[i];
-			Hash name = info.nameHash;
-			Hash hashWithProgram = hashBytes(&boundProgram.idx, sizeof(decltype(ProgramHandle::idx)), name);
+			auto uniformIdx = getUniform(boundProgram, info);
 
-			if (m_uniformMap.find(hashWithProgram) != m_uniformMap.end())
+			if (UniformHandle::invalidValue == uniformIdx)
 			{
-				UniformHandle handle = m_uniformMap[hashWithProgram];
+				Logger::errorf("Uniform %s does not exist in program with handle id %d", info.name, boundProgram.idx);
+				continue;
+			}
 
-				if (m_uniforms[handle.idx].m_type == info.type)
-				{
-					setUniform(boundProgram, handle, info.data);
-				}
-				else
-				{
-					Logger::error("Uniform exists in program, but type is mismatched");
-				}
+			if (m_uniforms[uniformIdx].m_type == info.type)
+			{
+				setUniformImpl(m_uniforms[uniformIdx], info.data);
 			}
 			else
 			{
-				Logger::error("Uniform does not exist in specified program");
+				Logger::error("Uniform exists in program, but type is mismatched");
 			}
 		}
 
+		checkGlError();
+	}
+
+	void WGlRenderBackend::bindTexture(const GlUniform& uniform, const GlTexture& texture)
+	{
+		assert(m_activeTextures < getMaxTextureUnits()); 
+		glActiveTexture(GL_TEXTURE0 + m_activeTextures); 	
+		glBindTexture(texture.m_format, texture.m_id); 
+		glUniform1i(uniform.m_location, m_activeTextures);
+	
+		m_activeTextures++;
+	}
+
+	void WGlRenderBackend::bindTextures(ProgramHandle boundProgram, const UniformInfo* locations, const TextureHandle* handles, size_t count)
+	{
+		for (size_t i = 0; i < count; ++i)
+		{
+			const UniformInfo& info = locations[i];
+			auto uniformIdx = getUniform(boundProgram, info);
+
+			if (UniformHandle::invalidValue == uniformIdx)
+			{
+				Logger::errorf("Texture %s does not exist in program with handle id %d", info.name, boundProgram.idx);
+				continue;
+			}
+
+			if (m_uniforms[uniformIdx].m_type == EUniform::Int)
+			{
+				bindTexture(m_uniforms[uniformIdx], m_textures[handles[i].textureIdx]);
+			}
+			else
+			{
+				Logger::error("Uniform exists in program, but type is not a sampler type");
+			}
+		}
+
+		getGlErrorString();
 		checkGlError();
 	}
 
@@ -818,9 +861,11 @@ namespace Phoenix
 		setProgram(state.program);
 		setDepth(state.depth);
 		bindUniforms(state.program, state.uniforms, state.uniformCount);
+		bindTextures(state.program, state.textureLocations, state.textures, state.textureCount);
 		//setBlend(state.blend);
 		//setStencil(state.stencil);
 		//setRaster(state.raster);
+		m_activeTextures = 0;
 	}
 
 	void WGlRenderBackend::drawLinear(VertexBufferHandle vertexbuffer, EPrimitive::Type primitive, uint32_t count, uint32_t start)

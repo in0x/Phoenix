@@ -58,18 +58,15 @@ namespace Phoenix
 
 		// LD, RD, RU, LU
 		Vec3 vertices[] = { Vec3{-0.5, -0.5, 0}, Vec3{0.5, -0.5, 0}, Vec3{0.5, 0.5, 0}, Vec3{-0.5, 0.5, 0} };
-		Vec3 normals[] = { Vec3{ 0, 0, 1 }, Vec3{ 0, 0, 1 }, Vec3{ 0, 0, 1 }, Vec3{ 0, 0, 1 } };
-		Vec2 uv[] = { Vec2{0,0}, Vec2{1,0}, Vec2{1,1}, Vec2{0,1} };
+		Vec2 uv[] = { Vec2{ 0.0 ,1.0 }, Vec2{ 1.0 ,1.0 }, Vec2{ 1.0 ,0.0 }, Vec2{ 0.0 ,0.0 } };
+
 		uint32_t indices[] = { 0, 1, 2, 0, 2, 3 };
 
 		VertexBufferFormat layout;
 		layout.add({ EAttributeProperty::Position, EAttributeType::Float, 3, },
 		{ sizeof(Vec3), 4, &vertices });
 
-		layout.add({ EAttributeProperty::Normal, EAttributeType::Float, 3, },
-		{ sizeof(Vec3), 4, &normals });
-
-		layout.add({ EAttributeProperty::TexCoord, EAttributeType::Float, 2 },
+		layout.add({ EAttributeProperty::TexCoord, EAttributeType::Float, 2 }, // My tex coords dont end up in the shader
 		{ sizeof(Vec2), 4, &uv });
 
 		mesh.vb = RenderFrontend::createVertexBuffer(layout);
@@ -125,13 +122,44 @@ namespace Phoenix
 		return renderMesh;
 	}
 
-	struct PlaceholderRenderer
+	TextureDesc createDesc(const Texture& texture, ETexture::Format format)
 	{
+		TextureDesc desc;
+		desc.width = texture.m_width;
+		desc.height = texture.m_height;
+
+		switch (texture.m_components)
+		{
+		case 4:
+		{ desc.components = ETexture::RGBA; } break;
+		case 3:
+		{ desc.components = ETexture::RGB; } break;
+		case 2:
+		{ desc.components = ETexture::RG; } break;
+		case 1:
+		{ desc.components = ETexture::R; } break;
+		default: { assert(false); } break;
+			// I guess depth is user decided?
+		}
+
+		desc.format = format;
+		desc.data = texture.m_data;
+		desc.bitsPerPixel = 8 * texture.m_components;
+
+		// Mips?
+		return desc;
+	}
+
+	class PlaceholderRenderer
+	{
+	public:
 		PlaceholderRenderer(const Matrix4& view, const Matrix4& projection, const Vec3& lightPos)
 			: m_viewMat(RenderFrontend::createUniform("viewTf", EUniform::Mat4, &view, sizeof(Matrix4)))
 			, m_projectionMat(RenderFrontend::createUniform("projectionTf", EUniform::Mat4, &projection, sizeof(Matrix4)))
 			, m_lightPos(RenderFrontend::createUniform("lightPosition", EUniform::Vec3, &lightPos, sizeof(Vec3)))
 		{
+			m_einTex.load("Textures/ein.png");
+			m_tex = RenderFrontend::createTexture(createDesc(m_einTex, ETexture::Tex2D), "tex");
 		}
 
 		void submit(const RenderMesh& mesh, ProgramHandle program)
@@ -142,15 +170,15 @@ namespace Phoenix
 			state.program = program;
 			state.depth = EDepth::Enable;
 
-			// NOTE(Phil): It would be nicer if there was a function to add a uniform list to a state group that doesnt return handle.
-			// Then when the stategroup is destroyed we can also destroy the uniform list.
-			//state.uniforms = RenderFrontend::createUniformList(mesh.modelMatHandle, m_viewMat, m_projectionMat);
 			UniformHandle uniforms[] = { mesh.modelMatHandle, m_viewMat, m_projectionMat };
 			state.uniforms = uniforms;
 			state.uniformCount = 3;
 
+			TextureHandle textures[] = { m_tex };
+			state.textures = textures;
+			state.textureCount = 1;
+
 			RenderFrontend::drawIndexed(mesh.vb, mesh.ib, EPrimitive::Triangles, 0, mesh.numIndices, state);
-			//RenderFrontend::destroyResourceList(state.uniforms);
 		}
 
 		void clear()
@@ -169,35 +197,9 @@ namespace Phoenix
 		UniformHandle m_viewMat;
 		UniformHandle m_projectionMat;
 		UniformHandle m_lightPos;
+		Texture m_einTex;
+		TextureHandle m_tex;
 	};
-
-	TextureDesc createDesc(const Texture& texture, ETextureFormat::Type format)
-	{
-		TextureDesc desc;
-		desc.width = texture.m_width;
-		desc.height = texture.m_height;
-
-		switch (texture.m_components)
-		{
-			case 4:
-			{ desc.components = ETextureComponents::RGBA; } break;
-			case 3:
-			{ desc.components = ETextureComponents::RGB; } break;
-			case 2:
-			{ desc.components = ETextureComponents::RG; } break;
-			case 1:
-			{ desc.components = ETextureComponents::R; } break;
-			default: { assert(false); } break;
-			// I guess depth is user decided?
-		}
-
-		desc.format = format;
-		desc.data = texture.m_data;
-		desc.bitsPerPixel = 8 * texture.m_components;
-
-		// Mips?
-		return desc;
-	}
 }
 
 int main(int argc, char** argv)
@@ -239,7 +241,7 @@ int main(int argc, char** argv)
 
 	ProgramHandle textureProgram = loadProgram("Shaders/textured.vert", "Shaders/textured.frag");
 
-	PlaceholderRenderer renderer(lookAtRH(Vec3{ 0, 0, 5 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 }),
+	PlaceholderRenderer renderer(lookAtRH(Vec3{ 0, 0, 10 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 }),
 		perspectiveRH(70, (float)config.width / (float)config.height, 1, 100),
 		Vec3(-5, 3, 5));
 
@@ -247,21 +249,17 @@ int main(int argc, char** argv)
 
 	checkGlError();
 
-	Texture einTex;
-	einTex.load("Textures/ein.png");
-	TextureHandle tex = RenderFrontend::createTexture(createDesc(einTex, ETextureFormat::Tex2D), "tex");
-	
 	while (window.isOpen())
 	{
 		angle += 0.5f;
 
 		renderer.clear();
 
-		//renderMesh.modelMat = Matrix4::rotation(0.f, angle, 0.f);
-		//renderer.submit(renderMesh, program); 
+		renderMesh.modelMat = Matrix4::rotation(0.f, angle, 0.f);
+		renderer.submit(renderMesh, program); 
 
 		//planeMesh.modelMat = Matrix4::rotation(0.f, angle, 0.f);
-		renderer.submit(planeMesh, program);
+		//renderer.submit(planeMesh, textureProgram);
 
 		renderer.render();
 

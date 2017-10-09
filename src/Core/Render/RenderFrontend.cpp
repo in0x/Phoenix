@@ -5,6 +5,7 @@
 #include "CommandBucket.hpp"
 #include "Commands.hpp"
 
+#include "../Logger.hpp"
 #include "../Math/PhiMath.hpp"
 
 #include <memory>
@@ -75,16 +76,15 @@ namespace Phoenix
 			s = nullptr;
 		}
 
-		const UniformInfo& getInfo(UniformHandle handle)
+		const UniformInfo& getInfo(size_t id)
 		{
-			return s->store.get(handle);
+			return s->store.get(id);
 		}
 
 		VertexBufferHandle createVertexBuffer(const VertexBufferFormat& format)
 		{
-			VertexBufferHandle handle = createVertexBufferHandle();
-			handle.idx = s->vertexBuffers++;
-
+			VertexBufferHandle handle = createVertexBufferHandle(s->vertexBuffers++);
+			
 			auto cvb = s->bucket.addCommand<Commands::CreateVertexBuffer>();
 			cvb->format = format;
 			cvb->handle = handle;
@@ -94,9 +94,8 @@ namespace Phoenix
 
 		IndexBufferHandle createIndexBuffer(size_t size, uint32_t count, const void* data)
 		{
-			IndexBufferHandle handle = createIndexBufferHandle();
-			handle.idx = s->indexBuffers++;
-
+			IndexBufferHandle handle = createIndexBufferHandle(s->indexBuffers++);
+			
 			auto cib = s->bucket.addCommand<Commands::CreateIndexBuffer>();
 			cib->size = size;
 			cib->count = count;
@@ -108,8 +107,7 @@ namespace Phoenix
 
 		ShaderHandle createShader(const char* source, EShader::Type shaderType)
 		{
-			ShaderHandle handle = createShaderHandle();
-			handle.idx = s->shaders++;
+			ShaderHandle handle = createShaderHandle(s->shaders++);
 			size_t strLen = strlen(source);
 
 			Commands::CreateShader* cs = s->bucket.addCommand<Commands::CreateShader>(strLen);
@@ -124,9 +122,8 @@ namespace Phoenix
 
 		ProgramHandle createProgram(const EShader::List& shaders)
 		{
-			ProgramHandle handle = createProgramHandle();
-			handle.idx = s->programs++;
-
+			ProgramHandle handle = createProgramHandle(s->programs++);
+			
 			auto createProg = s->bucket.addCommand<Commands::CreateProgram>();
 
 			createProg->shaders = shaders;
@@ -137,10 +134,9 @@ namespace Phoenix
 
 		UniformHandle createUniform(const char* name, EUniform::Type type, const void* data, size_t dataSize)
 		{
-			UniformHandle handle = createUniformHandle();
-			handle.idx = s->uniforms++;
-
-			s->store.create(handle, type, name, data, dataSize);
+			UniformHandle handle = createUniformHandle(s->uniforms++);
+			
+			s->store.create(handle.idx, type, name, data, dataSize);
 
 			if (handle.isValid() && data != nullptr)
 			{
@@ -158,7 +154,7 @@ namespace Phoenix
 				return;
 			}
 			
-			s->store.update(handle, data, dataSize);
+			s->store.update(handle.idx, data, dataSize);
 		}
 
 		size_t uniformMem(const StateGroup& state)
@@ -166,10 +162,51 @@ namespace Phoenix
 			return state.uniformCount * sizeof(UniformInfo);
 		}
 
+		size_t textureMem(const StateGroup& state)
+		{
+			return state.textureCount * sizeof(TextureHandle);
+		}
+
 		size_t resourceMem(const StateGroup& state)
 		{
-			size_t uniforms = uniformMem(state);
-			return uniforms;
+			size_t memory = uniformMem(state);
+			memory += textureMem(state);
+			return memory;
+		}
+
+		char* copyUniforms(char* memory, const StateGroup& state)
+		{
+			for (size_t i = 0; i < state.uniformCount; ++i)
+			{
+				const UniformInfo& info = getInfo(state.uniforms[i].idx);
+				memcpy(memory, &info, sizeof(UniformInfo));
+				memory += sizeof(UniformInfo);
+			}
+
+			return memory;
+		}
+
+		char* copyTextureLocations(char* memory, const StateGroup& state)
+		{
+			for (size_t i = 0; i < state.textureCount; ++i)
+			{
+				const UniformInfo& info = getInfo(state.textures[i].uniformHandle.idx);
+				memcpy(memory, &info, sizeof(UniformInfo));
+				memory += sizeof(UniformInfo);
+			}
+
+			return memory;
+		}
+
+		char* copyTextures(char* memory, const StateGroup& state)
+		{
+			for (size_t i = 0; i < state.textureCount; ++i)
+			{
+				memcpy(memory, &state.textures[i], sizeof(TextureHandle));
+				memory += sizeof(TextureHandle);
+			}
+
+			return memory;
 		}
 
 		void copyState(CStateGroup& cmdState, void* memory, const StateGroup& state)
@@ -180,29 +217,32 @@ namespace Phoenix
 			cmdState.raster = state.raster;
 			cmdState.stencil = state.stencil;
 			cmdState.uniformCount = state.uniformCount;
-			cmdState.uniforms = static_cast<UniformInfo*>(memory);
-			char* writeLocation = reinterpret_cast<char*>(cmdState.uniforms);
+			cmdState.textureCount = state.textureCount;
 
-			for (size_t i = 0; i < state.uniformCount; ++i)
-			{
-				const UniformInfo& info = getInfo(state.uniforms[i]);
-				memcpy(writeLocation, &info, sizeof(UniformInfo));
-				writeLocation += sizeof(UniformInfo);
-			}
+			cmdState.uniforms = static_cast<UniformInfo*>(memory); // NOTE(Phil): There might be a problem here with the pointer being one behind, overwriting the last one
+			char* writeLocation = reinterpret_cast<char*>(memory);
+			writeLocation = copyUniforms(writeLocation, state);
+
+			cmdState.textureLocations = reinterpret_cast<UniformInfo*>(writeLocation);
+			writeLocation = copyTextureLocations(writeLocation, state);
+
+			cmdState.textures = reinterpret_cast<TextureHandle*>(writeLocation);
+			copyTextures(writeLocation, state);
 		}
 
 		TextureHandle createTexture(const TextureDesc& desc, const char* name)
 		{
-			TextureHandle handle = createTextureHandle();
-			handle.idx = s->textures++;
+			TextureHandle handle = createTextureHandle(s->textures++, s->uniforms++);
 			size_t strLen = strlen(name);
 
 			Commands::createTexture* ct = s->bucket.addCommand<Commands::createTexture>(strLen);
 			ct->desc = desc;
-
+			ct->handle = handle;
 			ct->name = commandPacket::getAuxiliaryMemory(ct);
 			memcpy(commandPacket::getAuxiliaryMemory(ct), name, strLen);
 			ct->name[strLen] = '\0';
+
+			s->store.create(handle.uniformHandle.idx, EUniform::Int, name, 0, 0);
 
 			return handle;
 		}

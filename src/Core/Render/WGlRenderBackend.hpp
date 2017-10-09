@@ -82,22 +82,23 @@ namespace Phoenix
 
 		virtual void clearFrameBuffer(FrameBufferHandle handle, EBuffer::Type bitToClear, RGBA clearColor) override;
 
-		virtual void drawLinear(EPrimitive::Type primitive, uint32_t count, uint32_t start) override;
-		virtual void drawIndexed(EPrimitive::Type primitive, uint32_t count, uint32_t start) override;
+		virtual void drawLinear(VertexBufferHandle vertexbuffer, EPrimitive::Type primitive, uint32_t count, uint32_t start) override;
+		virtual void drawIndexed(VertexBufferHandle vertexBuffer, IndexBufferHandle indexBuffer, EPrimitive::Type primitive, uint32_t count, uint32_t start) override;
 
 	private:
 		UniformHandle WGlRenderBackend::addUniform();
 		
 		void registerActiveUniforms(ProgramHandle programHandle);
-		
+
 		void bindUniforms(ProgramHandle boundProgram, const UniformInfo* uniforms, size_t count);
+		void bindTexture(const GlUniform& uniform, const GlTexture& texture);
+		void bindTextures(ProgramHandle boundProgram, const UniformInfo* locations, const TextureHandle* handles, size_t count);
+		void setUniformImpl(const GlUniform& uniform, const void* data);
+		decltype(UniformHandle::idx) getUniform(ProgramHandle boundProgram, const UniformInfo& info) const;
 
 		void initBasic(const WGlRenderInit& initValues);
-		
 		void initGlew();
-
 		void checkMsaaSupport(const WGlRenderInit& initValues);
-		
 		void initWithMSAA(const WGlRenderInit& initValues);
 
 		void setVertexBuffer(VertexBufferHandle vb);
@@ -107,6 +108,7 @@ namespace Phoenix
 		void setRaster(ERaster::Type raster);
 		void setBlend(EBlend::Type blend);
 		void setStencil(EStencil::Type stencil);
+
 		GlVertexBuffer m_vertexBuffers[VertexBufferHandle::maxValue()];
 		GlIndexBuffer m_indexBuffers[IndexBufferHandle::maxValue()];
 		GlShader m_shaders[ShaderHandle::maxValue()];
@@ -121,5 +123,6 @@ namespace Phoenix
 		HDC m_deviceContext;
 		size_t m_uniformCount;
 		uint8_t m_msaaSupport;
+		uint8_t m_activeTextures;
 	};
 }
