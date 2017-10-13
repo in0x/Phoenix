@@ -230,19 +230,19 @@ namespace Phoenix
 			copyTextures(writeLocation, state);
 		}
 
-		TextureHandle createTexture(const TextureDesc& desc, const char* name)
+		TextureHandle createTexture(const TextureDesc& desc, const char* samplerName)
 		{
 			TextureHandle handle = createTextureHandle(s->textures++, s->uniforms++);
-			size_t strLen = strlen(name);
+			size_t strLen = strlen(samplerName);
 
 			Commands::createTexture* ct = s->bucket.addCommand<Commands::createTexture>(strLen);
 			ct->desc = desc;
 			ct->handle = handle;
 			ct->name = commandPacket::getAuxiliaryMemory(ct);
-			memcpy(commandPacket::getAuxiliaryMemory(ct), name, strLen);
+			memcpy(commandPacket::getAuxiliaryMemory(ct), samplerName, strLen);
 			ct->name[strLen] = '\0';
 
-			s->store.create(handle.uniformHandle.idx, EUniform::Int, name, 0, 0);
+			s->store.create(handle.uniformHandle.idx, EUniform::Int, samplerName, 0, 0);
 
 			return handle;
 		}
