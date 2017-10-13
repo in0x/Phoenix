@@ -21,23 +21,24 @@ CURRENT TASK:
 
 TODO:
 * Crashes when closed by closing window via taskbar
-* Implement Textures
 * Implement FrameBuffers
 * Implement dynamic array -> I'm not using that many vectors so this isn't very high prio.
 * Provide default stategroup and ensure that it works
-* Provide printf style logging
 * Figure out how overall memory acquisition will work
 * Input
 * Moveable camera
 * Standardized preamble for each log: TIME | SEVERITY | -> msg
 * I should startup glew independently of the backend
-
+* Add sparse array to shaderlist that tells us which shaders have been set
 * The sort keys are produced by the system that inserts into the buckets, i.e. the mesherenderer,
 * uirenderer etc. This allows them to all use a different pattern. The bucket then just does a
 * transparent sort based on the bits in the key.
 
 * The solution to being stateless is really just to set everything that isnt specified
 * to a default
+
+* Directly interpreting commands with OpenGL/DX might be more flexible (instead of using the IRenderBackend interface)
+
 */
 
 namespace Phoenix
@@ -66,7 +67,7 @@ namespace Phoenix
 		layout.add({ EAttributeProperty::Position, EAttributeType::Float, 3, },
 		{ sizeof(Vec3), 4, &vertices });
 
-		layout.add({ EAttributeProperty::TexCoord, EAttributeType::Float, 2 }, // My tex coords dont end up in the shader
+		layout.add({ EAttributeProperty::TexCoord, EAttributeType::Float, 2 }, 
 		{ sizeof(Vec2), 4, &uv });
 
 		mesh.vb = RenderFrontend::createVertexBuffer(layout);
@@ -111,7 +112,7 @@ namespace Phoenix
 		{ sizeof(Vec3), mesh.normals.size(), mesh.normals.data() });
 
 		renderMesh.vb = RenderFrontend::createVertexBuffer(layout);
-		renderMesh.ib = RenderFrontend::createIndexBuffer(sizeof(unsigned int), mesh.indices.size(), mesh.indices.data());
+		renderMesh.ib = RenderFrontend::createIndexBuffer(sizeof(uint32_t), mesh.indices.size(), mesh.indices.data());
 		renderMesh.modelMatHandle = RenderFrontend::createUniform("modelTf", EUniform::Mat4, &renderMesh.modelMat, sizeof(Matrix4));
 
 		renderMesh.numVertices = mesh.vertices.size();
@@ -122,9 +123,9 @@ namespace Phoenix
 		return renderMesh;
 	}
 
-	TextureDesc createDesc(const Texture& texture, ETexture::Format format)
+	ETexture::Description createDesc(const Texture& texture, ETexture::Filter minFilter, ETexture::Filter maxFilter)
 	{
-		TextureDesc desc;
+		ETexture::Description desc;
 		desc.width = texture.m_width;
 		desc.height = texture.m_height;
 
@@ -139,12 +140,11 @@ namespace Phoenix
 		case 1:
 		{ desc.components = ETexture::R; } break;
 		default: { assert(false); } break;
-			// I guess depth is user decided?
+		// TODO(Phil): How do we handle depth?
 		}
 
-		desc.format = format;
-		desc.data = texture.m_data;
-		desc.bitsPerPixel = 8 * texture.m_components;
+		desc.minFilter = minFilter;
+		desc.magFilter = maxFilter;
 
 		// Mips?
 		return desc;
@@ -184,9 +184,7 @@ int main(int argc, char** argv)
 	WGlRenderInit renderInit(window.getNativeHandle(), 4);
 	RenderFrontend::init(&renderInit);
 
-	RenderMesh renderMesh = loadRenderMesh(*fox);
 	RenderMesh planeMesh = createPlaneMesh();
-	//ProgramHandle program = loadProgram("Shaders/diffuse.vert", "Shaders/diffuse.frag");
 	ProgramHandle program = loadProgram("Shaders/textured.vert", "Shaders/textured.frag");
 
 	UniformHandle viewMat = RenderFrontend::createUniform("viewTf", EUniform::Mat4, &lookAtRH(Vec3{ 0, 0, 2 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 }), sizeof(Matrix4));
@@ -195,13 +193,8 @@ int main(int argc, char** argv)
 
 	Texture einTex;
 	einTex.load("Textures/ein.png");
-
-	Texture doomTex;
-	doomTex.load("Textures/doom.jpg");
-
-	TextureHandle ein = RenderFrontend::createTexture(createDesc(einTex, ETexture::Tex2D), "tex");
-	TextureHandle doom = RenderFrontend::createTexture(createDesc(doomTex, ETexture::Tex2D), "tex2");
-
+	TextureHandle ein = RenderFrontend::createTexture(createDesc(einTex, ETexture::Linear, ETexture::Linear), einTex.m_data, ETexture::Tex2D, "tex");
+	
 	float angle = 0.f;
 
 	checkGlError();
@@ -213,9 +206,6 @@ int main(int argc, char** argv)
 		RenderFrontend::clearFrameBuffer({}, EBuffer::Color, { 0.f, 0.f, 0.f, 1.f });
 		RenderFrontend::clearFrameBuffer({}, EBuffer::Depth, {});
 		RenderFrontend::submitCommands();
-
-		//renderMesh.modelMat = Matrix4::rotation(0.f, angle, 0.f);
-		//renderer.submit(renderMesh, program); 
 
 		planeMesh.modelMat = Matrix4::rotation(0.f, angle, 0.f);
 
@@ -229,9 +219,9 @@ int main(int argc, char** argv)
 		state.uniforms = uniforms;
 		state.uniformCount = 3;
 
-		TextureHandle textures[] = { ein, doom };
+		TextureHandle textures[] = { ein };
 		state.textures = textures;
-		state.textureCount = 2;
+		state.textureCount = 1;
 
 		RenderFrontend::drawIndexed(planeMesh.vb, planeMesh.ib, EPrimitive::Triangles, 0, planeMesh.numIndices, state);
 
@@ -246,4 +236,5 @@ int main(int argc, char** argv)
 
 	return 0;
 }
+
 

@@ -445,28 +445,37 @@ namespace Phoenix
 			DEPTH
 		};
 
-		enum MinFilter
+		enum Filter
 		{
 			Nearest,
-			Linear,
-			NearestMipMapNearest, // NOTE(Phil): These will probably change again when i implement mipmaps
-			NearestMipMapLinear,
-			LinearMipMapLinear,
-			LinearMipMapNearest
+			Linear
+		};
+		
+		struct Description
+		{
+			uint32_t width;
+			uint32_t height;
+			Components components;
+			Filter minFilter;
+			Filter magFilter;
+			uint8_t numMips;
+		};
+
+		struct CubemapData
+		{
+			enum Side
+			{
+				Right, // xpos
+				Left,  // xneg
+				Up,    // ypos
+				Down,  // yneg
+				Back,  // zpos
+				Front  // zneg
+			};
+
+			const void* data[6];
 		};
 	}
-
-	struct TextureDesc
-	{
-		const void* data;
-		uint32_t width;
-		uint32_t height;
-		ETexture::Format format;
-		ETexture::Components components;
-		uint16_t depth;             
-		uint8_t numMips;            
-		uint8_t bitsPerPixel;       
-	};
 
 	struct RGBA
 	{

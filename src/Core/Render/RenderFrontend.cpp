@@ -59,6 +59,7 @@ namespace Phoenix
 		void init(RenderInit* renderInit)
 		{
 			s = std::make_unique<Members>(renderInit);
+			Logger::log(std::to_string(sizeof(Commands::DrawIndexed)).c_str());
 		}
 
 		void submitCommands()
@@ -219,7 +220,7 @@ namespace Phoenix
 			cmdState.uniformCount = state.uniformCount;
 			cmdState.textureCount = state.textureCount;
 
-			cmdState.uniforms = static_cast<UniformInfo*>(memory); // NOTE(Phil): There might be a problem here with the pointer being one behind, overwriting the last one
+			cmdState.uniforms = static_cast<UniformInfo*>(memory); 
 			char* writeLocation = reinterpret_cast<char*>(memory);
 			writeLocation = copyUniforms(writeLocation, state);
 
@@ -230,19 +231,47 @@ namespace Phoenix
 			copyTextures(writeLocation, state);
 		}
 
-		TextureHandle createTexture(const TextureDesc& desc, const char* samplerName)
+		TextureHandle createTexture(const ETexture::Description& desc, ETexture::Format format, const char* samplerName)
 		{
 			TextureHandle handle = createTextureHandle(s->textures++, s->uniforms++);
 			size_t strLen = strlen(samplerName);
 
-			Commands::createTexture* ct = s->bucket.addCommand<Commands::createTexture>(strLen);
+			auto ct = s->bucket.addCommand<Commands::createTexture>(strLen);
 			ct->desc = desc;
 			ct->handle = handle;
 			ct->name = commandPacket::getAuxiliaryMemory(ct);
+			ct->format = format;
 			memcpy(commandPacket::getAuxiliaryMemory(ct), samplerName, strLen);
 			ct->name[strLen] = '\0';
 
 			s->store.create(handle.uniformHandle.idx, EUniform::Int, samplerName, 0, 0);
+
+			return handle;
+		}
+
+		TextureHandle createTexture(const ETexture::Description& desc, const void* data, ETexture::Format format, const char* samplerName)
+		{
+			TextureHandle handle = createTexture(desc, format, samplerName);
+			
+			auto ut = s->bucket.addCommand<Commands::UploadTexture>();
+			ut->data = data;
+			ut->handle = handle;
+			ut->width = desc.width;
+			ut->height = desc.height;
+
+			return handle;
+		}
+
+		TextureHandle createCubemap(const ETexture::Description& desc, const char* samplerName, const ETexture::CubemapData& cubemap)
+		{
+			TextureHandle handle = createTexture(desc, ETexture::CubeMap, samplerName);
+
+			auto ut = s->bucket.addCommand<Commands::UploadCubemap>();
+
+			ut->data = cubemap;
+			ut->handle = handle;
+			ut->width = desc.width;
+			ut->height = desc.height;
 
 			return handle;
 		}

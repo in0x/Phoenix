@@ -56,7 +56,23 @@ namespace Phoenix
 		void textureCreate(IRenderBackend* rc, const void* command)
 		{
 			auto dc = static_cast<const Commands::createTexture*>(command);
-			rc->createTexture(dc->handle, dc->desc, dc->name);
+			rc->createTexture(dc->handle, dc->format, dc->desc, dc->name);
+		}
+
+		void textureUpload(IRenderBackend* rc, const void* command)
+		{
+			auto dc = static_cast<const Commands::UploadTexture*>(command);
+			rc->uploadTextureData(dc->handle, dc->data, dc->width, dc->height);
+		}
+
+		void cubemapUpload(IRenderBackend* rc, const void* command)
+		{
+			auto dc = static_cast<const Commands::UploadCubemap*>(command);
+
+			for (size_t i = 0; i < 6; ++i)
+			{
+				rc->uploadTextureData(dc->handle, dc->data.data[i], dc->width, dc->height);
+			}
 		}
 	}
 
@@ -68,4 +84,6 @@ namespace Phoenix
 	const SubmitFptr Commands::CreateShader::SubmitFunc = SubmitFunctions::shaderCreate;
 	const SubmitFptr Commands::CreateProgram::SubmitFunc = SubmitFunctions::programCreate;
 	const SubmitFptr Commands::createTexture::SubmitFunc = SubmitFunctions::textureCreate;
+	const SubmitFptr Commands::UploadTexture::SubmitFunc = SubmitFunctions::textureUpload;
+	const SubmitFptr Commands::UploadCubemap::SubmitFunc = SubmitFunctions::cubemapUpload;
 }

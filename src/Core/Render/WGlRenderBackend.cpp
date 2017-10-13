@@ -495,7 +495,7 @@ namespace Phoenix
 			}
 			else
 			{
-				Logger::error("Trying to access invalid shader");
+				Logger::error("Trying to access shader that has not been set.");
 			}
 
 			typeCount++;
@@ -525,20 +525,59 @@ namespace Phoenix
 		return glComponents[components];
 	}
 
-	void WGlRenderBackend::createTexture(TextureHandle handle, const TextureDesc& description, const char* name)
+	GLenum toGlFilter(ETexture::Filter filter)
+	{
+		static GLenum glFilters[] = { GL_NEAREST, GL_LINEAR };
+		return glFilters[filter];
+	}
+
+	// Call this once for normal textures, 6 times for cubemaps (with same texturehandle)
+	void WGlRenderBackend::uploadTextureData(TextureHandle handle, const void* data, uint32_t width, uint32_t height) 
+	{
+		GlTexture& tex = m_textures[handle.textureIdx];
+		tex.m_dataType = GL_UNSIGNED_BYTE;
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(tex.m_format, tex.m_id);
+
+		glTexImage2D(tex.m_format,
+			0,
+			tex.m_components,
+			width, height,
+			0,
+			tex.m_components,
+			tex.m_dataType,
+			data);
+
+		//if (desc.format == ETexture::CubeMap)
+		//{
+		//	for (GLuint face = 0; face < 6; ++face)
+		//	{
+		//		/*glTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face,
+		//		0,
+		//		0, 0,
+		//		desc.width, desc.height,
+		//		components, GL_UNSIGNED_BYTE,
+		//		desc.data + face * );*/
+		//	}
+		//}
+	}
+
+	void WGlRenderBackend::createTexture(TextureHandle handle, ETexture::Format format, const ETexture::Description& desc, const char* name)
 	{
 		GlTexture& tex = m_textures[handle.textureIdx];
 
-		GLenum format = toGlFormat(description.format);
-		GLenum components = toGlComponents(description.components);
+		GLenum eformat = toGlFormat(format);
+		GLenum ecomponents = toGlComponents(desc.components);
 		
-		tex.m_format = format;
+		tex.m_format = eformat;
+		tex.m_components = ecomponents;
 
 		glGenTextures(1, &tex.m_id);
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(format, tex.m_id);
+		glBindTexture(eformat, tex.m_id);
 
-		if (description.width % 2 == 0)
+		if (desc.width % 2 == 0)
 		{
 			glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 		}
@@ -547,19 +586,16 @@ namespace Phoenix
 			glPixelStorei(GL_UNPACK_ALIGNMENT, 1); 
 		}
 
-		glTexImage2D(format,
-					0,
-					components,
-					description.width, description.height,
-					0,
-					components,
-					GL_UNSIGNED_BYTE,
-					description.data);
+		glTexParameterf(eformat, GL_TEXTURE_MAG_FILTER, toGlFilter(desc.magFilter));
+		glTexParameterf(eformat, GL_TEXTURE_MIN_FILTER, toGlFilter(desc.minFilter));
 
-		glTexParameteri(format, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); // TODO(Phil): Implement Abstraction for this
-		glTexParameteri(format, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexParameterf(format, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameterf(format, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(eformat, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); 
+		glTexParameteri(eformat, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); 
+		
+		if (eformat > ETexture::Tex2D)
+		{
+			glTexParameterf(eformat, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+		}
 	}
 
 	void WGlRenderBackend::createFrameBuffer()
