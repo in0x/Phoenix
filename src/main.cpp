@@ -149,57 +149,6 @@ namespace Phoenix
 		// Mips?
 		return desc;
 	}
-
-	class PlaceholderRenderer
-	{
-	public:
-		PlaceholderRenderer(const Matrix4& view, const Matrix4& projection, const Vec3& lightPos)
-			: m_viewMat(RenderFrontend::createUniform("viewTf", EUniform::Mat4, &view, sizeof(Matrix4)))
-			, m_projectionMat(RenderFrontend::createUniform("projectionTf", EUniform::Mat4, &projection, sizeof(Matrix4)))
-			, m_lightPos(RenderFrontend::createUniform("lightPosition", EUniform::Vec3, &lightPos, sizeof(Vec3)))
-		{
-			m_einTex.load("Textures/ein.png");
-			m_tex = RenderFrontend::createTexture(createDesc(m_einTex, ETexture::Tex2D), "tex");
-		}
-
-		void submit(const RenderMesh& mesh, ProgramHandle program)
-		{
-			RenderFrontend::setUniform(mesh.modelMatHandle, &mesh.modelMat, sizeof(Matrix4));
-
-			StateGroup state;
-			state.program = program;
-			state.depth = EDepth::Enable;
-
-			UniformHandle uniforms[] = { mesh.modelMatHandle, m_viewMat, m_projectionMat };
-			state.uniforms = uniforms;
-			state.uniformCount = 3;
-
-			TextureHandle textures[] = { m_tex };
-			state.textures = textures;
-			state.textureCount = 1;
-
-			RenderFrontend::drawIndexed(mesh.vb, mesh.ib, EPrimitive::Triangles, 0, mesh.numIndices, state);
-		}
-
-		void clear()
-		{
-			RenderFrontend::clearFrameBuffer({}, EBuffer::Color, { 0.f, 0.f, 0.f, 1.f });
-			RenderFrontend::clearFrameBuffer({}, EBuffer::Depth, {});
-			RenderFrontend::submitCommands();
-		}
-
-		void render()
-		{
-			RenderFrontend::submitCommands();
-			RenderFrontend::swapBuffers();
-		}
-
-		UniformHandle m_viewMat;
-		UniformHandle m_projectionMat;
-		UniformHandle m_lightPos;
-		Texture m_einTex;
-		TextureHandle m_tex;
-	};
 }
 
 int main(int argc, char** argv)
@@ -237,13 +186,21 @@ int main(int argc, char** argv)
 
 	RenderMesh renderMesh = loadRenderMesh(*fox);
 	RenderMesh planeMesh = createPlaneMesh();
-	ProgramHandle program = loadProgram("Shaders/diffuse.vert", "Shaders/diffuse.frag");
+	//ProgramHandle program = loadProgram("Shaders/diffuse.vert", "Shaders/diffuse.frag");
+	ProgramHandle program = loadProgram("Shaders/textured.vert", "Shaders/textured.frag");
 
-	ProgramHandle textureProgram = loadProgram("Shaders/textured.vert", "Shaders/textured.frag");
+	UniformHandle viewMat = RenderFrontend::createUniform("viewTf", EUniform::Mat4, &lookAtRH(Vec3{ 0, 0, 2 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 }), sizeof(Matrix4));
+	UniformHandle projectionMat = RenderFrontend::createUniform("projectionTf", EUniform::Mat4, &perspectiveRH(70, (float)config.width / (float)config.height, 1, 100), sizeof(Matrix4));
+	UniformHandle lightPos = RenderFrontend::createUniform("lightPosition", EUniform::Vec3, &Vec3(-5, 3, 5), sizeof(Vec3));
 
-	PlaceholderRenderer renderer(lookAtRH(Vec3{ 0, 0, 10 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 }),
-		perspectiveRH(70, (float)config.width / (float)config.height, 1, 100),
-		Vec3(-5, 3, 5));
+	Texture einTex;
+	einTex.load("Textures/ein.png");
+
+	Texture doomTex;
+	doomTex.load("Textures/doom.jpg");
+
+	TextureHandle ein = RenderFrontend::createTexture(createDesc(einTex, ETexture::Tex2D), "tex");
+	TextureHandle doom = RenderFrontend::createTexture(createDesc(doomTex, ETexture::Tex2D), "tex2");
 
 	float angle = 0.f;
 
@@ -253,15 +210,33 @@ int main(int argc, char** argv)
 	{
 		angle += 0.5f;
 
-		renderer.clear();
+		RenderFrontend::clearFrameBuffer({}, EBuffer::Color, { 0.f, 0.f, 0.f, 1.f });
+		RenderFrontend::clearFrameBuffer({}, EBuffer::Depth, {});
+		RenderFrontend::submitCommands();
 
-		renderMesh.modelMat = Matrix4::rotation(0.f, angle, 0.f);
-		renderer.submit(renderMesh, program); 
+		//renderMesh.modelMat = Matrix4::rotation(0.f, angle, 0.f);
+		//renderer.submit(renderMesh, program); 
 
-		//planeMesh.modelMat = Matrix4::rotation(0.f, angle, 0.f);
-		//renderer.submit(planeMesh, textureProgram);
+		planeMesh.modelMat = Matrix4::rotation(0.f, angle, 0.f);
 
-		renderer.render();
+		RenderFrontend::setUniform(planeMesh.modelMatHandle, &planeMesh.modelMat, sizeof(Matrix4));
+
+		StateGroup state;
+		state.program = program;
+		state.depth = EDepth::Enable;
+
+		UniformHandle uniforms[] = { planeMesh.modelMatHandle, viewMat, projectionMat };
+		state.uniforms = uniforms;
+		state.uniformCount = 3;
+
+		TextureHandle textures[] = { ein, doom };
+		state.textures = textures;
+		state.textureCount = 2;
+
+		RenderFrontend::drawIndexed(planeMesh.vb, planeMesh.ib, EPrimitive::Triangles, 0, planeMesh.numIndices, state);
+
+		RenderFrontend::submitCommands();
+		RenderFrontend::swapBuffers();
 
 		window.processMessages();
 	}
