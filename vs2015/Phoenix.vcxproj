@@ -183,8 +183,6 @@
     <ClInclude Include="..\src\Core\Memory\MemUtil.hpp" />
     <ClInclude Include="..\src\Core\Memory\PoolAllocator.hpp" />
     <ClInclude Include="..\src\Core\Memory\StackAllocator.hpp" />
-    <ClInclude Include="..\src\Core\ObjIndexer.hpp" />
-    <ClInclude Include="..\src\Core\ObjStructs.hpp" />
     <ClInclude Include="..\src\Core\OpenGL.hpp" />
     <ClInclude Include="..\src\Core\Render\CommandPacket.hpp" />
     <ClInclude Include="..\src\Core\Render\Commands.hpp" />
@@ -236,7 +234,6 @@
     <ClCompile Include="..\src\Core\Memory\PoolAllocator.cpp" />
     <ClCompile Include="..\src\Core\Memory\StackAllocator.cpp" />
     <ClCompile Include="..\src\Core\obj.cpp" />
-    <ClCompile Include="..\src\Core\ObjIndexer.cpp" />
     <ClCompile Include="..\src\Core\OpenGL.cpp" />
     <ClCompile Include="..\src\Core\Render\CommandPacket.cpp" />
     <ClCompile Include="..\src\Core\Render\Commands.cpp" />

@@ -1,27 +1,233 @@
 #include "obj.hpp"
+
 #include <functional>
 #include <cassert>
-#include "StringTokenizer.hpp"
-#include "ObjStructs.hpp"
-#include "Logger.hpp"
 #include <map>
-#include "ObjIndexer.hpp"
 
-/*
-	* TODO
-	* Rearrange data so that we can actually use an index buffer -> DONE
-	* Transform quad faces into two triangles -> DONE
-	* Support parsing indices and values (f: 1.000/... vs f: -23/...) -> DONE
-	* Make remapping run fast -> DONE
-	* Handle normals / uvs being able to be missing -> DONE
-	* Fix materials not being loaded (file is acting weird) -> DONE
-	* Trailing newline fucks face parsing up -> DONE
-	* Try using unordered_map (hashtable) -> Amortized O(1) access might be faster than tree
-	* Try to keep structs used for parsing seperate from the ones that are returned so that we can make them private
-*/
+#include "StringTokenizer.hpp"
+#include "Math/PhiMath.hpp"
+#include "Logger.hpp"
 
 namespace Phoenix
 {
+	struct Face
+	{
+		int vertexIndices[3];
+		int normalIndices[3];
+		int uvIndices[3];
+	};
+
+	struct ObjData
+	{
+		std::vector<Vec3> vertices;
+		std::vector<Vec2> uvs;
+		std::vector<Vec3> normals;
+		std::vector<Face> faces;
+		std::vector<MTL> materials;
+		bool bSmoothShading;
+	};
+
+	class ObjIndexer
+	{
+		struct PackedVertexData
+		{
+			Vec3 vertex;
+			Vec3 normal;
+			Vec2 uv;
+
+			bool operator<(const PackedVertexData rhv) const
+			{
+				return memcmp((void*)this, (void*)&rhv, sizeof(PackedVertexData)) > 0;
+			};
+		};
+
+		std::map<PackedVertexData, unsigned int> packed;
+		std::unique_ptr<Mesh> pConvertedMesh;
+
+	public:
+		std::unique_ptr<Mesh> convertForOpenGL(ObjData* loaded);
+
+	private:
+		void(ObjIndexer::*toPacked)(PackedVertexData*, const Face&, const ObjData*);
+		void(ObjIndexer::*addData)(const PackedVertexData&);
+
+		bool doesDataExist(const PackedVertexData& data, unsigned int& outIndex);
+
+		void toPackedV(PackedVertexData* dataArr, const Face& face, const ObjData* loaded);
+		void toPackedVN(PackedVertexData* dataArr, const Face& face, const ObjData* loaded);
+		void toPackedVT(PackedVertexData* dataArr, const Face& face, const ObjData* loaded);
+		void toPackedVTN(PackedVertexData* dataArr, const Face& face, const ObjData* loaded);
+
+		void addV(const PackedVertexData& data);
+		void addVN(const PackedVertexData& data);
+		void addVT(const PackedVertexData& data);
+		void addVTN(const PackedVertexData& data);
+
+		void addDataAndIndex(const PackedVertexData& data);
+	};
+
+	std::unique_ptr<Mesh> ObjIndexer::convertForOpenGL(ObjData* loaded)
+	{
+		pConvertedMesh = std::make_unique<Mesh>();
+		pConvertedMesh->materials.swap(loaded->materials);
+		pConvertedMesh->bSmoothShading = loaded->bSmoothShading;
+
+		bool bHasVertices = loaded->vertices.size() > 0;
+		assert(bHasVertices);
+		bool bHasNormals = loaded->normals.size() > 0;
+		bool bHasUVs = loaded->uvs.size() > 0;
+
+		if (bHasVertices & bHasNormals & bHasUVs)
+		{
+			toPacked = &ObjIndexer::toPackedVTN;
+			addData = &ObjIndexer::addVTN;
+		}
+		else if (bHasVertices & bHasNormals & !bHasUVs)
+		{
+			toPacked = &ObjIndexer::toPackedVN;
+			addData = &ObjIndexer::addVN;
+		}
+		else if (bHasVertices & bHasUVs & !bHasNormals)
+		{
+			toPacked = &ObjIndexer::toPackedVT;
+			addData = &ObjIndexer::addVT;
+		}
+		else // bHasVertices & !bHasNormals & !bHasUVs 
+		{
+			toPacked = &ObjIndexer::toPackedV;
+			addData = &ObjIndexer::addV;
+		}
+
+		size_t vertexCount = pConvertedMesh->vertices.size();
+		pConvertedMesh->vertices.reserve(vertexCount);
+
+		if (loaded->normals.size() > 0)
+		{
+			pConvertedMesh->normals.reserve(vertexCount);
+		}
+
+		if (loaded->normals.size() > 0)
+		{
+			pConvertedMesh->uvs.reserve(vertexCount);
+		}
+
+		for (const Face& face : loaded->faces)
+		{
+			PackedVertexData packedVertices[3];
+			(this->*toPacked)(packedVertices, face, loaded);
+
+			for (const auto& data : packedVertices)
+			{
+				unsigned int index;
+				bool bDataExists = doesDataExist(data, index);
+
+				if (bDataExists)
+				{
+					pConvertedMesh->indices.push_back(index);
+				}
+				else
+				{
+					addDataAndIndex(data);
+				}
+			}
+		}
+
+		return std::move(pConvertedMesh);
+	}
+
+	bool ObjIndexer::doesDataExist(const PackedVertexData& data, unsigned int& outIndex)
+	{
+		auto iter = packed.find(data);
+
+		if (iter == packed.end())
+		{
+			return false;
+		}
+		else {
+			outIndex = iter->second;
+			return true;
+		}
+	}
+
+	void ObjIndexer::toPackedV(PackedVertexData* dataArr, const Face& face, const ObjData* loaded)
+	{
+		dataArr[0].vertex = loaded->vertices[face.vertexIndices[0]];
+		dataArr[1].vertex = loaded->vertices[face.vertexIndices[1]];
+		dataArr[2].vertex = loaded->vertices[face.vertexIndices[2]];
+	}
+
+	void ObjIndexer::toPackedVN(PackedVertexData* dataArr, const Face& face, const ObjData* loaded)
+	{
+		dataArr[0].vertex = loaded->vertices[face.vertexIndices[0]];
+		dataArr[0].normal = loaded->normals[face.normalIndices[0]];
+
+		dataArr[1].vertex = loaded->vertices[face.vertexIndices[1]];
+		dataArr[1].normal = loaded->normals[face.normalIndices[1]];
+
+		dataArr[2].vertex = loaded->vertices[face.vertexIndices[2]];
+		dataArr[2].normal = loaded->normals[face.normalIndices[2]];
+	}
+
+	void ObjIndexer::toPackedVT(PackedVertexData* dataArr, const Face& face, const ObjData* loaded)
+	{
+		dataArr[0].vertex = loaded->vertices[face.vertexIndices[0]];
+		dataArr[0].uv = loaded->uvs[face.uvIndices[0]];
+
+		dataArr[1].vertex = loaded->vertices[face.vertexIndices[1]];
+		dataArr[1].uv = loaded->uvs[face.uvIndices[1]];
+
+		dataArr[2].vertex = loaded->vertices[face.vertexIndices[2]];
+		dataArr[2].uv = loaded->uvs[face.uvIndices[2]];
+	}
+
+	void ObjIndexer::toPackedVTN(PackedVertexData* dataArr, const Face& face, const ObjData* loaded)
+	{
+		dataArr[0].vertex = loaded->vertices[face.vertexIndices[0]];
+		dataArr[0].normal = loaded->normals[face.normalIndices[0]];
+		dataArr[0].uv = loaded->uvs[face.uvIndices[0]];
+
+		dataArr[1].vertex = loaded->vertices[face.vertexIndices[1]];
+		dataArr[1].normal = loaded->normals[face.normalIndices[1]];
+		dataArr[1].uv = loaded->uvs[face.uvIndices[1]];
+
+		dataArr[2].vertex = loaded->vertices[face.vertexIndices[2]];
+		dataArr[2].normal = loaded->normals[face.normalIndices[2]];
+		dataArr[2].uv = loaded->uvs[face.uvIndices[2]];
+	}
+
+	void ObjIndexer::addV(const PackedVertexData& data)
+	{
+		pConvertedMesh->vertices.push_back(data.vertex);
+	}
+
+	void ObjIndexer::addVN(const PackedVertexData& data)
+	{
+		pConvertedMesh->vertices.push_back(data.vertex);
+		pConvertedMesh->normals.push_back(data.normal);
+	}
+
+	void ObjIndexer::addVT(const PackedVertexData& data)
+	{
+		pConvertedMesh->vertices.push_back(data.vertex);
+		pConvertedMesh->uvs.push_back(data.uv);
+	}
+
+	void ObjIndexer::addVTN(const PackedVertexData& data)
+	{
+		pConvertedMesh->vertices.push_back(data.vertex);
+		pConvertedMesh->normals.push_back(data.normal);
+		pConvertedMesh->uvs.push_back(data.uv);
+	}
+
+	void ObjIndexer::addDataAndIndex(const PackedVertexData& data)
+	{
+		(this->*addData)(data);
+
+		unsigned int index = static_cast<unsigned int>(packed.size());
+		packed[data] = index;
+		pConvertedMesh->indices.push_back(index);
+	}
+
 	class ObjParser
 	{
 	public:	

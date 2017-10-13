@@ -58,12 +58,6 @@
     <ClInclude Include="..\src\Core\Math\MathStreamOverloads.hpp">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Core\ObjIndexer.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Core\ObjStructs.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Core\StringTokenizer.hpp">
       <Filter>Core</Filter>
     </ClInclude>
@@ -170,9 +164,6 @@
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Core\StringTokenizer.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Core\ObjIndexer.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Core\Logger.cpp">
