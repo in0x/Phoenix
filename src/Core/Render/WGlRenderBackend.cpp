@@ -466,7 +466,6 @@ namespace Phoenix
 
 		if (getAndLogShaderLog(shader.m_id))
 		{
-			// NOTE(Phil): Set handle invalid. Use references for handles.
 			assert(false);
 		}
 	}
