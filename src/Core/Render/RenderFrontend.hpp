@@ -24,9 +24,9 @@ namespace Phoenix
 
 		UniformHandle createUniform(const char* name, EUniform::Type type, const void* data = nullptr, size_t dataSize = 0);
 
-		TextureHandle createTexture(const ETexture::Description& desc, const void* data, ETexture::Format format, const char* samplerName);
+		TextureHandle createTexture(const TextureDesc& desc, const void* data, ETexture::Format format, const char* samplerName);
 
-		TextureHandle createCubemap(const ETexture::Description& desc, const char* samplerName, const ETexture::CubemapData& cubemap);
+		TextureHandle createCubemap(const TextureDesc& desc, const char* samplerName, const CubemapData& cubemap);
 
 		void setUniform(UniformHandle handle, const void* data, size_t dataSize);
 

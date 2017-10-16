@@ -249,7 +249,7 @@ namespace Phoenix
 			return handle;
 		}
 
-		TextureHandle createTexture(const ETexture::Description& desc, const void* data, ETexture::Format format, const char* samplerName)
+		TextureHandle createTexture(const TextureDesc& desc, const void* data, ETexture::Format format, const char* samplerName)
 		{
 			TextureHandle handle = createTexture(desc, format, samplerName);
 			
@@ -262,7 +262,7 @@ namespace Phoenix
 			return handle;
 		}
 
-		TextureHandle createCubemap(const ETexture::Description& desc, const char* samplerName, const ETexture::CubemapData& cubemap)
+		TextureHandle createCubemap(const TextureDesc& desc, const char* samplerName, const CubemapData& cubemap)
 		{
 			TextureHandle handle = createTexture(desc, ETexture::CubeMap, samplerName);
 

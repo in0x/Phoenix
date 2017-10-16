@@ -95,7 +95,7 @@ namespace Phoenix
 		{
 			SUBMITTABLE();
 
-			ETexture::Description desc;
+			TextureDesc desc;
 			char* name;
 			ETexture::Format format;
 			TextureHandle handle;
@@ -115,7 +115,7 @@ namespace Phoenix
 		{
 			SUBMITTABLE();
 			
-			ETexture::CubemapData data;
+			CubemapData data;
 			uint32_t width;
 			uint32_t height;
 			TextureHandle handle;

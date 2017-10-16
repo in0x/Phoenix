@@ -76,7 +76,7 @@ namespace Phoenix
 		virtual void createIndexBuffer(IndexBufferHandle handle, size_t size, uint32_t count, const void* data) override;
 		virtual void createShader(ShaderHandle handle, const char* source, EShader::Type shaderType) override;
 		virtual void createProgram(ProgramHandle handle, const EShader::List& shaders) override;
-		virtual void createTexture(TextureHandle handle, ETexture::Format format, const ETexture::Description& description, const char* name) override;
+		virtual void createTexture(TextureHandle handle, ETexture::Format format, const TextureDesc& description, const char* name) override;
 		virtual void uploadTextureData(TextureHandle handle, const void* data, uint32_t width, uint32_t height) override;
 		virtual void createFrameBuffer() override;
 		virtual void createUniform(UniformHandle& uniformHandle, const char* name, EUniform::Type type) override;

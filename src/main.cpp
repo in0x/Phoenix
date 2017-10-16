@@ -123,9 +123,9 @@ namespace Phoenix
 		return renderMesh;
 	}
 
-	ETexture::Description createDesc(const Texture& texture, ETexture::Filter minFilter, ETexture::Filter maxFilter)
+	TextureDesc createDesc(const Texture& texture, ETexture::Filter minFilter, ETexture::Filter maxFilter)
 	{
-		ETexture::Description desc;
+		TextureDesc desc;
 		desc.width = texture.m_width;
 		desc.height = texture.m_height;
 

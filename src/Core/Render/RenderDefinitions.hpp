@@ -450,32 +450,32 @@ namespace Phoenix
 			Nearest,
 			Linear
 		};
-		
-		struct Description
-		{
-			uint32_t width;
-			uint32_t height;
-			Components components;
-			Filter minFilter;
-			Filter magFilter;
-			uint8_t numMips;
-		};
-
-		struct CubemapData
-		{
-			enum Side
-			{
-				Right, // xpos
-				Left,  // xneg
-				Up,    // ypos
-				Down,  // yneg
-				Back,  // zpos
-				Front  // zneg
-			};
-
-			const void* data[6];
-		};
 	}
+
+	struct TextureDesc
+	{
+		uint32_t width;
+		uint32_t height;
+		ETexture::Components components;
+		ETexture::Filter minFilter;
+		ETexture::Filter magFilter;
+		uint8_t numMips;
+	};
+
+	struct CubemapData
+	{
+		enum Side
+		{
+			Right = 0, // xpos
+			Left,	   // xneg
+			Up,        // ypos
+			Down,      // yneg
+			Back,      // zpos
+			Front      // zneg
+		}; 
+
+		const void* data[6];
+	};
 
 	struct RGBA
 	{

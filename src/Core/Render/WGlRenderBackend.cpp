@@ -563,7 +563,7 @@ namespace Phoenix
 		//}
 	}
 
-	void WGlRenderBackend::createTexture(TextureHandle handle, ETexture::Format format, const ETexture::Description& desc, const char* name)
+	void WGlRenderBackend::createTexture(TextureHandle handle, ETexture::Format format, const TextureDesc& desc, const char* name)
 	{
 		GlTexture& tex = m_textures[handle.textureIdx];
 
