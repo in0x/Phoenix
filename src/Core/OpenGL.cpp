@@ -30,9 +30,15 @@ std::string getGlErrorString()
 	}
 }
 
+#define PHI_SLOW_GL_CHECK 1
+
 void checkGlError()
 {
+#if PHI_SLOW_GL_CHECK
+	getGlErrorString();
+#else
 	assert(glGetError() == GL_NO_ERROR);
+#endif
 }
 
 #include <vector>
