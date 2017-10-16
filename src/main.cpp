@@ -34,6 +34,7 @@ TODO:
 * uirenderer etc. This allows them to all use a different pattern. The bucket then just does a
 * transparent sort based on the bits in the key.
 * Validate VertexBufferLayout with shader
+* Selecting text in console during startup crashes the program?
 
 * The solution to being stateless is really just to set everything that isnt specified
 * to a default
@@ -174,23 +175,29 @@ int main(int argc, char** argv)
 
 	checkGlError();
 
-	Texture front, back, up, down, left, right;
-	front.load("Textures/vasa/negz.jpg");
-	back.load("Textures/vasa/posz.jpg");
-	up.load("Textures/vasa/posy.jpg");
-	down.load("Textures/vasa/negy.jpg");
-	left.load("Textures/vasa/negx.jpg");
-	right.load("Textures/vasa/posx.jpg");
+	TextureHandle cubemap;
 
-	CubemapData cbData;
-	cbData.data[CubemapData::Right] = right.m_data;
-	cbData.data[CubemapData::Left] = left.m_data;
-	cbData.data[CubemapData::Up] = up.m_data;
-	cbData.data[CubemapData::Down] = down.m_data;
-	cbData.data[CubemapData::Back] = back.m_data;
-	cbData.data[CubemapData::Front] = front.m_data;
+	{
+		Texture front, back, up, down, left, right;
+		front.load("Textures/vasa/negz.jpg");
+		back.load("Textures/vasa/posz.jpg");
+		up.load("Textures/vasa/posy.jpg");
+		down.load("Textures/vasa/negy.jpg");
+		left.load("Textures/vasa/negx.jpg");
+		right.load("Textures/vasa/posx.jpg");
 
-	TextureHandle cubemap = RenderFrontend::createCubemap(createDesc(front, ETexture::Nearest, ETexture::Nearest), "cubemap", cbData);
+		CubemapData cbData;
+		cbData.data[CubemapData::Right] = right.m_data;
+		cbData.data[CubemapData::Left] = left.m_data;
+		cbData.data[CubemapData::Up] = up.m_data;
+		cbData.data[CubemapData::Down] = down.m_data;
+		cbData.data[CubemapData::Back] = back.m_data;
+		cbData.data[CubemapData::Front] = front.m_data;
+
+		cubemap = RenderFrontend::createCubemap(createDesc(front, ETexture::Nearest, ETexture::Nearest), "cubemap", cbData);
+
+		RenderFrontend::submitCommands();
+	}
 
 	while (window.isOpen())
 	{
@@ -198,8 +205,7 @@ int main(int argc, char** argv)
 
 		RenderFrontend::clearFrameBuffer({}, EBuffer::Color, { 0.f, 0.f, 0.f, 1.f });
 		RenderFrontend::clearFrameBuffer({}, EBuffer::Depth, {});
-		RenderFrontend::submitCommands();
-
+		
 		StateGroup state;
 		state.depth = EDepth::Enable;
 
