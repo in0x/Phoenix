@@ -160,7 +160,7 @@ namespace Phoenix
 
 		size_t uniformMem(const StateGroup& state)
 		{
-			return state.uniformCount * sizeof(UniformInfo);
+			return (state.uniformCount + state.textureCount) * sizeof(UniformInfo);
 		}
 
 		size_t textureMem(const StateGroup& state)
