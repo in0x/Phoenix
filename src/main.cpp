@@ -33,6 +33,7 @@ TODO:
 * The sort keys are produced by the system that inserts into the buckets, i.e. the mesherenderer,
 * uirenderer etc. This allows them to all use a different pattern. The bucket then just does a
 * transparent sort based on the bits in the key.
+* Validate VertexBufferLayout with shader
 
 * The solution to being stateless is really just to set everything that isnt specified
 * to a default
@@ -59,7 +60,8 @@ namespace Phoenix
 
 		// LD, RD, RU, LU
 		Vec3 vertices[] = { Vec3{-0.5, -0.5, 0}, Vec3{0.5, -0.5, 0}, Vec3{0.5, 0.5, 0}, Vec3{-0.5, 0.5, 0} };
-		Vec2 uv[] = { Vec2{ 0.0 ,1.0 }, Vec2{ 1.0 ,1.0 }, Vec2{ 1.0 ,0.0 }, Vec2{ 0.0 ,0.0 } };
+		Vec3 normals[] = { Vec3{ 0,0,1 },Vec3{ 0,0,1 },Vec3{ 0,0,1 },Vec3{ 0,0,1 } };
+		//Vec2 uv[] = { Vec2{ 0.0 ,1.0 }, Vec2{ 1.0 ,1.0 }, Vec2{ 1.0 ,0.0 }, Vec2{ 0.0 ,0.0 } };
 
 		uint32_t indices[] = { 0, 1, 2, 0, 2, 3 };
 
@@ -67,8 +69,11 @@ namespace Phoenix
 		layout.add({ EAttributeProperty::Position, EAttributeType::Float, 3, },
 		{ sizeof(Vec3), 4, &vertices });
 
-		layout.add({ EAttributeProperty::TexCoord, EAttributeType::Float, 2 }, 
-		{ sizeof(Vec2), 4, &uv });
+		layout.add({ EAttributeProperty::Normal, EAttributeType::Float, 3, },
+		{ sizeof(Vec3), 4, &normals });
+
+		/*layout.add({ EAttributeProperty::TexCoord, EAttributeType::Float, 2 },
+		{ sizeof(Vec2), 4, &uv });*/
 
 		mesh.vb = RenderFrontend::createVertexBuffer(layout);
 		mesh.numVertices = 4;
@@ -78,7 +83,7 @@ namespace Phoenix
 		mesh.modelMat = Matrix4::translation(0, 0, 5);
 		mesh.modelMatHandle = RenderFrontend::createUniform("modelTf", EUniform::Mat4, &mesh.modelMat, sizeof(Matrix4));
 		RenderFrontend::submitCommands();
-	
+
 		mesh.modelMat = Matrix4::identity();
 
 		return mesh;
@@ -98,31 +103,6 @@ namespace Phoenix
 		return RenderFrontend::createProgram(shaders);
 	}
 
-	RenderMesh loadRenderMesh(const Mesh& mesh)
-	{
-		RenderMesh renderMesh;
-
-		renderMesh.modelMat = Matrix4::identity();
-
-		VertexBufferFormat layout;
-		layout.add({ EAttributeProperty::Position, EAttributeType::Float, 3 },
-		{ sizeof(Vec3), mesh.vertices.size(), mesh.vertices.data() });
-
-		layout.add({ EAttributeProperty::Normal, EAttributeType::Float, 3 },
-		{ sizeof(Vec3), mesh.normals.size(), mesh.normals.data() });
-
-		renderMesh.vb = RenderFrontend::createVertexBuffer(layout);
-		renderMesh.ib = RenderFrontend::createIndexBuffer(sizeof(uint32_t), mesh.indices.size(), mesh.indices.data());
-		renderMesh.modelMatHandle = RenderFrontend::createUniform("modelTf", EUniform::Mat4, &renderMesh.modelMat, sizeof(Matrix4));
-
-		renderMesh.numVertices = mesh.vertices.size();
-		renderMesh.numIndices = mesh.indices.size();
-
-		RenderFrontend::submitCommands();
-
-		return renderMesh;
-	}
-
 	TextureDesc createDesc(const Texture& texture, ETexture::Filter minFilter, ETexture::Filter maxFilter)
 	{
 		TextureDesc desc;
@@ -140,7 +120,7 @@ namespace Phoenix
 		case 1:
 		{ desc.components = ETexture::R; } break;
 		default: { assert(false); } break;
-		// TODO(Phil): How do we handle depth?
+			// TODO(Phil): How do we handle depth?
 		}
 
 		desc.minFilter = minFilter;
@@ -164,7 +144,6 @@ int main(int argc, char** argv)
 	Tests::runMemoryTests();
 
 	std::unique_ptr<Mesh> fox = loadObj("Models/Fox/", "RedFox.obj");
-
 	assert(fox != nullptr);
 
 	WindowConfig config = {
@@ -185,19 +164,33 @@ int main(int argc, char** argv)
 	RenderFrontend::init(&renderInit);
 
 	RenderMesh planeMesh = createPlaneMesh();
-	ProgramHandle program = loadProgram("Shaders/textured.vert", "Shaders/textured.frag");
+	ProgramHandle planeProgram = loadProgram("Shaders/reflect.vert", "Shaders/reflect.frag");
 
 	UniformHandle viewMat = RenderFrontend::createUniform("viewTf", EUniform::Mat4, &lookAtRH(Vec3{ 0, 0, 2 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 }), sizeof(Matrix4));
 	UniformHandle projectionMat = RenderFrontend::createUniform("projectionTf", EUniform::Mat4, &perspectiveRH(70, (float)config.width / (float)config.height, 1, 100), sizeof(Matrix4));
 	UniformHandle lightPos = RenderFrontend::createUniform("lightPosition", EUniform::Vec3, &Vec3(-5, 3, 5), sizeof(Vec3));
 
-	Texture einTex;
-	einTex.load("Textures/ein.png");
-	TextureHandle ein = RenderFrontend::createTexture(createDesc(einTex, ETexture::Linear, ETexture::Linear), einTex.m_data, ETexture::Tex2D, "tex");
-	
 	float angle = 0.f;
 
 	checkGlError();
+
+	Texture front, back, up, down, left, right;
+	front.load("Textures/vasa/negz.jpg");
+	back.load("Textures/vasa/posz.jpg");
+	up.load("Textures/vasa/posy.jpg");
+	down.load("Textures/vasa/negy.jpg");
+	left.load("Textures/vasa/negx.jpg");
+	right.load("Textures/vasa/posx.jpg");
+
+	CubemapData cbData;
+	cbData.data[CubemapData::Right] = right.m_data;
+	cbData.data[CubemapData::Left] = left.m_data;
+	cbData.data[CubemapData::Up] = up.m_data;
+	cbData.data[CubemapData::Down] = down.m_data;
+	cbData.data[CubemapData::Back] = back.m_data;
+	cbData.data[CubemapData::Front] = front.m_data;
+
+	TextureHandle cubemap = RenderFrontend::createCubemap(createDesc(front, ETexture::Nearest, ETexture::Nearest), "cubemap", cbData);
 
 	while (window.isOpen())
 	{
@@ -207,28 +200,30 @@ int main(int argc, char** argv)
 		RenderFrontend::clearFrameBuffer({}, EBuffer::Depth, {});
 		RenderFrontend::submitCommands();
 
-		planeMesh.modelMat = Matrix4::rotation(0.f, angle, 0.f);
+		StateGroup state;
+		state.depth = EDepth::Enable;
 
+		planeMesh.modelMat = Matrix4::rotation(0, angle, 0);
 		RenderFrontend::setUniform(planeMesh.modelMatHandle, &planeMesh.modelMat, sizeof(Matrix4));
 
-		StateGroup state;
-		state.program = program;
-		state.depth = EDepth::Enable;
+		state.program = planeProgram;
 
 		UniformHandle uniforms[] = { planeMesh.modelMatHandle, viewMat, projectionMat };
 		state.uniforms = uniforms;
 		state.uniformCount = 3;
 
-		TextureHandle textures[] = { ein };
+		TextureHandle textures[] = { cubemap };
 		state.textures = textures;
 		state.textureCount = 1;
 
 		RenderFrontend::drawIndexed(planeMesh.vb, planeMesh.ib, EPrimitive::Triangles, 0, planeMesh.numIndices, state);
-
+		
 		RenderFrontend::submitCommands();
 		RenderFrontend::swapBuffers();
 
 		window.processMessages();
+
+		checkGlError();
 	}
 
 	Logger::exit();

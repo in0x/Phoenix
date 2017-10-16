@@ -32,6 +32,8 @@ namespace Phoenix
 
 		void drawIndexed(VertexBufferHandle vb, IndexBufferHandle ib, EPrimitive::Type primitives, uint32_t start, uint32_t count, StateGroup& state);
 
+		void drawLinear(VertexBufferHandle vb, EPrimitive::Type primitive, uint32_t count, uint32_t start, StateGroup& state);
+
 		void clearFrameBuffer(FrameBufferHandle frame, EBuffer::Type bitToClear, RGBA color);
 	};
 

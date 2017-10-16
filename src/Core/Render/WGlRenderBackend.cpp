@@ -3,7 +3,6 @@
 
 #include "../OpenGL.hpp"
 #include "../Logger.hpp"
-#include "../Math/PhiMath.hpp"
 #include "../glew/wglew.h"
 #include "../Windows/Win32Window.hpp"
 
@@ -531,7 +530,6 @@ namespace Phoenix
 		return glFilters[filter];
 	}
 
-	// Call this once for normal textures, 6 times for cubemaps (with same texturehandle)
 	void WGlRenderBackend::uploadTextureData(TextureHandle handle, const void* data, uint32_t width, uint32_t height) 
 	{
 		GlTexture& tex = m_textures[handle.textureIdx];
@@ -540,7 +538,15 @@ namespace Phoenix
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(tex.m_format, tex.m_id);
 
-		glTexImage2D(tex.m_format,
+		GLenum format = tex.m_format;
+
+		if (tex.m_format == GL_TEXTURE_CUBE_MAP)
+		{
+			format = GL_TEXTURE_CUBE_MAP_POSITIVE_X + tex.m_cubeface;
+			tex.m_cubeface++;
+		}
+
+		glTexImage2D(format,
 			0,
 			tex.m_components,
 			width, height,
@@ -549,18 +555,7 @@ namespace Phoenix
 			tex.m_dataType,
 			data);
 
-		//if (desc.format == ETexture::CubeMap)
-		//{
-		//	for (GLuint face = 0; face < 6; ++face)
-		//	{
-		//		/*glTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face,
-		//		0,
-		//		0, 0,
-		//		desc.width, desc.height,
-		//		components, GL_UNSIGNED_BYTE,
-		//		desc.data + face * );*/
-		//	}
-		//}
+		checkGlError();
 	}
 
 	void WGlRenderBackend::createTexture(TextureHandle handle, ETexture::Format format, const TextureDesc& desc, const char* name)
@@ -592,10 +587,17 @@ namespace Phoenix
 		glTexParameteri(eformat, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); 
 		glTexParameteri(eformat, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); 
 		
-		if (eformat > ETexture::Tex2D)
+		if (format > ETexture::Tex2D)
 		{
 			glTexParameterf(eformat, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 		}
+
+		if (format == ETexture::CubeMap)
+		{
+			tex.m_cubeface = 0;
+		}
+
+		checkGlError();
 	}
 
 	void WGlRenderBackend::createFrameBuffer()
@@ -714,7 +716,6 @@ namespace Phoenix
 		{
 		case EUniform::Mat4:
 		{
-			const Matrix4* m = static_cast<const Matrix4*>(data);
 			glUniformMatrix4fv(uniform.m_location, uniform.m_size, false, static_cast<const GLfloat*>(data));
 		} break;
 		case EUniform::Vec3:
@@ -804,7 +805,9 @@ namespace Phoenix
 		{
 			GL_POINTS,
 			GL_LINES,
-			GL_TRIANGLES
+			GL_TRIANGLES,
+			GL_TRIANGLE_STRIP,
+			GL_QUADS
 		};
 
 		return glType[type];

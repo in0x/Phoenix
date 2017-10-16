@@ -59,7 +59,6 @@ namespace Phoenix
 		void init(RenderInit* renderInit)
 		{
 			s = std::make_unique<Members>(renderInit);
-			Logger::log(std::to_string(sizeof(Commands::DrawIndexed)).c_str());
 		}
 
 		void submitCommands()
@@ -109,7 +108,8 @@ namespace Phoenix
 		ShaderHandle createShader(const char* source, EShader::Type shaderType)
 		{
 			ShaderHandle handle = createShaderHandle(s->shaders++);
-			size_t strLen = strlen(source);
+
+			size_t strLen = strlen(source) + 1;
 
 			Commands::CreateShader* cs = s->bucket.addCommand<Commands::CreateShader>(strLen);
 			cs->shaderType = shaderType;
@@ -227,14 +227,14 @@ namespace Phoenix
 			cmdState.textureLocations = reinterpret_cast<UniformInfo*>(writeLocation);
 			writeLocation = copyTextureLocations(writeLocation, state);
 
-			cmdState.textures = reinterpret_cast<TextureHandle*>(writeLocation);
+			cmdState.textures = reinterpret_cast<TextureHandle*>(writeLocation); 
 			copyTextures(writeLocation, state);
 		}
 
-		TextureHandle createTexture(const ETexture::Description& desc, ETexture::Format format, const char* samplerName)
+		TextureHandle createTexture(const TextureDesc& desc, ETexture::Format format, const char* samplerName)
 		{
 			TextureHandle handle = createTextureHandle(s->textures++, s->uniforms++);
-			size_t strLen = strlen(samplerName);
+			size_t strLen = strlen(samplerName) + 1;
 
 			auto ct = s->bucket.addCommand<Commands::createTexture>(strLen);
 			ct->desc = desc;
@@ -244,7 +244,8 @@ namespace Phoenix
 			memcpy(commandPacket::getAuxiliaryMemory(ct), samplerName, strLen);
 			ct->name[strLen] = '\0';
 
-			s->store.create(handle.uniformHandle.idx, EUniform::Int, samplerName, 0, 0);
+			uint8_t placeholderData = 0;
+			s->store.create(handle.uniformHandle.idx, EUniform::Int, samplerName, &placeholderData, sizeof(uint8_t));
 
 			return handle;
 		}
@@ -283,7 +284,20 @@ namespace Phoenix
 			dc->vertexBuffer = vb;
 			dc->indexBuffer = ib;
 			dc->primitives = EPrimitive::Triangles;
-			dc->start = 0;
+			dc->start = start;
+			dc->count = count;
+
+			void* memory = commandPacket::getAuxiliaryMemory(dc);
+			copyState(dc->state, memory, state);
+		}
+
+		void drawLinear(VertexBufferHandle vb, EPrimitive::Type primitive, uint32_t count, uint32_t start, StateGroup& state)
+		{
+			auto dc = s->bucket.addCommand<Commands::DrawLinear>(resourceMem(state));
+
+			dc->vertexBuffer = vb;
+			dc->primitives = primitive;
+			dc->start = start;
 			dc->count = count;
 
 			void* memory = commandPacket::getAuxiliaryMemory(dc);

@@ -379,7 +379,9 @@ namespace Phoenix
 		{
 			Points,
 			Lines,
-			Triangles
+			Triangles,
+			TriangleStrip,
+			Quads
 		};
 	};
 

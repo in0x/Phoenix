@@ -45,6 +45,7 @@ namespace Phoenix
 		GLenum m_format;
 		GLenum m_components;
 		GLenum m_dataType;
+		int8_t m_cubeface;
 	};
 
 	class WGlRenderInit : public RenderInit
