@@ -15,34 +15,6 @@
 
 #include "Core/Windows/PlatformWindows.hpp"
 
-/*
-CURRENT TASK:
-* Implement Textures
-
-TODO:
-* Crashes when closed by closing window via taskbar
-* Implement FrameBuffers
-* Implement dynamic array -> I'm not using that many vectors so this isn't very high prio.
-* Provide default stategroup and ensure that it works
-* Figure out how overall memory acquisition will work
-* Input
-* Moveable camera
-* Standardized preamble for each log: TIME | SEVERITY | -> msg
-* I should startup glew independently of the backend
-* Add sparse array to shaderlist that tells us which shaders have been set
-* The sort keys are produced by the system that inserts into the buckets, i.e. the mesherenderer,
-* uirenderer etc. This allows them to all use a different pattern. The bucket then just does a
-* transparent sort based on the bits in the key.
-* Validate VertexBufferLayout with shader
-* Selecting text in console during startup crashes the program?
-
-* The solution to being stateless is really just to set everything that isnt specified
-* to a default
-
-* Directly interpreting commands with OpenGL/DX might be more flexible (instead of using the IRenderBackend interface)
-
-*/
-
 namespace Phoenix
 {
 	struct RenderMesh
