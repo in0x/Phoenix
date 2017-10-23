@@ -8,7 +8,7 @@ Unless I deem it to be too much work, or not interesting, I try to build as much
 [Trello](https://trello.com/b/exs4s9YZ/phoenix-engine)
 
 Obligatory In-Development Screenshot: 
-![alt text](doc/screen.png "If you see this text, please let me know.")
+![alt text](doc/screen.png "Left window: A plane reflecting a cubemap. Right Window: Logger.")
 
 Some current features highlighted. All of this has been implemented by hand. This doesn't mean that it's better than the other solutions out there (actually quite unlikely), but it does mean that I've acquired quite a lot of experience and knowledge when it comes to these topics. 
 * Loading of .obj files
