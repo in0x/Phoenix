@@ -39,13 +39,13 @@ namespace Phoenix
 			CStateGroup state;
 		};
 
-		struct ClearBuffer
+		struct ClearTarget
 		{
 			SUBMITTABLE();
 
 			RGBA color;
 			EBuffer::Type toClear;
-			FrameBufferHandle handle;
+			RenderTargetHandle handle;
 		};
 
 		struct CreateVertexBuffer

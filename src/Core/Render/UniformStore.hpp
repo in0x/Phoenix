@@ -19,9 +19,6 @@ namespace Phoenix
 	We use two caches
 	One that gets stored when creating a uniform using the frontend
 	And one for each program that is used for a series of drawcalls (lets us temporarily check if we have already updated it)
-
-	Really should get a memory allocator for uniform data
-
 	*/
 
 	struct UniformInfo

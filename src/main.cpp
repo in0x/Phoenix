@@ -104,6 +104,53 @@ namespace Phoenix
 	}
 }
 
+namespace Phoenix
+{
+	namespace Render
+	{
+#define RENDER_API_OPENGL 1
+#define RENDER_API_DIRECTX 2
+#define RENDER_API RENDER_API_OPENGL
+
+		template<int api>
+		class Backend
+		{
+		public:
+			static void init();
+			static void shutdown();
+			static void createVertexBuffer();
+		};
+
+		template<>
+		class Backend<RENDER_API_OPENGL>
+		{
+		public:
+
+			static void init() {}
+			static void shutdown() {}
+			static void createVertexBuffer() {}
+		};
+
+		template<>
+		class Backend<RENDER_API_DIRECTX>
+		{
+		public:
+			static void init() {}
+			static void shutdown() {}
+			static void createVertexBuffer() {}
+		};
+	}
+
+	using Backend = Render::Backend<RENDER_API>;
+
+	void testRend()
+	{
+		Backend::init();
+		Backend::createVertexBuffer();
+		Backend::shutdown();
+	}
+}
+
 int main(int argc, char** argv)
 {
 	using namespace Phoenix;
@@ -175,8 +222,8 @@ int main(int argc, char** argv)
 	{
 		angle += 0.5f;
 
-		RenderFrontend::clearFrameBuffer({}, EBuffer::Color, { 0.f, 0.f, 0.f, 1.f });
-		RenderFrontend::clearFrameBuffer({}, EBuffer::Depth, {});
+		RenderFrontend::clearRenderTarget({}, EBuffer::Color, { 0.f, 0.f, 0.f, 1.f });
+		RenderFrontend::clearRenderTarget({}, EBuffer::Depth, {});
 		
 		StateGroup state;
 		state.depth = EDepth::Enable;

@@ -23,10 +23,10 @@ namespace Phoenix
 			rc->drawLinear(dc->vertexBuffer, dc->primitives, dc->count, dc->start);
 		}
 	
-		void clearBuffer(IRenderBackend* rc, const void* command)
+		void clearTarget(IRenderBackend* rc, const void* command)
 		{
-			auto dc = static_cast<const Commands::ClearBuffer*>(command);
-			rc->clearFrameBuffer(dc->handle, dc->toClear, dc->color);
+			auto dc = static_cast<const Commands::ClearTarget*>(command);
+			rc->clearRenderTarget(dc->handle, dc->toClear, dc->color);
 		}
 
 		void vertexBufferCreate(IRenderBackend* rc, const void* command)
@@ -78,7 +78,7 @@ namespace Phoenix
 
 	const SubmitFptr Commands::DrawIndexed::SubmitFunc = SubmitFunctions::indexedDraw;
 	const SubmitFptr Commands::DrawLinear::SubmitFunc = SubmitFunctions::linearDraw;
-	const SubmitFptr Commands::ClearBuffer::SubmitFunc = SubmitFunctions::clearBuffer;
+	const SubmitFptr Commands::ClearTarget::SubmitFunc = SubmitFunctions::clearTarget;
 	const SubmitFptr Commands::CreateVertexBuffer::SubmitFunc = SubmitFunctions::vertexBufferCreate;
 	const SubmitFptr Commands::CreateIndexBuffer::SubmitFunc = SubmitFunctions::indexBufferCreate;
 	const SubmitFptr Commands::CreateShader::SubmitFunc = SubmitFunctions::shaderCreate;

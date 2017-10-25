@@ -62,7 +62,7 @@ namespace Phoenix
 	PHI_HANDLE_CUSTOM_MAXVAL(ShaderHandle, uint16_t, 1024);
 	PHI_HANDLE_CUSTOM_MAXVAL(ProgramHandle, uint16_t, 512);
 	//PHI_HANDLE_CUSTOM_MAXVAL(TextureHandle, uint16_t, 512);
-	PHI_HANDLE_CUSTOM_MAXVAL(FrameBufferHandle, uint8_t, 128);
+	PHI_HANDLE_CUSTOM_MAXVAL(RenderTargetHandle, uint8_t, 128);
 	PHI_HANDLE_CUSTOM_MAXVAL(UniformHandle, uint16_t, 512);
 	
 	class TextureHandle
@@ -482,6 +482,39 @@ namespace Phoenix
 	struct RGBA
 	{
 		float r, g, b, a;
+	};
+
+
+	namespace ERenderAttachment
+	{
+		enum Type 
+		{
+			Color =   1 << 0,
+			Stencil = 1 << 1,
+			Depth =   1 << 2
+		};
+	}
+
+	class RenderTargetDesc
+	{
+	public:
+		RenderTargetDesc()
+			: attachment(0)
+			, width(0)
+			, height(0)
+		{}
+
+		void AddAttachment(ERenderAttachment::Type type)
+		{
+			if (!(attachment & type))
+			{
+				attachment |= type;
+			}
+		}
+		
+		int32_t attachment;
+		uint32_t width;
+		uint32_t height;
 	};
 
 	struct UniformInfo;

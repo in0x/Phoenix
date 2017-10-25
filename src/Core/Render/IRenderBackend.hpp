@@ -20,12 +20,12 @@ namespace Phoenix
 		virtual void createProgram(ProgramHandle handle, const EShader::List& shaders) = 0;
 		virtual void createTexture(TextureHandle handle, ETexture::Format format, const TextureDesc& description, const char* name) = 0;
 		virtual void uploadTextureData(TextureHandle handle, const void* data, uint32_t width, uint32_t height) = 0;
-		virtual void createFrameBuffer() = 0;
+		virtual void createRenderTarget(RenderTargetHandle handle, const RenderTargetDesc& desc) = 0;
 		virtual void createUniform(UniformHandle& uniformHandle, const char* name, EUniform::Type type) = 0;
 
 		virtual void setState(const CStateGroup& state) = 0;
 
-		virtual void clearFrameBuffer(FrameBufferHandle handle, EBuffer::Type bitToClear, RGBA clearColor) = 0;
+		virtual void clearRenderTarget(RenderTargetHandle handle, EBuffer::Type bitToClear, RGBA clearColor) = 0;
 
 		virtual void drawLinear(VertexBufferHandle vertexbuffer, EPrimitive::Type primitive, uint32_t count, uint32_t start) = 0;
 		virtual void drawIndexed(VertexBufferHandle vertexBuffer, IndexBufferHandle indexBuffer, EPrimitive::Type primitive, uint32_t count, uint32_t start) = 0;

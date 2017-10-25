@@ -304,9 +304,9 @@ namespace Phoenix
 			copyState(dc->state, memory, state);
 		}
 
-		void clearFrameBuffer(FrameBufferHandle frame, EBuffer::Type bitToClear, RGBA color)
+		void clearRenderTarget(RenderTargetHandle frame, EBuffer::Type bitToClear, RGBA color)
 		{
-			auto dc = s->bucket.addCommand<Commands::ClearBuffer>();
+			auto dc = s->bucket.addCommand<Commands::ClearTarget>();
 
 			dc->handle = frame;
 			dc->toClear = bitToClear;

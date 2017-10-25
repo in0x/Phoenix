@@ -40,12 +40,20 @@ namespace Phoenix
 
 	struct GlTexture
 	{
-		char m_name[RenderConstants::c_maxUniformNameLenght];
 		GLuint m_id;
 		GLenum m_format;
 		GLenum m_components;
 		GLenum m_dataType;
 		int8_t m_cubeface;
+	};
+
+	struct GlFramebuffer
+	{
+		GLuint m_id;
+		GLuint m_colorTex;
+		GLuint m_stencilTex;
+		GLuint m_depthTex;
+		int32_t m_renderAttachments;
 	};
 
 	class WGlRenderInit : public RenderInit
@@ -79,19 +87,19 @@ namespace Phoenix
 		virtual void createProgram(ProgramHandle handle, const EShader::List& shaders) override;
 		virtual void createTexture(TextureHandle handle, ETexture::Format format, const TextureDesc& description, const char* name) override;
 		virtual void uploadTextureData(TextureHandle handle, const void* data, uint32_t width, uint32_t height) override;
-		virtual void createFrameBuffer() override;
+		virtual void createRenderTarget(RenderTargetHandle handle, const RenderTargetDesc& desc) override;
 		virtual void createUniform(UniformHandle& uniformHandle, const char* name, EUniform::Type type) override;
 
 		virtual void setState(const CStateGroup& state) override;
 
-		virtual void clearFrameBuffer(FrameBufferHandle handle, EBuffer::Type bitToClear, RGBA clearColor) override;
+		virtual void clearRenderTarget(RenderTargetHandle handle, EBuffer::Type bitToClear, RGBA clearColor) override;
 
 		virtual void drawLinear(VertexBufferHandle vertexbuffer, EPrimitive::Type primitive, uint32_t count, uint32_t start) override;
 		virtual void drawIndexed(VertexBufferHandle vertexBuffer, IndexBufferHandle indexBuffer, EPrimitive::Type primitive, uint32_t count, uint32_t start) override;
 
 	private:
 		UniformHandle WGlRenderBackend::addUniform();
-		
+
 		void registerActiveUniforms(ProgramHandle programHandle);
 
 		void bindUniforms(ProgramHandle boundProgram, const UniformInfo* uniforms, size_t count);
@@ -119,6 +127,7 @@ namespace Phoenix
 		GlProgram m_programs[ProgramHandle::maxValue()];
 		GlUniform m_uniforms[UniformHandle::maxValue()];
 		GlTexture m_textures[TextureHandle::maxValue()];
+		GlFramebuffer m_framebuffers[RenderTargetHandle::maxValue()];
 
 		std::map<Hash, UniformHandle> m_uniformMap;
 		

@@ -600,9 +600,42 @@ namespace Phoenix
 		checkGlError();
 	}
 
-	void WGlRenderBackend::createFrameBuffer()
+	GLenum toGlAttachment(ERenderAttachment::Type type)
 	{
-		Logger::warning(__LOCATION_INFO__ "not implemented!");
+		static GLenum attachments[] = {GL_COLOR_ATTACHMENT0, GL_STENCIL_ATTACHMENT, GL_DEPTH_ATTACHMENT};
+		return attachments[type];
+	}
+
+	void WGlRenderBackend::createRenderTarget(RenderTargetHandle handle, const RenderTargetDesc& desc)
+	{
+		GlFramebuffer& fb = m_framebuffers[handle.idx];
+		fb.m_renderAttachments = desc.attachment;
+
+		glCreateFramebuffers(1, &fb.m_id);
+
+		if (desc.attachment & ERenderAttachment::Color)
+		{
+			glGenTextures(1, &fb.m_colorTex);
+			glBindTexture(GL_TEXTURE_2D, fb.m_colorTex);
+			glTexStorage2D(fb.m_colorTex, 1, GL_RGBA8, desc.width, desc.height);
+			glNamedFramebufferTexture(fb.m_id, GL_COLOR_ATTACHMENT0, fb.m_colorTex, 0);
+		}
+
+		if (desc.attachment & ERenderAttachment::Stencil)
+		{
+			glGenTextures(1, &fb.m_stencilTex);
+			glBindTexture(GL_TEXTURE_2D, fb.m_stencilTex);
+			glTexStorage2D(fb.m_stencilTex, 1, GL_STENCIL_INDEX8, desc.width, desc.height);
+			glNamedFramebufferTexture(fb.m_id, GL_STENCIL_ATTACHMENT, fb.m_stencilTex, 0);
+		}
+
+		if (desc.attachment & ERenderAttachment::Depth)
+		{
+			glGenTextures(1, &fb.m_depthTex);
+			glBindTexture(GL_TEXTURE_2D, fb.m_depthTex);
+			glTexStorage2D(fb.m_depthTex, 1, GL_DEPTH_COMPONENT32F, desc.width, desc.height);
+			glNamedFramebufferTexture(fb.m_id, GL_DEPTH_ATTACHMENT, fb.m_depthTex, 0);
+		}
 	}
 
 	// NOTE(Phil): Textures return type int because the locations map to 
@@ -919,7 +952,7 @@ namespace Phoenix
 		glDrawElements(getPrimitiveEnum(primitive), count, GL_UNSIGNED_INT, (GLvoid*)(sizeof(GLubyte) * start));
 	}
 
-	void WGlRenderBackend::clearFrameBuffer(FrameBufferHandle handle, EBuffer::Type bitToClear, RGBA clearColor)
+	void WGlRenderBackend::clearRenderTarget(RenderTargetHandle handle, EBuffer::Type bitToClear, RGBA clearColor)
 	{
 		// TODO(PHIL): use actual frambuffer here, 0 is default for window
 
