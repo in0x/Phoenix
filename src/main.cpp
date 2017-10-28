@@ -10,10 +10,12 @@
 #include "Core/Logger.hpp"
 #include "Core/Texture.hpp"
 
-#include "Core/Render/RenderFrontend.hpp"
-#include "Core/Render/WGlRenderBackend.hpp"
-
 #include "Core/Windows/PlatformWindows.hpp"
+
+#include "Core/Render/RIOpenGL/RIOpenGLResourceStore.hpp"
+#include "Core/Render/RIOpenGL/RIDeviceOpenGL.hpp"
+#include "Core/Render/RIOpenGL/RenderInitWGL.hpp"
+#include "Core/Render/RIOpenGL/RIWGLGlewSupport.hpp"
 
 namespace Phoenix
 {
@@ -24,17 +26,16 @@ namespace Phoenix
 		IndexBufferHandle ib;
 		uint32_t numVertices;
 		uint32_t numIndices;
-		UniformHandle modelMatHandle;
+		Mat4UniformHandle modelMatHandle;
 	};
 
-	RenderMesh createPlaneMesh()
+	RenderMesh createPlaneMesh(IRIDevice* renderDevice)
 	{
 		RenderMesh mesh;
 
 		// LD, RD, RU, LU
 		Vec3 vertices[] = { Vec3{-0.5, -0.5, 0}, Vec3{0.5, -0.5, 0}, Vec3{0.5, 0.5, 0}, Vec3{-0.5, 0.5, 0} };
 		Vec3 normals[] = { Vec3{ 0,0,1 },Vec3{ 0,0,1 },Vec3{ 0,0,1 },Vec3{ 0,0,1 } };
-		//Vec2 uv[] = { Vec2{ 0.0 ,1.0 }, Vec2{ 1.0 ,1.0 }, Vec2{ 1.0 ,0.0 }, Vec2{ 0.0 ,0.0 } };
 
 		uint32_t indices[] = { 0, 1, 2, 0, 2, 3 };
 
@@ -45,111 +46,59 @@ namespace Phoenix
 		layout.add({ EAttributeProperty::Normal, EAttributeType::Float, 3, },
 		{ sizeof(Vec3), 4, &normals });
 
-		/*layout.add({ EAttributeProperty::TexCoord, EAttributeType::Float, 2 },
-		{ sizeof(Vec2), 4, &uv });*/
-
-		mesh.vb = RenderFrontend::createVertexBuffer(layout);
+		mesh.vb = renderDevice->createVertexBuffer(layout);
 		mesh.numVertices = 4;
-		mesh.ib = RenderFrontend::createIndexBuffer(sizeof(unsigned int), 6, &indices);
+		mesh.ib = renderDevice->createIndexBuffer(sizeof(unsigned int), 6, &indices);
 		mesh.numIndices = 6;
 
 		mesh.modelMat = Matrix4::translation(0, 0, 5);
-		mesh.modelMatHandle = RenderFrontend::createUniform("modelTf", EUniform::Mat4, &mesh.modelMat, sizeof(Matrix4));
-		RenderFrontend::submitCommands();
+		mesh.modelMatHandle = renderDevice->createMat4Uniform("modelTf", mesh.modelMat);
 
 		mesh.modelMat = Matrix4::identity();
 
 		return mesh;
 	}
 
-	ProgramHandle loadProgram(const char* vsPath, const char* fsPath)
+	ProgramHandle loadProgram(IRIDevice* renderDevice, char* vsPath, const char* fsPath)
 	{
 		std::string vsSource = Platform::loadText(vsPath);
-		ShaderHandle vs = RenderFrontend::createShader(vsSource.c_str(), EShader::Vertex);
+		VertexShaderHandle vs = renderDevice->createVertexShader(vsSource.c_str());
 
 		std::string fsSource = Platform::loadText(fsPath);
-		ShaderHandle fs = RenderFrontend::createShader(fsSource.c_str(), EShader::Fragment);
+		FragmentShaderHandle fs = renderDevice->createFragmentShader(fsSource.c_str());
 
-		EShader::List shaders = EShader::createList();
-		shaders[EShader::Vertex] = vs;
-		shaders[EShader::Fragment] = fs;
-		return RenderFrontend::createProgram(shaders);
-	}
-
-	TextureDesc createDesc(const Texture& texture, ETexture::Filter minFilter, ETexture::Filter maxFilter)
-	{
-		TextureDesc desc;
-		desc.width = texture.m_width;
-		desc.height = texture.m_height;
-
-		switch (texture.m_components)
-		{
-		case 4:
-		{ desc.components = ETexture::RGBA; } break;
-		case 3:
-		{ desc.components = ETexture::RGB; } break;
-		case 2:
-		{ desc.components = ETexture::RG; } break;
-		case 1:
-		{ desc.components = ETexture::R; } break;
-		default: { assert(false); } break;
-			// TODO(Phil): How do we handle depth?
-		}
-
-		desc.minFilter = minFilter;
-		desc.magFilter = maxFilter;
-
-		// Mips?
-		return desc;
+		return renderDevice->createProgram(vs, fs);
 	}
 }
+//
+//	TextureDesc createDesc(const Texture& texture, ETexture::Filter minFilter, ETexture::Filter maxFilter)
+//	{
+//		TextureDesc desc;
+//		desc.width = texture.m_width;
+//		desc.height = texture.m_height;
+//
+//		switch (texture.m_components)
+//		{
+//		case 4:
+//		{ desc.components = ETexture::RGBA; } break;
+//		case 3:
+//		{ desc.components = ETexture::RGB; } break;
+//		case 2:
+//		{ desc.components = ETexture::RG; } break;
+//		case 1:
+//		{ desc.components = ETexture::R; } break;
+//		default: { assert(false); } break;
+//			// TODO(Phil): How do we handle depth?
+//		}
+//
+//		desc.minFilter = minFilter;
+//		desc.magFilter = maxFilter;
+//
+//		// Mips?
+//		return desc;
+//	}
+//}
 
-namespace Phoenix
-{
-	namespace Render
-	{
-#define RENDER_API_OPENGL 1
-#define RENDER_API_DIRECTX 2
-#define RENDER_API RENDER_API_OPENGL
-
-		template<int api>
-		class Backend
-		{
-		public:
-			static void init();
-			static void shutdown();
-			static void createVertexBuffer();
-		};
-
-		template<>
-		class Backend<RENDER_API_OPENGL>
-		{
-		public:
-
-			static void init() {}
-			static void shutdown() {}
-			static void createVertexBuffer() {}
-		};
-
-		template<>
-		class Backend<RENDER_API_DIRECTX>
-		{
-		public:
-			static void init() {}
-			static void shutdown() {}
-			static void createVertexBuffer() {}
-		};
-	}
-
-	using Backend = Render::Backend<RENDER_API>;
-
-	void testRend()
-	{
-		Backend::init();
-		Backend::createVertexBuffer();
-		Backend::shutdown();
-	}
-}
 
 int main(int argc, char** argv)
 {
@@ -179,8 +128,19 @@ int main(int argc, char** argv)
 		Logger::error("Failed to initialize Win32Window");
 		return -1;
 	}
+	
+	// We need to strap something like a factory around this so we can startup all systems properly.
+	RenderInitWGL init(window.getNativeHandle(), 0);
+	RIOpenGLResourceStore glResources;
+	RIWGLGlewSupport glew(&init);
+	IRIDevice* renderDevice = new RIDeviceOpenGL(&glResources);
+	
+	RenderMesh plane = createPlaneMesh(renderDevice);
+	//ProgramHandle planeProgram = loadProgram(renderDevice, "Shaders/reflect.vert", "Shaders/reflect.frag");
 
-	WGlRenderInit renderInit(window.getNativeHandle(), 4);
+	delete renderDevice;
+
+	/*WGlRenderInit renderInit(window.getNativeHandle(), 4);
 	RenderFrontend::init(&renderInit);
 
 	RenderMesh planeMesh = createPlaneMesh();
@@ -249,10 +209,10 @@ int main(int argc, char** argv)
 		window.processMessages();
 
 		checkGlError();
-	}
+	}*/
 
 	Logger::exit();
-	RenderFrontend::exit();
+	//RenderFrontend::exit();
 
 	return 0;
 }

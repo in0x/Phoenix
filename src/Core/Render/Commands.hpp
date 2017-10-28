@@ -14,7 +14,7 @@ namespace Phoenix
 	// data and the RenderContext to execute the action.
 	namespace Commands
 	{
-		struct DrawIndexed
+		/*struct DrawIndexed
 		{
 			SUBMITTABLE();
 
@@ -120,5 +120,6 @@ namespace Phoenix
 			uint32_t height;
 			TextureHandle handle;
 		};
+	*/
 	}
 }

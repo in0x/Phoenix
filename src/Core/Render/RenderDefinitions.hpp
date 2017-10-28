@@ -1,93 +1,45 @@
 #pragma once
 
-#include <limits>
 #include <stdint.h>
 #include <array>
 
-#undef max
-
-// Goals:
-// Command-based: The user submits commands that specify the desired action
-// and required data which is then executed using the GPU. Commands can be 
-// stored in buckets, which in turn can be sorted in order to group commands
-// with similar data so as to reduce state changes.
-//
-// Stateless: To prevent the pitfalls of stateful APIs such as OpenGL, where
-// a state set by previous call can affect the next call, the system should be
-// stateless: Options set by the previous draw call should not have an effect on 
-// the next. 
+//TODO(Phil): Rename to RIPublic.hpp
 
 namespace Phoenix
 {
-	namespace RenderConstants
+	namespace ERenderApi
 	{
-		constexpr uint32_t c_maxUniformNameLenght = 64;
+		enum Type
+		{
+			Gl,
+			DX11,
+			NoOp
+		};
 	}
 
-#define PHI_HANDLE(name, size) \
-		class name \
-		{ \
-		public: \
-			static const size invalidValue = std::numeric_limits<size>::max(); \
-			size idx; \
-			bool isValid() const { return idx != invalidValue; } \
-			static constexpr size maxValue() { return std::numeric_limits<size>::max() - 1; } \
-		}; \
-		inline name create##name(size value = name::invalidValue)\
-		{ \
-			name handle; \
-			handle.idx = value; \
-			return handle; \
-		} \
-
-#define PHI_HANDLE_CUSTOM_MAXVAL(name, size, maxVal) \
-		static_assert(maxVal < std::numeric_limits<size>::max(), "Handle maxVal has to be smaller than largest value of type size"); \
-		class name \
-		{ \
-		public: \
-			static const size invalidValue = std::numeric_limits<size>::max(); \
-			size idx; \
-			bool isValid() const { return idx != invalidValue; } \
-			static constexpr size maxValue() { return maxVal; } \
-		}; \
-		inline name create##name(size value = name::invalidValue)\
-		{ \
-			name handle; \
-			handle.idx = value; \
-			return handle; \
-		} \
-
-	PHI_HANDLE_CUSTOM_MAXVAL(VertexBufferHandle, uint16_t, 2048);
-	PHI_HANDLE_CUSTOM_MAXVAL(IndexBufferHandle, uint16_t, 2048);
-	PHI_HANDLE_CUSTOM_MAXVAL(ShaderHandle, uint16_t, 1024);
-	PHI_HANDLE_CUSTOM_MAXVAL(ProgramHandle, uint16_t, 512);
-	//PHI_HANDLE_CUSTOM_MAXVAL(TextureHandle, uint16_t, 512);
-	PHI_HANDLE_CUSTOM_MAXVAL(RenderTargetHandle, uint8_t, 128);
-	PHI_HANDLE_CUSTOM_MAXVAL(UniformHandle, uint16_t, 512);
-	
-	class TextureHandle
+	// Should be subclassed to pass to specific RenderContext implementations
+	class RenderInit
 	{
 	public:
-		uint16_t textureIdx;
-		UniformHandle uniformHandle;
+		ERenderApi::Type getApiType()
+		{
+			return m_apiType;
+		}
 
-		static const uint16_t invalidValue = std::numeric_limits<uint16_t>::max();
-		bool isValid() const { return textureIdx != invalidValue && uniformHandle.isValid(); } 
-		static constexpr uint16_t maxValue() { return 512; } 
+	protected:
+		RenderInit(ERenderApi::Type apiType = ERenderApi::NoOp)
+			: m_apiType(apiType)
+		{}
+
+		virtual ~RenderInit() {}
+
+		ERenderApi::Type m_apiType;
 	};
 
-	inline TextureHandle createTextureHandle(uint16_t texIdx = TextureHandle::invalidValue, uint16_t uniformIdx = UniformHandle::invalidValue)
-	{
-		TextureHandle handle;
-		handle.textureIdx = texIdx;
-		handle.uniformHandle.idx = uniformIdx;
-		return handle;
-	}
+	class RIContext;
 
-	class IRenderBackend;
+	typedef void(*SubmitFptr)(RIContext*, const void*);
 
-	typedef void(*SubmitFptr)(IRenderBackend*, const void*);
-	
 	template <class T>
 	struct is_submittable
 	{
@@ -102,34 +54,6 @@ namespace Phoenix
 
 #define SUBMITTABLE() \
 		const static SubmitFptr SubmitFunc \
-
-	namespace ERenderApi
-	{
-		enum Type
-		{
-			Gl,
-			None
-		};
-	}
-
-	// Should be subclassed to pass to specific RenderContext implementations
-	class RenderInit
-	{
-	public:
-		ERenderApi::Type getApiType()
-		{
-			return m_apiType;
-		}
-
-	protected:
-		RenderInit(ERenderApi::Type apiType = ERenderApi::None)
-			: m_apiType(apiType)
-		{}
-
-		virtual ~RenderInit() {}
-
-		ERenderApi::Type m_apiType;
-	};
 
 	// Begin VertexBuffer.h
 
@@ -156,21 +80,6 @@ namespace Phoenix
 			Int,
 			Count
 		};
-	}
-
-	// NOTE(Phil): This should be moved.
-	inline const char* attribTypeToName(EAttributeProperty::Value type)
-	{
-		static const char* const names[EAttributeProperty::Count] =
-		{
-			"Position",
-			"Normal",
-			"Color",
-			"Bitangent",
-			"TexCoord",
-		};
-
-		return names[type];
 	}
 
 	// NOTE(Phil): Decl and data should likely be seperated into
@@ -271,28 +180,6 @@ namespace Phoenix
 
 	// end VertexBuffer.h
 
-	namespace EShader
-	{
-		enum Type
-		{
-			Vertex,
-			Geometry,
-			Fragment,
-			Compute,
-			Count,
-		};
-
-		// A set of shaders to be compiled into a program. 
-		// Some shaders may be omitteted if they are not required to create a valid shader program.
-		//using List = ShaderHandle[Shader::Type::Count];
-		using List = std::array<ShaderHandle, EShader::Type::Count>;
-		inline List createList()
-		{
-			ShaderHandle invalidHandle = createShaderHandle();
-			return{ invalidHandle, invalidHandle, invalidHandle, invalidHandle };
-		}
-	}
-
 	typedef uint64_t Hash;
 
 	inline Hash hashBytes(const void* data, size_t size, uint64_t offset = 14695981039346656037, uint64_t prime = 1099511628211)
@@ -358,20 +245,6 @@ namespace Phoenix
 	};
 
 	// end Hash.h
-	
-	namespace EUniform
-	{
-		enum Type
-		{
-			Float,
-			Int,
-			Vec3,
-			Vec4,
-			Mat3,
-			Mat4,
-			Count
-		};
-	}
 
 	namespace EPrimitive
 	{
@@ -454,8 +327,9 @@ namespace Phoenix
 		};
 	}
 
-	struct TextureDesc
+	class TextureDesc
 	{
+	public:
 		uint32_t width;
 		uint32_t height;
 		ETexture::Components components;
@@ -483,7 +357,6 @@ namespace Phoenix
 	{
 		float r, g, b, a;
 	};
-
 
 	namespace ERenderAttachment
 	{
@@ -519,48 +392,48 @@ namespace Phoenix
 
 	struct UniformInfo;
 	
-	struct StateGroup
-	{
-		EBlend::Type blend;
-		ERaster::Type raster;
-		EDepth::Type depth;
-		EStencil::Type stencil;
-		TextureHandle* textures;
-		size_t textureCount;
-		UniformHandle* uniforms;
-		size_t uniformCount;
-		ProgramHandle program;
-	};
+	//struct StateGroup
+	//{
+	//	EBlend::Type blend;
+	//	ERaster::Type raster;
+	//	EDepth::Type depth;
+	//	EStencil::Type stencil;
+	//	TextureHandle* textures;
+	//	size_t textureCount;
+	//	UniformHandle* uniforms;
+	//	size_t uniformCount;
+	//	ProgramHandle program;
+	//};
 
-	struct CStateGroup
-	{
-		EBlend::Type blend;
-		ERaster::Type raster;
-		EDepth::Type depth;
-		EStencil::Type stencil;
-		ProgramHandle program;
-		UniformInfo* uniforms;
-		size_t uniformCount;
-		UniformInfo* textureLocations;
-		TextureHandle* textures;
-		size_t textureCount;
-	};
+	//struct CStateGroup
+	//{
+	//	EBlend::Type blend;
+	//	ERaster::Type raster;
+	//	EDepth::Type depth;
+	//	EStencil::Type stencil;
+	//	ProgramHandle program;
+	//	UniformInfo* uniforms;
+	//	size_t uniformCount;
+	//	UniformInfo* textureLocations;
+	//	TextureHandle* textures;
+	//	size_t textureCount;
+	//};
 
-	typedef StateGroup* StateGroupStack;
-	// Somehow make sure that when the user gets a stategroup stack one default is there per default
+	//typedef StateGroup* StateGroupStack;
+	//// Somehow make sure that when the user gets a stategroup stack one default is there per default
 
-	// Compiles all StateGroups into one complete StateGroup. Interpretation
-	// walks from left to right -> A setting at the front overrides a setting at the back.
-	inline StateGroup compile(StateGroupStack states, uint32_t stateCount)
-	{
-		StateGroup state;
+	//// Compiles all StateGroups into one complete StateGroup. Interpretation
+	//// walks from left to right -> A setting at the front overrides a setting at the back.
+	//inline StateGroup compile(StateGroupStack states, uint32_t stateCount)
+	//{
+	//	StateGroup state;
 
-		for (size_t i = 0; i < stateCount; ++i)
-		{
-			const StateGroup& current = states[i];
-			// Set each setting if not set already;
-		}
+	//	for (size_t i = 0; i < stateCount; ++i)
+	//	{
+	//		const StateGroup& current = states[i];
+	//		// Set each setting if not set already;
+	//	}
 
-		return state;
-	}
+	//	return state;
+	//}
 }

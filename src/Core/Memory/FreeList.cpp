@@ -9,7 +9,7 @@ namespace Phoenix
 		: m_next(nullptr)
 	{}
 
-	FreeList::FreeList(void* memStart, void* memEnd, size_t blockSize, size_t numBlocks, size_t alignment) // if block size atleast 32 bit, store pointers, otherwise store indices
+	FreeList::FreeList(void* memStart, void* memEnd, size_t blockSize, size_t numBlocks, size_t alignment) 
 	{
 		assert(blockSize >= sizeof(void*));
 

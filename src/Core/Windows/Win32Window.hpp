@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 #include <string>
-#include <Windows.h>
+#include "PhiWindowsInclude.hpp"
 
 namespace Phoenix
 {

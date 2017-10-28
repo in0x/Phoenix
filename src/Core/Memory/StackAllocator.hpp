@@ -13,12 +13,6 @@ namespace Phoenix
 		
 		~StackAllocator();
 
-		StackAllocator& operator=(const StackAllocator&) = delete;
-
-		StackAllocator(const StackAllocator&) = delete;
-
-		StackAllocator(const StackAllocator&&) = delete;
-
 		void* allocate(size_t size, const Alignment& alignment);
 	
 		void free(void* memory);
@@ -26,6 +20,10 @@ namespace Phoenix
 		void clear();
 	
 	private:		
+		StackAllocator(const StackAllocator& other) = delete;
+
+		StackAllocator& operator=(const StackAllocator& other) = delete;
+
 		char* m_start;
 		char* m_end;
 		char* m_top;

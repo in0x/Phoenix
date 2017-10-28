@@ -34,9 +34,6 @@
     <ClInclude Include="..\src\Core\Logger.hpp">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Core\PhiSTL.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Core\Math\EulerAngles.hpp">
       <Filter>Math</Filter>
     </ClInclude>
@@ -50,9 +47,6 @@
       <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Core\Transform.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Core\OpenGL.hpp">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Core\Math\MathStreamOverloads.hpp">
@@ -73,15 +67,6 @@
     <ClInclude Include="..\src\Core\Render\RenderDefinitions.hpp">
       <Filter>Render</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Core\Render\IRenderBackend.hpp">
-      <Filter>Render</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Core\Render\WGlRenderBackend.hpp">
-      <Filter>Render</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Core\Render\RenderFrontend.hpp">
-      <Filter>Render</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Core\Memory\StackAllocator.hpp">
       <Filter>Memory</Filter>
     </ClInclude>
@@ -97,9 +82,6 @@
     <ClInclude Include="..\src\Tests\MemoryTests.hpp">
       <Filter>Test</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Core\Render\UniformStore.hpp">
-      <Filter>Render</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Core\Windows\PlatformWindows.hpp">
       <Filter>Core\Windows</Filter>
     </ClInclude>
@@ -114,6 +96,45 @@
     </ClInclude>
     <ClInclude Include="..\src\Core\Texture.hpp">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Render\RIDevice.hpp">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Render\RIContext.hpp">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Render\RIResources.hpp">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Render\RIResourceHandles.h">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Render\RIResourceContainer.hpp">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Render\RIOpenGL\RenderInitWGL.hpp">
+      <Filter>Render\RIOpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Render\RIOpenGL\RIContextOpenGL.hpp">
+      <Filter>Render\RIOpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Render\RIOpenGL\RIDeviceOpenGL.hpp">
+      <Filter>Render\RIOpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Render\RIOpenGL\RIResourcesOpenGL.hpp">
+      <Filter>Render\RIOpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Render\RIOpenGL\OpenGL.hpp">
+      <Filter>Render\RIOpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Render\RIOpenGL\RIWGLGlewSupport.hpp">
+      <Filter>Render\RIOpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Windows\PhiWindowsInclude.hpp">
+      <Filter>Core\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Render\RIOpenGL\RIOpenGLResourceStore.hpp">
+      <Filter>Render\RIOpenGL</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -160,9 +181,6 @@
       <Filter>Math</Filter>
     </ClCompile>
     <ClCompile Include="..\src\main.cpp" />
-    <ClCompile Include="..\src\Core\OpenGL.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Core\StringTokenizer.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -173,12 +191,6 @@
       <Filter>Render</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Core\Render\Commands.cpp">
-      <Filter>Render</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Core\Render\WGlRenderBackend.cpp">
-      <Filter>Render</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Core\Render\RenderFrontend.cpp">
       <Filter>Render</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Core\Memory\StackAllocator.cpp">
@@ -193,14 +205,23 @@
     <ClCompile Include="..\src\Tests\MemoryTests.cpp">
       <Filter>Test</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Core\Render\UniformStore.cpp">
-      <Filter>Render</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Core\Windows\Win32Window.cpp">
       <Filter>Core\Windows</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Core\Texture.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Core\Render\RIOpenGL\RIContextOpenGL.cpp">
+      <Filter>Render\RIOpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Core\Render\RIOpenGL\RIDeviceOpenGL.cpp">
+      <Filter>Render\RIOpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Core\Render\RIOpenGL\OpenGL.cpp">
+      <Filter>Render\RIOpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Core\Render\RIOpenGL\RIWGLGlewSupport.cpp">
+      <Filter>Render\RIOpenGL</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -224,6 +245,9 @@
     </Filter>
     <Filter Include="STB">
       <UniqueIdentifier>{982bc338-05d0-424a-a6eb-deec0681d852}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Render\RIOpenGL">
+      <UniqueIdentifier>{adf98348-3d7d-47f0-aba7-539c004aea75}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

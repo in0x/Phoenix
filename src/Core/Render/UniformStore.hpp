@@ -23,7 +23,7 @@ namespace Phoenix
 
 	struct UniformInfo
 	{
-		char name[RenderConstants::c_maxUniformNameLenght]; 
+		//char name[RenderConstants::c_maxUniformNameLenght]; 
 		Hash nameHash;
 		EUniform::Type type;
 		void* data;

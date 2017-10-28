@@ -35,6 +35,22 @@ namespace Phoenix
 		operator delete(m_start);
 	}
 
+	//StackAllocator::StackAllocator(const StackAllocator& other)
+	//{
+	//	size_t size = other.m_end - other.m_start;
+	//	
+	//	m_start = reinterpret_cast<char*>(operator new(size));
+	//	memcpy(m_start, other.m_start, size);
+	//	m_end = m_start + size;
+	//	m_top = m_start;
+	//}
+	//
+	//StackAllocator& StackAllocator::operator=(const StackAllocator& other)
+	//{
+	//	operator delete(m_start);
+	//	
+	//}
+
 	void StackAllocator::clear()
 	{
 		memset(m_start, 0, m_end - m_start);

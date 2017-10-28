@@ -1,10 +1,9 @@
 #pragma once
 
-#include "glew/glew.h"
-#include <string>
+#include "../../glew/glew.h"
 
-std::string getGlErrorString();
-void checkGlError();
+const char* getGlErrorString();
+bool checkGlError();
 
 void err_cb(GLenum        source,
 	GLenum        type,

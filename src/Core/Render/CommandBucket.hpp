@@ -10,7 +10,7 @@
 
 namespace Phoenix
 {
-	class IRenderBackend;
+	class RIContext;
 
 	class CommandBucket
 	{
@@ -57,7 +57,7 @@ namespace Phoenix
 			return commandPacket::getCommand<NewCommand>(packet);
 		}
 
-		void submit(IRenderBackend* rc) // TODO(Phil): Because packets are newed they currently still leak.
+		void submit(RIContext* rc) 
 		{
 			for (size_t i = 0; i < m_currentIndex; ++i)
 			{

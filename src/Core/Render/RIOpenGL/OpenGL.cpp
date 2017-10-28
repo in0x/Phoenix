@@ -1,43 +1,48 @@
 #include "OpenGL.hpp"
 #include <cassert>
 
-std::string getGlErrorString()
+const char* getGlErrorString()
 {
 	GLenum err(glGetError());
 
 	switch (err)
 	{
 	case GL_NO_ERROR:
-		return std::string("GL Error: No Error");
+		return "GL Error: No Error";
 	case GL_INVALID_OPERATION:
 		assert(false);
-		return std::string("INVALID_OPERATION");
+		return "INVALID_OPERATION";
 	case GL_INVALID_ENUM:
 		assert(false);
-		return std::string("INVALID_ENUM");
+		return "INVALID_ENUM";
 	case GL_INVALID_VALUE:
 		assert(false);
-		return std::string("INVALID_VALUE");
+		return "INVALID_VALUE";
 	case GL_OUT_OF_MEMORY:
 		assert(false);
-		return std::string("OUT_OF_MEMORY");
+		return "OUT_OF_MEMORY";
 	case GL_INVALID_FRAMEBUFFER_OPERATION:
 		assert(false);
-		return std::string("INVALID_FRAMEBUFFER_OPERATION");
+		return "INVALID_FRAMEBUFFER_OPERATION";
 	default:
-		return std::string("GL Error: Case not covered");
+		return nullptr;
 		assert(false);
 	}
 }
 
-#define PHI_SLOW_GL_CHECK 1
+#define PHI_SLOW_GL_ERROR_CHECK 0
 
-void checkGlError()
+bool checkGlError()
 {
-#if PHI_SLOW_GL_CHECK
-	getGlErrorString();
+#if PHI_SLOW_GL_ERROR_CHECK 
+	const char* errorMsg = getGlErrorString();
+	bool bHasError = nullptr == errorMsg;
+	assert(bHasError);
+	return bHasError;
 #else
-	assert(glGetError() == GL_NO_ERROR);
+	bool bHasError = GL_NO_ERROR == glGetError();
+	assert(bHasError);
+	return bHasError;
 #endif
 }
 

@@ -14,9 +14,9 @@ namespace Phoenix
 		void swapBuffers();
 		void exit();
 
-		VertexBufferHandle createVertexBuffer(const VertexBufferFormat& format);
+		//VertexBufferHandle createVertexBuffer(const VertexBufferFormat& format);
 
-		IndexBufferHandle createIndexBuffer(size_t size, uint32_t count, const void* data);
+		//IndexBufferHandle createIndexBuffer(size_t size, uint32_t count, const void* data);
 
 		ShaderHandle createShader(const char* source, EShader::Type shaderType);
 
@@ -24,7 +24,7 @@ namespace Phoenix
 
 		UniformHandle createUniform(const char* name, EUniform::Type type, const void* data = nullptr, size_t dataSize = 0);
 
-		TextureHandle createTexture(const TextureDesc& desc, const void* data, ETexture::Format format, const char* samplerName);
+		//TextureHandle createTexture(const TextureDesc& desc, const void* data, ETexture::Format format, const char* samplerName);
 
 		TextureHandle createCubemap(const TextureDesc& desc, const char* samplerName, const CubemapData& cubemap);
 
