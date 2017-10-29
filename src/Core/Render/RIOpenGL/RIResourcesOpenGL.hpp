@@ -44,44 +44,44 @@ namespace Phoenix
 	struct GlUniform
 	{
 		GLuint m_location;
-		GLint m_size;
+		GLint m_numElements;
 	};
 
-	class GlUniformInt : public RIUniformInt
-	{
-	public:
-		GlUniform m_glUniform;
-	};
+	//class GlUniformInt : public RIUniformInt
+	//{
+	//public:
+	//	GlUniform m_glUniform;
+	//};
 
-	class GlUniformFloat : public RIUniformFloat
-	{
-	public:
-		GlUniform m_glUniform;
-	};
+	//class GlUniformFloat : public RIUniformFloat
+	//{
+	//public:
+	//	GlUniform m_glUniform;
+	//};
 
-	class GlUniformVec3 : public RIUniformVec3
-	{
-	public:
-		GlUniform m_glUniform;
-	};
+	//class GlUniformVec3 : public RIUniformVec3
+	//{
+	//public:
+	//	GlUniform m_glUniform;
+	//};
 
-	class GlUniformVec4 : public RIUniformVec4
-	{
-	public:
-		GlUniform m_glUniform;
-	};
+	//class GlUniformVec4 : public RIUniformVec4
+	//{
+	//public:
+	//	GlUniform m_glUniform;
+	//};
 
-	class GlUniformMat3 : public RIUniformMat3
-	{
-	public:
-		GlUniform m_glUniform;
-	};
+	//class GlUniformMat3 : public RIUniformMat3
+	//{
+	//public:
+	//	GlUniform m_glUniform;
+	//};
 
-	class GlUniformMat4 : public RIUniformMat4
-	{
-	public:
-		GlUniform m_glUniform;
-	};
+	//class GlUniformMat4 : public RIUniformMat4
+	//{
+	//public:
+	//	GlUniform m_glUniform;
+	//};
 
 	class GlTexture2D : public RITexture2D
 	{

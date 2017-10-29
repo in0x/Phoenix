@@ -4,13 +4,13 @@
 #include "EulerAngles.hpp"
 #include "Quaternion.hpp"
 #include "PhiMath.hpp"
-#include <cassert>
+#include <assert.h>
 
 namespace Phoenix
 {
-	Matrix3::Matrix3(float m00, float m01, float m02, 
-					 float m10, float m11, float m12,
-					 float m20, float m21, float m22)
+	Matrix3::Matrix3(float m00, float m01, float m02,
+		float m10, float m11, float m12,
+		float m20, float m21, float m22)
 	{
 		m_data[0][0] = m00; m_data[0][1] = m10; m_data[0][2] = m20;
 		m_data[1][0] = m01; m_data[1][1] = m11; m_data[1][2] = m21;

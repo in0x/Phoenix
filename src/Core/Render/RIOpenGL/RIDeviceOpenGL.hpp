@@ -22,12 +22,6 @@ namespace Phoenix
 		virtual VertexShaderHandle	 createVertexShader(const char* source) override;
 		virtual FragmentShaderHandle createFragmentShader(const char* source) override;
 		virtual ProgramHandle		 createProgram(VertexShaderHandle vsHandle, FragmentShaderHandle fsHandle) override;
-		virtual IntUniformHandle	 createIntUniform(const char* name, int32_t value) override;
-		virtual FloatUniformHandle   createFloatUniform(const char* name, float value) override;
-		virtual Vec3UniformHandle	 createVec3Uniform(const char* name, const Vec3& value) override;
-		virtual Vec4UniformHandle	 createVec4Uniform(const char* name, const Vec4& value) override;
-		virtual Mat3UniformHandle	 createMat3Uniform(const char* name, const Matrix3& value) override;
-		virtual Mat4UniformHandle	 createMat4Uniform(const char* name, const Matrix4& value) override;
 		virtual Texture2DHandle		 createTexture2D(const TextureDesc& desc) override;
 		virtual RenderTargetHandle	 createRenderTarget(const RenderTargetDesc& desc) override;
 

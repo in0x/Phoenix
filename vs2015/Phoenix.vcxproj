@@ -137,7 +137,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <PrecompiledHeader>
       </PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
@@ -158,7 +158,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <PrecompiledHeader>
       </PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
@@ -178,6 +178,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\Core\FNVHash.hpp" />
     <ClInclude Include="..\src\Core\Math\MathStreamOverloads.hpp" />
     <ClInclude Include="..\src\Core\Memory\FreeList.hpp" />
     <ClInclude Include="..\src\Core\Memory\MemUtil.hpp" />
@@ -193,6 +194,7 @@
     <ClInclude Include="..\src\Core\Render\RIOpenGL\RenderInitWGL.hpp" />
     <ClInclude Include="..\src\Core\Render\RIOpenGL\RIContextOpenGL.hpp" />
     <ClInclude Include="..\src\Core\Render\RIOpenGL\RIDeviceOpenGL.hpp" />
+    <ClInclude Include="..\src\Core\Render\RIOpenGL\RIGlExistingUniforms.hpp" />
     <ClInclude Include="..\src\Core\Render\RIOpenGL\RIOpenGLResourceStore.hpp" />
     <ClInclude Include="..\src\Core\Render\RIOpenGL\RIResourcesOpenGL.hpp" />
     <ClInclude Include="..\src\Core\Render\RIOpenGL\RIWGLGlewSupport.hpp" />
@@ -246,6 +248,7 @@
     <ClCompile Include="..\src\Core\Render\RIOpenGL\OpenGL.cpp" />
     <ClCompile Include="..\src\Core\Render\RIOpenGL\RIContextOpenGL.cpp" />
     <ClCompile Include="..\src\Core\Render\RIOpenGL\RIDeviceOpenGL.cpp" />
+    <ClCompile Include="..\src\Core\Render\RIOpenGL\RIGlExistingUniforms.cpp" />
     <ClCompile Include="..\src\Core\Render\RIOpenGL\RIWGLGlewSupport.cpp" />
     <ClCompile Include="..\src\Core\StringTokenizer.cpp" />
     <ClCompile Include="..\src\Core\Texture.cpp" />

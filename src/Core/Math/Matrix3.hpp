@@ -14,13 +14,13 @@ namespace Phoenix
 	public:
 		MatrixData<3> m_data;
 
-		Matrix3()
-			: m_data(MatrixData<3>{})
+		constexpr Matrix3()
+			: m_data(MatrixData<3>())
 		{}
 
 		Matrix3(float m00, float m01, float m02,
-				float m10, float m11, float m12, 
-				float m20, float m21, float m22);
+			float m10, float m11, float m12,
+			float m20, float m21, float m22);
 
 		float& operator()(int row, int col);
 

@@ -9,15 +9,15 @@ namespace Phoenix
 		void stop();
 		void restart();
 
-		double getElapsedS();
-		double getElapsedMS();
+		double getElapsedS() const;
+		double getElapsedMS() const;
 
-		bool started();
+		bool started() const;
 
 	private:
 		double m_timeAtStart;
 		bool m_bStarted;
 
-		double getElapsedTime();
+		double getElapsedTime() const;
 	};
 }

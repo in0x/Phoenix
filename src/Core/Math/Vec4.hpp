@@ -9,14 +9,14 @@ namespace Phoenix
 	public:
 		float x, y, z, w;
 
-		Vec4()
+		constexpr Vec4()
 			: x(0.f)
 			, y(0.f)
 			, z(0.f)
 			, w(0.f)
 		{}
 
-		Vec4(float _x, float _y, float _z, float _w)
+		constexpr Vec4(float _x, float _y, float _z, float _w)
 			: x(_x)
 			, y(_y)
 			, z(_z)

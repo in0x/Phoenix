@@ -6,7 +6,7 @@ namespace Phoenix
 	void Clock::start()
 	{
 		m_bStarted = true;
-		m_timeAtStart = double(std::clock());
+		m_timeAtStart = static_cast<double>(std::clock());
 	}
 	
 	void Clock::stop()
@@ -20,25 +20,25 @@ namespace Phoenix
 		start();
 	}
 
-	double Clock::getElapsedTime()
+	double Clock::getElapsedTime() const
 	{
 		if (!m_bStarted)
 			return 0;
 
-		return double(std::clock()) - m_timeAtStart;
+		return static_cast<double>(std::clock()) - m_timeAtStart;
 	}
 
-	double Clock::getElapsedS()
+	double Clock::getElapsedS() const
 	{
 		return getElapsedTime() / CLOCKS_PER_SEC;
 	}
 	
-	double Clock::getElapsedMS()
+	double Clock::getElapsedMS() const
 	{
 		return (getElapsedTime() / CLOCKS_PER_SEC) * 1000;
 	}
 	
-	bool Clock::started()
+	bool Clock::started() const
 	{
 		return m_bStarted;
 	}

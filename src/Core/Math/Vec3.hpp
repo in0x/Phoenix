@@ -9,13 +9,13 @@ namespace Phoenix
 	public:
 		float x, y, z;
 
-		Vec3() 
+		constexpr Vec3() 
 			: x(0.f)
 			, y(0.f)
 			, z(0.f) 
 		{}
 
-		Vec3(float _x, float _y, float _z) 
+		constexpr Vec3(float _x, float _y, float _z) 
 			: x(_x)
 			, y(_y)
 			, z(_z)

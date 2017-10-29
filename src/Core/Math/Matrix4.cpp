@@ -4,7 +4,7 @@
 #include "Vec3.hpp"
 #include "EulerAngles.hpp"
 #include "PhiMath.hpp"
-#include <cassert>
+#include <assert.h>
 
 namespace Phoenix
 {

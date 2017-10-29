@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RenderDefinitions.hpp"
+#include "../FNVHash.hpp"
 
 #include "../Math/Vec3.hpp"
 #include "../Math/Vec4.hpp"
@@ -9,6 +9,8 @@
 
 namespace Phoenix
 {
+	// Could also have a virtual init and release in each type, would allow init without Device?
+
 	class RIResource
 	{
 	// NOTE(Phil): I want to have this so that I can
@@ -49,29 +51,75 @@ namespace Phoenix
 	class RIRenderTarget : public RIResource
 	{
 	};
+	
+	template <class T>
+	struct DefaultInitHelper
+	{
+		constexpr static T get();
+	};
+
+	template <>
+	struct DefaultInitHelper<int32_t>
+	{
+		constexpr static int32_t get() { return 0; }
+	};
+
+	template <>
+	struct DefaultInitHelper<float>
+	{
+		constexpr static float get() { return 0.f; }
+	};
+
+	template <>
+	struct DefaultInitHelper<Vec3>
+	{
+		constexpr static Vec3 get() { return Vec3{}; }
+	};
+
+	template <>
+	struct DefaultInitHelper<Vec4>
+	{
+		constexpr static Vec4 get() { return Vec4{}; }
+	};
+
+	template <>
+	struct DefaultInitHelper<Matrix3>
+	{
+		constexpr static Matrix3 get() { return Matrix3{}; }
+	};
+
+	template <>
+	struct DefaultInitHelper<Matrix4>
+	{
+		constexpr static Matrix4 get() { return Matrix4{}; }
+	};
 
 	template<class T>
 	class RIUniform : public RIResource
 	{
+	public:
+		RIUniform()
+			: m_value(DefaultInitHelper<T>::get())
+			, m_nameHash(0)
+		{
+		}
+		
 		RIUniform(const T& value, const char* name)
 			: m_value(value)
-			, m_name(nullptr)
 			, m_nameHash(HashFNV<const char*>()(name))
 		{
 		}
 
-		T m_value;
-		virtual const char* getName() { return nullptr; };
 		size_t size() const { return sizeof(T); }
 
-	private:
-		Hash m_nameHash;
+		T m_value;
+		FNVHash m_nameHash;
 	};
 
-	using RIUniformInt = RIUniform<int32_t>;
-	using RIUniformFloat = RIUniform<float>;
-	using RIUniformVec3 = RIUniform<Vec3>;
-	using RIUniformVec4 = RIUniform<Vec4>;
-	using RIUniformMat3 = RIUniform<Matrix3>;
-	using RIUniformMat4 = RIUniform<Matrix4>;
+	using RIUniformInt =   RIUniform<int32_t>;
+	using RIUniformFloat = RIUniform<float> ;
+	using RIUniformVec3 =  RIUniform<Vec3> ;
+	using RIUniformVec4 =  RIUniform<Vec4> ;
+	using RIUniformMat3 =  RIUniform<Matrix3> ;
+	using RIUniformMat4 =  RIUniform<Matrix4> ;
 }

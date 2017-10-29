@@ -16,8 +16,8 @@ namespace Phoenix {
 	public:
 		MatrixData<4> m_data;
 
-		Matrix4()
-			: m_data(MatrixData<4>{})
+		constexpr Matrix4()
+			: m_data(MatrixData<4>())
 		{}
 
 		Matrix4(float m00, float m01, float m02, float m03,

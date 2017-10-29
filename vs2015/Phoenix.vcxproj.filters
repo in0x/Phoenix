@@ -136,6 +136,12 @@
     <ClInclude Include="..\src\Core\Render\RIOpenGL\RIOpenGLResourceStore.hpp">
       <Filter>Render\RIOpenGL</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Core\Render\RIOpenGL\RIGlExistingUniforms.hpp">
+      <Filter>Render\RIOpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\FNVHash.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Core\Math\Matrix3.cpp">
@@ -221,6 +227,9 @@
       <Filter>Render\RIOpenGL</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Core\Render\RIOpenGL\RIWGLGlewSupport.cpp">
+      <Filter>Render\RIOpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Core\Render\RIOpenGL\RIGlExistingUniforms.cpp">
       <Filter>Render\RIOpenGL</Filter>
     </ClCompile>
   </ItemGroup>

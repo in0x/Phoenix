@@ -231,38 +231,7 @@ namespace Phoenix
 //		return handle;
 //	}
 //
-//	void RIContextOpenGL::registerActiveUniforms(ProgramHandle programHandle)
-//	{
-//		GlProgram& program = m_programs[programHandle.idx];
-//
-//		GLint count;
-//		GLint size;
-//		GLenum type;
-//
-//		const GLsizei bufSize = RenderConstants::c_maxUniformNameLenght;
-//		GLchar name[bufSize];
-//		GLsizei length;
-//
-//		glGetProgramiv(program.m_id, GL_ACTIVE_UNIFORMS, &count);
-//
-//		for (GLint i = 0; i < count; ++i)
-//		{
-//			glGetActiveUniform(program.m_id, (GLuint)i, bufSize, &length, &size, &type, name);
-//
-//			UniformHandle handle = addUniform();
-//
-//			GlUniform& uniform = m_uniforms[handle.idx];
-//			uniform.m_type = toUniformType(type);
-//			uniform.m_location = i;
-//			uniform.m_size = 1;
-//
-//			HashFNVIterative<> hash;
-//			hash.add(name, strlen(name));
-//			hash.add(&programHandle.idx, sizeof(decltype(programHandle.idx)));
-//
-//			m_uniformMap[hash()] = handle;
-//		}
-//	}
+
 //
 //	void RIContextOpenGL::createUniform(UniformHandle& uniformHandle, const char* name, EUniform::Type type)
 //	{

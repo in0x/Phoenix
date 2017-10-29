@@ -3,9 +3,11 @@
 #include "RIOpenGLResourceStore.hpp"
 #include "RIDeviceOpenGL.hpp"
 
+#include "../RenderDefinitions.hpp"
 #include "../../Logger.hpp"
 
 #include <assert.h>
+#include <vector>
 
 namespace Phoenix
 {
@@ -180,6 +182,32 @@ namespace Phoenix
 		return handle;
 	}
 	
+	void registerActiveUniforms(const GlProgram& program, GlExisitingUniforms& uniformstore)
+	{
+		GLint count;
+		GLint size;
+		GLenum type;
+	
+		GLint bufSize = 0;
+		glGetProgramiv(program.m_id, GL_ACTIVE_UNIFORM_MAX_LENGTH, &bufSize);
+
+		if (0 == bufSize)
+		{
+			return;
+		}
+
+		std::vector<GLchar> name(bufSize);
+		GLsizei length;
+	
+		glGetProgramiv(program.m_id, GL_ACTIVE_UNIFORMS, &count);
+	
+		for (GLint i = 0; i < count; ++i)
+		{
+			glGetActiveUniform(program.m_id, (GLuint)i, bufSize, &length, &size, &type, name.data());
+			uniformstore.registerUniform(name.data(), program.m_id, i, size);
+		}
+	}
+
 	ProgramHandle RIDeviceOpenGL::createProgram(VertexShaderHandle vsHandle, FragmentShaderHandle fsHandle) 
 	{
 		ProgramHandle handle = m_resources->m_programs.allocateResource();
@@ -198,22 +226,43 @@ namespace Phoenix
 		if (!glIsProgram(progHandle))
 		{
 			Logger::error("Failed to compile shader program.");
+			m_resources->m_programs.destroyResource(handle);
 			handle.invalidate();
 			return handle;
 		}
 
 		program->m_id = progHandle;
-		//registerActiveUniforms(handle);
+		registerActiveUniforms(*program, m_resources->m_actualUniforms);
 
 		checkGlError();
+
+		return handle;
 	}
 
-	IntUniformHandle	 RIDeviceOpenGL::createIntUniform(const char* name, int32_t value) { assert(false); return IntUniformHandle{}; }
-	FloatUniformHandle   RIDeviceOpenGL::createFloatUniform(const char* name, float value) { assert(false); return FloatUniformHandle{}; }
-	Vec3UniformHandle	 RIDeviceOpenGL::createVec3Uniform(const char* name, const Vec3& value) { assert(false); return Vec3UniformHandle{}; }
-	Vec4UniformHandle	 RIDeviceOpenGL::createVec4Uniform(const char* name, const Vec4& value) { assert(false); return Vec4UniformHandle{}; }
-	Mat3UniformHandle	 RIDeviceOpenGL::createMat3Uniform(const char* name, const Matrix3& value) { assert(false); return Mat3UniformHandle{}; }
-	Mat4UniformHandle	 RIDeviceOpenGL::createMat4Uniform(const char* name, const Matrix4& value) { assert(false); return Mat4UniformHandle{}; }
+//#define IMPL_CREATE_UNIFORM(HandleType, DataType, ContainerName) \
+//	HandleType RIDeviceOpenGL::createIntUniform(const char* name, DataType value) \
+//	{ \
+//		HandleType handle = m_resources->ContainerName.allocateResource(); \
+//		auto* uniform = m_resources->ContainerName.getResource(handle); \
+//		uniform->m_value = value; \
+//		uniform->m_nameHash = HashFNV<const char*>()(name); \
+//		return handle; \
+//	} \
+//
+//	IMPL_CREATE_UNIFORM(IntUniformHandle, int32_t, m_intUniforms)
+//		IMPL_CREATE_UNIFORM(FloatUniformHandle, float, m_floatUniforms)
+//		IMPL_CREATE_UNIFORM(Vec3UniformHandle, Vec3, m_vec3Uniforms)
+//		IMPL_CREATE_UNIFORM(Vec4UniformHandle, int32_t, m_intUniforms)
+//		IMPL_CREATE_UNIFORM(Mat3UniformHandle, int32_t, m_intUniforms)
+//		IMPL_CREATE_UNIFORM(Mat4UniformHandle, int32_t, m_intUniforms)
+//
+//	
+//	FloatUniformHandle   RIDeviceOpenGL::createFloatUniform(const char* name, float value) { assert(false); return FloatUniformHandle{}; }
+//	Vec3UniformHandle	 RIDeviceOpenGL::createVec3Uniform(const char* name, const Vec3& value) { assert(false); return Vec3UniformHandle{}; }
+//	Vec4UniformHandle	 RIDeviceOpenGL::createVec4Uniform(const char* name, const Vec4& value) { assert(false); return Vec4UniformHandle{}; }
+//	Mat3UniformHandle	 RIDeviceOpenGL::createMat3Uniform(const char* name, const Matrix3& value) { assert(false); return Mat3UniformHandle{}; }
+//	Mat4UniformHandle	 RIDeviceOpenGL::createMat4Uniform(const char* name, const Matrix4& value) { assert(false); return Mat4UniformHandle{}; }
+
 	Texture2DHandle		 RIDeviceOpenGL::createTexture2D(const TextureDesc& desc) { assert(false); return Texture2DHandle{}; }
 	RenderTargetHandle	 RIDeviceOpenGL::createRenderTarget(const RenderTargetDesc& desc) { assert(false); return RenderTargetHandle{}; }
 

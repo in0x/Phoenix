@@ -129,6 +129,8 @@ int main(int argc, char** argv)
 		return -1;
 	}
 	
+	Matrix4 mat;
+
 	// We need to strap something like a factory around this so we can startup all systems properly.
 	RenderInitWGL init(window.getNativeHandle(), 0);
 	RIOpenGLResourceStore glResources;
