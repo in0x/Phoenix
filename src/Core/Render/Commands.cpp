@@ -79,11 +79,6 @@ namespace Phoenix
 	//const SubmitFptr Commands::DrawIndexed::SubmitFunc = SubmitFunctions::indexedDraw;
 	//const SubmitFptr Commands::DrawLinear::SubmitFunc = SubmitFunctions::linearDraw;
 	//const SubmitFptr Commands::ClearTarget::SubmitFunc = SubmitFunctions::clearTarget;
-	//const SubmitFptr Commands::CreateVertexBuffer::SubmitFunc = SubmitFunctions::vertexBufferCreate;
-	//const SubmitFptr Commands::CreateIndexBuffer::SubmitFunc = SubmitFunctions::indexBufferCreate;
-	//const SubmitFptr Commands::CreateShader::SubmitFunc = SubmitFunctions::shaderCreate;
-	//const SubmitFptr Commands::CreateProgram::SubmitFunc = SubmitFunctions::programCreate;
-	//const SubmitFptr Commands::createTexture::SubmitFunc = SubmitFunctions::textureCreate;
 	//const SubmitFptr Commands::UploadTexture::SubmitFunc = SubmitFunctions::textureUpload;
 	//const SubmitFptr Commands::UploadCubemap::SubmitFunc = SubmitFunctions::cubemapUpload;
 }

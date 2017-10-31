@@ -106,7 +106,7 @@ int main(int argc, char** argv)
 	RenderMesh mesh = loadRenderMesh(*fox, renderDevice);
 	ProgramHandle program = loadProgram(renderDevice, "Shaders/diffuse.vert", "Shaders/diffuse.frag");
 	
-	Matrix4 viewTf = lookAtRH(Vec3{ 0, 0, 5 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 });
+	Matrix4 viewTf = lookAtRH(Vec3{ 0, 0, 4 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 });
 	Matrix4 projTf = perspectiveRH(70, (float)config.width / (float)config.height, 0.1, 100);
 
 	UniformHandle viewMat = renderDevice->createUniform("viewTf", EUniformType::Mat4);
@@ -118,11 +118,6 @@ int main(int argc, char** argv)
 
 	float angle = 0.f;
 
-	renderContext.setShaderProgram(program);
-
-	renderContext.setShaderData(viewMat, program, &viewTf, sizeof(Matrix4));
-	renderContext.setShaderData(projMat, program, &projMat, sizeof(Matrix4));
-
 	while (window.isOpen())
 	{
 		renderContext.clearRenderTargetColor(tempdefault, clearColor);
@@ -131,7 +126,11 @@ int main(int argc, char** argv)
 		angle += 0.05f;
 		mesh.modelMat = Matrix4::rotation(0, angle, 0);
 
+		renderContext.setShaderProgram(program);
+
 		renderContext.setShaderData(mesh.modelMatHandle, program, &mesh.modelMat, sizeof(Matrix4)); 
+		renderContext.setShaderData(viewMat, program, &viewTf, sizeof(Matrix4));
+		renderContext.setShaderData(projMat, program, &projMat, sizeof(Matrix4));
 
 		renderContext.drawIndexed(mesh.vb, mesh.ib, EPrimitive::Triangles, mesh.numVertices, 0);
 		

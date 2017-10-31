@@ -1,7 +1,33 @@
 #pragma once
 
+#include "../RIResourceHandles.h"
+#include "../RenderDefinitions.hpp"
+
 namespace Phoenix
 {
+	struct RIOpenGLResourceStore;
+
+	class RIContextOpenGL
+	{
+	public:
+		RIContextOpenGL(const RIOpenGLResourceStore* resources);
+
+		void drawLinear(VertexBufferHandle vbHandle, EPrimitive primitives, uint32_t count, uint32_t startIndex = 0);
+	
+		void drawIndexed(VertexBufferHandle vbHandle, IndexBufferHandle ibHandle, EPrimitive primitives, uint32_t count, uint32_t startIndex = 0);
+
+		void setShaderProgram(ProgramHandle programHandle);
+
+		void setShaderData(UniformHandle uniformHandle, ProgramHandle programHandle, const void* data, size_t dataSize);
+
+		void clearRenderTargetColor(RenderTargetHandle rtHandle, const RGBA& clearColor);
+
+		void clearRenderTargetDepth(RenderTargetHandle rtHandle);
+
+	private:
+		const RIOpenGLResourceStore* m_resources;
+	};
+
 	//class RIContextOpenGL : public RIContext
 	//{
 	//public:

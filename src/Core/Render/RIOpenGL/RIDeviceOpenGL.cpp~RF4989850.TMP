@@ -20,7 +20,7 @@ namespace Phoenix
 	{
 	}
 
-	GLuint createVBO(size_t typeSize, size_t elementCount, const void* data)
+	GLuint createVBO(size_t typeSize, uint32_t elementCount, const void* data)
 	{
 		GLuint vbo;
 		glGenBuffers(1, &vbo);
@@ -30,7 +30,7 @@ namespace Phoenix
 		return vbo;
 	}
 		
-	GLuint toGlAttribType(EAttributeType type)
+	GLuint attribSizeToGl(EAttributeType type)
 	{
 		switch (type)
 		{
@@ -70,13 +70,13 @@ namespace Phoenix
 			glVertexAttribPointer(
 				location,
 				decl.m_numElements,
-				toGlAttribType(decl.m_type),
+				attribSizeToGl(decl.m_type),
 				data.m_bNormalize,
 				data.m_size,
 				nullptr);
 		}
 		
-		if (checkGlErrorOccured())
+		if (checkGlError())
 		{
 			Logger::error("An error occured during VertexBuffer creation.");
 			m_resources->m_vertexbuffers.destroyResource(handle);
@@ -86,16 +86,16 @@ namespace Phoenix
 		return handle;
 	}
 
-	IndexBufferHandle RIDeviceOpenGL::createIndexBuffer(size_t elementSizeBytes, uint32_t count, const void* data) 
+	IndexBufferHandle RIDeviceOpenGL::createIndexBuffer(size_t size, uint32_t count, const void* data) 
 	{
 		IndexBufferHandle handle = m_resources->m_indexbuffers.allocateResource();
 		GlIndexBuffer* buffer = m_resources->m_indexbuffers.getResource(handle);
 
 		glGenBuffers(1, &buffer->m_id);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer->m_id);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, elementSizeBytes * count, data, GL_STATIC_DRAW); // TODO(Phil): Add dynamic support
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, size * count, data, GL_STATIC_DRAW); // TODO(Phil): Add dynamic support
 
-		if (checkGlErrorOccured())
+		if (checkGlError())
 		{
 			Logger::error("An error occured during IndexBuffer creation.");
 			m_resources->m_indexbuffers.destroyResource(handle);
@@ -150,7 +150,7 @@ namespace Phoenix
 		glShaderSource(shader->m_id, 1, (const char**)&source, NULL);
 		glCompileShader(shader->m_id);
 
-		checkGlErrorOccured();
+		checkGlError();
 		return getAndLogShaderLog(shader->m_id);
 	}
 	
@@ -222,14 +222,14 @@ namespace Phoenix
 		GlVertexShader* vertexshader = m_resources->m_vertexshaders.getResource(vsHandle);
 		GlFragmentShader* fragmentshader = m_resources->m_fragmentshaders.getResource(fsHandle);
 
-		GLuint programId = glCreateProgram();
+		GLuint progHandle = glCreateProgram();
 
-		glAttachShader(programId, vertexshader->m_glShader.m_id);
-		glAttachShader(programId, fragmentshader->m_glShader.m_id);
+		glAttachShader(progHandle, vertexshader->m_glShader.m_id);
+		glAttachShader(progHandle, fragmentshader->m_glShader.m_id);
 
-		glLinkProgram(programId);
+		glLinkProgram(progHandle);
 
-		if (!glIsProgram(programId))
+		if (!glIsProgram(progHandle))
 		{
 			Logger::error("Failed to compile shader program.");
 			m_resources->m_programs.destroyResource(handle);
@@ -237,10 +237,10 @@ namespace Phoenix
 			return handle;
 		}
 
-		program->m_id = programId;
+		program->m_id = progHandle;
 		registerActiveUniforms(*program, m_resources->m_actualUniforms);
 
-		if (checkGlErrorOccured())
+		if (checkGlError())
 		{
 			Logger::error("Failed to compile Shader program!");
 			m_resources->m_programs.destroyResource(handle);
@@ -318,7 +318,7 @@ namespace Phoenix
 			texture->m_cubeface = 0;
 		}*/
 
-		if (checkGlErrorOccured())
+		if (checkGlError())
 		{
 			Logger::error("Failed to compile create Texture2D!");
 			m_resources->m_texture2Ds.destroyResource(handle);
@@ -328,18 +328,9 @@ namespace Phoenix
 		return handle;
 	}
 
-	UniformHandle RIDeviceOpenGL::createUniform(const char* name, EUniformType type)
-	{
-		UniformHandle handle = m_resources->m_uniforms.allocateResource();
-		RIUniform* uniform = m_resources->m_uniforms.getResource(handle);
-		uniform->m_type = type;
-		uniform->m_nameHash = HashFNV<const char*>()(name);
-		return handle;
-	}
-
-	TextureCubeHandle RIDeviceOpenGL::createTextureCube(const TextureDesc& desc) { assert(false); return TextureCubeHandle{}; }
+	TextureCubeHandle	 RIDeviceOpenGL::createTextureCube(const TextureDesc& desc) { assert(false); return TextureCubeHandle{}; }
 
 
-	RenderTargetHandle RIDeviceOpenGL::createRenderTarget(const RenderTargetDesc& desc) { assert(false); return RenderTargetHandle{}; }
+	RenderTargetHandle	 RIDeviceOpenGL::createRenderTarget(const RenderTargetDesc& desc) { assert(false); return RenderTargetHandle{}; }
 
 }

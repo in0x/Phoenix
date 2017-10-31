@@ -62,14 +62,11 @@ class WinFile : public IFile
 }
 
 
-* Enums begin with the letter E and generally use the pattern of namespace:"Enum name", enum:"Thing enum describes"
+* Enums begin with the letter E 
 - Example:
-namespace EUniform
+enum EPixelFormat
 {
-	enum Type
-	{
-		// Enum Types.
-	}
+	R24G8;
 }
 
 * Prefer stdint.h types over regular built-in number types.

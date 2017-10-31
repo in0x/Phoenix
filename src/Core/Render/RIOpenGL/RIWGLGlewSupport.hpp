@@ -9,6 +9,7 @@ namespace Phoenix
 	{
 	public:
 		RIWGLGlewSupport(RenderInit* initValues);
+		void swapBuffers();
 		~RIWGLGlewSupport();
 
 	private:

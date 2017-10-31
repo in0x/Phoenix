@@ -11,16 +11,12 @@ namespace Phoenix
 		EVertexShader,
 		EFragmentShader,
 		EProgram,
-		EIntUniform,
-		EFloatUniform,
-		EVec3Uniform,
-		EVec4Uniform,
-		EMat3Uniform,
-		EMat4Uniform,
+		EUniform,
+		EUniformBuffer,
 		ETexture2D,
+		ETextureCube,
 		ERenderTarget
 	};
-
 
 	template<class IndexType, IndexType MaxValue, EResourceHandleType handleType>
 	class ResourceHandle
@@ -60,12 +56,9 @@ namespace Phoenix
 	using VertexShaderHandle =	 ResourceHandle<size_t, 1024, EResourceHandleType::EVertexShader>;
 	using FragmentShaderHandle = ResourceHandle<size_t, 1024, EResourceHandleType::EFragmentShader>;
 	using ProgramHandle =		 ResourceHandle<size_t, 1024, EResourceHandleType::EProgram>;
-	using IntUniformHandle =	 ResourceHandle<size_t, 1024, EResourceHandleType::EIntUniform>;
-	using FloatUniformHandle =	 ResourceHandle<size_t, 1024, EResourceHandleType::EFloatUniform>;
-	using Vec3UniformHandle =	 ResourceHandle<size_t, 1024, EResourceHandleType::EVec3Uniform>;
-	using Vec4UniformHandle =	 ResourceHandle<size_t, 1024, EResourceHandleType::EVec4Uniform>;
-	using Mat3UniformHandle =	 ResourceHandle<size_t, 1024, EResourceHandleType::EMat3Uniform>;
-	using Mat4UniformHandle =	 ResourceHandle<size_t, 1024, EResourceHandleType::EMat4Uniform>;
+	using UniformHandle =		 ResourceHandle<size_t, 1024, EResourceHandleType::EUniform>;
+	using UniformBufferHandle =  ResourceHandle<size_t, 1024, EResourceHandleType::EUniformBuffer>;
 	using Texture2DHandle =		 ResourceHandle<size_t, 1024, EResourceHandleType::ETexture2D>;
+	using TextureCubeHandle =	 ResourceHandle<size_t, 1024, EResourceHandleType::ETextureCube>;
 	using RenderTargetHandle =	 ResourceHandle<size_t, 1024, EResourceHandleType::ERenderTarget>;
 }

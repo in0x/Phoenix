@@ -3,7 +3,7 @@
 #include "../../glew/glew.h"
 
 const char* getGlErrorString();
-bool checkGlError();
+bool checkGlErrorOccured();
 
 void err_cb(GLenum        source,
 	GLenum        type,

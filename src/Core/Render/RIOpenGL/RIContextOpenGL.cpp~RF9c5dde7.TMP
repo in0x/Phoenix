@@ -5,8 +5,6 @@
 #include "../RenderDefinitions.hpp"
 #include "../../Logger.hpp"
 
-#include "../../Math/Matrix4.hpp"
-
 #include <assert.h>
 
 namespace Phoenix
@@ -14,6 +12,7 @@ namespace Phoenix
 	RIContextOpenGL::RIContextOpenGL(const RIOpenGLResourceStore* resources)
 		: m_resources(resources)
 	{
+					glEnable(GL_DEPTH_TEST);
 	}
 
 	GLenum toGlPrimitive(EPrimitive primitive)
@@ -63,7 +62,6 @@ namespace Phoenix
 		{
 		case EUniformType::Mat4:
 		{
-			const Matrix4* mat = static_cast<const Matrix4*>(data);
 			glUniformMatrix4fv(uniform.m_location, uniform.m_numElements, false, static_cast<const GLfloat*>(data));
 		} break;
 		case EUniformType::Vec3:
@@ -107,20 +105,10 @@ namespace Phoenix
 	
 		if (bIsActive)
 		{
-			//glUseProgram(program->m_id);
+			glUseProgram(program->m_id);
 			setUniform(glUniform, data, uniform->m_type);
 			//glUseProgram(0);
 		}
-	}
-
-	void RIContextOpenGL::clearRenderTargetColor(RenderTargetHandle rtHandle, const RGBA& clearColor)
-	{
-		glClearBufferfv(GL_COLOR, 0, (GLfloat*)&clearColor);
-	}
-	
-	void RIContextOpenGL::clearRenderTargetDepth(RenderTargetHandle rtHandle)
-	{
-		glClear(GL_DEPTH_BUFFER_BIT);
 	}
 
 //	void RIContextOpenGL::swapBuffer()

@@ -1,48 +1,73 @@
 #include "OpenGL.hpp"
-#include <cassert>
+#include <assert.h>
 
-const char* getGlErrorString()
+struct GlErrorMessages
+{
+	static const char* msgNoError;
+	static const char* msgInvalidOperation;
+	static const char* msgInvalidEnum;
+	static const char* msgInvalidValue;
+	static const char* msgOutOfMemory;
+	static const char* msgInvalidFramebufferOperation;
+
+};
+
+const char* GlErrorMessages::msgNoError = "GL Error: No Error";
+const char* GlErrorMessages::msgInvalidOperation = "GL Error: Invalid Operation";
+const char* GlErrorMessages::msgInvalidEnum = "GL Error: Invalid Enum";
+const char* GlErrorMessages::msgInvalidValue = "GL Error: Invalid Value";
+const char* GlErrorMessages::msgOutOfMemory = "GL Error: Out of Memory";
+const char* GlErrorMessages::msgInvalidFramebufferOperation = "GL Error: Invalid Framebuffer Operation";
+
+const char* getGlErrorString(bool& bErrorOccured)
 {
 	GLenum err(glGetError());
 
 	switch (err)
 	{
 	case GL_NO_ERROR:
-		return "GL Error: No Error";
+		bErrorOccured = false;
+		return GlErrorMessages::msgNoError;
 	case GL_INVALID_OPERATION:
 		assert(false);
-		return "INVALID_OPERATION";
+		bErrorOccured = true;
+		return GlErrorMessages::msgInvalidOperation;
 	case GL_INVALID_ENUM:
 		assert(false);
-		return "INVALID_ENUM";
+		bErrorOccured = true;
+		return GlErrorMessages::msgInvalidEnum;
 	case GL_INVALID_VALUE:
 		assert(false);
-		return "INVALID_VALUE";
+		bErrorOccured = true;
+		return GlErrorMessages::msgInvalidValue;
 	case GL_OUT_OF_MEMORY:
 		assert(false);
-		return "OUT_OF_MEMORY";
+		bErrorOccured = true;
+		return GlErrorMessages::msgOutOfMemory;
 	case GL_INVALID_FRAMEBUFFER_OPERATION:
 		assert(false);
-		return "INVALID_FRAMEBUFFER_OPERATION";
+		bErrorOccured = true;
+		return GlErrorMessages::msgInvalidFramebufferOperation;
 	default:
-		return nullptr;
+		bErrorOccured = true;
 		assert(false);
+		return nullptr;		
 	}
 }
 
-#define PHI_SLOW_GL_ERROR_CHECK 0
+#define PHI_SLOW_GL_ERROR_CHECK 1
 
-bool checkGlError()
+bool checkGlErrorOccured()
 {
 #if PHI_SLOW_GL_ERROR_CHECK 
-	const char* errorMsg = getGlErrorString();
-	bool bHasError = nullptr == errorMsg;
-	assert(bHasError);
-	return bHasError;
+	bool bErrorOccured;
+	const char* errorMsg = getGlErrorString(bErrorOccured);
+	assert(!bErrorOccured);
+	return bErrorOccured;
 #else
-	bool bHasError = GL_NO_ERROR == glGetError();
-	assert(bHasError);
-	return bHasError;
+	bool bErrorOccured = glGetError() != GL_NO_ERROR;
+	assert(!bErrorOccured);
+	return bErrorOccured;
 #endif
 }
 

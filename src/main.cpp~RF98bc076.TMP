@@ -30,6 +30,36 @@ namespace Phoenix
 		UniformHandle modelMatHandle;
 	};
 
+	RenderMesh createPlaneMesh(IRIDevice* renderDevice)
+	{
+		RenderMesh mesh;
+
+		// LD, RD, RU, LU
+		Vec3 vertices[] = { Vec3{-0.5, -0.5, 0}, Vec3{0.5, -0.5, 0}, Vec3{0.5, 0.5, 0}, Vec3{-0.5, 0.5, 0} };
+		Vec3 normals[] = { Vec3{ 0,0,1 },Vec3{ 0,0,1 },Vec3{ 0,0,1 },Vec3{ 0,0,1 } };
+
+		uint32_t indices[] = { 0, 1, 2, 0, 2, 3 };
+
+		VertexBufferFormat layout;
+		layout.add({ EAttributeProperty::Position, EAttributeType::Float, 3, },
+		{ sizeof(Vec3), 4, &vertices });
+
+		layout.add({ EAttributeProperty::Normal, EAttributeType::Float, 3, },
+		{ sizeof(Vec3), 4, &normals });
+
+		mesh.vb = renderDevice->createVertexBuffer(layout);
+		mesh.numVertices = 4;
+		mesh.ib = renderDevice->createIndexBuffer(sizeof(unsigned int), 6, &indices);
+		mesh.numIndices = 6;
+
+		mesh.modelMat = Matrix4::translation(0, 0, 5);
+		mesh.modelMatHandle = renderDevice->createUniform("modelTf", EUniformType::Mat4);
+
+		mesh.modelMat = Matrix4::identity();
+
+		return mesh;
+	}
+
 	ProgramHandle loadProgram(IRIDevice* renderDevice, char* vsPath, const char* fsPath)
 	{
 		std::string vsSource = Platform::loadText(vsPath);
@@ -40,30 +70,35 @@ namespace Phoenix
 
 		return renderDevice->createProgram(vs, fs);
 	}
-
-	RenderMesh loadRenderMesh(const Mesh& mesh, IRIDevice* renderDevice)
-	{
-		RenderMesh renderMesh;
-
-		renderMesh.modelMat = Matrix4::identity();
-
-		VertexBufferFormat layout;
-		layout.add({ EAttributeProperty::Position, EAttributeType::Float, 3 },
-		{ sizeof(Vec3), mesh.vertices.size(), mesh.vertices.data() });
-
-		layout.add({ EAttributeProperty::Normal, EAttributeType::Float, 3 },
-		{ sizeof(Vec3), mesh.normals.size(), mesh.normals.data() });
-
-		renderMesh.vb = renderDevice->createVertexBuffer(layout);
-		renderMesh.ib = renderDevice->createIndexBuffer(sizeof(uint32_t), mesh.indices.size(), mesh.indices.data());
-		renderMesh.modelMatHandle = renderDevice->createUniform("modelTf", EUniformType::Mat4);
-
-		renderMesh.numVertices = mesh.vertices.size();
-		renderMesh.numIndices = mesh.indices.size();
-
-		return renderMesh;
-	}
+//
+//	TextureDesc createDesc(const Texture& texture, ETexture::Filter minFilter, ETexture::Filter maxFilter)
+//	{
+//		TextureDesc desc;
+//		desc.width = texture.m_width;
+//		desc.height = texture.m_height;
+//
+//		switch (texture.m_components)
+//		{
+//		case 4:
+//		{ desc.components = ETexture::RGBA; } break;
+//		case 3:
+//		{ desc.components = ETexture::RGB; } break;
+//		case 2:
+//		{ desc.components = ETexture::RG; } break;
+//		case 1:
+//		{ desc.components = ETexture::R; } break;
+//		default: { assert(false); } break;
+//			// TODO(Phil): How do we handle depth?
+//		}
+//
+//		desc.minFilter = minFilter;
+//		desc.magFilter = maxFilter;
+//
+//		// Mips?
+//		return desc;
+//	}
 }
+
 
 int main(int argc, char** argv)
 {
@@ -94,54 +129,28 @@ int main(int argc, char** argv)
 		return -1;
 	}
 	
+	Matrix4 mat;
+
 	// We need to strap something like a factory around this so we can startup all systems properly.
-	RenderInitWGL init(window.getNativeHandle(), 2);
+	RenderInitWGL init(window.getNativeHandle(), 0);
 	
 	RIOpenGLResourceStore glResources;
 	
-	RIWGLGlewSupport wgl(&init);
+	RIWGLGlewSupport glew(&init);
 	IRIDevice* renderDevice = new RIDeviceOpenGL(&glResources);
 	RIContextOpenGL renderContext(&glResources);
 
-	RenderMesh mesh = loadRenderMesh(*fox, renderDevice);
-	ProgramHandle program = loadProgram(renderDevice, "Shaders/diffuse.vert", "Shaders/diffuse.frag");
+	RenderMesh plane = createPlaneMesh(renderDevice);
+	ProgramHandle planeProgram = loadProgram(renderDevice, "Shaders/reflect.vert", "Shaders/reflect.frag");
+
+	renderContext.setShaderData(plane.modelMatHandle, planeProgram, &plane.modelMat, sizeof(decltype(plane.modelMat)));
+	renderContext.setShaderProgram(planeProgram);
+	renderContext.drawIndexed(plane.vb, plane.ib, EPrimitive::Triangles, plane.numVertices, 0);
 	
-	Matrix4 viewTf = lookAtRH(Vec3{ 0, 0, 5 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 });
-	Matrix4 projTf = perspectiveRH(70, (float)config.width / (float)config.height, 0.1, 100);
-
-	UniformHandle viewMat = renderDevice->createUniform("viewTf", EUniformType::Mat4);
-	UniformHandle projMat = renderDevice->createUniform("projectionTf", EUniformType::Mat4);
-
-	RGBA clearColor{ 0.f, 0.f, 0.f, 1.f };
-	RenderTargetHandle tempdefault;
-	tempdefault.m_idx = 0;
-
-	float angle = 0.f;
-
-	renderContext.setShaderProgram(program);
-
-	renderContext.setShaderData(viewMat, program, &viewTf, sizeof(Matrix4));
-	renderContext.setShaderData(projMat, program, &projMat, sizeof(Matrix4));
-
-	while (window.isOpen())
-	{
-		renderContext.clearRenderTargetColor(tempdefault, clearColor);
-		renderContext.clearRenderTargetDepth(tempdefault);
-
-		angle += 0.05f;
-		mesh.modelMat = Matrix4::rotation(0, angle, 0);
-
-		renderContext.setShaderData(mesh.modelMatHandle, program, &mesh.modelMat, sizeof(Matrix4)); 
-
-		renderContext.drawIndexed(mesh.vb, mesh.ib, EPrimitive::Triangles, mesh.numVertices, 0);
-		
-		wgl.swapBuffers();
-		window.processMessages();
-
-		checkGlErrorOccured();
-	}
+	glew.swapBuffers();
 
 	delete renderDevice;
+
 
 	/*WGlRenderInit renderInit(window.getNativeHandle(), 4);
 	RenderFrontend::init(&renderInit);
@@ -149,6 +158,8 @@ int main(int argc, char** argv)
 	RenderMesh planeMesh = createPlaneMesh();
 	ProgramHandle planeProgram = loadProgram("Shaders/reflect.vert", "Shaders/reflect.frag");
 
+	UniformHandle viewMat = RenderFrontend::createUniform("viewTf", EUniform::Mat4, &lookAtRH(Vec3{ 0, 0, 2 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 }), sizeof(Matrix4));
+	UniformHandle projectionMat = RenderFrontend::createUniform("projectionTf", EUniform::Mat4, &perspectiveRH(70, (float)config.width / (float)config.height, 1, 100), sizeof(Matrix4));
 	UniformHandle lightPos = RenderFrontend::createUniform("lightPosition", EUniform::Vec3, &Vec3(-5, 3, 5), sizeof(Vec3));
 
 	float angle = 0.f;

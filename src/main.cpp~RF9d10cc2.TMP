@@ -30,6 +30,36 @@ namespace Phoenix
 		UniformHandle modelMatHandle;
 	};
 
+	RenderMesh createPlaneMesh(IRIDevice* renderDevice)
+	{
+		RenderMesh mesh;
+
+		// LD, RD, RU, LU
+		Vec3 vertices[] = { Vec3{-0.5, -0.5, 0}, Vec3{0.5, -0.5, 0}, Vec3{0.5, 0.5, 0}, Vec3{-0.5, 0.5, 0} };
+		Vec3 normals[] = { Vec3{ 0,0,1 },Vec3{ 0,0,1 },Vec3{ 0,0,1 },Vec3{ 0,0,1 } };
+
+		uint32_t indices[] = { 0, 1, 2, 0, 2, 3 };
+
+		VertexBufferFormat layout;
+		layout.add({ EAttributeProperty::Position, EAttributeType::Float, 3, },
+		{ sizeof(Vec3), 4, &vertices });
+
+		layout.add({ EAttributeProperty::Normal, EAttributeType::Float, 3, },
+		{ sizeof(Vec3), 4, &normals });
+
+		mesh.vb = renderDevice->createVertexBuffer(layout);
+		mesh.numVertices = 4;
+		mesh.ib = renderDevice->createIndexBuffer(sizeof(unsigned int), 6, &indices);
+		mesh.numIndices = 6;
+
+		mesh.modelMat = Matrix4::translation(0, 0, 5);
+		mesh.modelMatHandle = renderDevice->createUniform("modelTf", EUniformType::Mat4);
+
+		mesh.modelMat = Matrix4::identity();
+
+		return mesh;
+	}
+
 	ProgramHandle loadProgram(IRIDevice* renderDevice, char* vsPath, const char* fsPath)
 	{
 		std::string vsSource = Platform::loadText(vsPath);
@@ -63,6 +93,33 @@ namespace Phoenix
 
 		return renderMesh;
 	}
+//
+//	TextureDesc createDesc(const Texture& texture, ETexture::Filter minFilter, ETexture::Filter maxFilter)
+//	{
+//		TextureDesc desc;
+//		desc.width = texture.m_width;
+//		desc.height = texture.m_height;
+//
+//		switch (texture.m_components)
+//		{
+//		case 4:
+//		{ desc.components = ETexture::RGBA; } break;
+//		case 3:
+//		{ desc.components = ETexture::RGB; } break;
+//		case 2:
+//		{ desc.components = ETexture::RG; } break;
+//		case 1:
+//		{ desc.components = ETexture::R; } break;
+//		default: { assert(false); } break;
+//			// TODO(Phil): How do we handle depth?
+//		}
+//
+//		desc.minFilter = minFilter;
+//		desc.magFilter = maxFilter;
+//
+//		// Mips?
+//		return desc;
+//	}
 }
 
 int main(int argc, char** argv)
@@ -103,42 +160,29 @@ int main(int argc, char** argv)
 	IRIDevice* renderDevice = new RIDeviceOpenGL(&glResources);
 	RIContextOpenGL renderContext(&glResources);
 
-	RenderMesh mesh = loadRenderMesh(*fox, renderDevice);
+	RenderMesh foxMesh = loadRenderMesh(*fox, renderDevice);
+	foxMesh.modelMat = Matrix4::translation(0, 0, -5);
 	ProgramHandle program = loadProgram(renderDevice, "Shaders/diffuse.vert", "Shaders/diffuse.frag");
-	
-	Matrix4 viewTf = lookAtRH(Vec3{ 0, 0, 5 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 });
+
+	Matrix4 viewTf = lookAtRH(Vec3{ 0, 0, 2 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 });
 	Matrix4 projTf = perspectiveRH(70, (float)config.width / (float)config.height, 0.1, 100);
 
 	UniformHandle viewMat = renderDevice->createUniform("viewTf", EUniformType::Mat4);
 	UniformHandle projMat = renderDevice->createUniform("projectionTf", EUniformType::Mat4);
 
-	RGBA clearColor{ 0.f, 0.f, 0.f, 1.f };
 	RenderTargetHandle tempdefault;
-	tempdefault.m_idx = 0;
-
-	float angle = 0.f;
-
-	renderContext.setShaderProgram(program);
-
-	renderContext.setShaderData(viewMat, program, &viewTf, sizeof(Matrix4));
-	renderContext.setShaderData(projMat, program, &projMat, sizeof(Matrix4));
 
 	while (window.isOpen())
 	{
-		renderContext.clearRenderTargetColor(tempdefault, clearColor);
-		renderContext.clearRenderTargetDepth(tempdefault);
+		renderContext.setShaderData(foxMesh.modelMatHandle, program, &foxMesh.modelMat, sizeof(decltype(foxMesh.modelMat)));
+		renderContext.setShaderData(viewMat, program, &viewTf, sizeof(Matrix4));
+		renderContext.setShaderData(projMat, program, &projMat, sizeof(Matrix4));
 
-		angle += 0.05f;
-		mesh.modelMat = Matrix4::rotation(0, angle, 0);
-
-		renderContext.setShaderData(mesh.modelMatHandle, program, &mesh.modelMat, sizeof(Matrix4)); 
-
-		renderContext.drawIndexed(mesh.vb, mesh.ib, EPrimitive::Triangles, mesh.numVertices, 0);
-		
+		renderContext.setShaderProgram(program);
+		renderContext.drawIndexed(foxMesh.vb, foxMesh.ib, EPrimitive::Triangles, foxMesh.numVertices, 0);
+	
 		wgl.swapBuffers();
 		window.processMessages();
-
-		checkGlErrorOccured();
 	}
 
 	delete renderDevice;

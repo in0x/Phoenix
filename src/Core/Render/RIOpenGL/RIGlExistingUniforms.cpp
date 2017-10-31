@@ -23,9 +23,14 @@ namespace Phoenix
 		m_existingUniforms.emplace(hashValue, GlUniform{ location, numElements });
 	}
 
-	bool GlExisitingUniforms::getUniformIfExisting(FNVHash uniformHash, GLuint programID, GlUniform& outUniform) const
+	bool GlExisitingUniforms::getUniformIfExisting(const char* name, GLuint programID, GlUniform& outUniform) const
 	{
-		FNVHash hashWithProgram	= hashBytes(&programID, sizeof(GLuint), uniformHash);
+		return getUniformIfExisting(HashFNV<const char*>()(name), programID, outUniform);
+	}
+
+	bool GlExisitingUniforms::getUniformIfExisting(FNVHash nameHash, GLuint programID, GlUniform& outUniform) const
+	{
+		FNVHash hashWithProgram = hashBytes(&programID, sizeof(GLuint), nameHash);
 		auto uniformIt = m_existingUniforms.find(hashWithProgram);
 
 		if (m_existingUniforms.end() == uniformIt)

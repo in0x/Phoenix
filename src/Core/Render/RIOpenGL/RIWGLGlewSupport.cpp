@@ -71,6 +71,11 @@ namespace Phoenix
 		delete m_details;
 	}
 
+	void RIWGLGlewSupport::swapBuffers()
+	{
+		SwapBuffers(m_details->deviceContext);
+	}
+
 	void RIWGLGlewSupport::checkMsaaSupport(const RenderInitWGL& initValues)
 	{
 		if (!glewIsSupported("GL_ARB_multisample"))

@@ -7,33 +7,29 @@
 
 namespace Phoenix
 {
-	namespace ERenderApi
+	enum class ERenderApi
 	{
-		enum Type
-		{
-			Gl,
-			DX11,
-			NoOp
-		};
-	}
+		Gl,
+		NoOp
+	};
 
 	// Should be subclassed to pass to specific RenderContext implementations
 	class RenderInit
 	{
 	public:
-		ERenderApi::Type getApiType()
+		ERenderApi getApiType()
 		{
 			return m_apiType;
 		}
 
 	protected:
-		RenderInit(ERenderApi::Type apiType = ERenderApi::NoOp)
+		RenderInit(ERenderApi apiType = ERenderApi::NoOp)
 			: m_apiType(apiType)
 		{}
 
 		virtual ~RenderInit() {}
 
-		ERenderApi::Type m_apiType;
+		ERenderApi m_apiType;
 	};
 
 	class RIContext;
@@ -57,30 +53,34 @@ namespace Phoenix
 
 	// Begin VertexBuffer.h
 
-	namespace EAttributeProperty
+	enum class EAttributeProperty
 	{
-		enum Value
-		{
-			Position,
-			Normal,
-			Color,
-			Bitangent,
-			TexCoord,
-			Count,
-		};
-	}
+		Position,
+		Normal,
+		Color,
+		Bitangent,
+		TexCoord,
+		Count,
+	};
+	
+	enum class EAttributeType
+	{
+		Double,
+		Float,
+		Uint,
+		Int,
+		Count
+	};
 
-	namespace EAttributeType
+	enum class EUniformType
 	{
-		enum Value
-		{
-			Double,
-			Float,
-			Uint,
-			Int,
-			Count
-		};
-	}
+		Int,
+		Float,
+		Vec3,
+		Vec4,
+		Mat3,
+		Mat4
+	};
 
 	// NOTE(Phil): Decl and data should likely be seperated into
 	// two types, as multiple vertexbuffers may share the same
@@ -97,14 +97,14 @@ namespace Phoenix
 			{}
 
 
-			Decl(EAttributeProperty::Value type, EAttributeType::Value size, uint8_t numElement)
+			Decl(EAttributeProperty type, EAttributeType size, uint8_t numElement)
 				: m_property(type)
 				, m_type(size)
 				, m_numElements(numElement)
 			{}
 
-			EAttributeProperty::Value m_property; // The kind of property the attrib sets (position, normal, color, etc.)
-			EAttributeType::Value m_type; // The datatype of the property (float, int, etc.)
+			EAttributeProperty m_property; // The kind of property the attrib sets (position, normal, color, etc.)
+			EAttributeType m_type; // The datatype of the property (float, int, etc.)
 			uint8_t m_numElements; // The number of elements (e.g. 3 for a Vec3)
 		};
 
@@ -133,7 +133,6 @@ namespace Phoenix
 		Decl m_decl;
 		Data m_data;
 	};
-
 
 	// Describes the layout and content of a buffer used as input for a vertex shader.
 	class VertexBufferFormat
@@ -164,10 +163,10 @@ namespace Phoenix
 		}
 
 	private:
-		std::array<VertexAttrib, EAttributeProperty::Count> m_attribs;
+		std::array<VertexAttrib, static_cast<size_t>(EAttributeProperty::Count)> m_attribs;
 		size_t m_index;
-
-		VertexAttrib* has(EAttributeProperty::Value attribType)
+		
+		VertexAttrib* has(EAttributeProperty attribType)
 		{
 			for (auto& attrib : m_attribs)
 			{
@@ -180,95 +179,40 @@ namespace Phoenix
 
 	// end VertexBuffer.h
 
-	namespace EPrimitive
+	enum class EPrimitive
 	{
-		enum Type
-		{
-			Points,
-			Lines,
-			Triangles,
-			TriangleStrip,
-			Quads
-		};
+		Points,
+		Lines,
+		Triangles,
+		Quads
 	};
 
-	namespace EBlend
+	enum class EDepth
 	{
-		enum Type
-		{
-			Opaque
-		};
-	}
+		Enable,
+		Disable
+	};
 
-	namespace ERaster
+	enum class EPixelFormat
 	{
-		enum Type
-		{
-			Placeholder
-		};
-	}
+		None, 
+		R8G8B8A8
+	};
 
-	namespace EDepth
+	enum class ETextureFilter
 	{
-		enum Type
-		{
-			Enable,
-			Disable
-		};
-	}
-
-	namespace EStencil
-	{
-		enum Type
-		{
-			Placeholder
-		};
-	}
-
-	namespace EBuffer
-	{
-		enum Type
-		{
-			Color,
-			Depth,
-			Stencil 
-		};
-	}
-
-	namespace ETexture
-	{
-		enum Format
-		{
-			Tex1D,
-			Tex2D,
-			Tex3D,
-			CubeMap
-		};
-		
-		enum Components
-		{
-			R,
-			RG,
-			RGB,
-			RGBA,
-			DEPTH
-		};
-
-		enum Filter
-		{
-			Nearest,
-			Linear
-		};
-	}
+		Nearest,
+		Linear
+	};
 
 	class TextureDesc
 	{
 	public:
 		uint32_t width;
 		uint32_t height;
-		ETexture::Components components;
-		ETexture::Filter minFilter;
-		ETexture::Filter magFilter;
+		EPixelFormat pixelFormat;
+		ETextureFilter minFilter;
+		ETextureFilter magFilter;
 		uint8_t numMips;
 	};
 
@@ -325,6 +269,11 @@ namespace Phoenix
 	};
 
 	struct UniformInfo;
+
+	class PipelineState
+	{
+
+	};
 	
 	//struct StateGroup
 	//{

@@ -1,6 +1,12 @@
 #pragma once
 
 #include "RenderDefinitions.hpp"
+#include "RIResourceHandles.h"
+
+#include "../Math/Vec3.hpp"
+#include "../Math/Vec4.hpp"
+#include "../Math/Matrix3.hpp"
+#include "../Math/Matrix4.hpp"
 
 // NOTE(Phil): Directly interpreting commands with OpenGL/DX might be more flexible (instead of using the IRenderBackend interface)
 
@@ -12,114 +18,95 @@ namespace Phoenix
 	// contain a static pointer to a funtion with the SubmitFptr signature -
 	// this is the submit function. The submit function uses the command's 
 	// data and the RenderContext to execute the action.
-	namespace Commands
+	
+	struct RIDrawIndexedCommand
 	{
-		/*struct DrawIndexed
-		{
-			SUBMITTABLE();
+		uint32_t start;
+		uint32_t count;
 
-			uint32_t start;
-			uint32_t count;
+		EPrimitive primitives;
+		VertexBufferHandle vertexBuffer;
+		IndexBufferHandle indexBuffer;
+		//CStateGroup state;
+	};
 
-			EPrimitive::Type primitives;
-			VertexBufferHandle vertexBuffer;
-			IndexBufferHandle indexBuffer;
-			CStateGroup state;
-		};
+	struct RIDrawLinearCommand
+	{
+		uint32_t start;
+		uint32_t count;
 
-		struct DrawLinear
-		{
-			SUBMITTABLE();
+		EPrimitive primitives;
+		VertexBufferHandle vertexBuffer;
+		//CStateGroup state;
+	};
 
-			uint32_t start;
-			uint32_t count;
+	/*struct ClearTarget
+	{
+		SUBMITTABLE();
 
-			EPrimitive::Type primitives;
-			VertexBufferHandle vertexBuffer;
-			CStateGroup state;
-		};
+		RGBA color;
+		EBuffer::Type toClear;
+		RenderTargetHandle handle;
+	};*/
 
-		struct ClearTarget
-		{
-			SUBMITTABLE();
+	struct RISetUniformInt32Command
+	{
+		int32_t data;
+		ProgramHandle usingProgram;
+		UniformHandle uniform;
+	};
 
-			RGBA color;
-			EBuffer::Type toClear;
-			RenderTargetHandle handle;
-		};
+	struct RISetUniformFloatCommand
+	{
+		float data;
+		ProgramHandle usingProgram;
+		UniformHandle uniform;
+	};
 
-		struct CreateVertexBuffer
-		{
-			SUBMITTABLE();
+	struct RISetUniformVec3Command
+	{
+		Vec3 data;
+		ProgramHandle usingProgram;
+		UniformHandle uniform;
+	};
 
-			VertexBufferFormat format;
-			VertexBufferHandle handle;
-		};
+	struct RISetUniformVec4Command
+	{
+		Vec4 data;
+		ProgramHandle usingProgram;
+		UniformHandle uniform;
+	};
 
-		struct CreateIndexBuffer
-		{
-			SUBMITTABLE();
+	struct RISetUniformMatrix3Command
+	{
+		Matrix3 data;
+		ProgramHandle usingProgram;
+		UniformHandle uniform;
+	};
 
-			const void* data;
-			size_t size;
-			uint32_t count;
-			IndexBufferHandle handle;
-		};
+	struct RISetUniformMatrix4Command
+	{
+		Matrix4 data;
+		ProgramHandle usingProgram;
+		UniformHandle uniform;
+	};
 
-		struct CreateShader
-		{
-			SUBMITTABLE();
+	struct RIUploadTexture2DCommand
+	{
+		const void* data;
+		uint32_t width;
+		uint32_t height;
+		Texture2DHandle handle;
+	};
 
-			char* source;
-			EShader::Type shaderType;
-			ShaderHandle handle;
-		};
-
-		struct CreateProgram
-		{
-			SUBMITTABLE();
-
-			EShader::List shaders;
-			ProgramHandle handle;
-		};
-
-		struct SetUniform
-		{
-			SUBMITTABLE();
-
-			const void* data;
-			UniformHandle handle;
-		};
-
-		struct createTexture
-		{
-			SUBMITTABLE();
-
-			TextureDesc desc;
-			char* name;
-			ETexture::Format format;
-			TextureHandle handle;
-		};
-
-		struct UploadTexture
-		{
-			SUBMITTABLE();
-
-			const void* data;
-			uint32_t width;
-			uint32_t height;
-			TextureHandle handle;
-		};
-
-		struct UploadCubemap
-		{
-			SUBMITTABLE();
+/*	struct UploadCubemap
+	{
+		SUBMITTABLE();
 			
-			CubemapData data;
-			uint32_t width;
-			uint32_t height;
-			TextureHandle handle;
-		};
-	*/
-	}
+		CubemapData data;
+		uint32_t width;
+		uint32_t height;
+		TextureHandle handle;
+	};*/
+
 }

@@ -27,8 +27,13 @@ namespace Phoenix
 				delete m_resources[i].m_pToResource;
 			}
 		}
+		
+		Resource* getResource(Handle handle) 
+		{
+			return m_resources[handle.m_idx].m_pToResource;
+		}
 
-		Resource* getResource(Handle handle)
+		const Resource* getResource(Handle handle) const
 		{
 			return m_resources[handle.m_idx].m_pToResource;
 		}
@@ -48,7 +53,8 @@ namespace Phoenix
 
 			item->m_pToResource = new Resource;
 
-			handle.m_idx = reinterpret_cast<char*>(item) - reinterpret_cast<char*>(&m_resources[0]);
+			ptrdiff_t offsetfromstart = reinterpret_cast<char*>(item) - reinterpret_cast<char*>(&m_resources[0]);
+			handle.m_idx = offsetfromstart / sizeof(ResourceListSlot);
 			return handle;
 		}
 
