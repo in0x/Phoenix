@@ -6,6 +6,9 @@
 namespace Phoenix
 {
 	struct RIOpenGLResourceStore;
+	class GlVertexBuffer;
+	class GlIndexBuffer;
+	class GlProgram;
 
 	class RIContextOpenGL
 	{
@@ -13,12 +16,12 @@ namespace Phoenix
 		RIContextOpenGL(const RIOpenGLResourceStore* resources);
 
 		void drawLinear(VertexBufferHandle vbHandle, EPrimitive primitives, uint32_t count, uint32_t startIndex = 0);
-	
+
 		void drawIndexed(VertexBufferHandle vbHandle, IndexBufferHandle ibHandle, EPrimitive primitives, uint32_t count = 0, uint32_t startIndex = 0);
 
 		void setShaderProgram(ProgramHandle programHandle);
 
-		void setProgramData(UniformHandle uniformHandle, ProgramHandle programHandle, const void* data);
+		void bindUniform(UniformHandle uniformHandle, const void* data);
 
 		void setVertexBuffer(VertexBufferHandle vbHandle);
 
@@ -28,8 +31,24 @@ namespace Phoenix
 
 		void clearRenderTargetDepth(RenderTargetHandle rtHandle);
 
+		void uploadTextureData(Texture2DHandle handle, const void* data);
+
+		void bindTexture(Texture2DHandle handle);
+
+		void endFrame();
+
+		uint32_t getMaxTextureUnits() const;
+
 	private:
 		const RIOpenGLResourceStore* m_resources;
+
+		struct BoundState
+		{
+			const GlVertexBuffer* vertexbuffer = nullptr;
+			const GlIndexBuffer* indexbuffer = nullptr ;
+			const GlProgram*	program = nullptr;
+			uint8_t activeTextureCount = 0;
+		} m_boundState;
 	};
 
 	//class RIContextOpenGL : public RIContext

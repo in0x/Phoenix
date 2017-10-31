@@ -149,7 +149,7 @@ namespace Phoenix
 
 		if (!bIsActive)
 		{
-			Logger::errorf("Texture %d does not have an equivalent sampler in currently bound program", texture->m_namehash);
+			Logger::errorf("Texture ");
 			return;
 		}
 
@@ -318,7 +318,40 @@ namespace Phoenix
 //			|| typeVal == GL_TEXTURE_CUBE_MAP
 //			|| typeVal == GL_TEXTURE_1D);
 //	}
+//
+//	UniformHandle RIContextOpenGL::addUniform()
+//	{
+//		UniformHandle handle = createUniformHandle();
+//		handle.idx = m_uniformCount++;
+//		return handle;
+//	}
+//
 
+//
+//	void RIContextOpenGL::createUniform(UniformHandle& uniformHandle, const char* name, EUniform::Type type)
+//	{
+//	}
+//
+
+//
+//	void RIContextOpenGL::setVertexBuffer(VertexBufferHandle vb)
+//	{
+//		GlVertexBuffer buffer = m_vertexBuffers[vb.idx];
+//		glBindVertexArray(buffer.m_id);
+//	}
+//
+//	void RIContextOpenGL::setIndexBuffer(IndexBufferHandle ib)
+//	{
+//		GlIndexBuffer buffer = m_indexBuffers[ib.idx];
+//		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.m_id);
+//	}
+//
+//	void RIContextOpenGL::RIContextOpenGL::setProgram(ProgramHandle prog)
+//	{
+//		GlProgram program = m_programs[prog.idx];
+//		glUseProgram(program.m_id);
+//	}
+//
 //	void RIContextOpenGL::setDepth(EDepth::Type depth)
 //	{
 //		switch (depth)
@@ -349,7 +382,21 @@ namespace Phoenix
 //	{
 //		Logger::warning(__LOCATION_INFO__ "not implemented!");
 //	}
-
+//
+//	GLenum getPrimitiveEnum(EPrimitive::Type type)
+//	{
+//		static constexpr GLuint glType[] =
+//		{
+//			GL_POINTS,
+//			GL_LINES,
+//			GL_TRIANGLES,
+//			GL_TRIANGLE_STRIP,
+//			GL_QUADS
+//		};
+//
+//		return glType[type];
+//	}
+//
 
 //
 //	void RIContextOpenGL::bindTexture(const GlUniform& uniform, const GlTexture2D& texture)

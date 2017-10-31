@@ -22,7 +22,7 @@ namespace Phoenix
 		virtual VertexShaderHandle	 createVertexShader(const char* source) override;
 		virtual FragmentShaderHandle createFragmentShader(const char* source) override;
 		virtual ProgramHandle		 createProgram(VertexShaderHandle vsHandle, FragmentShaderHandle fsHandle) override;
-		virtual Texture2DHandle		 createTexture2D(const TextureDesc& desc) override;
+		virtual Texture2DHandle		 createTexture2D(const TextureDesc& desc, const char* name) override;
 		virtual TextureCubeHandle	 createTextureCube(const TextureDesc& desc) override;
 		virtual RenderTargetHandle	 createRenderTarget(const RenderTargetDesc& desc) override;
 		virtual UniformHandle		 createUniform(const char* name, EUniformType type) override;

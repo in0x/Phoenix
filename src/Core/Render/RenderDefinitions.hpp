@@ -196,7 +196,8 @@ namespace Phoenix
 	enum class EPixelFormat
 	{
 		None,
-		R8G8B8A8
+		R8G8B8A8,
+		R8G8B8,
 	};
 
 	enum class ETextureFilter

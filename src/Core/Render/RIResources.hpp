@@ -50,10 +50,12 @@ namespace Phoenix
 		RITexture()
 			: m_pixelFormat(EPixelFormat::None)
 			, m_numMips(0)
+			, m_namehash(0)
 		{}
 
 		EPixelFormat m_pixelFormat;
 		uint8_t m_numMips;
+		FNVHash m_namehash;
 	};
 
 	class RITexture2D : public RITexture

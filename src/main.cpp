@@ -21,12 +21,6 @@
 
 namespace Phoenix
 {
-	//template <size_t size>
-	//class StaticStackAllocator
-	//{
-	//	uint8_t m_bytes[size];
-	//};
-	
 	struct RenderMesh
 	{
 		Matrix4 modelMat;
@@ -36,6 +30,34 @@ namespace Phoenix
 		uint32_t numIndices;
 		UniformHandle modelMatHandle;
 	};
+
+	RenderMesh createPlaneMesh(IRIDevice* renderDevice)
+	{
+		RenderMesh mesh;
+
+		// LD, RD, RU, LU
+		Vec3 vertices[] = { Vec3{ -0.5, -0.5, 0 }, Vec3{ 0.5, -0.5, 0 }, Vec3{ 0.5, 0.5, 0 }, Vec3{ -0.5, 0.5, 0 } };
+		Vec2 uv[] = { Vec2{ 0.0 ,1.0 }, Vec2{ 1.0 ,1.0 }, Vec2{ 1.0 ,0.0 }, Vec2{ 0.0 ,0.0 } };
+
+		uint32_t indices[] = { 0, 1, 2, 0, 2, 3 };
+
+		VertexBufferFormat layout;
+		layout.add({ EAttributeProperty::Position, EAttributeType::Float, 3, },
+		{ sizeof(Vec3), 4, &vertices });
+
+		layout.add({ EAttributeProperty::TexCoord, EAttributeType::Float, 2 },
+		{ sizeof(Vec2), 4, &uv });
+
+		mesh.vb = renderDevice->createVertexBuffer(layout);
+		mesh.numVertices = 4;
+		mesh.ib = renderDevice->createIndexBuffer(sizeof(unsigned int), 6, &indices);
+		mesh.numIndices = 6;
+
+		mesh.modelMat = Matrix4::identity();
+		mesh.modelMatHandle = renderDevice->createUniform("modelTf", EUniformType::Mat4);
+		
+		return mesh;
+	}
 
 	ProgramHandle loadProgram(IRIDevice* renderDevice, char* vsPath, const char* fsPath)
 	{
@@ -73,6 +95,33 @@ namespace Phoenix
 		renderMesh.numIndices = mesh.indices.size();
 
 		return renderMesh;
+	}
+	
+	TextureDesc createDesc(const Texture& texture, ETextureFilter minFilter, ETextureFilter magFilter, uint8_t numMips = 0)
+	{
+		TextureDesc desc;
+		desc.width = texture.m_width;
+		desc.height = texture.m_height;
+
+		switch (texture.m_components)
+		{
+		case 4:
+		{ desc.pixelFormat = EPixelFormat::R8G8B8A8; } break;
+		case 3: 
+		{ desc.pixelFormat = EPixelFormat::R8G8B8; } break;
+		case 2:
+		{ assert(false); } break; 
+		case 1:
+		{ assert(false); } break;
+		default: { assert(false); } break;
+		}
+
+		desc.minFilter = minFilter;
+		desc.magFilter = magFilter;
+
+		desc.numMips = numMips;
+
+		return desc;
 	}
 }
 
@@ -114,35 +163,42 @@ int main(int argc, char** argv)
 	IRIDevice* renderDevice = new RIDeviceOpenGL(&glResources);
 	RIContextOpenGL renderContext(&glResources);
 
-	RenderMesh mesh = loadRenderMesh(*fox, renderDevice);
-
-	ProgramHandle programHandle = loadProgram(renderDevice, "Shaders/diffuse.vert", "Shaders/diffuse.frag");
+	RenderMesh mesh = createPlaneMesh(renderDevice);
 	
-	Matrix4 viewTf = lookAtRH(Vec3{ 0, 0, 10 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 });
+	ProgramHandle programHandle = loadProgram(renderDevice, "Shaders/textured.vert", "Shaders/textured.frag");
+	
+	Matrix4 viewTf = lookAtRH(Vec3{ 0, 0, 5 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 });
 	Matrix4 projTf = perspectiveRH(70, (float)config.width / (float)config.height, 0.1, 100);
 
 	UniformHandle viewMat = renderDevice->createUniform("viewTf", EUniformType::Mat4);
 	UniformHandle projMat = renderDevice->createUniform("projectionTf", EUniformType::Mat4);
 
-	renderContext.setProgramData(viewMat, programHandle, &viewTf);
-	renderContext.setProgramData(projMat, programHandle, &projTf);
-
-	// A better way to do uniforms may be to map basic uniform handles to blocks and only use blocks in glsl
+	renderContext.setShaderProgram(programHandle);
+	renderContext.bindUniform(viewMat, &viewTf);
+	renderContext.bindUniform(projMat, &projTf);
 
 	RenderTargetHandle tempdefault;
 	tempdefault.m_idx = 0;
 	RGBA clearColor{ 1.f, 1.f, 1.f, 1.f };
 	float angle = 0.f;
 
+	Texture testTexture;
+	testTexture.load("Textures/ein.png");
+	TextureDesc desc = createDesc(testTexture, ETextureFilter::Linear, ETextureFilter::Linear);
+	Texture2DHandle texture = renderDevice->createTexture2D(desc, "testTexture");
+	
+	renderContext.uploadTextureData(texture, testTexture.m_data);
+	renderContext.bindTexture(texture);
+
 	while (window.isOpen())
 	{
 		renderContext.clearRenderTargetColor(tempdefault, clearColor);
 		renderContext.clearRenderTargetDepth(tempdefault);
 
-		angle += 0.05f;
+		angle += 0.5f;
 		mesh.modelMat = Matrix4::rotation(0, angle, 0);
 
-		renderContext.setProgramData(mesh.modelMatHandle, programHandle, &mesh.modelMat);
+		renderContext.bindUniform(mesh.modelMatHandle, &mesh.modelMat);
 
 		renderContext.drawIndexed(mesh.vb, mesh.ib, EPrimitive::Triangles);
 
@@ -150,6 +206,8 @@ int main(int argc, char** argv)
 		window.processMessages();
 
 		checkGlErrorOccured();
+	
+		renderContext.endFrame();
 	}
 
 	/*ProgramHandle program = loadProgram(renderDevice, "Shaders/diffuse.vert", "Shaders/diffuse.frag");

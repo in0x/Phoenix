@@ -34,13 +34,6 @@ namespace Phoenix
 		}
 	}
 
-	uint32_t RIContextOpenGL::getMaxTextureUnits() const
-	{
-		GLint maxTextureUnits;
-		glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxTextureUnits);
-		return static_cast<uint32_t>(maxTextureUnits);
-	}
-
 	void RIContextOpenGL::drawLinear(VertexBufferHandle vbHandle, EPrimitive primitives, uint32_t count, uint32_t start)
 	{
 		setVertexBuffer(vbHandle);
@@ -138,28 +131,12 @@ namespace Phoenix
 		}
 	}
 
-	void RIContextOpenGL::bindTexture(Texture2DHandle handle)
+	void bindTexture(Texture2DHandle handle)
 	{
-		const GlTexture2D* texture = m_resources->m_texture2Ds.getResource(handle);
+		const GlTexture2D 
 		const GlProgram* program = m_boundState.program;
 		assert(nullptr != program);
 
-		GlUniform glUniform;
-		bool bIsActive = m_resources->m_actualUniforms.getUniformIfExisting(texture->m_namehash, program->m_id, glUniform);
-
-		if (!bIsActive)
-		{
-			Logger::errorf("Texture %d does not have an equivalent sampler in currently bound program", texture->m_namehash);
-			return;
-		}
-
-		assert(m_boundState.activeTextureCount < getMaxTextureUnits());
-
-		glActiveTexture(GL_TEXTURE0 + m_boundState.activeTextureCount);
-		glBindTexture(GL_TEXTURE_2D, texture->m_id);
-		setUniform(glUniform, &m_boundState.activeTextureCount, EUniformType::Int);
-
-		m_boundState.activeTextureCount++;
 	}
 
 	void RIContextOpenGL::clearRenderTargetColor(RenderTargetHandle rtHandle, const RGBA& clearColor)
@@ -196,10 +173,6 @@ namespace Phoenix
 	tex.m_cubeface++;
 	}*/
 
-	void RIContextOpenGL::endFrame()
-	{
-		m_boundState.activeTextureCount = 0;
-	}
 
 //
 //	uint32_t RIContextOpenGL::getMaxTextureUnits() const
@@ -318,7 +291,40 @@ namespace Phoenix
 //			|| typeVal == GL_TEXTURE_CUBE_MAP
 //			|| typeVal == GL_TEXTURE_1D);
 //	}
+//
+//	UniformHandle RIContextOpenGL::addUniform()
+//	{
+//		UniformHandle handle = createUniformHandle();
+//		handle.idx = m_uniformCount++;
+//		return handle;
+//	}
+//
 
+//
+//	void RIContextOpenGL::createUniform(UniformHandle& uniformHandle, const char* name, EUniform::Type type)
+//	{
+//	}
+//
+
+//
+//	void RIContextOpenGL::setVertexBuffer(VertexBufferHandle vb)
+//	{
+//		GlVertexBuffer buffer = m_vertexBuffers[vb.idx];
+//		glBindVertexArray(buffer.m_id);
+//	}
+//
+//	void RIContextOpenGL::setIndexBuffer(IndexBufferHandle ib)
+//	{
+//		GlIndexBuffer buffer = m_indexBuffers[ib.idx];
+//		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.m_id);
+//	}
+//
+//	void RIContextOpenGL::RIContextOpenGL::setProgram(ProgramHandle prog)
+//	{
+//		GlProgram program = m_programs[prog.idx];
+//		glUseProgram(program.m_id);
+//	}
+//
 //	void RIContextOpenGL::setDepth(EDepth::Type depth)
 //	{
 //		switch (depth)
@@ -349,7 +355,21 @@ namespace Phoenix
 //	{
 //		Logger::warning(__LOCATION_INFO__ "not implemented!");
 //	}
-
+//
+//	GLenum getPrimitiveEnum(EPrimitive::Type type)
+//	{
+//		static constexpr GLuint glType[] =
+//		{
+//			GL_POINTS,
+//			GL_LINES,
+//			GL_TRIANGLES,
+//			GL_TRIANGLE_STRIP,
+//			GL_QUADS
+//		};
+//
+//		return glType[type];
+//	}
+//
 
 //
 //	void RIContextOpenGL::bindTexture(const GlUniform& uniform, const GlTexture2D& texture)
