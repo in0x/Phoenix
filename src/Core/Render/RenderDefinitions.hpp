@@ -62,7 +62,7 @@ namespace Phoenix
 		TexCoord,
 		Count,
 	};
-	
+
 	enum class EAttributeType
 	{
 		Double,
@@ -165,7 +165,7 @@ namespace Phoenix
 	private:
 		std::array<VertexAttrib, static_cast<size_t>(EAttributeProperty::Count)> m_attribs;
 		size_t m_index;
-		
+
 		VertexAttrib* has(EAttributeProperty attribType)
 		{
 			for (auto& attrib : m_attribs)
@@ -195,7 +195,7 @@ namespace Phoenix
 
 	enum class EPixelFormat
 	{
-		None, 
+		None,
 		R8G8B8A8
 	};
 
@@ -226,7 +226,7 @@ namespace Phoenix
 			Down,      // yneg
 			Back,      // zpos
 			Front      // zneg
-		}; 
+		};
 
 		const void* data[6];
 	};
@@ -238,11 +238,11 @@ namespace Phoenix
 
 	namespace ERenderAttachment
 	{
-		enum Type 
+		enum Type
 		{
-			Color =   1 << 0,
+			Color = 1 << 0,
 			Stencil = 1 << 1,
-			Depth =   1 << 2
+			Depth = 1 << 2
 		};
 	}
 
@@ -262,7 +262,7 @@ namespace Phoenix
 				attachment |= type;
 			}
 		}
-		
+
 		int32_t attachment;
 		uint32_t width;
 		uint32_t height;
@@ -274,7 +274,7 @@ namespace Phoenix
 	{
 
 	};
-	
+
 	//struct StateGroup
 	//{
 	//	EBlend::Type blend;

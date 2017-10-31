@@ -36,18 +36,22 @@ namespace Phoenix
 
 	void RIContextOpenGL::drawLinear(VertexBufferHandle vbHandle, EPrimitive primitives, uint32_t count, uint32_t start)
 	{
-		const GlVertexBuffer* vb = m_resources->m_vertexbuffers.getResource(vbHandle);
-		glBindVertexArray(vb->m_id);
+		setVertexBuffer(vbHandle);
 		glDrawArrays(toGlPrimitive(primitives), start, count);
 	}
 
 	void RIContextOpenGL::drawIndexed(VertexBufferHandle vbHandle, IndexBufferHandle ibHandle, EPrimitive primitives, uint32_t count, uint32_t startIndex)
 	{
-		const GlVertexBuffer* vb = m_resources->m_vertexbuffers.getResource(vbHandle);
+		setVertexBuffer(vbHandle);
+	
 		const GlIndexBuffer* ib = m_resources->m_indexbuffers.getResource(ibHandle);
-
-		glBindVertexArray(vb->m_id);		
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ib->m_id);
+		
+		if (0 == count)
+		{
+			count = ib->m_numElements;
+		}
+		
 		glDrawElements(toGlPrimitive(primitives), count, GL_UNSIGNED_INT, (GLvoid*)(sizeof(GLubyte) * startIndex));
 	}
 
@@ -57,6 +61,18 @@ namespace Phoenix
 		glUseProgram(program->m_id);
 	}
 
+	void RIContextOpenGL::setVertexBuffer(VertexBufferHandle vbHandle)
+	{
+		const GlVertexBuffer* vb = m_resources->m_vertexbuffers.getResource(vbHandle);
+		glBindVertexArray(vb->m_id);
+	}
+
+	void RIContextOpenGL::setIndexBuffer(IndexBufferHandle ibHandle)
+	{
+		const GlIndexBuffer* ib = m_resources->m_indexbuffers.getResource(ibHandle);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ib->m_id);
+	}
+	
 	void setUniform(const GlUniform& uniform, const void* data, EUniformType type)
 	{
 		switch (type)
@@ -97,7 +113,7 @@ namespace Phoenix
 		checkGlErrorOccured();
 	}
 
-	void RIContextOpenGL::setShaderData(UniformHandle uniformHandle, ProgramHandle programHandle, const void* data, size_t dataSize)
+	void RIContextOpenGL::setProgramData(UniformHandle uniformHandle, ProgramHandle programHandle, const void* data)
 	{
 		const RIUniform* uniform = m_resources->m_uniforms.getResource(uniformHandle);
 		const GlProgram* program = m_resources->m_programs.getResource(programHandle);
@@ -107,9 +123,8 @@ namespace Phoenix
 	
 		if (bIsActive)
 		{
-			//glUseProgram(program->m_id);
+			glUseProgram(program->m_id);
 			setUniform(glUniform, data, uniform->m_type);
-			//glUseProgram(0);
 		}
 	}
 

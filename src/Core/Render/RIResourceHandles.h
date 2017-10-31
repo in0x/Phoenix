@@ -47,7 +47,7 @@ namespace Phoenix
 
 		bool isValid() const
 		{
-			return m_idx != invalidValue;
+			return m_idx != invalidValue();
 		}
 	};
 

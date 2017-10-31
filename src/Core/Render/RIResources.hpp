@@ -20,11 +20,16 @@ namespace Phoenix
 
 	class RIVertexBuffer : public RIResource
 	{
-	public:
 	};
 
 	class RIIndexBuffer : public RIResource
 	{
+	public:
+		RIIndexBuffer()
+			: m_numElements(0)
+		{}
+
+		size_t m_numElements;
 	};
 
 	class RIVertexShader : public RIResource

@@ -17,9 +17,16 @@
 #include "Core/Render/RIOpenGL/RenderInitWGL.hpp"
 #include "Core/Render/RIOpenGL/RIWGLGlewSupport.hpp"
 #include "Core/Render/RIOpenGL/RIContextOpenGL.hpp"
+#include "Core/Render/RIOpenGL/OpenGL.hpp"
 
 namespace Phoenix
 {
+	//template <size_t size>
+	//class StaticStackAllocator
+	//{
+	//	uint8_t m_bytes[size];
+	//};
+	
 	struct RenderMesh
 	{
 		Matrix4 modelMat;
@@ -57,6 +64,10 @@ namespace Phoenix
 		renderMesh.vb = renderDevice->createVertexBuffer(layout);
 		renderMesh.ib = renderDevice->createIndexBuffer(sizeof(uint32_t), mesh.indices.size(), mesh.indices.data());
 		renderMesh.modelMatHandle = renderDevice->createUniform("modelTf", EUniformType::Mat4);
+
+		assert(renderMesh.vb.isValid());
+		assert(renderMesh.ib.isValid());
+		assert(renderMesh.modelMatHandle.isValid());
 
 		renderMesh.numVertices = mesh.vertices.size();
 		renderMesh.numIndices = mesh.indices.size();
@@ -104,8 +115,45 @@ int main(int argc, char** argv)
 	RIContextOpenGL renderContext(&glResources);
 
 	RenderMesh mesh = loadRenderMesh(*fox, renderDevice);
-	ProgramHandle program = loadProgram(renderDevice, "Shaders/diffuse.vert", "Shaders/diffuse.frag");
+
+	ProgramHandle programHandle = loadProgram(renderDevice, "Shaders/diffuse.vert", "Shaders/diffuse.frag");
 	
+	Matrix4 viewTf = lookAtRH(Vec3{ 0, 0, 10 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 });
+	Matrix4 projTf = perspectiveRH(70, (float)config.width / (float)config.height, 0.1, 100);
+
+	UniformHandle viewMat = renderDevice->createUniform("viewTf", EUniformType::Mat4);
+	UniformHandle projMat = renderDevice->createUniform("projectionTf", EUniformType::Mat4);
+
+	renderContext.setProgramData(viewMat, programHandle, &viewTf);
+	renderContext.setProgramData(projMat, programHandle, &projTf);
+
+	// A better way to do uniforms may be to map basic uniform handles to blocks and only use blocks in glsl
+
+	RenderTargetHandle tempdefault;
+	tempdefault.m_idx = 0;
+	RGBA clearColor{ 1.f, 1.f, 1.f, 1.f };
+	float angle = 0.f;
+
+	while (window.isOpen())
+	{
+		renderContext.clearRenderTargetColor(tempdefault, clearColor);
+		renderContext.clearRenderTargetDepth(tempdefault);
+
+		angle += 0.05f;
+		mesh.modelMat = Matrix4::rotation(0, angle, 0);
+
+		renderContext.setProgramData(mesh.modelMatHandle, programHandle, &mesh.modelMat);
+
+		renderContext.drawIndexed(mesh.vb, mesh.ib, EPrimitive::Triangles);
+
+		wgl.swapBuffers();
+		window.processMessages();
+
+		checkGlErrorOccured();
+	}
+
+	/*ProgramHandle program = loadProgram(renderDevice, "Shaders/diffuse.vert", "Shaders/diffuse.frag");
+
 	Matrix4 viewTf = lookAtRH(Vec3{ 0, 0, 5 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 });
 	Matrix4 projTf = perspectiveRH(70, (float)config.width / (float)config.height, 0.1, 100);
 
@@ -131,17 +179,19 @@ int main(int argc, char** argv)
 		angle += 0.05f;
 		mesh.modelMat = Matrix4::rotation(0, angle, 0);
 
-		renderContext.setShaderData(mesh.modelMatHandle, program, &mesh.modelMat, sizeof(Matrix4)); 
+		renderContext.setShaderData(mesh.modelMatHandle, program, &mesh.modelMat, sizeof(Matrix4));
 
 		renderContext.drawIndexed(mesh.vb, mesh.ib, EPrimitive::Triangles, mesh.numVertices, 0);
-		
+
 		wgl.swapBuffers();
 		window.processMessages();
 
 		checkGlErrorOccured();
-	}
+	}*/
 
 	delete renderDevice;
+	Logger::exit();
+	return 0;
 
 	/*WGlRenderInit renderInit(window.getNativeHandle(), 4);
 	RenderFrontend::init(&renderInit);
@@ -212,10 +262,7 @@ int main(int argc, char** argv)
 		checkGlError();
 	}*/
 
-	Logger::exit();
 	//RenderFrontend::exit();
-
-	return 0;
 }
 
 

@@ -44,6 +44,7 @@ namespace Phoenix
 			return GL_INT;
 
 		case EAttributeType::Count:
+		default:
 			assert(false);
 			return GL_INVALID_ENUM;
 		}
@@ -86,10 +87,11 @@ namespace Phoenix
 		return handle;
 	}
 
-	IndexBufferHandle RIDeviceOpenGL::createIndexBuffer(size_t elementSizeBytes, uint32_t count, const void* data) 
+	IndexBufferHandle RIDeviceOpenGL::createIndexBuffer(size_t elementSizeBytes, size_t count, const void* data) 
 	{
 		IndexBufferHandle handle = m_resources->m_indexbuffers.allocateResource();
 		GlIndexBuffer* buffer = m_resources->m_indexbuffers.getResource(handle);
+		buffer->m_numElements = count;
 
 		glGenBuffers(1, &buffer->m_id);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer->m_id);
@@ -106,7 +108,7 @@ namespace Phoenix
 	};
 	
 	// Returns true if an error occured during shader compilation.
-	bool getAndLogShaderLog(GLuint shader)
+	bool isShaderGud(GLuint shader)
 	{
 		if (glIsShader(shader))
 		{
@@ -151,7 +153,7 @@ namespace Phoenix
 		glCompileShader(shader->m_id);
 
 		checkGlErrorOccured();
-		return getAndLogShaderLog(shader->m_id);
+		return isShaderGud(shader->m_id);
 	}
 	
 	VertexShaderHandle RIDeviceOpenGL::createVertexShader(const char* source) 
@@ -256,6 +258,9 @@ namespace Phoenix
 		{
 		case EPixelFormat::R8G8B8A8:
 			return GL_RGBA8;
+		default:
+			assert(false);
+			return GL_INVALID_ENUM;
 		}
 	}
 
@@ -265,6 +270,9 @@ namespace Phoenix
 		{
 		case EPixelFormat::R8G8B8A8:
 			return GL_RGB;
+		default:
+			assert(false);
+			return GL_INVALID_ENUM;
 		}
 	}
 
@@ -274,9 +282,11 @@ namespace Phoenix
 		{
 		case ETextureFilter::Linear:
 				return GL_LINEAR;
-
 		case ETextureFilter::Nearest:
 			return GL_NEAREST;
+		default:
+			assert(false);
+			return GL_INVALID_ENUM;
 		}
 	}
 

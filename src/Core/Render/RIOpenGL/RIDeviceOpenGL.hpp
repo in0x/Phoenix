@@ -18,7 +18,7 @@ namespace Phoenix
 		virtual ~RIDeviceOpenGL();
 
 		virtual VertexBufferHandle	 createVertexBuffer(const VertexBufferFormat& format) override;
-		virtual IndexBufferHandle	 createIndexBuffer(size_t elementSizeBytes, uint32_t count, const void* data) override;
+		virtual IndexBufferHandle	 createIndexBuffer(size_t elementSizeBytes, size_t count, const void* data) override;
 		virtual VertexShaderHandle	 createVertexShader(const char* source) override;
 		virtual FragmentShaderHandle createFragmentShader(const char* source) override;
 		virtual ProgramHandle		 createProgram(VertexShaderHandle vsHandle, FragmentShaderHandle fsHandle) override;

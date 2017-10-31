@@ -14,11 +14,15 @@ namespace Phoenix
 
 		void drawLinear(VertexBufferHandle vbHandle, EPrimitive primitives, uint32_t count, uint32_t startIndex = 0);
 	
-		void drawIndexed(VertexBufferHandle vbHandle, IndexBufferHandle ibHandle, EPrimitive primitives, uint32_t count, uint32_t startIndex = 0);
+		void drawIndexed(VertexBufferHandle vbHandle, IndexBufferHandle ibHandle, EPrimitive primitives, uint32_t count = 0, uint32_t startIndex = 0);
 
 		void setShaderProgram(ProgramHandle programHandle);
 
-		void setShaderData(UniformHandle uniformHandle, ProgramHandle programHandle, const void* data, size_t dataSize);
+		void setProgramData(UniformHandle uniformHandle, ProgramHandle programHandle, const void* data);
+
+		void setVertexBuffer(VertexBufferHandle vbHandle);
+
+		void setIndexBuffer(IndexBufferHandle ibHandle);
 
 		void clearRenderTargetColor(RenderTargetHandle rtHandle, const RGBA& clearColor);
 
