@@ -11,7 +11,7 @@ namespace Phoenix
 	class GlExisitingUniforms
 	{
 	public:
-		void registerUniform(const char* name, GLuint programID, GLuint location, GLint numElements);
+		void registerUniform(const char* name, GLuint programID, GLuint location, GLint numElements, GLenum glType);
 		bool getUniformIfExisting(const char* name, GLuint programID, GlUniform& outUniform) const;
 		bool getUniformIfExisting(FNVHash nameHash, GLuint programID, GlUniform& outUniform) const;
 

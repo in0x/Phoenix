@@ -123,6 +123,24 @@ namespace Phoenix
 		checkGlErrorOccured();
 	}
 
+	bool isBasicUniformType(GLenum glType)
+	{
+		return (glType == GL_FLOAT
+			|| glType == GL_INT
+			|| glType == GL_FLOAT_VEC3
+			|| glType == GL_FLOAT_VEC4
+			|| glType == GL_FLOAT_MAT3
+			|| glType == GL_FLOAT_MAT4);
+	}
+
+	bool isSamplerType(GLenum glType)
+	{
+		return (glType == GL_TEXTURE_2D
+			|| glType == GL_TEXTURE_3D
+			|| glType == GL_TEXTURE_CUBE_MAP
+			|| glType == GL_TEXTURE_1D);
+	}
+
 	void RIContextOpenGL::bindUniform(UniformHandle uniformHandle, const void* data)
 	{
 		const RIUniform* uniform = m_resources->m_uniforms.getResource(uniformHandle);
@@ -134,6 +152,7 @@ namespace Phoenix
 	
 		if (bIsActive)
 		{
+			assert(isBasicUniformType(glUniform.m_glType));
 			setUniform(glUniform, data, uniform->m_type);
 		}
 	}
@@ -145,6 +164,24 @@ namespace Phoenix
 		GLenum texturetype;
 	};
 	
+	GLenum getSamplerType(GLenum textureType)
+	{
+		switch (textureType)
+		{
+		case GL_TEXTURE_2D:
+			return GL_SAMPLER_2D;
+		case GL_TEXTURE_3D:
+			return GL_SAMPLER_3D;
+		case GL_TEXTURE_CUBE_MAP:
+			return GL_SAMPLER_CUBE;
+		case GL_TEXTURE_1D:
+			return GL_SAMPLER_1D;
+		default:
+			assert(false);
+			return GL_INVALID_ENUM;
+		}
+	}
+
 	void RIContextOpenGL::bindTextureBase(const TextureBind& binding)
 	{
 		const GlProgram* program = m_boundState.program;
@@ -159,6 +196,7 @@ namespace Phoenix
 			return;
 		}
 
+		assert(glUniform.m_glType == getSamplerType(binding.texturetype)); 
 		assert(m_boundState.activeTextureCount < getMaxTextureUnits());
 
 		glActiveTexture(GL_TEXTURE0 + m_boundState.activeTextureCount);

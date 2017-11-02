@@ -44,7 +44,8 @@ namespace Phoenix
 	struct GlUniform
 	{
 		GLuint m_location;
-		GLint m_numElements;
+		GLint m_numElements; // An optional argument that carries the sampler type would be nice
+		GLenum m_glType;
 	};
 
 	struct GlTextureBase

@@ -6,7 +6,7 @@
 
 namespace Phoenix
 {
-	void GlExisitingUniforms::registerUniform(const char* name, GLuint programID, GLuint location, GLint numElements)
+	void GlExisitingUniforms::registerUniform(const char* name, GLuint programID, GLuint location, GLint numElements, GLenum glType)
 	{
 		HashFNVIterative<> hash;
 		hash.add(name, strlen(name));
@@ -20,7 +20,7 @@ namespace Phoenix
 			assert(false);
 		}
 
-		m_existingUniforms.emplace(hashValue, GlUniform{ location, numElements });
+		m_existingUniforms.emplace(hashValue, GlUniform{ location, numElements, glType });
 	}
 
 	bool GlExisitingUniforms::getUniformIfExisting(const char* name, GLuint programID, GlUniform& outUniform) const

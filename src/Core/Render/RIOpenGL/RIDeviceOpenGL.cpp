@@ -190,6 +190,14 @@ namespace Phoenix
 		return handle;
 	}
 	
+	bool checkIsSamplerType(GLenum typeVal)
+	{
+		return (typeVal == GL_TEXTURE_2D
+			|| typeVal == GL_TEXTURE_3D
+			|| typeVal == GL_TEXTURE_CUBE_MAP
+			|| typeVal == GL_TEXTURE_1D);
+	}
+
 	void registerActiveUniforms(const GlProgram& program, GlExisitingUniforms& uniformstore)
 	{
 		GLint count;
@@ -212,7 +220,7 @@ namespace Phoenix
 		for (GLint i = 0; i < count; ++i)
 		{
 			glGetActiveUniform(program.m_id, (GLuint)i, bufSize, &length, &size, &type, name.data());
-			uniformstore.registerUniform(name.data(), program.m_id, i, size);
+			uniformstore.registerUniform(name.data(), program.m_id, i, size, type);
 		}
 	}
 
