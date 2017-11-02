@@ -17,7 +17,8 @@ namespace Phoenix
 		RIResourceContainer<GlProgram,		  ProgramHandle,		256 > m_programs;
 		RIResourceContainer<GlTexture2D,	  Texture2DHandle,		1024> m_texture2Ds;
 		RIResourceContainer<GlFramebuffer,	  RenderTargetHandle,   256 > m_framebuffer;
-		RIResourceContainer<RIUniform,		  UniformHandle,		512> m_uniforms;
+		RIResourceContainer<RIUniform,		  UniformHandle,		512>  m_uniforms;
+		RIResourceContainer<GlTextureCube,	  TextureCubeHandle,	256>  m_textureCubes;
 		GlExisitingUniforms m_actualUniforms;
 	};
 }

@@ -72,6 +72,7 @@ namespace Phoenix
 
 	class RITextureCube : public RITexture
 	{
+	public:
 		RITextureCube()
 			: m_size(0)
 		{}

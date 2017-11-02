@@ -6,6 +6,7 @@
 namespace Phoenix
 {
 	struct RIOpenGLResourceStore;
+	struct TextureBind;
 	class GlVertexBuffer;
 	class GlIndexBuffer;
 	class GlProgram;
@@ -19,13 +20,13 @@ namespace Phoenix
 
 		void drawIndexed(VertexBufferHandle vbHandle, IndexBufferHandle ibHandle, EPrimitive primitives, uint32_t count = 0, uint32_t startIndex = 0);
 
-		void setShaderProgram(ProgramHandle programHandle);
+		void bindShaderProgram(ProgramHandle programHandle);
 
 		void bindUniform(UniformHandle uniformHandle, const void* data);
 
-		void setVertexBuffer(VertexBufferHandle vbHandle);
+		void bindVertexBuffer(VertexBufferHandle vbHandle);
 
-		void setIndexBuffer(IndexBufferHandle ibHandle);
+		void bindIndexBuffer(IndexBufferHandle ibHandle);
 
 		void clearRenderTargetColor(RenderTargetHandle rtHandle, const RGBA& clearColor);
 
@@ -33,13 +34,19 @@ namespace Phoenix
 
 		void uploadTextureData(Texture2DHandle handle, const void* data);
 
+		void uploadTextureData(TextureCubeHandle handle, ETextureCubeSide side, const void* data);
+
 		void bindTexture(Texture2DHandle handle);
+
+		void bindTexture(TextureCubeHandle handle);
 
 		void endFrame();
 
 		uint32_t getMaxTextureUnits() const;
 
 	private:
+		void bindTextureBase(const TextureBind& binding);
+
 		const RIOpenGLResourceStore* m_resources;
 
 		struct BoundState

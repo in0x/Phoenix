@@ -43,16 +43,16 @@ namespace Phoenix
 
 	void RIContextOpenGL::drawLinear(VertexBufferHandle vbHandle, EPrimitive primitives, uint32_t count, uint32_t start)
 	{
-		setVertexBuffer(vbHandle);
+		bindVertexBuffer(vbHandle);
 		glDrawArrays(toGlPrimitive(primitives), start, count);
 	}
 
 	void RIContextOpenGL::drawIndexed(VertexBufferHandle vbHandle, IndexBufferHandle ibHandle, EPrimitive primitives, uint32_t count, uint32_t startIndex)
 	{
-		setVertexBuffer(vbHandle);
+		bindVertexBuffer(vbHandle);
 	
 		const GlIndexBuffer* ib = m_resources->m_indexbuffers.getResource(ibHandle);
-		setIndexBuffer(ibHandle);
+		bindIndexBuffer(ibHandle);
 
 		if (0 == count)
 		{
@@ -62,21 +62,21 @@ namespace Phoenix
 		glDrawElements(toGlPrimitive(primitives), count, GL_UNSIGNED_INT, (GLvoid*)(sizeof(GLubyte) * startIndex));
 	}
 
-	void RIContextOpenGL::setShaderProgram(ProgramHandle programHandle)
+	void RIContextOpenGL::bindShaderProgram(ProgramHandle programHandle)
 	{
 		const GlProgram* program = m_resources->m_programs.getResource(programHandle);
 		m_boundState.program = program;
 		glUseProgram(program->m_id);
 	}
 
-	void RIContextOpenGL::setVertexBuffer(VertexBufferHandle vbHandle)
+	void RIContextOpenGL::bindVertexBuffer(VertexBufferHandle vbHandle)
 	{
 		const GlVertexBuffer* vb = m_resources->m_vertexbuffers.getResource(vbHandle);
 		m_boundState.vertexbuffer = vb;
 		glBindVertexArray(vb->m_id);
 	}
 
-	void RIContextOpenGL::setIndexBuffer(IndexBufferHandle ibHandle)
+	void RIContextOpenGL::bindIndexBuffer(IndexBufferHandle ibHandle)
 	{
 		const GlIndexBuffer* ib = m_resources->m_indexbuffers.getResource(ibHandle);
 		m_boundState.indexbuffer = ib;
@@ -138,28 +138,46 @@ namespace Phoenix
 		}
 	}
 
-	void RIContextOpenGL::bindTexture(Texture2DHandle handle)
+	struct TextureBind
 	{
-		const GlTexture2D* texture = m_resources->m_texture2Ds.getResource(handle);
+		const RITexture& texture; 
+		GLuint texID; 
+		GLenum texturetype;
+	};
+	
+	void RIContextOpenGL::bindTextureBase(const TextureBind& binding)
+	{
 		const GlProgram* program = m_boundState.program;
 		assert(nullptr != program);
 
 		GlUniform glUniform;
-		bool bIsActive = m_resources->m_actualUniforms.getUniformIfExisting(texture->m_namehash, program->m_id, glUniform);
+		bool bIsActive = m_resources->m_actualUniforms.getUniformIfExisting(binding.texture.m_namehash, program->m_id, glUniform);
 
 		if (!bIsActive)
 		{
-			Logger::errorf("Texture %d does not have an equivalent sampler in currently bound program", texture->m_namehash);
+			Logger::errorf("Texture %d does not have an equivalent sampler in currently bound program", binding.texture.m_namehash);
 			return;
 		}
 
 		assert(m_boundState.activeTextureCount < getMaxTextureUnits());
 
 		glActiveTexture(GL_TEXTURE0 + m_boundState.activeTextureCount);
-		glBindTexture(GL_TEXTURE_2D, texture->m_id);
+		glBindTexture(binding.texturetype, binding.texID);
 		setUniform(glUniform, &m_boundState.activeTextureCount, EUniformType::Int);
 
 		m_boundState.activeTextureCount++;
+	}
+
+	void RIContextOpenGL::bindTexture(Texture2DHandle handle)
+	{
+		const GlTexture2D* texture = m_resources->m_texture2Ds.getResource(handle);
+		bindTextureBase({ *texture, texture->m_glTex.m_id, GL_TEXTURE_2D });
+	}
+
+	void RIContextOpenGL::bindTexture(TextureCubeHandle handle)
+	{
+		const GlTextureCube* texture = m_resources->m_textureCubes.getResource(handle);
+		bindTextureBase({ *texture, texture->m_glTex.m_id, GL_TEXTURE_CUBE_MAP });
 	}
 
 	void RIContextOpenGL::clearRenderTargetColor(RenderTargetHandle rtHandle, const RGBA& clearColor)
@@ -177,19 +195,39 @@ namespace Phoenix
 		const GlTexture2D* texture = m_resources->m_texture2Ds.getResource(handle);
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture->m_id);
+		glBindTexture(GL_TEXTURE_2D, texture->m_glTex.m_id);
 
 		glTexImage2D(GL_TEXTURE_2D,
 			0,
-			texture->m_pixelFormat,
+			texture->m_glTex.m_pixelFormat,
 			texture->m_width, texture->m_height,
 			0,
-			texture->m_components,
-			texture->m_dataType,
+			texture->m_glTex.m_components,
+			texture->m_glTex.m_dataType,
 			data);
 
 		checkGlErrorOccured();
 	}
+
+	void RIContextOpenGL::uploadTextureData(TextureCubeHandle handle, ETextureCubeSide side, const void* data)
+	{
+		const GlTextureCube* texture = m_resources->m_textureCubes.getResource(handle);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, texture->m_glTex.m_id);
+
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + static_cast<uint32_t>(side),
+			0,
+			texture->m_glTex.m_pixelFormat,
+			texture->m_size, texture->m_size,
+			0,
+			texture->m_glTex.m_components,
+			texture->m_glTex.m_dataType,
+			data);
+
+		checkGlErrorOccured();
+	}
+
 	/*if (tex.m_format == GL_TEXTURE_CUBE_MAP)
 	{
 	format = GL_TEXTURE_CUBE_MAP_POSITIVE_X + tex.m_cubeface;

@@ -31,12 +31,13 @@ namespace Phoenix
 		UniformHandle modelMatHandle;
 	};
 
-	RenderMesh createPlaneMesh(IRIDevice* renderDevice)
+	RenderMesh createPlaneMesh(IRIDevice* renderDevice, bool bShouldHaveNormals, bool bShoudHaveUVs)
 	{
 		RenderMesh mesh;
 
 		// LD, RD, RU, LU
 		Vec3 vertices[] = { Vec3{ -0.5, -0.5, 0 }, Vec3{ 0.5, -0.5, 0 }, Vec3{ 0.5, 0.5, 0 }, Vec3{ -0.5, 0.5, 0 } };
+		Vec3 normals[] = { Vec3{ 0,0,1 },Vec3{ 0,0,1 },Vec3{ 0,0,1 },Vec3{ 0,0,1 } };
 		Vec2 uv[] = { Vec2{ 0.0 ,1.0 }, Vec2{ 1.0 ,1.0 }, Vec2{ 1.0 ,0.0 }, Vec2{ 0.0 ,0.0 } };
 
 		uint32_t indices[] = { 0, 1, 2, 0, 2, 3 };
@@ -45,9 +46,18 @@ namespace Phoenix
 		layout.add({ EAttributeProperty::Position, EAttributeType::Float, 3, },
 		{ sizeof(Vec3), 4, &vertices });
 
-		layout.add({ EAttributeProperty::TexCoord, EAttributeType::Float, 2 },
-		{ sizeof(Vec2), 4, &uv });
-
+		if (bShouldHaveNormals)
+		{
+			layout.add({ EAttributeProperty::Normal, EAttributeType::Float, 3, },
+			{ sizeof(Vec3), 4, &normals });
+		}
+		
+		if (bShoudHaveUVs)
+		{
+			layout.add({ EAttributeProperty::TexCoord, EAttributeType::Float, 2 },
+			{ sizeof(Vec2), 4, &uv });
+		}
+		
 		mesh.vb = renderDevice->createVertexBuffer(layout);
 		mesh.numVertices = 4;
 		mesh.ib = renderDevice->createIndexBuffer(sizeof(unsigned int), 6, &indices);
@@ -163,9 +173,9 @@ int main(int argc, char** argv)
 	IRIDevice* renderDevice = new RIDeviceOpenGL(&glResources);
 	RIContextOpenGL renderContext(&glResources);
 
-	RenderMesh mesh = createPlaneMesh(renderDevice);
+	RenderMesh mesh = createPlaneMesh(renderDevice, true, false);
 	
-	ProgramHandle programHandle = loadProgram(renderDevice, "Shaders/textured.vert", "Shaders/textured.frag");
+	ProgramHandle programHandle = loadProgram(renderDevice, "Shaders/reflect.vert", "Shaders/reflect.frag");
 	
 	Matrix4 viewTf = lookAtRH(Vec3{ 0, 0, 5 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 });
 	Matrix4 projTf = perspectiveRH(70, (float)config.width / (float)config.height, 0.1, 100);
@@ -173,7 +183,7 @@ int main(int argc, char** argv)
 	UniformHandle viewMat = renderDevice->createUniform("viewTf", EUniformType::Mat4);
 	UniformHandle projMat = renderDevice->createUniform("projectionTf", EUniformType::Mat4);
 
-	renderContext.setShaderProgram(programHandle);
+	renderContext.bindShaderProgram(programHandle);
 	renderContext.bindUniform(viewMat, &viewTf);
 	renderContext.bindUniform(projMat, &projTf);
 
@@ -182,13 +192,30 @@ int main(int argc, char** argv)
 	RGBA clearColor{ 1.f, 1.f, 1.f, 1.f };
 	float angle = 0.f;
 
-	Texture testTexture;
-	testTexture.load("Textures/ein.png");
-	TextureDesc desc = createDesc(testTexture, ETextureFilter::Linear, ETextureFilter::Linear);
-	Texture2DHandle texture = renderDevice->createTexture2D(desc, "testTexture");
-	
-	renderContext.uploadTextureData(texture, testTexture.m_data);
-	renderContext.bindTexture(texture);
+	TextureCubeHandle cubemap;
+
+	{
+		Texture negz, posz, posy, negy, negx, posx;
+		negz.load("Textures/vasa/negz.jpg");
+		posz.load("Textures/vasa/posz.jpg");
+		posy.load("Textures/vasa/posy.jpg");
+		negy.load("Textures/vasa/negy.jpg");
+		negx.load("Textures/vasa/negx.jpg");
+		posx.load("Textures/vasa/posx.jpg");
+
+		cubemap = renderDevice->createTextureCube(createDesc(negz, ETextureFilter::Nearest, ETextureFilter::Nearest), "cubemap");
+		
+		renderContext.uploadTextureData(cubemap, ETextureCubeSide::XPositive, posx.m_data);
+		renderContext.uploadTextureData(cubemap, ETextureCubeSide::XNegative, negx.m_data);
+		
+		renderContext.uploadTextureData(cubemap, ETextureCubeSide::ZPositive, posz.m_data);
+		renderContext.uploadTextureData(cubemap, ETextureCubeSide::ZNegative, posz.m_data);
+		
+		renderContext.uploadTextureData(cubemap, ETextureCubeSide::YPositive, posy.m_data);
+		renderContext.uploadTextureData(cubemap, ETextureCubeSide::YNegative, negy.m_data);
+	}
+
+	renderContext.bindTexture(cubemap);
 
 	while (window.isOpen())
 	{
@@ -210,117 +237,9 @@ int main(int argc, char** argv)
 		renderContext.endFrame();
 	}
 
-	/*ProgramHandle program = loadProgram(renderDevice, "Shaders/diffuse.vert", "Shaders/diffuse.frag");
-
-	Matrix4 viewTf = lookAtRH(Vec3{ 0, 0, 5 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 });
-	Matrix4 projTf = perspectiveRH(70, (float)config.width / (float)config.height, 0.1, 100);
-
-	UniformHandle viewMat = renderDevice->createUniform("viewTf", EUniformType::Mat4);
-	UniformHandle projMat = renderDevice->createUniform("projectionTf", EUniformType::Mat4);
-
-	RGBA clearColor{ 0.f, 0.f, 0.f, 1.f };
-	RenderTargetHandle tempdefault;
-	tempdefault.m_idx = 0;
-
-	float angle = 0.f;
-
-	renderContext.setShaderProgram(program);
-
-	renderContext.setShaderData(viewMat, program, &viewTf, sizeof(Matrix4));
-	renderContext.setShaderData(projMat, program, &projMat, sizeof(Matrix4));
-
-	while (window.isOpen())
-	{
-		renderContext.clearRenderTargetColor(tempdefault, clearColor);
-		renderContext.clearRenderTargetDepth(tempdefault);
-
-		angle += 0.05f;
-		mesh.modelMat = Matrix4::rotation(0, angle, 0);
-
-		renderContext.setShaderData(mesh.modelMatHandle, program, &mesh.modelMat, sizeof(Matrix4));
-
-		renderContext.drawIndexed(mesh.vb, mesh.ib, EPrimitive::Triangles, mesh.numVertices, 0);
-
-		wgl.swapBuffers();
-		window.processMessages();
-
-		checkGlErrorOccured();
-	}*/
-
 	delete renderDevice;
 	Logger::exit();
 	return 0;
-
-	/*WGlRenderInit renderInit(window.getNativeHandle(), 4);
-	RenderFrontend::init(&renderInit);
-
-	RenderMesh planeMesh = createPlaneMesh();
-	ProgramHandle planeProgram = loadProgram("Shaders/reflect.vert", "Shaders/reflect.frag");
-
-	UniformHandle lightPos = RenderFrontend::createUniform("lightPosition", EUniform::Vec3, &Vec3(-5, 3, 5), sizeof(Vec3));
-
-	float angle = 0.f;
-
-	checkGlError();
-
-	TextureHandle cubemap;
-
-	{
-		Texture front, back, up, down, left, right;
-		front.load("Textures/vasa/negz.jpg");
-		back.load("Textures/vasa/posz.jpg");
-		up.load("Textures/vasa/posy.jpg");
-		down.load("Textures/vasa/negy.jpg");
-		left.load("Textures/vasa/negx.jpg");
-		right.load("Textures/vasa/posx.jpg");
-
-		CubemapData cbData;
-		cbData.data[CubemapData::Right] = right.m_data;
-		cbData.data[CubemapData::Left] = left.m_data;
-		cbData.data[CubemapData::Up] = up.m_data;
-		cbData.data[CubemapData::Down] = down.m_data;
-		cbData.data[CubemapData::Back] = back.m_data;
-		cbData.data[CubemapData::Front] = front.m_data;
-
-		cubemap = RenderFrontend::createCubemap(createDesc(front, ETexture::Nearest, ETexture::Nearest), "cubemap", cbData);
-
-		RenderFrontend::submitCommands();
-	}
-
-	while (window.isOpen())
-	{
-		angle += 0.5f;
-
-		RenderFrontend::clearRenderTarget({}, EBuffer::Color, { 0.f, 0.f, 0.f, 1.f });
-		RenderFrontend::clearRenderTarget({}, EBuffer::Depth, {});
-		
-		StateGroup state;
-		state.depth = EDepth::Enable;
-
-		planeMesh.modelMat = Matrix4::rotation(0, angle, 0);
-		RenderFrontend::setUniform(planeMesh.modelMatHandle, &planeMesh.modelMat, sizeof(Matrix4));
-
-		state.program = planeProgram;
-
-		UniformHandle uniforms[] = { planeMesh.modelMatHandle, viewMat, projectionMat };
-		state.uniforms = uniforms;
-		state.uniformCount = 3;
-
-		TextureHandle textures[] = { cubemap };
-		state.textures = textures;
-		state.textureCount = 1;
-
-		RenderFrontend::drawIndexed(planeMesh.vb, planeMesh.ib, EPrimitive::Triangles, 0, planeMesh.numIndices, state);
-		
-		RenderFrontend::submitCommands();
-		RenderFrontend::swapBuffers();
-
-		window.processMessages();
-
-		checkGlError();
-	}*/
-
-	//RenderFrontend::exit();
 }
 
 

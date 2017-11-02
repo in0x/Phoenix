@@ -294,31 +294,37 @@ namespace Phoenix
 		}
 	}
 
-	Texture2DHandle	RIDeviceOpenGL::createTexture2D(const TextureDesc& desc, const char* name) 
-	{ 
-		Texture2DHandle handle = m_resources->m_texture2Ds.allocateResource();
-		GlTexture2D* texture = m_resources->m_texture2Ds.getResource(handle);
-
-		texture->m_pixelFormat = toGlFormat(desc.pixelFormat);
-		texture->m_components = toGlComponents(desc.pixelFormat);
-		texture->m_dataType = GL_UNSIGNED_BYTE; // NOTE(Phil): This might be problematic with higher pixeldepth textures later (hdr)
-		texture->m_numMips = desc.numMips;
-		texture->m_namehash = HashFNV<const char*>()(name);
-		texture->m_width = desc.width;
-		texture->m_height = desc.height;
-
-		glGenTextures(1, &texture->m_id);
-		glActiveTexture(GL_TEXTURE0);		
-		glBindTexture(GL_TEXTURE_2D, texture->m_id);
+	void createTextureBase(RITexture& texture, GlTextureBase& glTex, const TextureDesc& desc, const char* name, GLenum textureType)
+	{
+		glTex.m_pixelFormat = toGlFormat(desc.pixelFormat);
+		glTex.m_components = toGlComponents(desc.pixelFormat);
+		glTex.m_dataType = GL_UNSIGNED_BYTE; // NOTE(Phil): This might be problematic with higher pixeldepth textures later (hdr)
+		texture.m_numMips = desc.numMips;
+		texture.m_namehash = HashFNV<const char*>()(name);
+		
+		glGenTextures(1, &glTex.m_id);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(textureType, glTex.m_id);
 
 		if (desc.width % 2 == 0)
 		{
-			glPixelStorei(GL_UNPACK_ALIGNMENT, 4); 
+			glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 		}
 		else
 		{
 			glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 		}
+	}
+
+	Texture2DHandle	RIDeviceOpenGL::createTexture2D(const TextureDesc& desc, const char* name) 
+	{ 
+		Texture2DHandle handle = m_resources->m_texture2Ds.allocateResource();
+		GlTexture2D* texture = m_resources->m_texture2Ds.getResource(handle);
+
+		createTextureBase(*texture, texture->m_glTex, desc, name, GL_TEXTURE_2D);
+
+		texture->m_width = desc.width;
+		texture->m_height = desc.height;
 
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, toGlFilter(desc.magFilter));
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, toGlFilter(desc.minFilter));
@@ -335,16 +341,37 @@ namespace Phoenix
 
 		return handle;
 	}
-
-	/*if (format > ETexture::Tex2D)
+	
+	TextureCubeHandle RIDeviceOpenGL::createTextureCube(const TextureDesc& desc, const char* name)
 	{
-	glTexParameterf(format, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+		TextureCubeHandle handle = m_resources->m_textureCubes.allocateResource();
+		GlTextureCube* texture = m_resources->m_textureCubes.getResource(handle);
+
+		createTextureBase(*texture, texture->m_glTex, desc, name, GL_TEXTURE_CUBE_MAP);
+
+		assert(desc.width == desc.height);
+		texture->m_size = desc.width;
+
+		glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, toGlFilter(desc.magFilter));
+		glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, toGlFilter(desc.minFilter));
+
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+		if (checkGlErrorOccured())
+		{
+			Logger::error("Failed to create TextureCube!");
+			m_resources->m_textureCubes.destroyResource(handle);
+			handle.invalidate();
+		}
+
+		return handle;
 	}
 
-	if (format == ETexture::CubeMap)
-	{
-	texture->m_cubeface = 0;
-	}*/
+	//if (format > ETexture::Tex2D) // Relevant for Texture3D
+	//{
+	//glTexParameterf(format, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	//}
 
 	UniformHandle RIDeviceOpenGL::createUniform(const char* name, EUniformType type)
 	{
@@ -355,9 +382,5 @@ namespace Phoenix
 		return handle;
 	}
 
-	TextureCubeHandle RIDeviceOpenGL::createTextureCube(const TextureDesc& desc) { assert(false); return TextureCubeHandle{}; }
-
-
 	RenderTargetHandle RIDeviceOpenGL::createRenderTarget(const RenderTargetDesc& desc) { assert(false); return RenderTargetHandle{}; }
-
 }

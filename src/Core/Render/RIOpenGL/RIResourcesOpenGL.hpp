@@ -47,18 +47,24 @@ namespace Phoenix
 		GLint m_numElements;
 	};
 
-	class GlTexture2D : public RITexture2D
+	struct GlTextureBase
 	{
-	public:
 		GLuint m_id;
 		GLenum m_pixelFormat;
 		GLenum m_components;
 		GLenum m_dataType;
 	};
 
+	class GlTexture2D : public RITexture2D
+	{
+	public:
+		GlTextureBase m_glTex;
+	};
+
 	class GlTextureCube : public RITextureCube
 	{
-		int8_t m_cubeface;
+	public:
+		GlTextureBase m_glTex;
 	};
 
 	class GlFramebuffer : public RIRenderTarget

@@ -217,19 +217,14 @@ namespace Phoenix
 		uint8_t numMips;
 	};
 
-	struct CubemapData
+	enum ETextureCubeSide
 	{
-		enum Side
-		{
-			Right = 0, // xpos
-			Left,	   // xneg
-			Up,        // ypos
-			Down,      // yneg
-			Back,      // zpos
-			Front      // zneg
-		};
-
-		const void* data[6];
+		XPositive, 
+		XNegative,	   
+		YPositive,        
+		YNegative,      
+		ZPositive,      
+		ZNegative     
 	};
 
 	struct RGBA
