@@ -180,16 +180,13 @@ int main(int argc, char** argv)
 	RenderMesh mesh = createPlaneMesh(renderDevice, true, false);
 	
 	ProgramHandle programHandle = loadProgram(renderDevice, "Shaders/reflect.vert", "Shaders/reflect.frag");
+	ProgramHandle drawToScreenProgram = loadProgram(renderDevice, "Shaders/fillScreen.vert", "Shaders/fillScreen.frag");
 	
 	Matrix4 viewTf = lookAtRH(Vec3{ 0, 0, 5 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 });
 	Matrix4 projTf = perspectiveRH(70, (float)config.width / (float)config.height, 0.1, 100);
 
 	UniformHandle viewMat = renderDevice->createUniform("viewTf", EUniformType::Mat4);
 	UniformHandle projMat = renderDevice->createUniform("projectionTf", EUniformType::Mat4);
-
-	renderContext.bindShaderProgram(programHandle);
-	renderContext.bindUniform(viewMat, &viewTf);
-	renderContext.bindUniform(projMat, &projTf);
 
 	RenderTargetHandle tempdefault;
 	tempdefault.m_idx = 0;
@@ -219,19 +216,51 @@ int main(int argc, char** argv)
 		renderContext.uploadTextureData(cubemap, ETextureCubeSide::YNegative, negy.m_data);
 	}
 
-	renderContext.bindTexture(cubemap);
+	TextureDesc texDesc;
+	texDesc.width = 800;
+	texDesc.height = 600;
+	texDesc.pixelFormat = EPixelFormat::R8G8B8A8;
+	texDesc.minFilter = ETextureFilter::Linear;
+	texDesc.magFilter = ETextureFilter::Linear;
+	texDesc.numMips = 0;
+	texDesc.wrapU = ETextureWrap::ClampToEdge;
+	texDesc.wrapV = ETextureWrap::ClampToEdge;
+	texDesc.wrapW = ETextureWrap::ClampToEdge;
+	Texture2DHandle colorTex = renderDevice->createTexture2D(texDesc, "fbTexColor");
+
+	texDesc.pixelFormat = EPixelFormat::Depth16I;
+	Texture2DHandle depthTex = renderDevice->createTexture2D(texDesc, "fbTexDepth");
+
+	RenderTargetDesc rtDesc;
+	rtDesc.attachments[RenderTargetDesc::Color] = colorTex;
+	rtDesc.attachments[RenderTargetDesc::Depth] = depthTex;
+
+	RenderTargetHandle renderTarget = renderDevice->createRenderTarget(rtDesc);
 
 	while (window.isOpen())
 	{
-		renderContext.clearRenderTargetColor(tempdefault, clearColor);
-		renderContext.clearRenderTargetDepth(tempdefault);
+		renderContext.bindRenderTarget(renderTarget);
+
+		renderContext.clearRenderTargetColor(renderTarget, clearColor);
+		renderContext.clearRenderTargetDepth(renderTarget);
+	
+		renderContext.bindShaderProgram(programHandle);
+		renderContext.bindUniform(viewMat, &viewTf);
+		renderContext.bindUniform(projMat, &projTf);
+
+		renderContext.bindTexture(cubemap);
 
 		angle += 0.5f;
 		mesh.modelMat = Matrix4::rotation(0, angle, 0);
 
 		renderContext.bindUniform(mesh.modelMatHandle, &mesh.modelMat);
-
 		renderContext.drawIndexed(mesh.vb, mesh.ib, EPrimitive::Triangles);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		renderContext.bindShaderProgram(drawToScreenProgram);
+		renderContext.bindTexture(colorTex);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
 
 		wgl.swapBuffers();
 		window.processMessages();

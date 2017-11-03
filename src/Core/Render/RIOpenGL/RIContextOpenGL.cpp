@@ -269,6 +269,11 @@ namespace Phoenix
 		m_boundState.activeTextureCount = 0;
 	}
 
+	void RIContextOpenGL::bindRenderTarget(RenderTargetHandle handle)
+	{
+		const GlFramebuffer* framebuffer = m_resources->m_framebuffers.getResource(handle);
+		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer->m_id);
+	}
 //
 //	uint32_t RIContextOpenGL::getMaxTextureUnits() const
 //	{

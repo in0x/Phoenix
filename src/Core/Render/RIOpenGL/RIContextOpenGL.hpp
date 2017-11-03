@@ -39,6 +39,8 @@ namespace Phoenix
 
 		void bindTexture(TextureCubeHandle handle);
 
+		void bindRenderTarget(RenderTargetHandle handle);
+
 		void endFrame();
 
 		uint32_t getMaxTextureUnits() const;

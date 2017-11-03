@@ -268,6 +268,13 @@ namespace Phoenix
 			return GL_RGBA8;
 		case EPixelFormat::R8G8B8:
 			return GL_RGB8;
+		case EPixelFormat::Depth32F:
+			return GL_DEPTH_COMPONENT32F;
+		case EPixelFormat::Depth16I:
+			return GL_DEPTH_COMPONENT16;
+		case EPixelFormat::Stencil8I:
+			return GL_STENCIL_INDEX8;
+
 		default:
 			assert(false);
 			return GL_INVALID_ENUM;
@@ -283,11 +290,11 @@ namespace Phoenix
 		case EPixelFormat::R8G8B8:
 			return GL_RGB;
 		case EPixelFormat::Depth32F:
-			return GL_DEPTH_COMPONENT32F;
+			return GL_DEPTH_COMPONENT;
 		case EPixelFormat::Depth16I:
-			return GL_DEPTH_COMPONENT16;
+			return GL_DEPTH_COMPONENT;
 		case EPixelFormat::Stencil8I:
-			return GL_STENCIL_INDEX8;
+			return GL_STENCIL_INDEX;
 		default:
 			assert(false);
 			return GL_INVALID_ENUM;
@@ -381,8 +388,6 @@ namespace Phoenix
 		texture->m_width = desc.width;
 		texture->m_height = desc.height;
 
-		checkGlErrorOccured();
-
 		glTexStorage2D(GL_TEXTURE_2D, desc.numMips + 1, texture->m_glTex.m_pixelFormat, desc.width, desc.height);
 
 		if (checkGlErrorOccured())
@@ -449,7 +454,12 @@ namespace Phoenix
 			attachifValid(desc, framebuffer, RenderTargetDesc::Stencil);
 		}
 
-		if (checkGlErrorOccured() || GL_FRAMEBUFFER_COMPLETE != glCheckFramebufferStatus(framebuffer->m_id))
+		GLenum framebufferstate = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+		bool bNotComplete = GL_FRAMEBUFFER_COMPLETE != framebufferstate;
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		if (checkGlErrorOccured() || bNotComplete)
 		{
 			Logger::error("Failed to create RenderTarget!");
 			m_resources->m_framebuffers.destroyResource(handle);
@@ -488,10 +498,7 @@ namespace Phoenix
 
 		GlTexture2D* texture = m_resources->m_texture2Ds.getResource(texHandle);
 		fb->m_attachments[attachment] = texture;
-
-		glBindTexture(GL_TEXTURE_2D, texture->m_glTex.m_id);
-		glNamedFramebufferTexture(fb->m_id, GL_COLOR_ATTACHMENT0, texture->m_glTex.m_id, 0);		
-
+		glFramebufferTexture(GL_FRAMEBUFFER, toGlAttachment(attachment), texture->m_glTex.m_id, 0);
 		return true;
 	}
 

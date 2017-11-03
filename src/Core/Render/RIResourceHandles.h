@@ -28,6 +28,10 @@ namespace Phoenix
 			: m_idx(invalidValue())
 		{}
 
+		explicit ResourceHandle(IndexType index)
+			: m_idx(index)
+		{}
+
 		IndexType m_idx;
 
 		static constexpr IndexType maxValue()
