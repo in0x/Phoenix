@@ -64,9 +64,6 @@
     <ClInclude Include="..\src\Core\Render\CommandPacket.hpp">
       <Filter>Render</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Core\Render\RenderDefinitions.hpp">
-      <Filter>Render</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Core\Memory\StackAllocator.hpp">
       <Filter>Memory</Filter>
     </ClInclude>
@@ -141,6 +138,9 @@
     </ClInclude>
     <ClInclude Include="..\src\Core\FNVHash.hpp">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Render\RIDefs.hpp">
+      <Filter>Render</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

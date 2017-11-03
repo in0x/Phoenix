@@ -38,5 +38,7 @@ namespace Phoenix
 		
 	private:
 		RIOpenGLResourceStore* m_resources;
+
+		bool RIDeviceOpenGL::attachifValid(const RenderTargetDesc& desc, GlFramebuffer* fb, RenderTargetDesc::EAttachment attachment);
 	};
 }

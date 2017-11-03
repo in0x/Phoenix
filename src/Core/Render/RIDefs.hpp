@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <array>
 
-//TODO(Phil): Rename to RIPublic.hpp
+#include "RIResourceHandles.h"
 
 namespace Phoenix
 {
@@ -198,6 +198,10 @@ namespace Phoenix
 		None,
 		R8G8B8A8,
 		R8G8B8,
+		Depth32F,
+		Depth16I,
+		Stencil8I,
+		Depth24IStencil8I
 	};
 
 	enum class ETextureFilter
@@ -229,12 +233,12 @@ namespace Phoenix
 
 	enum ETextureCubeSide
 	{
-		XPositive, 
-		XNegative,	   
-		YPositive,        
-		YNegative,      
-		ZPositive,      
-		ZNegative     
+		XPositive,
+		XNegative,
+		YPositive,
+		YNegative,
+		ZPositive,
+		ZNegative
 	};
 
 	struct RGBA
@@ -242,36 +246,26 @@ namespace Phoenix
 		float r, g, b, a;
 	};
 
-	namespace ERenderAttachment
-	{
-		enum Type
-		{
-			Color = 1 << 0,
-			Stencil = 1 << 1,
-			Depth = 1 << 2
-		};
-	}
-
 	class RenderTargetDesc
 	{
 	public:
-		RenderTargetDesc()
-			: attachment(0)
-			, width(0)
-			, height(0)
-		{}
+		Texture2DHandle attachments[4]; // DepthStencil is always preferred if set.
 
-		void AddAttachment(ERenderAttachment::Type type)
+		RenderTargetDesc()
 		{
-			if (!(attachment & type))
+			for (size_t i = 0; i < 4; ++i)
 			{
-				attachment |= type;
+				attachments[i].invalidate();
 			}
 		}
 
-		int32_t attachment;
-		uint32_t width;
-		uint32_t height;
+		enum EAttachment
+		{
+			Color = 0,
+			Depth,
+			Stencil,
+			DepthStencil
+		};
 	};
 
 	struct UniformInfo;

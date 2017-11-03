@@ -2,7 +2,7 @@
 #include "RIOpenGLResourceStore.hpp"
 #include "OpenGL.hpp"
 
-#include "../RenderDefinitions.hpp"
+#include "../RIDefs.hpp"
 #include "../../Logger.hpp"
 
 #include "../../Math/Matrix4.hpp"
@@ -253,23 +253,16 @@ namespace Phoenix
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, texture->m_glTex.m_id);
 
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + static_cast<uint32_t>(side),
+		glTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + static_cast<uint32_t>(side),
 			0,
-			texture->m_glTex.m_pixelFormat,
+			0, 0,
 			texture->m_size, texture->m_size,
-			0,
 			texture->m_glTex.m_components,
 			texture->m_glTex.m_dataType,
 			data);
 
 		checkGlErrorOccured();
 	}
-
-	/*if (tex.m_format == GL_TEXTURE_CUBE_MAP)
-	{
-	format = GL_TEXTURE_CUBE_MAP_POSITIVE_X + tex.m_cubeface;
-	tex.m_cubeface++;
-	}*/
 
 	void RIContextOpenGL::endFrame()
 	{

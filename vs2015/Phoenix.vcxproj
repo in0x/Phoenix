@@ -188,7 +188,7 @@
     <ClInclude Include="..\src\Core\Render\Commands.hpp" />
     <ClInclude Include="..\src\Core\Render\RIContext.hpp" />
     <ClInclude Include="..\src\Core\Render\RIDevice.hpp" />
-    <ClInclude Include="..\src\Core\Render\RenderDefinitions.hpp" />
+    <ClInclude Include="..\src\Core\Render\RIDefs.hpp" />
     <ClInclude Include="..\src\Core\Render\CommandBucket.hpp" />
     <ClInclude Include="..\src\Core\Render\RIOpenGL\OpenGL.hpp" />
     <ClInclude Include="..\src\Core\Render\RIOpenGL\RenderInitWGL.hpp" />

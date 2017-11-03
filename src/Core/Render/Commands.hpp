@@ -1,14 +1,11 @@
 #pragma once
 
-#include "RenderDefinitions.hpp"
-#include "RIResourceHandles.h"
+#include "RIDefs.hpp"
 
 #include "../Math/Vec3.hpp"
 #include "../Math/Vec4.hpp"
 #include "../Math/Matrix3.hpp"
 #include "../Math/Matrix4.hpp"
-
-// NOTE(Phil): Directly interpreting commands with OpenGL/DX might be more flexible (instead of using the IRenderBackend interface)
 
 namespace Phoenix
 {

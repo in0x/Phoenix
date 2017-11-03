@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../RenderDefinitions.hpp"
+#include "../RiDefs.hpp"
 #include "Windows.h" // NOTE(Phil): We should still eliminate this.
 
 namespace Phoenix

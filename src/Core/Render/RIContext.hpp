@@ -1,5 +1,5 @@
 #pragma once
-#include "RenderDefinitions.hpp"
+#include "RIDefs.hpp"
 
 namespace Phoenix 
 {

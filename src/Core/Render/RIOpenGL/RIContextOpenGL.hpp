@@ -1,7 +1,6 @@
 #pragma once
 
-#include "../RIResourceHandles.h"
-#include "../RenderDefinitions.hpp"
+#include "../RIDefs.hpp"
 
 namespace Phoenix
 {

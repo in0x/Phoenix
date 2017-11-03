@@ -71,10 +71,11 @@ namespace Phoenix
 	class GlFramebuffer : public RIRenderTarget
 	{
 	public:
+		GlFramebuffer()
+			: m_id(0)
+		{}
+
 		GLuint m_id;
-		GLuint m_colorTex;
-		GLuint m_stencilTex;
-		GLuint m_depthTex;
-		int32_t m_renderAttachments;
+		GlTexture2D* m_attachments[4];
 	};
 }

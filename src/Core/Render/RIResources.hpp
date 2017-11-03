@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RenderDefinitions.hpp"
+#include "RIDefs.hpp"
 #include "../FNVHash.hpp"
 #include <assert.h>
 

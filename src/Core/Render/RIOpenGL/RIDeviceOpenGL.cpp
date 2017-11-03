@@ -3,7 +3,7 @@
 #include "RIOpenGLResourceStore.hpp"
 #include "RIDeviceOpenGL.hpp"
 
-#include "../RenderDefinitions.hpp"
+#include "../RIDefs.hpp"
 #include "../../Logger.hpp"
 
 #include <assert.h>
@@ -282,6 +282,30 @@ namespace Phoenix
 			return GL_RGBA;
 		case EPixelFormat::R8G8B8:
 			return GL_RGB;
+		case EPixelFormat::Depth32F:
+			return GL_DEPTH_COMPONENT32F;
+		case EPixelFormat::Depth16I:
+			return GL_DEPTH_COMPONENT16;
+		case EPixelFormat::Stencil8I:
+			return GL_STENCIL_INDEX8;
+		default:
+			assert(false);
+			return GL_INVALID_ENUM;
+		}
+	}
+
+	GLenum toGlTexDatatype(EPixelFormat format)
+	{
+		switch (format)
+		{
+		case EPixelFormat::R8G8B8A8:
+		case EPixelFormat::R8G8B8:
+			return GL_UNSIGNED_BYTE;
+		case EPixelFormat::Depth32F:
+			return GL_FLOAT;
+		case EPixelFormat::Depth16I:
+		case EPixelFormat::Stencil8I:
+			return GL_UNSIGNED_SHORT;
 		default:
 			assert(false);
 			return GL_INVALID_ENUM;
@@ -296,19 +320,6 @@ namespace Phoenix
 			return GL_LINEAR;
 		case ETextureFilter::Nearest:
 			return GL_NEAREST;
-		default:
-			assert(false);
-			return GL_INVALID_ENUM;
-		}
-	}
-
-	GLenum toGlTexDatatype(EPixelFormat format)
-	{
-		switch (format)
-		{
-		case EPixelFormat::R8G8B8A8:
-		case EPixelFormat::R8G8B8:
-			return GL_UNSIGNED_BYTE;
 		default:
 			assert(false);
 			return GL_INVALID_ENUM;
@@ -357,7 +368,7 @@ namespace Phoenix
 
 		glTexParameteri(textureType, GL_TEXTURE_WRAP_S, toGlWrap(desc.wrapU));
 		glTexParameteri(textureType, GL_TEXTURE_WRAP_T, toGlWrap(desc.wrapV));
-		glTexParameterf(textureType, GL_TEXTURE_WRAP_R, toGlWrap(desc.wrapW));		
+		glTexParameterf(textureType, GL_TEXTURE_WRAP_R, toGlWrap(desc.wrapW));
 	}
 
 	Texture2DHandle	RIDeviceOpenGL::createTexture2D(const TextureDesc& desc, const char* name)
@@ -381,6 +392,8 @@ namespace Phoenix
 			handle.invalidate();
 		}
 
+		// NOTE(Phil): May want to add option for rendertarget-only textures later.
+
 		return handle;
 	}
 
@@ -393,6 +406,8 @@ namespace Phoenix
 
 		assert(desc.width == desc.height);
 		texture->m_size = desc.width;
+
+		glTexStorage2D(GL_TEXTURE_CUBE_MAP, desc.numMips + 1, texture->m_glTex.m_pixelFormat, texture->m_size, texture->m_size);
 
 		if (checkGlErrorOccured())
 		{
@@ -413,39 +428,71 @@ namespace Phoenix
 		return handle;
 	}
 
+	// Allocate Texture using RITexture and use it for attachment.
 	RenderTargetHandle RIDeviceOpenGL::createRenderTarget(const RenderTargetDesc& desc)
 	{
 		RenderTargetHandle handle = m_resources->m_framebuffers.allocateResource();
-		GlFramebuffer* fb = m_resources->m_framebuffers.getResource(handle);
+		GlFramebuffer* framebuffer = m_resources->m_framebuffers.getResource(handle);
 
-		//fb->m_renderAttachments = desc.attachment;
+		assert(desc.attachments[0].isValid());
 
-	/*	glCreateFramebuffers(1, &fb->m_id);
+		glGenFramebuffers(1, &framebuffer->m_id);
+		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer->m_id);
+		 
+		attachifValid(desc, framebuffer, RenderTargetDesc::Color);
 
-		if (desc.attachment & ERenderAttachment::Color)
+		bool bHasDepthStencil = attachifValid(desc, framebuffer, RenderTargetDesc::DepthStencil);
+
+		if (!bHasDepthStencil)
 		{
-			glGenTextures(1, &fb->m_colorTex);
-			glBindTexture(GL_TEXTURE_2D, fb->m_colorTex);
-			glTexStorage2D(fb->m_colorTex, 1, GL_RGBA8, desc.width, desc.height);
-			glNamedFramebufferTexture(fb->m_id, GL_COLOR_ATTACHMENT0, fb->m_colorTex, 0);
+			attachifValid(desc, framebuffer, RenderTargetDesc::Depth);
+			attachifValid(desc, framebuffer, RenderTargetDesc::Stencil);
 		}
 
-		if (desc.attachment & ERenderAttachment::Stencil)
+		if (checkGlErrorOccured() || GL_FRAMEBUFFER_COMPLETE != glCheckFramebufferStatus(framebuffer->m_id))
 		{
-			glGenTextures(1, &fb.m_stencilTex);
-			glBindTexture(GL_TEXTURE_2D, fb.m_stencilTex);
-			glTexStorage2D(fb.m_stencilTex, 1, GL_STENCIL_INDEX8, desc.width, desc.height);
-			glNamedFramebufferTexture(fb.m_id, GL_STENCIL_ATTACHMENT, fb.m_stencilTex, 0);
+			Logger::error("Failed to create RenderTarget!");
+			m_resources->m_framebuffers.destroyResource(handle);
+			handle.invalidate();
 		}
-
-		if (desc.attachment & ERenderAttachment::Depth)
-		{
-			glGenTextures(1, &fb.m_depthTex);
-			glBindTexture(GL_TEXTURE_2D, fb.m_depthTex);
-			glTexStorage2D(fb.m_depthTex, 1, GL_DEPTH_COMPONENT32F, desc.width, desc.height);
-			glNamedFramebufferTexture(fb.m_id, GL_DEPTH_ATTACHMENT, fb.m_depthTex, 0);
-		}*/
 
 		return handle;
 	}
+
+	GLenum toGlAttachment(RenderTargetDesc::EAttachment attachment)
+	{
+		switch (attachment)
+		{
+		case RenderTargetDesc::Color:
+			return GL_COLOR_ATTACHMENT0;
+		case RenderTargetDesc::Depth:
+			return GL_DEPTH_ATTACHMENT;
+		case RenderTargetDesc::Stencil:
+			return GL_STENCIL_ATTACHMENT;
+		case RenderTargetDesc::DepthStencil:
+			return GL_DEPTH_STENCIL_ATTACHMENT;
+		default:
+			assert(false);
+			return GL_INVALID_ENUM;
+		}
+	}
+
+	bool RIDeviceOpenGL::attachifValid(const RenderTargetDesc& desc, GlFramebuffer* fb, RenderTargetDesc::EAttachment attachment)
+	{
+		Texture2DHandle texHandle = desc.attachments[attachment];
+
+		if (!texHandle.isValid())
+		{
+			return false;
+		}
+
+		GlTexture2D* texture = m_resources->m_texture2Ds.getResource(texHandle);
+		fb->m_attachments[attachment] = texture;
+
+		glBindTexture(GL_TEXTURE_2D, texture->m_glTex.m_id);
+		glNamedFramebufferTexture(fb->m_id, GL_COLOR_ATTACHMENT0, texture->m_glTex.m_id, 0);		
+
+		return true;
+	}
+
 }
