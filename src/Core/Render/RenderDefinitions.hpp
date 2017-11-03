@@ -206,6 +206,13 @@ namespace Phoenix
 		Linear
 	};
 
+	enum class ETextureWrap
+	{
+		ClampToEdge,
+		Repeat,
+		MirroredRepeat
+	};
+
 	class TextureDesc
 	{
 	public:
@@ -214,6 +221,9 @@ namespace Phoenix
 		EPixelFormat pixelFormat;
 		ETextureFilter minFilter;
 		ETextureFilter magFilter;
+		ETextureWrap wrapU;
+		ETextureWrap wrapV;
+		ETextureWrap wrapW;
 		uint8_t numMips;
 	};
 

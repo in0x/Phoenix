@@ -51,13 +51,13 @@ namespace Phoenix
 			layout.add({ EAttributeProperty::Normal, EAttributeType::Float, 3, },
 			{ sizeof(Vec3), 4, &normals });
 		}
-		
+
 		if (bShoudHaveUVs)
 		{
 			layout.add({ EAttributeProperty::TexCoord, EAttributeType::Float, 2 },
 			{ sizeof(Vec2), 4, &uv });
 		}
-		
+
 		mesh.vb = renderDevice->createVertexBuffer(layout);
 		mesh.numVertices = 4;
 		mesh.ib = renderDevice->createIndexBuffer(sizeof(unsigned int), 6, &indices);
@@ -65,7 +65,7 @@ namespace Phoenix
 
 		mesh.modelMat = Matrix4::identity();
 		mesh.modelMatHandle = renderDevice->createUniform("modelTf", EUniformType::Mat4);
-		
+
 		return mesh;
 	}
 
@@ -106,7 +106,7 @@ namespace Phoenix
 
 		return renderMesh;
 	}
-	
+
 	TextureDesc createDesc(const Texture& texture, ETextureFilter minFilter, ETextureFilter magFilter, uint8_t numMips = 0)
 	{
 		TextureDesc desc;
@@ -117,10 +117,10 @@ namespace Phoenix
 		{
 		case 4:
 		{ desc.pixelFormat = EPixelFormat::R8G8B8A8; } break;
-		case 3: 
+		case 3:
 		{ desc.pixelFormat = EPixelFormat::R8G8B8; } break;
 		case 2:
-		{ assert(false); } break; 
+		{ assert(false); } break;
 		case 1:
 		{ assert(false); } break;
 		default: { assert(false); } break;
@@ -130,6 +130,10 @@ namespace Phoenix
 		desc.magFilter = magFilter;
 
 		desc.numMips = numMips;
+
+		desc.wrapU = ETextureWrap::ClampToEdge;
+		desc.wrapV = ETextureWrap::ClampToEdge;
+		desc.wrapW = ETextureWrap::ClampToEdge;
 
 		return desc;
 	}

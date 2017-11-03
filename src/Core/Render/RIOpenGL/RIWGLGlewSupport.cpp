@@ -42,6 +42,7 @@ namespace Phoenix
 		m_details = new RIWGLGlewSupport::Details;
 
 		initGlew();
+
 		checkMsaaSupport(*wglInitValues);
 
 		if (wglInitValues->m_msaaSamples > 0 && m_details->msaaSupport > 0)
@@ -62,6 +63,15 @@ namespace Phoenix
 		Logger::log(vendor);
 		Logger::log(renderer);
 		Logger::log(glslVersion);
+
+		GLint majorVersion = 0;
+		glGetIntegerv(GL_MAJOR_VERSION, &majorVersion);
+
+		if (majorVersion < 4)
+		{
+			Logger::errorf("Phoenix currently assumes atleast GL Version 4. Detected Version: %d.", majorVersion);
+			assert(false);
+		}
 	}
 
 	RIWGLGlewSupport::~RIWGLGlewSupport()

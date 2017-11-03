@@ -235,11 +235,10 @@ namespace Phoenix
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture->m_glTex.m_id);
 
-		glTexImage2D(GL_TEXTURE_2D,
+		glTexSubImage2D(GL_TEXTURE_2D,
 			0,
-			texture->m_glTex.m_pixelFormat,
+			0,0,
 			texture->m_width, texture->m_height,
-			0,
 			texture->m_glTex.m_components,
 			texture->m_glTex.m_dataType,
 			data);

@@ -26,10 +26,10 @@ namespace Phoenix
 		glGenBuffers(1, &vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glBufferData(GL_ARRAY_BUFFER, typeSize * elementCount, data, GL_STATIC_DRAW); // TODO(Phil): Implement GL_DYNAMIC_DRAW																			  
-		
+
 		return vbo;
 	}
-		
+
 	GLuint toGlAttribType(EAttributeType type)
 	{
 		switch (type)
@@ -49,8 +49,8 @@ namespace Phoenix
 			return GL_INVALID_ENUM;
 		}
 	}
-	
-	VertexBufferHandle RIDeviceOpenGL::createVertexBuffer(const VertexBufferFormat& format) 
+
+	VertexBufferHandle RIDeviceOpenGL::createVertexBuffer(const VertexBufferFormat& format)
 	{
 		VertexBufferHandle handle = m_resources->m_vertexbuffers.allocateResource();
 		GlVertexBuffer* buffer = m_resources->m_vertexbuffers.getResource(handle);
@@ -76,7 +76,7 @@ namespace Phoenix
 				data.m_size,
 				nullptr);
 		}
-		
+
 		if (checkGlErrorOccured())
 		{
 			Logger::error("An error occured during VertexBuffer creation.");
@@ -87,7 +87,7 @@ namespace Phoenix
 		return handle;
 	}
 
-	IndexBufferHandle RIDeviceOpenGL::createIndexBuffer(size_t elementSizeBytes, size_t count, const void* data) 
+	IndexBufferHandle RIDeviceOpenGL::createIndexBuffer(size_t elementSizeBytes, size_t count, const void* data)
 	{
 		IndexBufferHandle handle = m_resources->m_indexbuffers.allocateResource();
 		GlIndexBuffer* buffer = m_resources->m_indexbuffers.getResource(handle);
@@ -106,7 +106,7 @@ namespace Phoenix
 
 		return handle;
 	};
-	
+
 	// Returns true if an error occured during shader compilation.
 	bool getAndLogShaderLog(GLuint shader)
 	{
@@ -114,28 +114,28 @@ namespace Phoenix
 		{
 			int infoLogLength = 0;
 			int maxLength = infoLogLength;
-	
+
 			glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLength);
-	
+
 			char* infoLog = new char[maxLength];
-	
+
 			glGetShaderInfoLog(shader, maxLength, &infoLogLength, infoLog);
-	
+
 			if (infoLogLength > 0)
 			{
 				Logger::error(infoLog);
 				return false;
 			}
-	
+
 			delete[] infoLog;
 		}
-	
+
 		else
 		{
 			Logger::errorf("ID %d is not a shader", shader);
 			return false;
 		}
-	
+
 		return true;
 	}
 
@@ -148,21 +148,21 @@ namespace Phoenix
 
 		shader->m_shaderType = shaderType;
 		shader->m_id = glCreateShader(shaderType);
-		
+
 		glShaderSource(shader->m_id, 1, (const char**)&source, NULL);
 		glCompileShader(shader->m_id);
 
 		checkGlErrorOccured();
 		return getAndLogShaderLog(shader->m_id);
 	}
-	
-	VertexShaderHandle RIDeviceOpenGL::createVertexShader(const char* source) 
+
+	VertexShaderHandle RIDeviceOpenGL::createVertexShader(const char* source)
 	{
-		VertexShaderHandle handle = m_resources->m_vertexshaders.allocateResource();		
+		VertexShaderHandle handle = m_resources->m_vertexshaders.allocateResource();
 		GlVertexShader* shader = m_resources->m_vertexshaders.getResource(handle);
 
 		bool bSuccess = createShader(&shader->m_glShader, GL_VERTEX_SHADER, source);
-	
+
 		if (!bSuccess)
 		{
 			Logger::error("Failed to create Vertex Shader!");
@@ -173,11 +173,11 @@ namespace Phoenix
 		return handle;
 	}
 
-	FragmentShaderHandle RIDeviceOpenGL::createFragmentShader(const char* source) 
-	{ 
+	FragmentShaderHandle RIDeviceOpenGL::createFragmentShader(const char* source)
+	{
 		FragmentShaderHandle handle = m_resources->m_fragmentshaders.allocateResource();
 		GlFragmentShader* shader = m_resources->m_fragmentshaders.getResource(handle);
-		
+
 		bool bSuccess = createShader(&shader->m_glShader, GL_FRAGMENT_SHADER, source);
 
 		if (!bSuccess)
@@ -189,7 +189,7 @@ namespace Phoenix
 
 		return handle;
 	}
-	
+
 	bool checkIsSamplerType(GLenum typeVal)
 	{
 		return (typeVal == GL_TEXTURE_2D
@@ -203,7 +203,7 @@ namespace Phoenix
 		GLint count;
 		GLint size;
 		GLenum type;
-	
+
 		GLint bufSize = 0;
 		glGetProgramiv(program.m_id, GL_ACTIVE_UNIFORM_MAX_LENGTH, &bufSize);
 
@@ -214,9 +214,9 @@ namespace Phoenix
 
 		std::vector<GLchar> name(bufSize);
 		GLsizei length;
-	
+
 		glGetProgramiv(program.m_id, GL_ACTIVE_UNIFORMS, &count);
-	
+
 		for (GLint i = 0; i < count; ++i)
 		{
 			glGetActiveUniform(program.m_id, (GLuint)i, bufSize, &length, &size, &type, name.data());
@@ -224,7 +224,7 @@ namespace Phoenix
 		}
 	}
 
-	ProgramHandle RIDeviceOpenGL::createProgram(VertexShaderHandle vsHandle, FragmentShaderHandle fsHandle) 
+	ProgramHandle RIDeviceOpenGL::createProgram(VertexShaderHandle vsHandle, FragmentShaderHandle fsHandle)
 	{
 		ProgramHandle handle = m_resources->m_programs.allocateResource();
 
@@ -293,9 +293,38 @@ namespace Phoenix
 		switch (filter)
 		{
 		case ETextureFilter::Linear:
-				return GL_LINEAR;
+			return GL_LINEAR;
 		case ETextureFilter::Nearest:
 			return GL_NEAREST;
+		default:
+			assert(false);
+			return GL_INVALID_ENUM;
+		}
+	}
+
+	GLenum toGlTexDatatype(EPixelFormat format)
+	{
+		switch (format)
+		{
+		case EPixelFormat::R8G8B8A8:
+		case EPixelFormat::R8G8B8:
+			return GL_UNSIGNED_BYTE;
+		default:
+			assert(false);
+			return GL_INVALID_ENUM;
+		}
+	}
+
+	GLenum toGlWrap(ETextureWrap wrap)
+	{
+		switch (wrap)
+		{
+		case ETextureWrap::ClampToEdge:
+			return GL_CLAMP_TO_EDGE;
+		case ETextureWrap::Repeat:
+			return GL_REPEAT;
+		case ETextureWrap::MirroredRepeat:
+			return GL_MIRRORED_REPEAT;
 		default:
 			assert(false);
 			return GL_INVALID_ENUM;
@@ -306,10 +335,10 @@ namespace Phoenix
 	{
 		glTex.m_pixelFormat = toGlFormat(desc.pixelFormat);
 		glTex.m_components = toGlComponents(desc.pixelFormat);
-		glTex.m_dataType = GL_UNSIGNED_BYTE; // NOTE(Phil): This might be problematic with higher pixeldepth textures later (hdr)
+		glTex.m_dataType = toGlTexDatatype(desc.pixelFormat);
 		texture.m_numMips = desc.numMips;
 		texture.m_namehash = HashFNV<const char*>()(name);
-		
+
 		glGenTextures(1, &glTex.m_id);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(textureType, glTex.m_id);
@@ -322,10 +351,17 @@ namespace Phoenix
 		{
 			glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 		}
+
+		glTexParameterf(textureType, GL_TEXTURE_MAG_FILTER, toGlFilter(desc.magFilter));
+		glTexParameterf(textureType, GL_TEXTURE_MIN_FILTER, toGlFilter(desc.minFilter));
+
+		glTexParameteri(textureType, GL_TEXTURE_WRAP_S, toGlWrap(desc.wrapU));
+		glTexParameteri(textureType, GL_TEXTURE_WRAP_T, toGlWrap(desc.wrapV));
+		glTexParameterf(textureType, GL_TEXTURE_WRAP_R, toGlWrap(desc.wrapW));		
 	}
 
-	Texture2DHandle	RIDeviceOpenGL::createTexture2D(const TextureDesc& desc, const char* name) 
-	{ 
+	Texture2DHandle	RIDeviceOpenGL::createTexture2D(const TextureDesc& desc, const char* name)
+	{
 		Texture2DHandle handle = m_resources->m_texture2Ds.allocateResource();
 		GlTexture2D* texture = m_resources->m_texture2Ds.getResource(handle);
 
@@ -334,11 +370,9 @@ namespace Phoenix
 		texture->m_width = desc.width;
 		texture->m_height = desc.height;
 
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, toGlFilter(desc.magFilter));
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, toGlFilter(desc.minFilter));
+		checkGlErrorOccured();
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexStorage2D(GL_TEXTURE_2D, desc.numMips + 1, texture->m_glTex.m_pixelFormat, desc.width, desc.height);
 
 		if (checkGlErrorOccured())
 		{
@@ -349,7 +383,7 @@ namespace Phoenix
 
 		return handle;
 	}
-	
+
 	TextureCubeHandle RIDeviceOpenGL::createTextureCube(const TextureDesc& desc, const char* name)
 	{
 		TextureCubeHandle handle = m_resources->m_textureCubes.allocateResource();
@@ -359,12 +393,6 @@ namespace Phoenix
 
 		assert(desc.width == desc.height);
 		texture->m_size = desc.width;
-
-		glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, toGlFilter(desc.magFilter));
-		glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, toGlFilter(desc.minFilter));
-
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 		if (checkGlErrorOccured())
 		{
@@ -376,11 +404,6 @@ namespace Phoenix
 		return handle;
 	}
 
-	//if (format > ETexture::Tex2D) // Relevant for Texture3D
-	//{
-	//glTexParameterf(format, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-	//}
-
 	UniformHandle RIDeviceOpenGL::createUniform(const char* name, EUniformType type)
 	{
 		UniformHandle handle = m_resources->m_uniforms.allocateResource();
@@ -390,5 +413,39 @@ namespace Phoenix
 		return handle;
 	}
 
-	RenderTargetHandle RIDeviceOpenGL::createRenderTarget(const RenderTargetDesc& desc) { assert(false); return RenderTargetHandle{}; }
+	RenderTargetHandle RIDeviceOpenGL::createRenderTarget(const RenderTargetDesc& desc)
+	{
+		RenderTargetHandle handle = m_resources->m_framebuffers.allocateResource();
+		GlFramebuffer* fb = m_resources->m_framebuffers.getResource(handle);
+
+		//fb->m_renderAttachments = desc.attachment;
+
+	/*	glCreateFramebuffers(1, &fb->m_id);
+
+		if (desc.attachment & ERenderAttachment::Color)
+		{
+			glGenTextures(1, &fb->m_colorTex);
+			glBindTexture(GL_TEXTURE_2D, fb->m_colorTex);
+			glTexStorage2D(fb->m_colorTex, 1, GL_RGBA8, desc.width, desc.height);
+			glNamedFramebufferTexture(fb->m_id, GL_COLOR_ATTACHMENT0, fb->m_colorTex, 0);
+		}
+
+		if (desc.attachment & ERenderAttachment::Stencil)
+		{
+			glGenTextures(1, &fb.m_stencilTex);
+			glBindTexture(GL_TEXTURE_2D, fb.m_stencilTex);
+			glTexStorage2D(fb.m_stencilTex, 1, GL_STENCIL_INDEX8, desc.width, desc.height);
+			glNamedFramebufferTexture(fb.m_id, GL_STENCIL_ATTACHMENT, fb.m_stencilTex, 0);
+		}
+
+		if (desc.attachment & ERenderAttachment::Depth)
+		{
+			glGenTextures(1, &fb.m_depthTex);
+			glBindTexture(GL_TEXTURE_2D, fb.m_depthTex);
+			glTexStorage2D(fb.m_depthTex, 1, GL_DEPTH_COMPONENT32F, desc.width, desc.height);
+			glNamedFramebufferTexture(fb.m_id, GL_DEPTH_ATTACHMENT, fb.m_depthTex, 0);
+		}*/
+
+		return handle;
+	}
 }
