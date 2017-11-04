@@ -196,12 +196,12 @@ namespace Phoenix
 	enum class EPixelFormat
 	{
 		None,
-		R8G8B8A8,
 		R8G8B8,
+		R8G8B8A8,
 		Depth32F,
 		Depth16I,
 		Stencil8I,
-		Depth24IStencil8I
+		Depth24IStencil8I,
 	};
 
 	enum class ETextureFilter
@@ -220,6 +220,18 @@ namespace Phoenix
 	class TextureDesc
 	{
 	public:
+		class TextureDesc()
+			: width(0)
+			, height(0)
+			, pixelFormat(EPixelFormat::None)
+			, minFilter(ETextureFilter::Linear)
+			, magFilter(ETextureFilter::Linear)
+			, wrapU(ETextureWrap::ClampToEdge)
+			, wrapV(ETextureWrap::ClampToEdge)
+			, wrapW(ETextureWrap::ClampToEdge)
+			, numMips(0)
+		{}
+
 		uint32_t width;
 		uint32_t height;
 		EPixelFormat pixelFormat;
