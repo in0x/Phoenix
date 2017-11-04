@@ -5,8 +5,6 @@
 #include "../RIDefs.hpp"
 #include "../../Logger.hpp"
 
-#include "../../Math/Matrix4.hpp"
-
 #include <assert.h>
 
 namespace Phoenix
@@ -94,7 +92,6 @@ namespace Phoenix
 		{
 		case EUniformType::Mat4:
 		{
-			const Matrix4* mat = static_cast<const Matrix4*>(data);
 			glUniformMatrix4fv(uniform.m_location, uniform.m_numElements, false, static_cast<const GLfloat*>(data));
 		} break;
 		case EUniformType::Vec3:
@@ -269,7 +266,7 @@ namespace Phoenix
 		checkGlErrorOccured();
 	}
 
-	void RIContextOpenGL::endFrame()
+	void RIContextOpenGL::endPass()
 	{
 		m_boundState.activeTextureCount = 0;
 	}
@@ -294,228 +291,4 @@ namespace Phoenix
 	{
 		glClear(GL_DEPTH_BUFFER_BIT);
 	}
-
-//
-//	uint32_t RIContextOpenGL::getMaxTextureUnits() const
-//	{
-//		GLint maxTextureUnits;
-//		glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxTextureUnits);
-//		return static_cast<uint32_t>(maxTextureUnits);
-//	}
-//
-//	uint32_t RIContextOpenGL::getMaxUniformCount() const
-//	{
-//		GLint maxUniforms;
-//		glGetIntegerv(GL_MAX_UNIFORM_LOCATIONS, &maxUniforms);
-//		return static_cast<uint32_t>(maxUniforms);
-//	}
-
-
-//
-
-//
-//	GLenum toGlAttachment(ERenderAttachment::Type type)
-//	{
-//		static GLenum attachments[] = { GL_COLOR_ATTACHMENT0, GL_STENCIL_ATTACHMENT, GL_DEPTH_ATTACHMENT };
-//		return attachments[type];
-//	}
-//
-//	void RIContextOpenGL::createRenderTarget(RenderTargetHandle& handle, const RenderTargetDesc& desc)
-//	{
-//		GlFramebuffer& fb = m_framebuffers[handle.idx];
-//		fb.m_renderAttachments = desc.attachment;
-//
-//		glCreateFramebuffers(1, &fb.m_id);
-//
-//		if (desc.attachment & ERenderAttachment::Color)
-//		{
-//			glGenTextures(1, &fb.m_colorTex);
-//			glBindTexture(GL_TEXTURE_2D, fb.m_colorTex);
-//			glTexStorage2D(fb.m_colorTex, 1, GL_RGBA8, desc.width, desc.height);
-//			glNamedFramebufferTexture(fb.m_id, GL_COLOR_ATTACHMENT0, fb.m_colorTex, 0);
-//		}
-//
-//		if (desc.attachment & ERenderAttachment::Stencil)
-//		{
-//			glGenTextures(1, &fb.m_stencilTex);
-//			glBindTexture(GL_TEXTURE_2D, fb.m_stencilTex);
-//			glTexStorage2D(fb.m_stencilTex, 1, GL_STENCIL_INDEX8, desc.width, desc.height);
-//			glNamedFramebufferTexture(fb.m_id, GL_STENCIL_ATTACHMENT, fb.m_stencilTex, 0);
-//		}
-//
-//		if (desc.attachment & ERenderAttachment::Depth)
-//		{
-//			glGenTextures(1, &fb.m_depthTex);
-//			glBindTexture(GL_TEXTURE_2D, fb.m_depthTex);
-//			glTexStorage2D(fb.m_depthTex, 1, GL_DEPTH_COMPONENT32F, desc.width, desc.height);
-//			glNamedFramebufferTexture(fb.m_id, GL_DEPTH_ATTACHMENT, fb.m_depthTex, 0);
-//		}
-//	}
-//
-//	// NOTE(Phil): Textures return type int because the locations map to 
-//	// texture units.
-//	EUniform::Type toUniformType(GLenum glType)
-//	{
-//		switch (glType)
-//		{
-//		case GL_FLOAT_VEC3:
-//		{
-//			return EUniform::Vec3;
-//		} break;
-//		case GL_FLOAT_VEC4:
-//		{
-//			return EUniform::Vec4;
-//		} break;
-//		case GL_FLOAT_MAT3:
-//		{
-//			return EUniform::Mat3;
-//		} break;
-//		case GL_INT:
-//		case GL_SAMPLER_1D:
-//		case GL_SAMPLER_2D:
-//		case GL_SAMPLER_3D:
-//		case GL_SAMPLER_CUBE:
-//		{
-//			return EUniform::Int;
-//		} break;
-//		case GL_FLOAT_MAT4:
-//		{
-//			return EUniform::Mat4;
-//		} break;
-//		case GL_FLOAT:
-//		{
-//			return EUniform::Float;
-//		} break;
-//		default:
-//		{
-//			Logger::error("Trying to convert invalid GlEnum to Uniform::Type");
-//			assert(false);
-//			return EUniform::Count;
-//		} break;
-//		}
-//	}
-//
-//	bool checkIsBasicUniform(GLenum typeVal)
-//	{
-//		return (typeVal == GL_FLOAT
-//			|| typeVal == GL_INT
-//			|| typeVal == GL_FLOAT_VEC3
-//			|| typeVal == GL_FLOAT_VEC4
-//			|| typeVal == GL_FLOAT_MAT3
-//			|| typeVal == GL_FLOAT_MAT4);
-//	}
-//
-//	bool checkIsSampler(GLenum typeVal)
-//	{
-//		return (typeVal == GL_TEXTURE_2D
-//			|| typeVal == GL_TEXTURE_3D
-//			|| typeVal == GL_TEXTURE_CUBE_MAP
-//			|| typeVal == GL_TEXTURE_1D);
-//	}
-
-//	void RIContextOpenGL::setDepth(EDepth::Type depth)
-//	{
-//		switch (depth)
-//		{
-//		case EDepth::Enable:
-//		{
-//			glEnable(GL_DEPTH_TEST);
-//		} break;
-//		case EDepth::Disable:
-//		{
-//			glDisable(GL_DEPTH_TEST);
-//		} break;
-//		default: break;
-//		}
-//	}
-//
-//	void RIContextOpenGL::setRaster(ERaster::Type raster)
-//	{
-//		Logger::warning(__LOCATION_INFO__ "not implemented!");
-//	}
-//
-//	void RIContextOpenGL::setBlend(EBlend::Type blend)
-//	{
-//		Logger::warning(__LOCATION_INFO__ "not implemented!");
-//	}
-//
-//	void RIContextOpenGL::setStencil(EStencil::Type stencil)
-//	{
-//		Logger::warning(__LOCATION_INFO__ "not implemented!");
-//	}
-
-
-//
-//	void RIContextOpenGL::bindTexture(const GlUniform& uniform, const GlTexture2D& texture)
-//	{
-//		assert(m_activeTextures < getMaxTextureUnits());
-//		glActiveTexture(GL_TEXTURE0 + m_activeTextures);
-//		glBindTexture(texture.m_format, texture.m_id);
-//		glUniform1i(uniform.m_location, m_activeTextures);
-//
-//		m_activeTextures++;
-//	}
-//
-//	void RIContextOpenGL::bindTextures(ProgramHandle boundProgram, const UniformInfo* locations, const TextureHandle* handles, size_t count)
-//	{
-//		for (size_t i = 0; i < count; ++i)
-//		{
-//			const UniformInfo& info = locations[i];
-//			auto uniformIdx = getUniform(boundProgram, info);
-//
-//			if (UniformHandle::invalidValue == uniformIdx)
-//			{
-//				Logger::errorf("Texture %s does not exist in program with handle id %d", info.name, boundProgram.idx);
-//				continue;
-//			}
-//
-//			if (m_uniforms[uniformIdx].m_type == EUniform::Int)
-//			{
-//				bindTexture(m_uniforms[uniformIdx], m_textures[handles[i].textureIdx]);
-//			}
-//			else
-//			{
-//				Logger::error("Uniform exists in program, but type is not a sampler type");
-//			}
-//		}
-//
-//		getGlErrorString();
-//		checkGlError();
-//	}
-//
-//	void RIContextOpenGL::setState(const CStateGroup& state)
-//	{
-//		setProgram(state.program);
-//		setDepth(state.depth);
-//		bindUniforms(state.program, state.uniforms, state.uniformCount);
-//		bindTextures(state.program, state.textureLocations, state.textures, state.textureCount);
-//		//setBlend(state.blend);
-//		//setStencil(state.stencil);
-//		//setRaster(state.raster);
-//		m_activeTextures = 0;
-//	}
-
-//
-
-//
-//	void RIContextOpenGL::clearRenderTarget(RenderTargetHandle handle, EBuffer::Type bitToClear, RGBA clearColor)
-//	{
-//		// TODO(PHIL): use actual frambuffer here, 0 is default for window
-//
-//		switch (bitToClear)
-//		{
-//		case EBuffer::Color:
-//		{
-//			glClearBufferfv(GL_COLOR, 0, (GLfloat*)&clearColor);
-//		} break;
-//		case EBuffer::Depth:
-//		{
-//			glClear(GL_DEPTH_BUFFER_BIT);
-//		} break;
-//		case EBuffer::Stencil:
-//		{
-//			glClear(GL_STENCIL_BUFFER_BIT);
-//		} break;
-//		}
-//	}
 }

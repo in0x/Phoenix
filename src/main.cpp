@@ -220,12 +220,6 @@ int main(int argc, char** argv)
 	texDesc.width = 800;
 	texDesc.height = 600;
 	texDesc.pixelFormat = EPixelFormat::R8G8B8A8;
-	texDesc.minFilter = ETextureFilter::Linear;
-	texDesc.magFilter = ETextureFilter::Linear;
-	texDesc.numMips = 0;
-	texDesc.wrapU = ETextureWrap::ClampToEdge;
-	texDesc.wrapV = ETextureWrap::ClampToEdge;
-	texDesc.wrapW = ETextureWrap::ClampToEdge;
 	Texture2DHandle colorTex = renderDevice->createTexture2D(texDesc, "fbTexColor");
 
 	texDesc.pixelFormat = EPixelFormat::Depth16I;
@@ -269,7 +263,7 @@ int main(int argc, char** argv)
 
 		checkGlErrorOccured();
 	
-		renderContext.endFrame();
+		renderContext.endPass();
 	}
 
 	delete renderDevice;
