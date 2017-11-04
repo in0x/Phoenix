@@ -153,7 +153,7 @@ namespace Phoenix
 	bool Matrix4::operator==(const Matrix4& rhv)
 	{
 		Matrix4& lhv = *this;
-		
+
 		for (int i = 0; i < 4; i++)
 		{
 			for (int j = 0; j < 4; j++)
@@ -300,8 +300,8 @@ namespace Phoenix
 		return Matrix4
 		{
 			C*E,           -C*F,        -D,  0.f,
-		   -B*D*E + A*F,  B*D*F + A*E, -B*C, 0.f, 
-			A*D*E + B*F, -A*D*F + B*E,  A*C, 0.f, 
+		   -B*D*E + A*F,  B*D*F + A*E, -B*C, 0.f,
+			A*D*E + B*F, -A*D*F + B*E,  A*C, 0.f,
 			0.f,		  0.f,			0.f, 1.f
 		};
 	}
@@ -314,14 +314,12 @@ namespace Phoenix
 						0, 0, 0, 1 };
 	}
 
-	Vec3 operator*(const Matrix4& lhv, Vec3 rhv)
+	Vec4 operator*(const Matrix4& lhv, const Vec4& rhv)
 	{
-		return rhv;
-	}
-
-	Vec4 operator*(const Matrix4& lhv, Vec4 rhv)
-	{
-		return rhv;
+		return Vec4(lhv(0, 0) * rhv.x + lhv(0, 1) * rhv.y + lhv(0, 2) * rhv.z + lhv(0, 3) * rhv.w,
+					lhv(1, 0) * rhv.x + lhv(1, 1) * rhv.y + lhv(1, 2) * rhv.z + lhv(1, 3) * rhv.w,
+					lhv(2, 0) * rhv.x + lhv(2, 1) * rhv.y + lhv(2, 2) * rhv.z + lhv(2, 3) * rhv.w,
+					lhv(3, 0) * rhv.x + lhv(3, 1) * rhv.y + lhv(3, 2) * rhv.z + lhv(3, 3) * rhv.w);
 	}
 
 	Matrix4 operator+(Matrix4 lhv, const Matrix4& rhv)

@@ -51,7 +51,7 @@ namespace Phoenix
 
 		m_width = static_cast<uint32_t>(width);
 		m_height = static_cast<uint32_t>(height);
-		m_components = components;
+		m_components = static_cast<uint8_t>(components);
 	}
 
 	void Texture::clear()

@@ -222,12 +222,15 @@ namespace Phoenix
 
 	void RIContextOpenGL::clearRenderTargetColor(RenderTargetHandle rtHandle, const RGBA& clearColor)
 	{
-		glClearBufferfv(GL_COLOR, 0, (GLfloat*)&clearColor);
+		const GlFramebuffer* fb = m_resources->m_framebuffers.getResource(rtHandle);
+		glClearNamedFramebufferfv(fb->m_id, GL_COLOR, 0, (GLfloat*)&clearColor);
 	}
 
 	void RIContextOpenGL::clearRenderTargetDepth(RenderTargetHandle rtHandle)
 	{
-		glClear(GL_DEPTH_BUFFER_BIT);
+		const GlFramebuffer* fb = m_resources->m_framebuffers.getResource(rtHandle);
+		GLfloat clearValue = 1;
+		glClearNamedFramebufferfv(fb->m_id, GL_DEPTH, 0, &clearValue);
 	}
 
 	void RIContextOpenGL::uploadTextureData(Texture2DHandle handle, const void* data)

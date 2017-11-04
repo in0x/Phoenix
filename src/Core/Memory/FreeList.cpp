@@ -35,7 +35,7 @@ namespace Phoenix
 			iter = asFree;
 		}
 
-		ptrdiff_t diff = static_cast<char*>(memEnd) - reinterpret_cast<char*>(iter);
+		size_t diff = static_cast<char*>(memEnd) - reinterpret_cast<char*>(iter);
 		assert(blockSize == diff);
 		iter->m_next = nullptr;
 	}

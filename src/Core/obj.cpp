@@ -458,7 +458,7 @@ namespace Phoenix
 			}
 			else if (compare(firstToken, "illum"))
 			{
-				mat->illum = strToInt(tokens[1]);
+				mat->illum = static_cast<int8_t>(strToInt(tokens[1]));
 			}
 			else if (compare(firstToken, "Ns"))
 			{

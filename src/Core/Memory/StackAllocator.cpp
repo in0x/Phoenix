@@ -84,8 +84,6 @@ namespace Phoenix
 
 		m_top = reinterpret_cast<char*>(rawAddress);
 
-		ptrdiff_t diff = m_top - m_start;
-
 		return;
 	}
 }

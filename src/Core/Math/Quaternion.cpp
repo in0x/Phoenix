@@ -22,10 +22,10 @@ namespace Phoenix
 		return quat;
 	}
 
-	Quaternion Quaternion::fromEulerAngles(const Vec3& angles)
+	/*Quaternion Quaternion::fromEulerAngles(const Vec3& angles)
 	{
 		return{ 0, 0, 0, 0 };
-	}
+	}*/
 
 	Matrix4 Quaternion::toMatrix4() const
 	{

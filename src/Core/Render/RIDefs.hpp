@@ -121,7 +121,7 @@ namespace Phoenix
 				: m_size(size)
 				, m_count(count)
 				, m_data(data)
-				, m_bNormalize(m_bNormalize)
+				, m_bNormalize(bNormalize)
 			{}
 
 			size_t m_size; // The amount of memory taken up by a single element in the buffer (result of sizeof())

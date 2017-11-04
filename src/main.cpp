@@ -26,8 +26,8 @@ namespace Phoenix
 		Matrix4 modelMat;
 		VertexBufferHandle vb;
 		IndexBufferHandle ib;
-		uint32_t numVertices;
-		uint32_t numIndices;
+		size_t numVertices;
+		size_t numIndices;
 		UniformHandle modelMatHandle;
 	};
 
@@ -182,8 +182,8 @@ int main(int argc, char** argv)
 	ProgramHandle programHandle = loadProgram(renderDevice, "Shaders/reflect.vert", "Shaders/reflect.frag");
 	ProgramHandle drawToScreenProgram = loadProgram(renderDevice, "Shaders/fillScreen.vert", "Shaders/fillScreen.frag");
 	
-	Matrix4 viewTf = lookAtRH(Vec3{ 0, 0, 5 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 });
-	Matrix4 projTf = perspectiveRH(70, (float)config.width / (float)config.height, 0.1, 100);
+	Matrix4 viewTf = lookAtRH(Vec3( 0, 0, 5 ), Vec3( 0,0,0 ), Vec3( 0,1,0 ));
+	Matrix4 projTf = perspectiveRH(70.f, (float)config.width / (float)config.height, 0.1f, 100.f);
 
 	UniformHandle viewMat = renderDevice->createUniform("viewTf", EUniformType::Mat4);
 	UniformHandle projMat = renderDevice->createUniform("projectionTf", EUniformType::Mat4);

@@ -138,7 +138,7 @@ namespace Phoenix
 	bool Matrix3::operator==(const Matrix3& rhv)
 	{
 		Matrix3& lhv = *this;
-		
+
 		for (int i = 0; i < 3; i++)
 		{
 			for (int j = 0; j < 3; j++)
@@ -194,8 +194,8 @@ namespace Phoenix
 	{
 		const Matrix3& self = *this;
 		return self(0, 0) * minor(1, 2, 1, 2) -
-			   self(0, 1) * minor(1, 2, 0, 2) +
-			   self(0, 2) * minor(1, 2, 0, 1);
+			self(0, 1) * minor(1, 2, 0, 2) +
+			self(0, 2) * minor(1, 2, 0, 1);
 	}
 
 	// Classical adjoint is transpose of matrix of cofactors
@@ -225,7 +225,7 @@ namespace Phoenix
 	Matrix4 Matrix3::asMatrix4() const
 	{
 		const Matrix3& self = *this;
-		return Matrix4 {
+		return Matrix4{
 			self(0,0), self(0,1), self(0,2), 0,
 			self(1,0), self(1,1), self(1,2), 0,
 			self(2,0), self(2,1), self(2,2), 0,
@@ -311,9 +311,11 @@ namespace Phoenix
 						0, 0, 1 };
 	}
 
-	Vec3 operator*(const Matrix3& lhv, Vec3 rhv)
+	Vec3 operator*(const Matrix3& lhv, const Vec3& rhv)
 	{
-		return rhv;
+		return Vec3(lhv(0, 0) * rhv.x + lhv(0, 1) * rhv.y + lhv(0, 2) * rhv.z,
+					lhv(1, 0) * rhv.x + lhv(1, 1) * rhv.y + lhv(1, 2) * rhv.z,
+					lhv(2, 0) * rhv.x + lhv(2, 1) * rhv.y + lhv(2, 2) * rhv.z);
 	}
 
 	Matrix3 operator+(Matrix3 lhv, const Matrix3& rhv)

@@ -17,7 +17,7 @@ namespace Phoenix
 		Quaternion(float w, float x, float y, float z);
 
 		static Quaternion fromExpMap(float theta, const Vec3& n);
-		static Quaternion fromEulerAngles(const Vec3& angles);
+		//static Quaternion fromEulerAngles(const Vec3& angles);
 
 		Matrix4 toMatrix4() const;
 

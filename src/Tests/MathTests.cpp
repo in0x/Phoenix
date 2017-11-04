@@ -17,7 +17,7 @@ namespace Phoenix { namespace Tests
 
 	void legacyTests()
 	{
-		std::cout << lookAtRH(Vec3{ 0,0,2 }, Vec3{ 0,0,0 }, Vec3{ 0,1,0 }) << '\n';
+		std::cout << lookAtRH(Vec3( 0,0,2 ), Vec3( 0,0,0 ), Vec3( 0,1,0 )) << '\n';
 		std::cout << perspectiveRH(90.f, 1920.f / 1080.f, 0.5f, 20.f) << '\n';
 
 		float det = Matrix3(3, 1, 2,

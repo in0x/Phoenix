@@ -370,12 +370,12 @@ namespace Phoenix
 			glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 		}
 
-		glTexParameterf(textureType, GL_TEXTURE_MAG_FILTER, toGlFilter(desc.magFilter));
-		glTexParameterf(textureType, GL_TEXTURE_MIN_FILTER, toGlFilter(desc.minFilter));
+		glTexParameteri(textureType, GL_TEXTURE_MAG_FILTER, toGlFilter(desc.magFilter));
+		glTexParameteri(textureType, GL_TEXTURE_MIN_FILTER, toGlFilter(desc.minFilter));
 
 		glTexParameteri(textureType, GL_TEXTURE_WRAP_S, toGlWrap(desc.wrapU));
 		glTexParameteri(textureType, GL_TEXTURE_WRAP_T, toGlWrap(desc.wrapV));
-		glTexParameterf(textureType, GL_TEXTURE_WRAP_R, toGlWrap(desc.wrapW));
+		glTexParameteri(textureType, GL_TEXTURE_WRAP_R, toGlWrap(desc.wrapW));
 	}
 
 	Texture2DHandle	RIDeviceOpenGL::createTexture2D(const TextureDesc& desc, const char* name)
