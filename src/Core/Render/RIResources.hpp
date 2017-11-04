@@ -91,8 +91,7 @@ namespace Phoenix
 		FNVHash m_nameHash;
 	};
 
-	// Definetly split up uniform declaration and data. Declaration in the device, data with a command that can copy later.
-	class RIUniformBuffer : RIResource
+	class RIConstantBuffer : RIResource
 	{
 
 	};
