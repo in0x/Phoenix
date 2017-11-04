@@ -15,6 +15,8 @@ namespace Phoenix
 	public:
 		RIContextOpenGL(const RIOpenGLResourceStore* resources);
 
+		void drawLinear(EPrimitive primitives, uint32_t count, uint32_t start);
+
 		void drawLinear(VertexBufferHandle vbHandle, EPrimitive primitives, uint32_t count, uint32_t startIndex = 0);
 
 		void drawIndexed(VertexBufferHandle vbHandle, IndexBufferHandle ibHandle, EPrimitive primitives, uint32_t count = 0, uint32_t startIndex = 0);
@@ -40,6 +42,12 @@ namespace Phoenix
 		void bindTexture(TextureCubeHandle handle);
 
 		void bindRenderTarget(RenderTargetHandle handle);
+
+		void bindDefaultRenderTarget();
+
+		void clearColor();
+
+		void clearDepth();
 
 		void endFrame();
 

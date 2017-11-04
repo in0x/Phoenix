@@ -256,12 +256,14 @@ int main(int argc, char** argv)
 		renderContext.bindUniform(mesh.modelMatHandle, &mesh.modelMat);
 		renderContext.drawIndexed(mesh.vb, mesh.ib, EPrimitive::Triangles);
 
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		renderContext.bindDefaultRenderTarget();
+		renderContext.clearColor();
+		renderContext.clearDepth();
 		renderContext.bindShaderProgram(drawToScreenProgram);
 		renderContext.bindTexture(colorTex);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-
+	
+		renderContext.drawLinear(EPrimitive::Triangles, 3, 0);
+		
 		wgl.swapBuffers();
 		window.processMessages();
 

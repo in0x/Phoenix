@@ -41,6 +41,11 @@ namespace Phoenix
 		return static_cast<uint32_t>(maxTextureUnits);
 	}
 
+	void RIContextOpenGL::drawLinear(EPrimitive primitives, uint32_t count, uint32_t start)
+	{
+		glDrawArrays(toGlPrimitive(primitives), start, count);
+	}
+
 	void RIContextOpenGL::drawLinear(VertexBufferHandle vbHandle, EPrimitive primitives, uint32_t count, uint32_t start)
 	{
 		bindVertexBuffer(vbHandle);
@@ -50,7 +55,7 @@ namespace Phoenix
 	void RIContextOpenGL::drawIndexed(VertexBufferHandle vbHandle, IndexBufferHandle ibHandle, EPrimitive primitives, uint32_t count, uint32_t startIndex)
 	{
 		bindVertexBuffer(vbHandle);
-	
+
 		const GlIndexBuffer* ib = m_resources->m_indexbuffers.getResource(ibHandle);
 		bindIndexBuffer(ibHandle);
 
@@ -58,7 +63,7 @@ namespace Phoenix
 		{
 			count = ib->m_numElements;
 		}
-		
+
 		glDrawElements(toGlPrimitive(primitives), count, GL_UNSIGNED_INT, (GLvoid*)(sizeof(GLubyte) * startIndex));
 	}
 
@@ -82,7 +87,7 @@ namespace Phoenix
 		m_boundState.indexbuffer = ib;
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ib->m_id);
 	}
-	
+
 	void setUniform(const GlUniform& uniform, const void* data, EUniformType type)
 	{
 		switch (type)
@@ -149,7 +154,7 @@ namespace Phoenix
 
 		GlUniform glUniform;
 		bool bIsActive = m_resources->m_actualUniforms.getUniformIfExisting(uniform->m_nameHash, program->m_id, glUniform);
-	
+
 		if (bIsActive)
 		{
 			assert(isBasicUniformType(glUniform.m_glType));
@@ -159,11 +164,11 @@ namespace Phoenix
 
 	struct TextureBind
 	{
-		const RITexture& texture; 
-		GLuint texID; 
+		const RITexture& texture;
+		GLuint texID;
 		GLenum texturetype;
 	};
-	
+
 	GLenum getSamplerType(GLenum textureType)
 	{
 		switch (textureType)
@@ -196,7 +201,7 @@ namespace Phoenix
 			return;
 		}
 
-		assert(glUniform.m_glType == getSamplerType(binding.texturetype)); 
+		assert(glUniform.m_glType == getSamplerType(binding.texturetype));
 		assert(m_boundState.activeTextureCount < getMaxTextureUnits());
 
 		glActiveTexture(GL_TEXTURE0 + m_boundState.activeTextureCount);
@@ -222,7 +227,7 @@ namespace Phoenix
 	{
 		glClearBufferfv(GL_COLOR, 0, (GLfloat*)&clearColor);
 	}
-	
+
 	void RIContextOpenGL::clearRenderTargetDepth(RenderTargetHandle rtHandle)
 	{
 		glClear(GL_DEPTH_BUFFER_BIT);
@@ -237,7 +242,7 @@ namespace Phoenix
 
 		glTexSubImage2D(GL_TEXTURE_2D,
 			0,
-			0,0,
+			0, 0,
 			texture->m_width, texture->m_height,
 			texture->m_glTex.m_components,
 			texture->m_glTex.m_dataType,
@@ -274,6 +279,22 @@ namespace Phoenix
 		const GlFramebuffer* framebuffer = m_resources->m_framebuffers.getResource(handle);
 		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer->m_id);
 	}
+
+	void RIContextOpenGL::bindDefaultRenderTarget()
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
+
+	void RIContextOpenGL::clearColor()
+	{
+		glClear(GL_COLOR_BUFFER_BIT);
+	}
+	
+	void RIContextOpenGL::clearDepth()
+	{
+		glClear(GL_DEPTH_BUFFER_BIT);
+	}
+
 //
 //	uint32_t RIContextOpenGL::getMaxTextureUnits() const
 //	{
