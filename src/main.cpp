@@ -1,4 +1,4 @@
-#include <cassert>
+#include <assert.h>
 #include <fstream>
 
 #include "Tests/MathTests.hpp"
