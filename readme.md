@@ -14,4 +14,4 @@ Some current features highlighted. All of this has been implemented by hand. Thi
 * A command-based, stateless approach to rendering sitting atop RenderBackend.
 * A custom math library.
 * A few custom memory allocators and utility functions.
-* ~~ A custom window implementation (currently only for Windows). ~~ This is deprecated in favor of using GLFW (and DXUT later).
+* ~~A custom window implementation (currently only for Windows).~~ This is deprecated in favor of using GLFW (and DXUT later).
