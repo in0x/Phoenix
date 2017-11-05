@@ -1,14 +1,13 @@
 #pragma once
 
 #include "../RIDevice.hpp"
-#include "../RIResourceHandles.h"
+#include "../RIResourceHandles.hpp"
 #include "../RIResourceContainer.hpp"
 
 namespace Phoenix
 {
 	class RIWGlDetails;
-	class GlVertexBuffer;
-	class RenderInit;
+	class GlFramebuffer;
 	struct RIOpenGLResourceStore;
 	
 	class RIDeviceOpenGL : public IRIDevice

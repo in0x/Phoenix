@@ -6,18 +6,11 @@
 
 #include "Core/obj.hpp"
 #include "Core/Math/PhiMath.hpp"
-#include "Core/Windows/Win32Window.hpp"
 #include "Core/Logger.hpp"
 #include "Core/Texture.hpp"
 
 #include "Core/Windows/PlatformWindows.hpp"
-
-#include "Core/Render/RIOpenGL/RIOpenGLResourceStore.hpp"
-#include "Core/Render/RIOpenGL/RIDeviceOpenGL.hpp"
-#include "Core/Render/RIOpenGL/RenderInitWGL.hpp"
-#include "Core/Render/RIOpenGL/RIWGLGlewSupport.hpp"
-#include "Core/Render/RIOpenGL/RIContextOpenGL.hpp"
-#include "Core/Render/RIOpenGL/OpenGL.hpp"
+#include "Core/Render/RIOpenGL/RIOpenGL.hpp";
 
 namespace Phoenix
 {
@@ -154,28 +147,26 @@ int main(int argc, char** argv)
 	std::unique_ptr<Mesh> fox = loadObj("Models/Fox/", "RedFox.obj");
 	assert(fox != nullptr);
 
-	WindowConfig config = {
-		800, 600,
-		0,0,
-		std::wstring(L"Phoenix"),
-		false,
-		true };
+	RIOpenGL renderInterface;
+	bool bRIstarted = renderInterface.init();
 
-	Win32Window window(config);
-	if (!window.isOpen())
+	if (!bRIstarted)
 	{
-		Logger::error("Failed to initialize Win32Window");
-		return -1;
+		Logger::error("Failed to initialize RenderInterface");
+		assert(false);
 	}
-	
-	// We need to strap something like a factory around this so we can startup all systems properly.
-	RenderInitWGL init(window.getNativeHandle(), 2);
-	
-	RIOpenGLResourceStore glResources;
-	
-	RIWGLGlewSupport wgl(&init);
-	IRIDevice* renderDevice = new RIDeviceOpenGL(&glResources);
-	RIContextOpenGL renderContext(&glResources);
+
+	IRIDevice* renderDevice = renderInterface.getRenderDevice();
+	IRIContext* renderContext = renderInterface.getRenderContex();
+
+	WindowConfig config;
+	config.width = 800;
+	config.height = 600;
+	config.title = "Phoenix";
+	config.bFullscreen = false;
+
+	RenderWindow* window = renderInterface.createWindow(config);
+	renderInterface.setWindowToRenderTo(window);
 
 	RenderMesh mesh = createPlaneMesh(renderDevice, true, false);
 	
@@ -206,14 +197,14 @@ int main(int argc, char** argv)
 
 		cubemap = renderDevice->createTextureCube(createDesc(negz, ETextureFilter::Nearest, ETextureFilter::Nearest), "cubemap");
 		
-		renderContext.uploadTextureData(cubemap, ETextureCubeSide::XPositive, posx.m_data);
-		renderContext.uploadTextureData(cubemap, ETextureCubeSide::XNegative, negx.m_data);
+		renderContext->uploadTextureData(cubemap, ETextureCubeSide::XPositive, posx.m_data);
+		renderContext->uploadTextureData(cubemap, ETextureCubeSide::XNegative, negx.m_data);
 		
-		renderContext.uploadTextureData(cubemap, ETextureCubeSide::ZPositive, posz.m_data);
-		renderContext.uploadTextureData(cubemap, ETextureCubeSide::ZNegative, posz.m_data);
+		renderContext->uploadTextureData(cubemap, ETextureCubeSide::ZPositive, posz.m_data);
+		renderContext->uploadTextureData(cubemap, ETextureCubeSide::ZNegative, posz.m_data);
 		
-		renderContext.uploadTextureData(cubemap, ETextureCubeSide::YPositive, posy.m_data);
-		renderContext.uploadTextureData(cubemap, ETextureCubeSide::YNegative, negy.m_data);
+		renderContext->uploadTextureData(cubemap, ETextureCubeSide::YPositive, posy.m_data);
+		renderContext->uploadTextureData(cubemap, ETextureCubeSide::YNegative, negy.m_data);
 	}
 
 	TextureDesc texDesc;
@@ -231,42 +222,40 @@ int main(int argc, char** argv)
 
 	RenderTargetHandle renderTarget = renderDevice->createRenderTarget(rtDesc);
 
-	while (window.isOpen())
+	while (!window->wantsToClose())
 	{
-		renderContext.bindRenderTarget(renderTarget);
+		renderContext->bindRenderTarget(renderTarget);
 
-		renderContext.clearRenderTargetColor(renderTarget, clearColor);
-		renderContext.clearRenderTargetDepth(renderTarget);
+		renderContext->clearRenderTargetColor(renderTarget, clearColor);
+		renderContext->clearRenderTargetDepth(renderTarget);
 	
-		renderContext.bindShaderProgram(programHandle);
-		renderContext.bindUniform(viewMat, &viewTf);
-		renderContext.bindUniform(projMat, &projTf);
+		renderContext->bindShaderProgram(programHandle);
+		renderContext->bindUniform(viewMat, &viewTf);
+		renderContext->bindUniform(projMat, &projTf);
 
-		renderContext.bindTexture(cubemap);
+		renderContext->bindTexture(cubemap);
 
 		angle += 0.5f;
 		mesh.modelMat = Matrix4::rotation(0, angle, 0);
 
-		renderContext.bindUniform(mesh.modelMatHandle, &mesh.modelMat);
-		renderContext.drawIndexed(mesh.vb, mesh.ib, EPrimitive::Triangles);
+		renderContext->bindUniform(mesh.modelMatHandle, &mesh.modelMat);
+		renderContext->drawIndexed(mesh.vb, mesh.ib, EPrimitive::Triangles);
 
-		renderContext.bindDefaultRenderTarget();
-		renderContext.clearColor();
-		renderContext.clearDepth();
-		renderContext.bindShaderProgram(drawToScreenProgram);
-		renderContext.bindTexture(colorTex);
+		renderContext->bindDefaultRenderTarget();
+		renderContext->clearColor();
+		renderContext->clearDepth();
+		renderContext->bindShaderProgram(drawToScreenProgram);
+		renderContext->bindTexture(colorTex);
 	
-		renderContext.drawLinear(EPrimitive::Triangles, 3, 0);
+		renderContext->drawLinear(EPrimitive::Triangles, 3, 0);
 		
-		wgl.swapBuffers();
-		window.processMessages();
+		renderInterface.swapBufferToWindow(window);
 
-		checkGlErrorOccured();
-	
-		renderContext.endPass();
+		Platform::pollEvents();
+		
+		renderContext->endPass();
 	}
 
-	delete renderDevice;
 	Logger::exit();
 	return 0;
 }

@@ -10,7 +10,7 @@
 
 namespace Phoenix
 {
-	class RIContext;
+	class IRIContext;
 
 	class CommandBucket
 	{
@@ -57,7 +57,7 @@ namespace Phoenix
 			return commandPacket::getCommand<NewCommand>(packet);
 		}
 
-		void submit(RIContext* rc) 
+		void submit(IRIContext* rc) 
 		{
 			for (size_t i = 0; i < m_currentIndex; ++i)
 			{

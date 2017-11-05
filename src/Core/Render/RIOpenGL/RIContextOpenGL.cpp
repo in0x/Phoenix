@@ -272,6 +272,7 @@ namespace Phoenix
 	void RIContextOpenGL::endPass()
 	{
 		m_boundState.activeTextureCount = 0;
+		checkGlErrorOccured();
 	}
 
 	void RIContextOpenGL::bindRenderTarget(RenderTargetHandle handle)

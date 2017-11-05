@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../RIResourceContainer.hpp"
-#include "../RIResourceHandles.h"
+#include "../RIResourceHandles.hpp"
 
 #include "RIResourcesOpenGL.hpp"
 #include "RIGlExistingUniforms.hpp"

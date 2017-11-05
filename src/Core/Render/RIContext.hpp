@@ -1,37 +1,49 @@
 #pragma once
+
 #include "RIDefs.hpp"
 
-namespace Phoenix 
+namespace Phoenix
 {
-	class RIContext {};
-	// A RenderContext represents an object that can be used to perform actions 
-	// on rendering API (e.g. OpenGL or DirectX).  
-	//class RIContext
-	//{
-	//public:
-	//	virtual void init(RenderInit* initValues) = 0;
+	class IRIContext
+	{
+	public:
+		virtual void drawLinear(EPrimitive primitives, uint32_t count, uint32_t start) = 0;
 
-	//	virtual uint32_t getMaxTextureUnits() const = 0;
-	//	virtual uint32_t getMaxUniformCount() const = 0;
+		virtual void drawLinear(VertexBufferHandle vbHandle, EPrimitive primitives, uint32_t count, uint32_t startIndex = 0) = 0;
 
-	//	virtual void createVertexBuffer(VertexBufferHandle& handle, const VertexBufferFormat& format) = 0;
-	//	virtual void createIndexBuffer(IndexBufferHandle& handle, size_t size, uint32_t count, const void* data) = 0;
-	//	virtual void createShader(ShaderHandle& handle, const char* source, EShader::Type shaderType) = 0;
-	//	virtual void createProgram(ProgramHandle& handle, const EShader::List& shaders) = 0;
-	//	virtual void createTexture(TextureHandle& handle, ETexture::Format format, const TextureDesc& description, const char* name) = 0;
-	//	virtual void uploadTextureData(TextureHandle& handle, const void* data, uint32_t width, uint32_t height) = 0;
-	//	virtual void createRenderTarget(RenderTargetHandle& handle, const RenderTargetDesc& desc) = 0;
-	//	virtual void createUniform(UniformHandle& uniformHandle, const char* name, EUniform::Type type) = 0;
+		virtual void drawIndexed(VertexBufferHandle vbHandle, IndexBufferHandle ibHandle, EPrimitive primitives, uint32_t count = 0, uint32_t startIndex = 0) = 0;
 
-	//	virtual void setState(const CStateGroup& state) = 0;
-	//	virtual void clearRenderTarget(RenderTargetHandle handle, EBuffer::Type bitToClear, RGBA clearColor) = 0;
+		virtual void bindShaderProgram(ProgramHandle programHandle) = 0;
 
-	//	virtual void drawLinear(VertexBufferHandle vertexbuffer, EPrimitive::Type primitive, uint32_t count, uint32_t start) = 0;
-	//	virtual void drawIndexed(VertexBufferHandle vertexBuffer, IndexBufferHandle indexBuffer, EPrimitive::Type primitive, uint32_t count, uint32_t start) = 0;
+		virtual void bindUniform(UniformHandle uniformHandle, const void* data) = 0;
 
-	//	//TODO(Phil): Destruction functions / release of resources on self destruction
+		virtual void bindVertexBuffer(VertexBufferHandle vbHandle) = 0;
 
-	//	virtual void swapBuffer() = 0;
-	//};
+		virtual void bindIndexBuffer(IndexBufferHandle ibHandle) = 0;
+
+		virtual void clearRenderTargetColor(RenderTargetHandle rtHandle, const RGBA& clearColor) = 0;
+
+		virtual void clearRenderTargetDepth(RenderTargetHandle rtHandle) = 0;
+
+		virtual void uploadTextureData(Texture2DHandle handle, const void* data) = 0;
+
+		virtual void uploadTextureData(TextureCubeHandle handle, ETextureCubeSide side, const void* data) = 0;
+
+		virtual void bindTexture(Texture2DHandle handle) = 0;
+
+		virtual void bindTexture(TextureCubeHandle handle) = 0;
+
+		virtual void bindRenderTarget(RenderTargetHandle handle) = 0;
+
+		virtual void bindDefaultRenderTarget() = 0;
+
+		virtual void clearColor() = 0;
+
+		virtual void clearDepth() = 0;
+
+		virtual void endPass() = 0;
+
+		virtual uint32_t getMaxTextureUnits() const = 0;
+	};
 }
 

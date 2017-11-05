@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stdint.h>
-#include "RIResourceHandles.h"
+#include "RIDefs.hpp"
 
 namespace Phoenix
 {

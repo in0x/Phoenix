@@ -94,11 +94,20 @@
     <ClInclude Include="..\src\Core\Render\RIDevice.hpp">
       <Filter>Render</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Core\Render\RIContext.hpp">
+      <Filter>Render</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\Core\Render\RIResources.hpp">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Render\RIResourceHandles.h">
       <Filter>Render</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Core\Render\RIResourceContainer.hpp">
       <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Render\RIOpenGL\RenderInitWGL.hpp">
+      <Filter>Render\RIOpenGL</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Core\Render\RIOpenGL\RIContextOpenGL.hpp">
       <Filter>Render\RIOpenGL</Filter>
@@ -110,6 +119,9 @@
       <Filter>Render\RIOpenGL</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Core\Render\RIOpenGL\OpenGL.hpp">
+      <Filter>Render\RIOpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Render\RIOpenGL\RIWGLGlewSupport.hpp">
       <Filter>Render\RIOpenGL</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Core\Windows\PhiWindowsInclude.hpp">
@@ -125,15 +137,6 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Core\Render\RIDefs.hpp">
-      <Filter>Render</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Core\Render\RIResourceHandles.hpp">
-      <Filter>Render</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Core\Render\RIOpenGL\RIOpenGL.hpp">
-      <Filter>Render\RIOpenGL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Core\Render\RenderWindow.hpp">
       <Filter>Render</Filter>
     </ClInclude>
   </ItemGroup>
@@ -217,10 +220,10 @@
     <ClCompile Include="..\src\Core\Render\RIOpenGL\OpenGL.cpp">
       <Filter>Render\RIOpenGL</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Core\Render\RIOpenGL\RIGlExistingUniforms.cpp">
+    <ClCompile Include="..\src\Core\Render\RIOpenGL\RIWGLGlewSupport.cpp">
       <Filter>Render\RIOpenGL</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Core\Render\RIOpenGL\RIOpenGL.cpp">
+    <ClCompile Include="..\src\Core\Render\RIOpenGL\RIGlExistingUniforms.cpp">
       <Filter>Render\RIOpenGL</Filter>
     </ClCompile>
   </ItemGroup>

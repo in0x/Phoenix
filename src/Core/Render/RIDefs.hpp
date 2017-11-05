@@ -3,38 +3,18 @@
 #include <stdint.h>
 #include <array>
 
-#include "RIResourceHandles.h"
+#include "RIResourceHandles.hpp"
 
 namespace Phoenix
 {
 	enum class ERenderApi
 	{
-		Gl,
-		NoOp
+		Gl
 	};
 
-	// Should be subclassed to pass to specific RenderContext implementations
-	class RenderInit
-	{
-	public:
-		ERenderApi getApiType()
-		{
-			return m_apiType;
-		}
+	class IRIContext;
 
-	protected:
-		RenderInit(ERenderApi apiType = ERenderApi::NoOp)
-			: m_apiType(apiType)
-		{}
-
-		virtual ~RenderInit() {}
-
-		ERenderApi m_apiType;
-	};
-
-	class RIContext;
-
-	typedef void(*SubmitFptr)(RIContext*, const void*);
+	typedef void(*SubmitFptr)(IRIContext*, const void*);
 
 	template <class T>
 	struct is_submittable

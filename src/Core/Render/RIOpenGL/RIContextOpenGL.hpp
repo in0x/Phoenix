@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../RIDefs.hpp"
+#include "../RIContext.hpp"
 
 namespace Phoenix
 {
@@ -10,48 +10,48 @@ namespace Phoenix
 	class GlIndexBuffer;
 	class GlProgram;
 
-	class RIContextOpenGL
+	class RIContextOpenGL : public IRIContext
 	{
 	public:
 		RIContextOpenGL(const RIOpenGLResourceStore* resources);
 
-		void drawLinear(EPrimitive primitives, uint32_t count, uint32_t start);
+		virtual void drawLinear(EPrimitive primitives, uint32_t count, uint32_t start) override;
 
-		void drawLinear(VertexBufferHandle vbHandle, EPrimitive primitives, uint32_t count, uint32_t startIndex = 0);
+		virtual void drawLinear(VertexBufferHandle vbHandle, EPrimitive primitives, uint32_t count, uint32_t startIndex = 0) override;
 
-		void drawIndexed(VertexBufferHandle vbHandle, IndexBufferHandle ibHandle, EPrimitive primitives, uint32_t count = 0, uint32_t startIndex = 0);
+		virtual void drawIndexed(VertexBufferHandle vbHandle, IndexBufferHandle ibHandle, EPrimitive primitives, uint32_t count = 0, uint32_t startIndex = 0) override;
 
-		void bindShaderProgram(ProgramHandle programHandle);
+		virtual void bindShaderProgram(ProgramHandle programHandle) override;
 
-		void bindUniform(UniformHandle uniformHandle, const void* data);
+		virtual void bindUniform(UniformHandle uniformHandle, const void* data) override;
 
-		void bindVertexBuffer(VertexBufferHandle vbHandle);
+		virtual void bindVertexBuffer(VertexBufferHandle vbHandle) override;
 
-		void bindIndexBuffer(IndexBufferHandle ibHandle);
+		virtual void bindIndexBuffer(IndexBufferHandle ibHandle) override;
 
-		void clearRenderTargetColor(RenderTargetHandle rtHandle, const RGBA& clearColor);
+		virtual void clearRenderTargetColor(RenderTargetHandle rtHandle, const RGBA& clearColor) override;
 
-		void clearRenderTargetDepth(RenderTargetHandle rtHandle);
+		virtual void clearRenderTargetDepth(RenderTargetHandle rtHandle) override;
 
-		void uploadTextureData(Texture2DHandle handle, const void* data);
+		virtual void uploadTextureData(Texture2DHandle handle, const void* data) override;
 
-		void uploadTextureData(TextureCubeHandle handle, ETextureCubeSide side, const void* data);
+		virtual void uploadTextureData(TextureCubeHandle handle, ETextureCubeSide side, const void* data) override;
 
-		void bindTexture(Texture2DHandle handle);
+		virtual void bindTexture(Texture2DHandle handle) override;
 
-		void bindTexture(TextureCubeHandle handle);
+		virtual void bindTexture(TextureCubeHandle handle) override;
 
-		void bindRenderTarget(RenderTargetHandle handle);
+		virtual void bindRenderTarget(RenderTargetHandle handle) override;
 
-		void bindDefaultRenderTarget();
+		virtual void bindDefaultRenderTarget() override;
 
-		void clearColor();
+		virtual void clearColor() override;
 
-		void clearDepth();
+		virtual void clearDepth() override;
 
-		void endPass();
+		virtual void endPass() override;
 
-		uint32_t getMaxTextureUnits() const;
+		virtual uint32_t getMaxTextureUnits() const override;
 
 	private:
 		void bindTextureBase(const TextureBind& binding);
