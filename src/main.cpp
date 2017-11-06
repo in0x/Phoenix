@@ -165,6 +165,9 @@ int main(int argc, char** argv)
 	config.title = "Phoenix";
 	config.bFullscreen = false;
 
+
+	// NOTE(Phil): This is super,super broken right now, as the pointer will get invalidated if the vector backing storage grows.
+	// DONT PROGRAM WHEN YOU'RE TIRED. Need to fix asap.
 	RenderWindow* window = renderInterface.createWindow(config);
 	renderInterface.setWindowToRenderTo(window);
 
