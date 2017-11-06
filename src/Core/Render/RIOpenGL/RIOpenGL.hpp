@@ -3,8 +3,8 @@
 #include "../RIDevice.hpp"
 #include "../RIContext.hpp"
 #include "../RenderWindow.hpp" 
-// NOTE(Phil): These are included instead of forward declared so I can just include
-// this header for starting and using the render system.
+
+#include <memory>
 
 namespace Phoenix
 {
@@ -18,7 +18,10 @@ namespace Phoenix
 
 		void exit();
 
-		RenderWindow* createWindow(const WindowConfig& config);
+		// NOTE(Phil): The unique_ptr here is a fix for some broken code I had before.
+		// I need to rework how platform windows are handed out, but right now I only
+		// have time to do a real quick fix.
+		std::unique_ptr<RenderWindow> RIOpenGL::createWindow(const WindowConfig& config);
 
 		void setWindowToRenderTo(RenderWindow* window);
 

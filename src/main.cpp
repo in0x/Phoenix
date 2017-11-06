@@ -165,10 +165,9 @@ int main(int argc, char** argv)
 	config.title = "Phoenix";
 	config.bFullscreen = false;
 
+	std::unique_ptr<RenderWindow> windowPtr = renderInterface.createWindow(config);
+	RenderWindow* window = windowPtr.get();
 
-	// NOTE(Phil): This is super,super broken right now, as the pointer will get invalidated if the vector backing storage grows.
-	// DONT PROGRAM WHEN YOU'RE TIRED. Need to fix asap.
-	RenderWindow* window = renderInterface.createWindow(config);
 	renderInterface.setWindowToRenderTo(window);
 
 	RenderMesh mesh = createPlaneMesh(renderDevice, true, false);

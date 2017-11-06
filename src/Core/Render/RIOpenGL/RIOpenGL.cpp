@@ -9,6 +9,7 @@
 #include "../../glfw/glfw3.h"
 #include "../../glew/glew.h"
 #include "../../Logger.hpp"
+
 #include <vector>
 
 namespace Phoenix
@@ -53,7 +54,6 @@ namespace Phoenix
 		RIOpenGLResourceStore resources;
 		RIDeviceOpenGL device;
 		RIContextOpenGL context;
-		std::vector<GlRenderWindow> windows;
 	};
 
 	RIOpenGL::RIOpenGL()
@@ -66,19 +66,20 @@ namespace Phoenix
 		delete m_pImpl;
 	}
 
-	RenderWindow* RIOpenGL::createWindow(const WindowConfig& config)
+	std::unique_ptr<RenderWindow> RIOpenGL::createWindow(const WindowConfig& config)
 	{
-		m_pImpl->windows.push_back(GlRenderWindow());
-		GlRenderWindow& window = m_pImpl->windows.back();
+		std::unique_ptr<RenderWindow> window = std::make_unique<GlRenderWindow>();
 
-		if (!window.init(config))
+		GlRenderWindow* glWindow = static_cast<GlRenderWindow*>(window.get());
+		
+		if (!glWindow->init(config))
 		{
 			Logger::errorf("Failed to create window with title %s", config.title);
 			assert(false);
 			return nullptr;
 		}
 
-		return &m_pImpl->windows.back();
+		return std::move(window);
 	}
 
 	void RIOpenGL::setWindowToRenderTo(RenderWindow* window)

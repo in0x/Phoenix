@@ -17,6 +17,6 @@ namespace Phoenix
 	public:
 		virtual ~RenderWindow() {}
 
-		virtual bool wantsToClose() = 0;
+		virtual bool wantsToClose() { return false; }
 	};
 }
