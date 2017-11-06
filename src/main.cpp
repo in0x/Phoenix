@@ -256,6 +256,7 @@ int main(int argc, char** argv)
 		renderContext->endPass();
 	}
 
+	renderInterface.exit();
 	Logger::exit();
 	return 0;
 }

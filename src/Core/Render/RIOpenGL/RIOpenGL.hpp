@@ -16,6 +16,8 @@ namespace Phoenix
 		
 		bool init();
 
+		void exit();
+
 		RenderWindow* createWindow(const WindowConfig& config);
 
 		void setWindowToRenderTo(RenderWindow* window);

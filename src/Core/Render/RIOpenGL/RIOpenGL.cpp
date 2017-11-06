@@ -108,7 +108,7 @@ namespace Phoenix
 		glfwWindowHint(GLFW_VISIBLE, 0);
 		GLFWwindow* window = glfwCreateWindow(windowWidth, windowHeight, "BasicContext", nullptr, nullptr);
 		
-		if (!window)
+		if (nullptr == window)
 		{
 			Logger::error("Failed to create initial window");
 			assert(false);
@@ -117,18 +117,43 @@ namespace Phoenix
 
 		glfwMakeContextCurrent(window);
 
-		if (glewInit())
+		if (glewInit() != 0)
 		{
 			Logger::error("Failed to initialize GLEW");
 			assert(false);
 			return false;
 		}
 
-		glfwMakeContextCurrent(nullptr);
+		const char* version = reinterpret_cast<const char*>(glGetString(GL_VERSION));
+		const char* vendor = reinterpret_cast<const char*>(glGetString(GL_VENDOR));
+		const char* renderer = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
+		const char* glslVersion = reinterpret_cast<const char*>(glGetString(GL_SHADING_LANGUAGE_VERSION));
+
+		Logger::log(version);
+		Logger::log(vendor);
+		Logger::log(renderer);
+		Logger::log(glslVersion);
+
+		GLint majorVersion = 0;
+		glGetIntegerv(GL_MAJOR_VERSION, &majorVersion);
+
+		if (majorVersion < 4)
+		{
+			Logger::errorf("Phoenix currently assumes atleast GL Version 4. Detected Version: %d.", majorVersion);
+			assert(false);
+			return false;
+		}
+
+		//glfwMakeContextCurrent(nullptr);
 		glfwDestroyWindow(window);
 		glfwDefaultWindowHints();
 
 		return true;
+	}
+
+	void RIOpenGL::exit()
+	{
+		glfwTerminate();
 	}
 
 	IRIDevice* RIOpenGL::getRenderDevice()
