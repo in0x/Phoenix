@@ -4,9 +4,9 @@
 #include <typeindex>
 #include <typeinfo>
 
-#include "RenderDefinitions.hpp"
+#include "RIDefs.hpp"
 #include "CommandPacket.hpp"
-#include "../Memory/StackAllocator.hpp"
+#include <Memory/StackAllocator.hpp>
 
 namespace Phoenix
 {

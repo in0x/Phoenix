@@ -3,8 +3,8 @@
 #include "RIOpenGLResourceStore.hpp"
 #include "RIDeviceOpenGL.hpp"
 
-#include "../RIDefs.hpp"
-#include "../../Logger.hpp"
+#include <Render/RIDefs.hpp>
+#include <Core/Logger.hpp>
 
 #include <assert.h>
 #include <vector>

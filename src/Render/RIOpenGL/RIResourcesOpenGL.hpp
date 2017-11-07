@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../RIResources.hpp"
+#include <Render/RIResources.hpp>
 #include "OpenGL.hpp"
 
 namespace Phoenix

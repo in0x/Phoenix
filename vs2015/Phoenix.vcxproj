@@ -125,7 +125,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)../src/Core/glew;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)../src;</AdditionalIncludeDirectories>
       <EnablePREfast>false</EnablePREfast>
       <AdditionalOptions>/std:c++latest %(AdditionalOptions)</AdditionalOptions>
       <TreatWarningAsError>false</TreatWarningAsError>
@@ -169,7 +169,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)../src/Core/glew;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)../src;</AdditionalIncludeDirectories>
       <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>
     <Link>
@@ -183,46 +183,47 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Core\FNVHash.hpp" />
-    <ClInclude Include="..\src\Core\Math\MathStreamOverloads.hpp" />
-    <ClInclude Include="..\src\Core\Memory\FreeList.hpp" />
-    <ClInclude Include="..\src\Core\Memory\MemUtil.hpp" />
-    <ClInclude Include="..\src\Core\Memory\PoolAllocator.hpp" />
-    <ClInclude Include="..\src\Core\Memory\StackAllocator.hpp" />
-    <ClInclude Include="..\src\Core\Render\CommandPacket.hpp" />
-    <ClInclude Include="..\src\Core\Render\Commands.hpp" />
-    <ClInclude Include="..\src\Core\Render\RenderWindow.hpp" />
-    <ClInclude Include="..\src\Core\Render\RIDevice.hpp" />
-    <ClInclude Include="..\src\Core\Render\RIDefs.hpp" />
-    <ClInclude Include="..\src\Core\Render\CommandBucket.hpp" />
-    <ClInclude Include="..\src\Core\Render\RIOpenGL\OpenGL.hpp" />
-    <ClInclude Include="..\src\Core\Render\RIOpenGL\RIContextOpenGL.hpp" />
-    <ClInclude Include="..\src\Core\Render\RIOpenGL\RIDeviceOpenGL.hpp" />
-    <ClInclude Include="..\src\Core\Render\RIOpenGL\RIGlExistingUniforms.hpp" />
-    <ClInclude Include="..\src\Core\Render\RIOpenGL\RIOpenGL.hpp" />
-    <ClInclude Include="..\src\Core\Render\RIOpenGL\RIOpenGLResourceStore.hpp" />
-    <ClInclude Include="..\src\Core\Render\RIOpenGL\RIResourcesOpenGL.hpp" />
-    <ClInclude Include="..\src\Core\Render\RIResourceContainer.hpp" />
-    <ClInclude Include="..\src\Core\Render\RIResourceHandles.hpp" />
-    <ClInclude Include="..\src\Core\Render\RIResources.hpp" />
     <ClInclude Include="..\src\Core\StringTokenizer.hpp" />
     <ClInclude Include="..\src\Core\Texture.hpp" />
     <ClInclude Include="..\src\Core\Transform.h" />
-    <ClInclude Include="..\src\Core\Math\PhiMath.hpp" />
     <ClInclude Include="..\src\Core\obj.hpp" />
     <ClInclude Include="..\src\Core\Clock.hpp" />
     <ClInclude Include="..\src\Core\Logger.hpp" />
-    <ClInclude Include="..\src\Core\Math\EulerAngles.hpp" />
-    <ClInclude Include="..\src\Core\Math\Matrix3.hpp" />
-    <ClInclude Include="..\src\Core\Math\Matrix4.hpp" />
-    <ClInclude Include="..\src\Core\Math\MatrixData.hpp" />
-    <ClInclude Include="..\src\Core\Math\Plane.hpp" />
-    <ClInclude Include="..\src\Core\Math\Quaternion.hpp" />
-    <ClInclude Include="..\src\Core\Math\Ray.hpp" />
-    <ClInclude Include="..\src\Core\Math\Vec2.hpp" />
-    <ClInclude Include="..\src\Core\Math\Vec3.hpp" />
-    <ClInclude Include="..\src\Core\Math\Vec4.hpp" />
     <ClInclude Include="..\src\Core\Windows\PhiWindowsInclude.hpp" />
     <ClInclude Include="..\src\Core\Windows\PlatformWindows.hpp" />
+    <ClInclude Include="..\src\Math\EulerAngles.hpp" />
+    <ClInclude Include="..\src\Math\MathStreamOverloads.hpp" />
+    <ClInclude Include="..\src\Math\Matrix3.hpp" />
+    <ClInclude Include="..\src\Math\Matrix4.hpp" />
+    <ClInclude Include="..\src\Math\MatrixData.hpp" />
+    <ClInclude Include="..\src\Math\PhiMath.hpp" />
+    <ClInclude Include="..\src\Math\Plane.hpp" />
+    <ClInclude Include="..\src\Math\Quaternion.hpp" />
+    <ClInclude Include="..\src\Math\Ray.hpp" />
+    <ClInclude Include="..\src\Math\Vec2.hpp" />
+    <ClInclude Include="..\src\Math\Vec3.hpp" />
+    <ClInclude Include="..\src\Math\Vec4.hpp" />
+    <ClInclude Include="..\src\Memory\FreeList.hpp" />
+    <ClInclude Include="..\src\Memory\MemUtil.hpp" />
+    <ClInclude Include="..\src\Memory\PoolAllocator.hpp" />
+    <ClInclude Include="..\src\Memory\StackAllocator.hpp" />
+    <ClInclude Include="..\src\Render\CommandBucket.hpp" />
+    <ClInclude Include="..\src\Render\CommandPacket.hpp" />
+    <ClInclude Include="..\src\Render\Commands.hpp" />
+    <ClInclude Include="..\src\Render\RenderWindow.hpp" />
+    <ClInclude Include="..\src\Render\RIContext.hpp" />
+    <ClInclude Include="..\src\Render\RIDefs.hpp" />
+    <ClInclude Include="..\src\Render\RIDevice.hpp" />
+    <ClInclude Include="..\src\Render\RIOpenGL\OpenGL.hpp" />
+    <ClInclude Include="..\src\Render\RIOpenGL\RIContextOpenGL.hpp" />
+    <ClInclude Include="..\src\Render\RIOpenGL\RIDeviceOpenGL.hpp" />
+    <ClInclude Include="..\src\Render\RIOpenGL\RIGlExistingUniforms.hpp" />
+    <ClInclude Include="..\src\Render\RIOpenGL\RIOpenGL.hpp" />
+    <ClInclude Include="..\src\Render\RIOpenGL\RIOpenGLResourceStore.hpp" />
+    <ClInclude Include="..\src\Render\RIOpenGL\RIResourcesOpenGL.hpp" />
+    <ClInclude Include="..\src\Render\RIResourceContainer.hpp" />
+    <ClInclude Include="..\src\Render\RIResourceHandles.hpp" />
+    <ClInclude Include="..\src\Render\RIResources.hpp" />
     <ClInclude Include="..\src\STB\stb_easy_font.h" />
     <ClInclude Include="..\src\STB\stb_image.h" />
     <ClInclude Include="..\src\Tests\MathTests.hpp" />
@@ -231,31 +232,31 @@
   <ItemGroup>
     <ClCompile Include="..\src\Core\Clock.cpp" />
     <ClCompile Include="..\src\Core\Logger.cpp" />
-    <ClCompile Include="..\src\Core\Math\MathStreamOverloads.cpp" />
-    <ClCompile Include="..\src\Core\Math\Matrix3.cpp" />
-    <ClCompile Include="..\src\Core\Math\Matrix4.cpp" />
-    <ClCompile Include="..\src\Core\Math\PhiMath.cpp" />
-    <ClCompile Include="..\src\Core\Math\Plane.cpp" />
-    <ClCompile Include="..\src\Core\Math\Quaternion.cpp" />
-    <ClCompile Include="..\src\Core\Math\Ray.cpp" />
-    <ClCompile Include="..\src\Core\Math\Vec2.cpp" />
-    <ClCompile Include="..\src\Core\Math\Vec3.cpp" />
-    <ClCompile Include="..\src\Core\Math\Vec4.cpp" />
-    <ClCompile Include="..\src\Core\Memory\FreeList.cpp" />
-    <ClCompile Include="..\src\Core\Memory\PoolAllocator.cpp" />
-    <ClCompile Include="..\src\Core\Memory\StackAllocator.cpp" />
     <ClCompile Include="..\src\Core\obj.cpp" />
-    <ClCompile Include="..\src\Core\Render\CommandPacket.cpp" />
-    <ClCompile Include="..\src\Core\Render\Commands.cpp" />
-    <ClCompile Include="..\src\Core\Render\RIOpenGL\OpenGL.cpp" />
-    <ClCompile Include="..\src\Core\Render\RIOpenGL\RIContextOpenGL.cpp" />
-    <ClCompile Include="..\src\Core\Render\RIOpenGL\RIDeviceOpenGL.cpp" />
-    <ClCompile Include="..\src\Core\Render\RIOpenGL\RIGlExistingUniforms.cpp" />
-    <ClCompile Include="..\src\Core\Render\RIOpenGL\RIOpenGL.cpp" />
     <ClCompile Include="..\src\Core\StringTokenizer.cpp" />
     <ClCompile Include="..\src\Core\Texture.cpp" />
     <ClCompile Include="..\src\Core\Transform.cpp" />
     <ClCompile Include="..\src\main.cpp" />
+    <ClCompile Include="..\src\Math\MathStreamOverloads.cpp" />
+    <ClCompile Include="..\src\Math\Matrix3.cpp" />
+    <ClCompile Include="..\src\Math\Matrix4.cpp" />
+    <ClCompile Include="..\src\Math\PhiMath.cpp" />
+    <ClCompile Include="..\src\Math\Plane.cpp" />
+    <ClCompile Include="..\src\Math\Quaternion.cpp" />
+    <ClCompile Include="..\src\Math\Ray.cpp" />
+    <ClCompile Include="..\src\Math\Vec2.cpp" />
+    <ClCompile Include="..\src\Math\Vec3.cpp" />
+    <ClCompile Include="..\src\Math\Vec4.cpp" />
+    <ClCompile Include="..\src\Memory\FreeList.cpp" />
+    <ClCompile Include="..\src\Memory\PoolAllocator.cpp" />
+    <ClCompile Include="..\src\Memory\StackAllocator.cpp" />
+    <ClCompile Include="..\src\Render\CommandPacket.cpp" />
+    <ClCompile Include="..\src\Render\Commands.cpp" />
+    <ClCompile Include="..\src\Render\RIOpenGL\OpenGL.cpp" />
+    <ClCompile Include="..\src\Render\RIOpenGL\RIContextOpenGL.cpp" />
+    <ClCompile Include="..\src\Render\RIOpenGL\RIDeviceOpenGL.cpp" />
+    <ClCompile Include="..\src\Render\RIOpenGL\RIGlExistingUniforms.cpp" />
+    <ClCompile Include="..\src\Render\RIOpenGL\RIOpenGL.cpp" />
     <ClCompile Include="..\src\Tests\MathTests.cpp" />
     <ClCompile Include="..\src\Tests\MemoryTests.cpp" />
   </ItemGroup>

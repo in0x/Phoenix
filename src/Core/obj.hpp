@@ -3,8 +3,8 @@
 #include <memory>
 #include <vector>
 
-#include "Math/Vec2.hpp"
-#include "Math/Vec3.hpp"
+#include <Math/Vec2.hpp>
+#include <Math/Vec3.hpp>
 
 namespace Phoenix
 {

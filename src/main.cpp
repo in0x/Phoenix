@@ -5,12 +5,13 @@
 #include "Tests/MemoryTests.hpp"
 
 #include "Core/obj.hpp"
-#include "Core/Math/PhiMath.hpp"
 #include "Core/Logger.hpp"
 #include "Core/Texture.hpp"
 
 #include "Core/Windows/PlatformWindows.hpp"
-#include "Core/Render/RIOpenGL/RIOpenGL.hpp";
+#include "Math/PhiMath.hpp"
+
+#include "Render/RIOpenGL/RIOpenGL.hpp"
 
 namespace Phoenix
 {
@@ -166,6 +167,7 @@ int main(int argc, char** argv)
 	config.bFullscreen = false;
 
 	std::unique_ptr<RenderWindow> windowPtr = renderInterface.createWindow(config);
+	
 	RenderWindow* window = windowPtr.get();
 
 	renderInterface.setWindowToRenderTo(window);

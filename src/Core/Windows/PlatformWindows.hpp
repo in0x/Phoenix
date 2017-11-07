@@ -1,4 +1,5 @@
 #include "PhiWindowsInclude.hpp"
+#include <algorithm>
 
 #ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
 #define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004

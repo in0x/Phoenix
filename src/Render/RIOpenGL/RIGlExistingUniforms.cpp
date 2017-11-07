@@ -1,7 +1,7 @@
 #include "RIGlExistingUniforms.hpp"
 #include "RIResourcesOpenGL.hpp"
 
-#include "../../Logger.hpp"
+#include <Core/Logger.hpp>
 #include <assert.h>
 
 namespace Phoenix

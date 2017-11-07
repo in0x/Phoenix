@@ -1,7 +1,7 @@
 #pragma once
 
 #include "OpenGL.hpp"
-#include "../../FNVHash.hpp"
+#include <Core/FNVHash.hpp>
 #include <unordered_map>
 
 namespace Phoenix

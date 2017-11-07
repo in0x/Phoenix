@@ -1,7 +1,7 @@
 #include "MemoryTests.hpp"
 
-#include "../Core/Memory/PoolAllocator.hpp"
-#include "../Core/Memory/StackAllocator.hpp"
+#include <Memory/PoolAllocator.hpp>
+#include <Memory/StackAllocator.hpp>
 
 namespace Phoenix { namespace Tests
 {

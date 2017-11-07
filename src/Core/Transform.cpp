@@ -2,6 +2,9 @@
 
 #include "Transform.h"
 
+#include <Math/Matrix3.hpp>
+#include <Math/EulerAngles.hpp>
+
 namespace Phoenix
 {
 	Transform::Transform()

@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Math/PhiMath.hpp"
+#include <Math/Matrix4.hpp>
+#include <Math/Vec3.hpp>
 
 namespace Phoenix
 {

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../RIDevice.hpp"
-#include "../RIContext.hpp"
-#include "../RenderWindow.hpp" 
+#include <Render/RIDevice.hpp>
+#include <Render/RIContext.hpp>
+#include <Render/RenderWindow.hpp> 
 
 #include <memory>
 

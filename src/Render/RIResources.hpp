@@ -1,7 +1,7 @@
 #pragma once
 
 #include "RIDefs.hpp"
-#include "../FNVHash.hpp"
+#include <Core/FNVHash.hpp>
 #include <assert.h>
 
 namespace Phoenix

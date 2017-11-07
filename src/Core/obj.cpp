@@ -1,12 +1,12 @@
 #include "obj.hpp"
 
 #include <functional>
+#include <algorithm>
 #include <cassert>
 #include <map>
 
-#include "StringTokenizer.hpp"
-#include "Math/PhiMath.hpp"
-#include "Logger.hpp"
+#include <Core/StringTokenizer.hpp>
+#include <Core/Logger.hpp>
 
 namespace Phoenix
 {

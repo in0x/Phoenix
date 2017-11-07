@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../RIDevice.hpp"
-#include "../RIResourceHandles.hpp"
-#include "../RIResourceContainer.hpp"
+#include <Render/RIDevice.hpp>
+#include <Render/RIResourceHandles.hpp>
+#include <Render/RIResourceContainer.hpp>
 
 namespace Phoenix
 {

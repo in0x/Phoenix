@@ -2,8 +2,8 @@
 #include "RIOpenGLResourceStore.hpp"
 #include "OpenGL.hpp"
 
-#include "../RIDefs.hpp"
-#include "../../Logger.hpp"
+#include <Render/RIDefs.hpp>
+#include <Core/Logger.hpp>
 
 #include <assert.h>
 

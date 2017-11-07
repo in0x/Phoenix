@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../RIContext.hpp"
+#include <Render/RIContext.hpp>
 
 namespace Phoenix
 {

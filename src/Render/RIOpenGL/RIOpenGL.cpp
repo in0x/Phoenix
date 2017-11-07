@@ -5,10 +5,10 @@
 #include "RIContextOpenGL.hpp"
 #include "RIOpenGLResourceStore.hpp"
 
-#include "../RenderWindow.hpp"
-#include "../../glfw/glfw3.h"
-#include "../../glew/glew.h"
-#include "../../Logger.hpp"
+#include <Render/RenderWindow.hpp>
+#include <glfw/glfw3.h>
+#include <glew/glew.h>
+#include <Core/Logger.hpp>
 
 #include <vector>
 
@@ -145,7 +145,7 @@ namespace Phoenix
 			return false;
 		}
 
-		//glfwMakeContextCurrent(nullptr);
+		glfwMakeContextCurrent(nullptr);
 		glfwDestroyWindow(window);
 		glfwDefaultWindowHints();
 

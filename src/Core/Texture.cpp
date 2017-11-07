@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Texture.hpp"
-#include "Logger.hpp"
+#include <Core/Logger.hpp>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "../STB/stb_image.h"
