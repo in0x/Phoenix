@@ -145,8 +145,8 @@ int main(int argc, char** argv)
 	Tests::runMathTests();
 	Tests::runMemoryTests();
 
-	std::unique_ptr<Mesh> fox = loadObj("Models/Fox/", "RedFox.obj");
-	assert(fox != nullptr);
+	OBJImport fox = loadObj("Models/Fox/", "RedFox.obj");
+	assert(fox.mesh != nullptr);
 
 	RIOpenGL renderInterface;
 	bool bRIstarted = renderInterface.init();
@@ -172,92 +172,55 @@ int main(int argc, char** argv)
 
 	renderInterface.setWindowToRenderTo(window);
 
-	RenderMesh mesh = createPlaneMesh(renderDevice, true, false);
-	
-	ProgramHandle programHandle = loadProgram(renderDevice, "Shaders/reflect.vert", "Shaders/reflect.frag");
-	ProgramHandle drawToScreenProgram = loadProgram(renderDevice, "Shaders/fillScreen.vert", "Shaders/fillScreen.frag");
+	ProgramHandle program = loadProgram(renderDevice, "Shaders/diffuse.vert", "Shaders/diffuse.frag");
+	RenderMesh mesh = loadRenderMesh(*fox.mesh, renderDevice);
 	
 	Matrix4 viewTf = lookAtRH(Vec3( 0, 0, 5 ), Vec3( 0,0,0 ), Vec3( 0,1,0 ));
 	Matrix4 projTf = perspectiveRH(70.f, (float)config.width / (float)config.height, 0.1f, 100.f);
 
 	UniformHandle viewMat = renderDevice->createUniform("viewTf", EUniformType::Mat4);
 	UniformHandle projMat = renderDevice->createUniform("projectionTf", EUniformType::Mat4);
+	UniformHandle ambient = renderDevice->createUniform("cAmbient", EUniformType::Vec3);
+	UniformHandle diffuse = renderDevice->createUniform("cDiffuse", EUniformType::Vec3);
+	UniformHandle specular = renderDevice->createUniform("cSpecular", EUniformType::Vec3);
+	UniformHandle light = renderDevice->createUniform("lightPosition", EUniformType::Vec3); 
 
 	RenderTargetHandle tempdefault;
 	tempdefault.m_idx = 0;
 	RGBA clearColor{ 1.f, 1.f, 1.f, 1.f };
 	float angle = 0.f;
 
-	TextureCubeHandle cubemap;
+	Vec3 cAmbient = Vec3(0.3f, 0.3f, 0.3f);
+	Vec3 cDiffuse = Vec3(0.6f, 0.15f, 0.15f);
+	Vec3 cSpecular = Vec3(0.6f, 0.15f, 0.15f);
+	
+	Vec3 lightPos = Vec3(0.f, 5.f, 3.f);
 
-	{
-		Texture negz, posz, posy, negy, negx, posx;
-		negz.load("Textures/vasa/negz.jpg");
-		posz.load("Textures/vasa/posz.jpg");
-		posy.load("Textures/vasa/posy.jpg");
-		negy.load("Textures/vasa/negy.jpg");
-		negx.load("Textures/vasa/negx.jpg");
-		posx.load("Textures/vasa/posx.jpg");
-
-		cubemap = renderDevice->createTextureCube(createDesc(negz, ETextureFilter::Nearest, ETextureFilter::Nearest), "cubemap");
-		
-		renderContext->uploadTextureData(cubemap, ETextureCubeSide::XPositive, posx.m_data);
-		renderContext->uploadTextureData(cubemap, ETextureCubeSide::XNegative, negx.m_data);
-		
-		renderContext->uploadTextureData(cubemap, ETextureCubeSide::ZPositive, posz.m_data);
-		renderContext->uploadTextureData(cubemap, ETextureCubeSide::ZNegative, posz.m_data);
-		
-		renderContext->uploadTextureData(cubemap, ETextureCubeSide::YPositive, posy.m_data);
-		renderContext->uploadTextureData(cubemap, ETextureCubeSide::YNegative, negy.m_data);
-	}
-
-	TextureDesc texDesc;
-	texDesc.width = 800;
-	texDesc.height = 600;
-	texDesc.pixelFormat = EPixelFormat::R8G8B8A8;
-	Texture2DHandle colorTex = renderDevice->createTexture2D(texDesc, "fbTexColor");
-
-	texDesc.pixelFormat = EPixelFormat::Depth16I;
-	Texture2DHandle depthTex = renderDevice->createTexture2D(texDesc, "fbTexDepth");
-
-	RenderTargetDesc rtDesc;
-	rtDesc.attachments[RenderTargetDesc::Color] = colorTex;
-	rtDesc.attachments[RenderTargetDesc::Depth] = depthTex;
-
-	RenderTargetHandle renderTarget = renderDevice->createRenderTarget(rtDesc);
+	renderContext->bindShaderProgram(program);
+	renderContext->bindUniform(viewMat, &viewTf);
+	renderContext->bindUniform(projMat, &projTf);
+	renderContext->bindUniform(ambient, &cAmbient);
+	renderContext->bindUniform(diffuse, &cDiffuse);
+	renderContext->bindUniform(specular, &cSpecular);
+	renderContext->bindUniform(light, &lightPos);
 
 	while (!window->wantsToClose())
 	{
-		renderContext->bindRenderTarget(renderTarget);
-
-		renderContext->clearRenderTargetColor(renderTarget, clearColor);
-		renderContext->clearRenderTargetDepth(renderTarget);
-	
-		renderContext->bindShaderProgram(programHandle);
-		renderContext->bindUniform(viewMat, &viewTf);
-		renderContext->bindUniform(projMat, &projTf);
-
-		renderContext->bindTexture(cubemap);
+		renderContext->clearColor();
+		renderContext->clearDepth();
 
 		angle += 0.5f;
 		mesh.modelMat = Matrix4::rotation(0, angle, 0);
 
 		renderContext->bindUniform(mesh.modelMatHandle, &mesh.modelMat);
-		renderContext->drawIndexed(mesh.vb, mesh.ib, EPrimitive::Triangles);
-
-		renderContext->bindDefaultRenderTarget();
-		renderContext->clearColor();
-		renderContext->clearDepth();
-		renderContext->bindShaderProgram(drawToScreenProgram);
-		renderContext->bindTexture(colorTex);
-	
-		renderContext->drawLinear(EPrimitive::Triangles, 3, 0);
 		
-		renderInterface.swapBufferToWindow(window);
-
-		Platform::pollEvents();
+		renderContext->drawIndexed(mesh.vb, mesh.ib, EPrimitive::Triangles, mesh.numIndices, 0);
 		
 		renderContext->endPass();
+
+		renderInterface.swapBufferToWindow(window);
+
+		Platform::pollEvents();		
 	}
 
 	renderInterface.exit();

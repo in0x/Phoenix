@@ -86,6 +86,7 @@ namespace Phoenix
 	{
 		GlRenderWindow* glWindow = static_cast<GlRenderWindow*>(window);
 		glfwMakeContextCurrent(glWindow->m_glfwWindow);
+		glEnable(GL_DEPTH_TEST);
 	}
 
 	void RIOpenGL::swapBufferToWindow(RenderWindow* window)
@@ -134,7 +135,7 @@ namespace Phoenix
 		Logger::log(vendor);
 		Logger::log(renderer);
 		Logger::log(glslVersion);
-
+		
 		GLint majorVersion = 0;
 		glGetIntegerv(GL_MAJOR_VERSION, &majorVersion);
 

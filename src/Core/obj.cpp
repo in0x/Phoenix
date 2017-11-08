@@ -42,10 +42,11 @@ namespace Phoenix
 		};
 
 		std::map<PackedVertexData, unsigned int> packed;
-		std::unique_ptr<Mesh> pConvertedMesh;
+		OBJImport pImport;
+		Mesh* pConvertedMesh;
 
 	public:
-		std::unique_ptr<Mesh> convertForOpenGL(ObjData* loaded);
+		OBJImport convertForOpenGL(ObjData* loaded);
 
 	private:
 		void(ObjIndexer::*toPacked)(PackedVertexData*, const Face&, const ObjData*);
@@ -66,11 +67,13 @@ namespace Phoenix
 		void addDataAndIndex(const PackedVertexData& data);
 	};
 
-	std::unique_ptr<Mesh> ObjIndexer::convertForOpenGL(ObjData* loaded)
+	OBJImport ObjIndexer::convertForOpenGL(ObjData* loaded)
 	{
-		pConvertedMesh = std::make_unique<Mesh>();
-		pConvertedMesh->materials.swap(loaded->materials);
-		pConvertedMesh->bSmoothShading = loaded->bSmoothShading;
+		pImport.mesh = std::make_unique<Mesh>();
+		pConvertedMesh = pImport.mesh.get();
+
+		pImport.materials.swap(loaded->materials);
+		pImport.bSmoothShading = loaded->bSmoothShading;
 
 		bool bHasVertices = loaded->vertices.size() > 0;
 		assert(bHasVertices);
@@ -132,7 +135,7 @@ namespace Phoenix
 			}
 		}
 
-		return std::move(pConvertedMesh);
+		return std::move(pImport);
 	}
 
 	bool ObjIndexer::doesDataExist(const PackedVertexData& data, unsigned int& outIndex)
@@ -231,7 +234,7 @@ namespace Phoenix
 	class ObjParser
 	{
 	public:	
-		std::unique_ptr<Mesh> parseOBJ(const std::string& pathTo, const std::string& name);
+		OBJImport parseOBJ(const std::string& pathTo, const std::string& name);
 
 	private:
 		void(ObjParser::*vertexParser)(std::vector<char*>&, int) = nullptr;
@@ -506,7 +509,7 @@ namespace Phoenix
 		}
 	}
 
-	std::unique_ptr<Mesh> ObjParser::parseOBJ(const std::string& pathTo, const std::string& name)
+	OBJImport ObjParser::parseOBJ(const std::string& pathTo, const std::string& name)
 	{
 		std::string path = pathTo + name;
 		FILE* file = openFile(path);
@@ -580,10 +583,10 @@ namespace Phoenix
 		ObjIndexer indexer;
 		fclose(file);
 
-		return indexer.convertForOpenGL(pMeshRaw);
+		return std::move(indexer.convertForOpenGL(pMeshRaw));
 	}
 
-	std::unique_ptr<Mesh> loadObj(const std::string& pathTo, const std::string& name)
+	OBJImport loadObj(const std::string& pathTo, const std::string& name)
 	{
 		ObjParser parser;
 		return parser.parseOBJ(pathTo, name);

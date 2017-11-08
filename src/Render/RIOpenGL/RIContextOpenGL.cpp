@@ -157,6 +157,10 @@ namespace Phoenix
 			assert(isBasicUniformType(glUniform.m_glType));
 			setUniform(glUniform, data, uniform->m_type);
 		}
+		else
+		{
+			Logger::errorf("Uniform %d does not exist in currently bound program", uniform->m_nameHash);
+		}
 	}
 
 	struct TextureBind

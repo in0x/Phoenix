@@ -9,17 +9,15 @@ in VS_OUT_STRUCT
 	vec4 eyeLight;
 } vs_in ; 
 
-
-const vec3 modelColor = vec3(0.5, 0.0, 0.5);
 const float shininess = 100;
-
-//vec3 kAmbient = vec3(0.3, 0.3, 0.3);
-//vec3 kDiffuse = vec3(0.7, 0.7, 0.7);
-//vec3 kSpecular = vec3(0.5, 0.5, 0.5);
 
 float kAmbient = 0.7;
 float kDiffuse = 1.0;
 float kSpecular = 0.5;
+
+uniform vec3 cAmbient;
+uniform vec3 cDiffuse;
+uniform vec3 cSpecular;
 
 void main()
 {
@@ -33,6 +31,5 @@ void main()
 	//float specular = pow(max(dot(normalize(R),normalize(V)), 0.0), shininess); 
 	float specular = pow(max(dot(normalize(H),normalize(N)), 0.0), shininess); 
 	
-	//color = vec4(kAmbient * modelColor + kDiffuse* dotNL * modelColor + kSpecular * specular * modelColor, 1.0);
-	color = vs_in.eyeNormal;
+	color = vec4(kAmbient * cAmbient + kDiffuse* dotNL * cDiffuse + kSpecular * specular * cSpecular, 1.0);
 }

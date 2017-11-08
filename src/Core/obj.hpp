@@ -3,6 +3,7 @@
 #include <memory>
 #include <vector>
 
+#include <Core/Mesh.hpp>
 #include <Math/Vec2.hpp>
 #include <Math/Vec3.hpp>
 
@@ -21,16 +22,13 @@ namespace Phoenix
 		int8_t illum;		
 	};
 
-	struct Mesh
+	struct OBJImport
 	{
-		std::vector<Vec3> vertices;
-		std::vector<Vec2> uvs;
-		std::vector<Vec3> normals;
-		std::vector<uint32_t> indices;
+		std::unique_ptr<Mesh> mesh;
 		std::vector<MTL> materials;
 		bool bSmoothShading;
 	};
 
-	std::unique_ptr<Mesh> loadObj(const std::string& pathTo, const std::string& name);
+	OBJImport loadObj(const std::string& pathTo, const std::string& name);
 };
 

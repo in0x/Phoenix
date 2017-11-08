@@ -182,10 +182,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\Core\Mesh.hpp" />
+    <ClInclude Include="..\src\Core\WorldObject.hpp" />
     <ClInclude Include="..\src\Core\FNVHash.hpp" />
     <ClInclude Include="..\src\Core\StringTokenizer.hpp" />
     <ClInclude Include="..\src\Core\Texture.hpp" />
-    <ClInclude Include="..\src\Core\Transform.h" />
     <ClInclude Include="..\src\Core\obj.hpp" />
     <ClInclude Include="..\src\Core\Clock.hpp" />
     <ClInclude Include="..\src\Core\Logger.hpp" />
@@ -235,7 +236,6 @@
     <ClCompile Include="..\src\Core\obj.cpp" />
     <ClCompile Include="..\src\Core\StringTokenizer.cpp" />
     <ClCompile Include="..\src\Core\Texture.cpp" />
-    <ClCompile Include="..\src\Core\Transform.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\Math\MathStreamOverloads.cpp" />
     <ClCompile Include="..\src\Math\Matrix3.cpp" />
