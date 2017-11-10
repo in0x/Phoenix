@@ -510,6 +510,8 @@ namespace Phoenix
 				bHasAnyColors = true;
 			}
 		}
+
+		return bHasAnyColors;
 	}
 
 	bool RIDeviceOpenGL::attachifValid(Texture2DHandle tex, GlFramebuffer* fb, RenderTargetDesc::EAttachment attachment)
