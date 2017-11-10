@@ -76,6 +76,6 @@ namespace Phoenix
 		{}
 
 		GLuint m_id;
-		GlTexture2D* m_attachments[4];
+		const GlTexture2D* m_attachments[RenderTargetDesc::NumAttachments];
 	};
 }

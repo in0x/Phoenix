@@ -38,6 +38,7 @@ namespace Phoenix
 	private:
 		RIOpenGLResourceStore* m_resources;
 
-		bool RIDeviceOpenGL::attachifValid(const RenderTargetDesc& desc, GlFramebuffer* fb, RenderTargetDesc::EAttachment attachment);
+		bool RIDeviceOpenGL::attachColors(const RenderTargetDesc& desc, GlFramebuffer* fb);	
+		bool attachifValid(Texture2DHandle tex, GlFramebuffer* fb, RenderTargetDesc::EAttachment attachment);
 	};
 }

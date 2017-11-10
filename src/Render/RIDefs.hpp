@@ -241,22 +241,34 @@ namespace Phoenix
 	class RenderTargetDesc
 	{
 	public:
-		Texture2DHandle attachments[4]; // DepthStencil is always preferred if set.
+		// Attachments.
+		Texture2DHandle colorAttachs[4];
+		Texture2DHandle depthAttach; 
+		Texture2DHandle stencilAttach; 
+		Texture2DHandle depthStencilAttach; // DepthStencil should always be preferred if set.
 
 		RenderTargetDesc()
 		{
 			for (size_t i = 0; i < 4; ++i)
 			{
-				attachments[i].invalidate();
+				colorAttachs[i].invalidate();
 			}
+			depthAttach.invalidate();
+			stencilAttach.invalidate();
+			depthStencilAttach.invalidate();
 		}
 
 		enum EAttachment
 		{
-			Color = 0,
+			Color0 = 0,
+			Color1,
+			Color2,
+			Color3,
+			NumMaxColors,
 			Depth,
 			Stencil,
-			DepthStencil
+			NumAttachments, // NOTE(Phil): Always have this as second too last to counteract that we have NumMaxColors as well.
+			DepthStencil,
 		};
 	};
 

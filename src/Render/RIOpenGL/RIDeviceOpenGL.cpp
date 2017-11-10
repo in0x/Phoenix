@@ -433,25 +433,47 @@ namespace Phoenix
 		return handle;
 	}
 
-	// Allocate Texture using RITexture and use it for attachment.
+	GLenum toGlAttachment(RenderTargetDesc::EAttachment attachment)
+	{
+		switch (attachment)
+		{
+		case RenderTargetDesc::Color0:
+			return GL_COLOR_ATTACHMENT0;
+		case RenderTargetDesc::Color1:
+			return GL_COLOR_ATTACHMENT1;
+		case RenderTargetDesc::Color2:
+			return GL_COLOR_ATTACHMENT2;
+		case RenderTargetDesc::Color3:
+			return GL_COLOR_ATTACHMENT3; 
+		case RenderTargetDesc::Depth:
+			return GL_DEPTH_ATTACHMENT;
+		case RenderTargetDesc::Stencil:
+			return GL_STENCIL_ATTACHMENT;
+		case RenderTargetDesc::DepthStencil:
+			return GL_DEPTH_STENCIL_ATTACHMENT;
+		default:
+			assert(false);
+			return GL_INVALID_ENUM;
+		}
+	}
+
 	RenderTargetHandle RIDeviceOpenGL::createRenderTarget(const RenderTargetDesc& desc)
 	{
 		RenderTargetHandle handle = m_resources->m_framebuffers.allocateResource();
 		GlFramebuffer* framebuffer = m_resources->m_framebuffers.getResource(handle);
 
-		assert(desc.attachments[0].isValid());
-
 		glGenFramebuffers(1, &framebuffer->m_id);
 		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer->m_id);
-		 
-		attachifValid(desc, framebuffer, RenderTargetDesc::Color);
 
-		bool bHasDepthStencil = attachifValid(desc, framebuffer, RenderTargetDesc::DepthStencil);
+		bool bHasColor = attachColors(desc, framebuffer);
+		assert(bHasColor);
+
+		bool bHasDepthStencil = attachifValid(desc.depthStencilAttach, framebuffer, RenderTargetDesc::DepthStencil);
 
 		if (!bHasDepthStencil)
 		{
-			attachifValid(desc, framebuffer, RenderTargetDesc::Depth);
-			attachifValid(desc, framebuffer, RenderTargetDesc::Stencil);
+			attachifValid(desc.depthAttach, framebuffer, RenderTargetDesc::Depth);
+			attachifValid(desc.stencilAttach, framebuffer, RenderTargetDesc::Stencil);
 		}
 
 		GLenum framebufferstate = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -469,34 +491,35 @@ namespace Phoenix
 		return handle;
 	}
 
-	GLenum toGlAttachment(RenderTargetDesc::EAttachment attachment)
+	// Returns false if no color attachments exist.
+	bool RIDeviceOpenGL::attachColors(const RenderTargetDesc& desc, GlFramebuffer* fb)
 	{
-		switch (attachment)
+		bool bHasAnyColors = false;
+
+		for (size_t i = 0; i < RenderTargetDesc::NumMaxColors; ++i)
 		{
-		case RenderTargetDesc::Color:
-			return GL_COLOR_ATTACHMENT0;
-		case RenderTargetDesc::Depth:
-			return GL_DEPTH_ATTACHMENT;
-		case RenderTargetDesc::Stencil:
-			return GL_STENCIL_ATTACHMENT;
-		case RenderTargetDesc::DepthStencil:
-			return GL_DEPTH_STENCIL_ATTACHMENT;
-		default:
-			assert(false);
-			return GL_INVALID_ENUM;
+			Texture2DHandle texHandle = desc.colorAttachs[i];
+
+			if (texHandle.isValid())
+			{
+				GlTexture2D* texture = m_resources->m_texture2Ds.getResource(texHandle);
+				fb->m_attachments[i] = texture;
+
+				glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, texture->m_glTex.m_id, 0);
+
+				bHasAnyColors = true;
+			}
 		}
 	}
 
-	bool RIDeviceOpenGL::attachifValid(const RenderTargetDesc& desc, GlFramebuffer* fb, RenderTargetDesc::EAttachment attachment)
+	bool RIDeviceOpenGL::attachifValid(Texture2DHandle tex, GlFramebuffer* fb, RenderTargetDesc::EAttachment attachment)
 	{
-		Texture2DHandle texHandle = desc.attachments[attachment];
-
-		if (!texHandle.isValid())
+		if (!tex.isValid())
 		{
 			return false;
 		}
 
-		GlTexture2D* texture = m_resources->m_texture2Ds.getResource(texHandle);
+		const GlTexture2D* texture = m_resources->m_texture2Ds.getResource(tex);
 		fb->m_attachments[attachment] = texture;
 		glFramebufferTexture(GL_FRAMEBUFFER, toGlAttachment(attachment), texture->m_glTex.m_id, 0);
 		return true;
