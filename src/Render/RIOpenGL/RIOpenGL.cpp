@@ -86,7 +86,7 @@ namespace Phoenix
 	{
 		GlRenderWindow* glWindow = static_cast<GlRenderWindow*>(window);
 		glfwMakeContextCurrent(glWindow->m_glfwWindow);
-		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_DEPTH_TEST); // NOTE(Phil): This is a workaround until we have StateGroups back.
 	}
 
 	void RIOpenGL::swapBufferToWindow(RenderWindow* window)

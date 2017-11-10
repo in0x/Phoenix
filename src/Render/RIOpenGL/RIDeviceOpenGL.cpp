@@ -268,6 +268,14 @@ namespace Phoenix
 			return GL_RGBA8;
 		case EPixelFormat::R8G8B8:
 			return GL_RGB8;
+		case EPixelFormat::RGB16F:
+			return GL_RGB16F;
+		case EPixelFormat::RGBA16F:
+			return GL_RGBA16F;
+		case EPixelFormat::RGB32F:
+			return GL_RGB32F;
+		case EPixelFormat::RGBA32F:
+			return GL_RGBA32F;
 		case EPixelFormat::Depth32F:
 			return GL_DEPTH_COMPONENT32F;
 		case EPixelFormat::Depth16I:
@@ -286,8 +294,12 @@ namespace Phoenix
 		switch (format)
 		{
 		case EPixelFormat::R8G8B8A8:
+		case EPixelFormat::RGBA16F:
+		case EPixelFormat::RGBA32F:
 			return GL_RGBA;
 		case EPixelFormat::R8G8B8:
+		case EPixelFormat::RGB16F:
+		case EPixelFormat::RGB32F:
 			return GL_RGB;
 		case EPixelFormat::Depth32F:
 			return GL_DEPTH_COMPONENT;
@@ -309,6 +321,10 @@ namespace Phoenix
 		case EPixelFormat::R8G8B8:
 			return GL_UNSIGNED_BYTE;
 		case EPixelFormat::Depth32F:
+		case EPixelFormat::RGBA16F:
+		case EPixelFormat::RGBA32F:
+		case EPixelFormat::RGB16F:
+		case EPixelFormat::RGB32F:
 			return GL_FLOAT;
 		case EPixelFormat::Depth16I:
 		case EPixelFormat::Stencil8I:
@@ -435,16 +451,13 @@ namespace Phoenix
 
 	GLenum toGlAttachment(RenderTargetDesc::EAttachment attachment)
 	{
+		if (attachment < RenderTargetDesc::NumMaxColors && attachment != RenderTargetDesc::NumMaxColors)
+		{
+			return GL_COLOR_ATTACHMENT0 + static_cast<int32_t>(attachment);
+		}
+
 		switch (attachment)
 		{
-		case RenderTargetDesc::Color0:
-			return GL_COLOR_ATTACHMENT0;
-		case RenderTargetDesc::Color1:
-			return GL_COLOR_ATTACHMENT1;
-		case RenderTargetDesc::Color2:
-			return GL_COLOR_ATTACHMENT2;
-		case RenderTargetDesc::Color3:
-			return GL_COLOR_ATTACHMENT3; 
 		case RenderTargetDesc::Depth:
 			return GL_DEPTH_ATTACHMENT;
 		case RenderTargetDesc::Stencil:
