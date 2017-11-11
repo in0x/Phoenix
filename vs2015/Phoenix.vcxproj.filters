@@ -142,6 +142,9 @@
     <ClInclude Include="..\src\Core\Mesh.hpp">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Core\Shader.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Core\Clock.cpp">
@@ -225,6 +228,10 @@
     </ClCompile>
     <ClCompile Include="..\src\Math\Vec4.cpp">
       <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Core\Mesh.cpp" />
+    <ClCompile Include="..\src\Core\Shader.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -183,6 +183,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Core\Mesh.hpp" />
+    <ClInclude Include="..\src\Core\Shader.hpp" />
     <ClInclude Include="..\src\Core\WorldObject.hpp" />
     <ClInclude Include="..\src\Core\FNVHash.hpp" />
     <ClInclude Include="..\src\Core\StringTokenizer.hpp" />
@@ -233,7 +234,9 @@
   <ItemGroup>
     <ClCompile Include="..\src\Core\Clock.cpp" />
     <ClCompile Include="..\src\Core\Logger.cpp" />
+    <ClCompile Include="..\src\Core\Mesh.cpp" />
     <ClCompile Include="..\src\Core\obj.cpp" />
+    <ClCompile Include="..\src\Core\Shader.cpp" />
     <ClCompile Include="..\src\Core\StringTokenizer.cpp" />
     <ClCompile Include="..\src\Core\Texture.cpp" />
     <ClCompile Include="..\src\main.cpp" />

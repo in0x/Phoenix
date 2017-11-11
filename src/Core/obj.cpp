@@ -43,7 +43,7 @@ namespace Phoenix
 
 		std::map<PackedVertexData, unsigned int> packed;
 		OBJImport pImport;
-		Mesh* pConvertedMesh;
+		OBJMesh* pConvertedMesh;
 
 	public:
 		OBJImport convertForOpenGL(ObjData* loaded);
@@ -69,8 +69,7 @@ namespace Phoenix
 
 	OBJImport ObjIndexer::convertForOpenGL(ObjData* loaded)
 	{
-		pImport.mesh = std::make_unique<Mesh>();
-		pConvertedMesh = pImport.mesh.get();
+		pConvertedMesh = &pImport.mesh;
 
 		pImport.materials.swap(loaded->materials);
 		pImport.bSmoothShading = loaded->bSmoothShading;

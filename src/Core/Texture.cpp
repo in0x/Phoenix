@@ -3,6 +3,9 @@
 #include "Texture.hpp"
 #include <Core/Logger.hpp>
 
+#include <Render/RIDefs.hpp>
+#include <Render/RIDevice.hpp>
+
 #define STB_IMAGE_IMPLEMENTATION
 #include "../STB/stb_image.h"
 
@@ -17,27 +20,25 @@ namespace Phoenix
 
 	Texture::~Texture()
 	{
-		clear();
-	}
-
-	// NOTE(Phil): Consider hiding this in an asset loading service later.
-	void Texture::load(const char* path)
-	{
 		if (nullptr != m_data)
 		{
-			Logger::log("Texture already loaded, overriding.");
-			clear();
+			stbi_image_free(m_data);
 		}
+	}
 
+	Texture loadTexture(const char* path)
+	{
 		Logger::logf("Loading texture %s", path);
+
+		Texture texture;
 
 		int width = 0;
 		int height = 0;
 		int components = 0;
 
-		m_data = stbi_load(path, &width, &height, &components, 0);
+		texture.m_data = stbi_load(path, &width, &height, &components, 0);
 		
-		if (nullptr == m_data)
+		if (nullptr == texture.m_data)
 		{
 			Logger::errorf("Failed to load texture with error: %s", stbi_failure_reason());
 			assert(false);
@@ -49,17 +50,20 @@ namespace Phoenix
 			Logger::warningf("Texture has none power-of-2 dimensions: Width %d, Height: %d", width, height);
 		}
 
-		m_width = static_cast<uint32_t>(width);
-		m_height = static_cast<uint32_t>(height);
-		m_components = static_cast<uint8_t>(components);
+		texture.m_width = static_cast<uint32_t>(width);
+		texture.m_height = static_cast<uint32_t>(height);
+		texture.m_components = static_cast<uint8_t>(components);
+
+		return texture;
 	}
 
-	void Texture::clear()
+	void destroyTexture(Texture& texture)
 	{
-		if (nullptr != m_data)
-		{
-			stbi_image_free(m_data);
-		}
+		stbi_image_free(texture.m_data);
+		texture.m_data = nullptr;
+		texture.m_height = 0;
+		texture.m_width = 0;
+		texture.m_components = 0;
 	}
 
 	void flipTextureHorizontal(Texture& texture)
@@ -84,5 +88,47 @@ namespace Phoenix
 				bottom++;
 			}
 		}
+	}
+
+	TextureDesc createDesc(const Texture& texture, ETextureFilter minFilter, ETextureFilter magFilter, uint8_t numMips = 0)
+	{
+		TextureDesc desc;
+		desc.width = texture.m_width;
+		desc.height = texture.m_height;
+
+		switch (texture.m_components)
+		{
+		case 4:
+		{ desc.pixelFormat = EPixelFormat::R8G8B8A8; } break;
+		case 3:
+		{ desc.pixelFormat = EPixelFormat::R8G8B8; } break;
+		case 2:
+		{ assert(false); } break;
+		case 1:
+		{ assert(false); } break;
+		default: { assert(false); } break;
+		}
+
+		desc.minFilter = minFilter;
+		desc.magFilter = magFilter;
+
+		desc.numMips = numMips;
+
+		desc.wrapU = ETextureWrap::ClampToEdge;
+		desc.wrapV = ETextureWrap::ClampToEdge;
+		desc.wrapW = ETextureWrap::ClampToEdge;
+
+		return desc;
+	}
+
+	Texture2DHandle loadRenderTexture2D(const char* path, const char* nameInShader, IRIDevice* renderDevice)
+	{
+		Texture tex = loadTexture(path);
+
+		TextureDesc desc = createDesc(tex, ETextureFilter::Linear, ETextureFilter::Linear);
+		Texture2DHandle tex2D = renderDevice->createTexture2D(desc, nameInShader);
+		
+		assert(tex2D.isValid());
+		return tex2D;
 	}
 }

@@ -1,16 +1,18 @@
 #pragma once
 
-#include <vector>
-#include <Math/Vec2.hpp>
-#include <Math/Vec3.hpp>
+#include <Render/RIResourceHandles.hpp>
 
 namespace Phoenix
-{
-	struct Mesh
+{	
+	class IRIDevice;
+
+	struct RenderMesh
 	{
-		std::vector<Vec3> vertices;
-		std::vector<Vec2> uvs;
-		std::vector<Vec3> normals;
-		std::vector<uint32_t> indices;
+		VertexBufferHandle vb;
+		IndexBufferHandle ib;
+		size_t numVertices;
+		size_t numIndices;
 	};
+
+	RenderMesh loadRenderMesh(const char* path, IRIDevice* renderDevice);
 }

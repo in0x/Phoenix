@@ -21,10 +21,18 @@ namespace Phoenix
 		size_t idxFaceFrom;
 		int8_t illum;		
 	};
+	
+	struct OBJMesh
+	{
+		std::vector<Vec3> vertices;
+		std::vector<Vec2> uvs;
+		std::vector<Vec3> normals;
+		std::vector<uint32_t> indices;
+	};
 
 	struct OBJImport
 	{
-		std::unique_ptr<Mesh> mesh;
+		OBJMesh mesh;
 		std::vector<MTL> materials;
 		bool bSmoothShading;
 	};
