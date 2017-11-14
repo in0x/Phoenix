@@ -239,6 +239,7 @@
     <ClCompile Include="..\src\Core\Shader.cpp" />
     <ClCompile Include="..\src\Core\StringTokenizer.cpp" />
     <ClCompile Include="..\src\Core\Texture.cpp" />
+    <ClCompile Include="..\src\Core\Windows\PlatformWindows.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\Math\MathStreamOverloads.cpp" />
     <ClCompile Include="..\src\Math\Matrix3.cpp" />
