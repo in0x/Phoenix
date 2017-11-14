@@ -173,6 +173,82 @@ namespace Phoenix
 		Disable
 	};
 
+	enum class EBlend
+	{
+		Enable,
+		Disable
+	};
+
+	enum class EBlendFactor
+	{
+		Zero,
+		One,
+		SrcColor,
+		OneMinusSrcColor,
+		SrcAlpha,
+		OneMinusSrcAlpha,
+		DstColor,
+		OneMinusDstColor,
+		DstAlpha,
+		OneMinusDstAlpha
+	};
+
+	enum class EBlendOp
+	{
+		Add,
+		Subtract_SD,
+		Subtract_DS,
+		Min,
+		Max
+	};
+
+	class BlendState
+	{
+	public:
+		// For don't care / disabled state.
+		BlendState()
+			: m_enabeld(EBlend::Disable)
+			, m_blendOpRGB(EBlendOp::Add)
+			, m_blendOpA(EBlendOp::Add)
+			, m_factorSrcRGB(EBlendFactor::One)
+			, m_factorSrcA(EBlendFactor::One)
+			, m_factorDstRGB(EBlendFactor::Zero)
+			, m_factorDstA(EBlendFactor::Zero)
+		{}
+
+		BlendState(EBlend enabled)
+			: m_enabeld(enabled)
+			, m_blendOpRGB(EBlendOp::Add)
+			, m_blendOpA(EBlendOp::Add)
+			, m_factorSrcRGB(EBlendFactor::One)
+			, m_factorSrcA(EBlendFactor::One)
+			, m_factorDstRGB(EBlendFactor::Zero)
+			, m_factorDstA(EBlendFactor::Zero)
+		{}
+
+		// Convinience constructor if we want enabled but not separate equations.
+		BlendState(EBlendOp opBoth, EBlendFactor factorSrcBoth, EBlendFactor factorABoth)
+			: m_enabeld(EBlend::Enable)
+			, m_blendOpRGB(opBoth)
+			, m_blendOpA(opBoth)
+			, m_factorSrcRGB(factorSrcBoth)
+			, m_factorSrcA(factorABoth)
+			, m_factorDstRGB(factorSrcBoth)
+			, m_factorDstA(factorABoth)
+		{}
+
+		EBlend m_enabeld;
+
+		EBlendOp m_blendOpRGB;
+		EBlendOp m_blendOpA;
+
+		EBlendFactor m_factorSrcRGB;
+		EBlendFactor m_factorSrcA;
+		
+		EBlendFactor m_factorDstRGB;
+		EBlendFactor m_factorDstA;
+	};
+
 	enum class EPixelFormat
 	{
 		None,

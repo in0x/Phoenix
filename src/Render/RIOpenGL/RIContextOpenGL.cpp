@@ -296,9 +296,101 @@ namespace Phoenix
 	{
 		glClear(GL_COLOR_BUFFER_BIT);
 	}
-	
+
 	void RIContextOpenGL::clearDepth()
 	{
 		glClear(GL_DEPTH_BUFFER_BIT);
+	}
+
+	void RIContextOpenGL::setDepthTest(EDepth state)
+	{
+		if (EDepth::Enable == state)
+		{
+			glEnable(GL_DEPTH_TEST);
+		}
+		else
+		{
+			glDisable(GL_DEPTH_TEST);
+		}
+	}
+
+	void RIContextOpenGL::setDepthWrite(EDepth state)
+	{
+		if (EDepth::Enable == state)
+		{
+			glDepthMask(GL_TRUE);
+		}
+		else
+		{
+			glDepthMask(GL_FALSE);
+		}
+	}
+
+	GLenum toGlBlendFactor(EBlendFactor factor)
+	{
+		switch (factor)
+		{
+		case EBlendFactor::Zero:
+			return GL_ZERO;
+		case EBlendFactor::One:
+			return GL_ONE;
+		case EBlendFactor::SrcColor:
+			return GL_SRC_COLOR;
+		case EBlendFactor::OneMinusSrcColor:
+			return GL_ONE_MINUS_SRC_COLOR;
+		case EBlendFactor::SrcAlpha:
+			return GL_SRC_ALPHA;
+		case EBlendFactor::OneMinusSrcAlpha:
+			return GL_ONE_MINUS_SRC_ALPHA;
+		case EBlendFactor::DstColor:
+			return GL_DST_COLOR;
+		case EBlendFactor::OneMinusDstColor:
+			return GL_ONE_MINUS_DST_COLOR;
+		case EBlendFactor::DstAlpha:
+			return GL_DST_ALPHA;
+		case EBlendFactor::OneMinusDstAlpha:
+			return GL_ONE_MINUS_DST_ALPHA;
+		default:
+			assert(false);
+			return GL_INVALID_ENUM;
+		}
+	}
+
+	GLenum toGlBlendOp(EBlendOp op)
+	{
+		switch (op)
+		{
+		case EBlendOp::Add:
+			return GL_FUNC_ADD;
+		case EBlendOp::Subtract_SD:
+			return GL_FUNC_SUBTRACT;
+		case EBlendOp::Subtract_DS:
+			return GL_FUNC_REVERSE_SUBTRACT;
+		case EBlendOp::Min:
+			return GL_MIN;
+		case EBlendOp::Max:
+			return GL_MAX;
+		default:
+			assert(false);
+			return GL_INVALID_ENUM;
+		}
+	}
+
+	void RIContextOpenGL::setBlendState(const BlendState& state)
+	{
+		if (EBlend::Disable == state.m_enabeld)
+		{
+			glDisable(GL_BLEND);
+			return;
+		}
+
+		glEnable(GL_BLEND);
+		
+		glBlendEquationSeparate(toGlBlendOp(state.m_blendOpRGB), toGlBlendOp(state.m_blendOpA));
+		
+		glBlendFuncSeparate(toGlBlendFactor(state.m_factorSrcRGB)
+						  , toGlBlendFactor(state.m_factorDstRGB)
+						  , toGlBlendFactor(state.m_factorSrcA)
+						  , toGlBlendFactor(state.m_factorDstA));
 	}
 }

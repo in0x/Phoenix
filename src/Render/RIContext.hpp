@@ -37,6 +37,12 @@ namespace Phoenix
 
 		virtual void bindDefaultRenderTarget() = 0;
 
+		virtual void setDepthTest(EDepth state) = 0;
+
+		virtual void setDepthWrite(EDepth state) = 0;
+
+		virtual void setBlendState(const BlendState& state) = 0;
+
 		virtual void clearColor() = 0;
 
 		virtual void clearDepth() = 0;

@@ -22,8 +22,6 @@ int main(int argc, char** argv)
 	Logger::init(true, false, 1024);
 	Logger::setAnsiColorEnabled(Platform::enableConsoleColor(true));
 
-	SetProcessDPIAware();
-
 	Tests::runMathTests();
 	Tests::runMemoryTests();
 
@@ -55,7 +53,7 @@ int main(int argc, char** argv)
 
 	ProgramHandle program = loadShaderProgram(renderDevice, "Shaders/diffuse.vert", "Shaders/diffuse.frag");
 	
-	Matrix4 viewTf = lookAtRH(Vec3( 0, 0, 5 ), Vec3( 0,0,0 ), Vec3( 0,1,0 ));
+	Matrix4 viewTf = lookAtRH(Vec3(0.f, 0.f, 5.f), Vec3(0.f, 0.f, 0.f), Vec3(0.f, 1.f, 0.f));
 	Matrix4 projTf = perspectiveRH(70.f, (float)config.width / (float)config.height, 0.1f, 100.f);
 
 	UniformHandle modelMat = renderDevice->createUniform("modelTf", EUniformType::Mat4);
@@ -84,6 +82,7 @@ int main(int argc, char** argv)
 	renderContext->bindUniform(diffuse, &cDiffuse);
 	renderContext->bindUniform(specular, &cSpecular);
 	renderContext->bindUniform(light, &lightPos);
+	renderContext->setDepthTest(EDepth::Enable);
 
 	while (!window->wantsToClose())
 	{

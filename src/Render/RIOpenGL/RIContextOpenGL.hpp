@@ -45,6 +45,12 @@ namespace Phoenix
 
 		virtual void bindDefaultRenderTarget() override;
 
+		virtual void setDepthTest(EDepth state) override;
+
+		virtual void setDepthWrite(EDepth state) override;
+
+		virtual void setBlendState(const BlendState& state) override;
+
 		virtual void clearColor() override;
 
 		virtual void clearDepth() override;
