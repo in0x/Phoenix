@@ -490,6 +490,8 @@ namespace Phoenix
 			attachifValid(desc.stencilAttach, framebuffer, RenderTargetDesc::Stencil);
 		}
 
+		glDrawBuffers(framebuffer->m_colorAttachCount, framebuffer->m_colorAttachments);
+
 		GLenum framebufferstate = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 		bool bNotComplete = GL_FRAMEBUFFER_COMPLETE != framebufferstate;
 
@@ -517,11 +519,13 @@ namespace Phoenix
 			if (texHandle.isValid())
 			{
 				GlTexture2D* texture = m_resources->m_texture2Ds.getResource(texHandle);
-				fb->m_attachments[i] = texture;
+				fb->m_attachedTextures[i] = texture;
 
 				glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, texture->m_glTex.m_id, 0);
-
+				fb->m_colorAttachments[i] = GL_COLOR_ATTACHMENT0 + i;
+			
 				bHasAnyColors = true;
+				fb->m_colorAttachCount++;
 			}
 		}
 
@@ -536,7 +540,7 @@ namespace Phoenix
 		}
 
 		const GlTexture2D* texture = m_resources->m_texture2Ds.getResource(tex);
-		fb->m_attachments[attachment] = texture;
+		fb->m_attachedTextures[attachment] = texture;
 		glFramebufferTexture(GL_FRAMEBUFFER, toGlAttachment(attachment), texture->m_glTex.m_id, 0);
 		return true;
 	}

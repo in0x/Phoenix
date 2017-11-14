@@ -73,9 +73,12 @@ namespace Phoenix
 	public:
 		GlFramebuffer()
 			: m_id(0)
+			, m_colorAttachCount(0)
 		{}
 
+		const GlTexture2D* m_attachedTextures[RenderTargetDesc::NumAttachments];
+		GLenum m_colorAttachments[RenderTargetDesc::NumMaxColors];
 		GLuint m_id;
-		const GlTexture2D* m_attachments[RenderTargetDesc::NumAttachments];
+		uint8_t m_colorAttachCount;
 	};
 }
