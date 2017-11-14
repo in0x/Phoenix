@@ -182,7 +182,7 @@ namespace Phoenix
 
 		if (!bSuccess)
 		{
-			Logger::error("Failed to create Vertex Shader!");
+			Logger::error("Failed to create Fragment Shader!");
 			m_resources->m_fragmentshaders.destroyResource(handle);
 			handle.invalidate();
 		}
@@ -446,6 +446,7 @@ namespace Phoenix
 		RIUniform* uniform = m_resources->m_uniforms.getResource(handle);
 		uniform->m_type = type;
 		uniform->m_nameHash = HashFNV<const char*>()(name);
+		strncpy(uniform->m_debugName, name, RIUniform::MAX_NAME_LENGTH);
 		return handle;
 	}
 

@@ -159,7 +159,7 @@ namespace Phoenix
 		}
 		else
 		{
-			Logger::errorf("Uniform %d does not exist in currently bound program", uniform->m_nameHash);
+			Logger::errorf("Uniform %s does not exist in currently bound program", uniform->m_debugName);
 		}
 	}
 

@@ -89,6 +89,10 @@ namespace Phoenix
 	public:
 		EUniformType m_type;
 		FNVHash m_nameHash;
+
+		enum { MAX_NAME_LENGTH = 32 };
+
+		char m_debugName[MAX_NAME_LENGTH];
 	};
 
 	class RIConstantBuffer : RIResource
