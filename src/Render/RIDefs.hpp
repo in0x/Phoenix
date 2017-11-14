@@ -185,7 +185,7 @@ namespace Phoenix
 		Depth32F,
 		Depth16I,
 		Stencil8I,
-		Depth24IStencil8I,
+		//Depth24IStencil8I,
 	};
 
 	enum class ETextureFilter
