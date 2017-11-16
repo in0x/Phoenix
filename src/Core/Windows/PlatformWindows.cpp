@@ -73,20 +73,19 @@ namespace Phoenix
 			{
 				return true;
 			}
+			
+			if (enabled)
+			{
+				mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+			}
 			else
 			{
-				if (enabled)
-				{
-					mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-				}
-				else
-				{
-					mode &= ~ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-				}
-				if (SetConsoleMode(hStdOut, mode))
-				{
-					return true;
-				}
+				mode &= ~ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+			}
+			
+			if (SetConsoleMode(hStdOut, mode))
+			{
+				return true;
 			}
 
 			return false;
