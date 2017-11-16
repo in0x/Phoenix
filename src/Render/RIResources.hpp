@@ -52,7 +52,9 @@ namespace Phoenix
 			, m_numMips(0)
 			, m_namehash(0)
 		{}
+		enum { MAX_NAME_LENGTH = 32 };
 
+		char m_debugName[MAX_NAME_LENGTH];
 		EPixelFormat m_pixelFormat;
 		uint8_t m_numMips;
 		FNVHash m_namehash;
@@ -87,12 +89,11 @@ namespace Phoenix
 	class RIUniform : public RIResource
 	{
 	public:
-		EUniformType m_type;
-		FNVHash m_nameHash;
-
 		enum { MAX_NAME_LENGTH = 32 };
 
 		char m_debugName[MAX_NAME_LENGTH];
+		EUniformType m_type;
+		FNVHash m_nameHash;
 	};
 
 	class RIConstantBuffer : RIResource

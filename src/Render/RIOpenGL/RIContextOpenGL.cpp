@@ -198,7 +198,7 @@ namespace Phoenix
 
 		if (!bIsActive)
 		{
-			Logger::errorf("Texture %d does not have an equivalent sampler in currently bound program", binding.texture.m_namehash);
+			Logger::errorf("Texture %s does not have an equivalent sampler in currently bound program", binding.texture.m_debugName);
 			return;
 		}
 

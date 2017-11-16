@@ -372,6 +372,7 @@ namespace Phoenix
 		glTex.m_dataType = toGlTexDatatype(desc.pixelFormat);
 		texture.m_numMips = desc.numMips;
 		texture.m_namehash = HashFNV<const char*>()(name);
+		strncpy(texture.m_debugName, name, RITexture::MAX_NAME_LENGTH);
 
 		glGenTextures(1, &glTex.m_id);
 		glActiveTexture(GL_TEXTURE0);
