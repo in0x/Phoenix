@@ -88,22 +88,11 @@ namespace Phoenix
 		UniformHandle uniform;
 	};
 
-	struct RIUploadTexture2DCommand
+	/*struct RIUploadTexture2DCommand
 	{
 		const void* data;
 		uint32_t width;
 		uint32_t height;
 		Texture2DHandle handle;
-	};
-
-/*	struct UploadCubemap
-	{
-		SUBMITTABLE();
-			
-		CubemapData data;
-		uint32_t width;
-		uint32_t height;
-		TextureHandle handle;
 	};*/
-
 }
