@@ -183,6 +183,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Core\Mesh.hpp" />
+    <ClInclude Include="..\src\Core\PerspectiveCamera.hpp" />
     <ClInclude Include="..\src\Core\Shader.hpp" />
     <ClInclude Include="..\src\Core\WorldObject.hpp" />
     <ClInclude Include="..\src\Core\FNVHash.hpp" />
@@ -212,6 +213,7 @@
     <ClInclude Include="..\src\Render\CommandBucket.hpp" />
     <ClInclude Include="..\src\Render\CommandPacket.hpp" />
     <ClInclude Include="..\src\Render\Commands.hpp" />
+    <ClInclude Include="..\src\Render\DeferredRenderer.hpp" />
     <ClInclude Include="..\src\Render\RenderWindow.hpp" />
     <ClInclude Include="..\src\Render\RIContext.hpp" />
     <ClInclude Include="..\src\Render\RIDefs.hpp" />
@@ -240,6 +242,7 @@
     <ClCompile Include="..\src\Core\StringTokenizer.cpp" />
     <ClCompile Include="..\src\Core\Texture.cpp" />
     <ClCompile Include="..\src\Core\Windows\PlatformWindows.cpp" />
+    <ClCompile Include="..\src\Core\WorldObject.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\Math\MathStreamOverloads.cpp" />
     <ClCompile Include="..\src\Math\Matrix3.cpp" />
@@ -256,6 +259,7 @@
     <ClCompile Include="..\src\Memory\StackAllocator.cpp" />
     <ClCompile Include="..\src\Render\CommandPacket.cpp" />
     <ClCompile Include="..\src\Render\Commands.cpp" />
+    <ClCompile Include="..\src\Render\DeferredRenderer.cpp" />
     <ClCompile Include="..\src\Render\RIOpenGL\OpenGL.cpp" />
     <ClCompile Include="..\src\Render\RIOpenGL\RIContextOpenGL.cpp" />
     <ClCompile Include="..\src\Render\RIOpenGL\RIDeviceOpenGL.cpp" />

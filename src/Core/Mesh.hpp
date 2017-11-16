@@ -8,10 +8,10 @@ namespace Phoenix
 
 	struct RenderMesh
 	{
-		VertexBufferHandle vb;
-		IndexBufferHandle ib;
-		size_t numVertices;
-		size_t numIndices;
+		VertexBufferHandle m_vertexbuffer;
+		IndexBufferHandle m_indexbuffer;
+		size_t m_numVertices;
+		size_t m_numIndices;
 	};
 
 	RenderMesh loadRenderMesh(const char* path, IRIDevice* renderDevice);

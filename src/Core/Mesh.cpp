@@ -31,21 +31,21 @@ namespace Phoenix
 
 			OBJImport import = loadObj(pathToAsset, assetName);
 
-			mesh.numVertices = import.mesh.vertices.size();
-			mesh.numIndices = import.mesh.indices.size();
+			mesh.m_numVertices = import.mesh.vertices.size();
+			mesh.m_numIndices = import.mesh.indices.size();
 
 			VertexBufferFormat layout;
 			layout.add({ EAttributeProperty::Position, EAttributeType::Float, 3 },
-			{ sizeof(Vec3), mesh.numVertices, import.mesh.vertices.data() });
+			{ sizeof(Vec3), mesh.m_numVertices, import.mesh.vertices.data() });
 
 			layout.add({ EAttributeProperty::Normal, EAttributeType::Float, 3 },
-			{ sizeof(Vec3), mesh.numIndices, import.mesh.normals.data() });
+			{ sizeof(Vec3), mesh.m_numIndices, import.mesh.normals.data() });
 
-			mesh.vb = renderDevice->createVertexBuffer(layout);
-			mesh.ib = renderDevice->createIndexBuffer(sizeof(uint32_t), mesh.numIndices, import.mesh.indices.data());
+			mesh.m_vertexbuffer = renderDevice->createVertexBuffer(layout);
+			mesh.m_indexbuffer = renderDevice->createIndexBuffer(sizeof(uint32_t), mesh.m_numIndices, import.mesh.indices.data());
 
-			assert(mesh.vb.isValid());
-			assert(mesh.ib.isValid());
+			assert(mesh.m_vertexbuffer.isValid());
+			assert(mesh.m_indexbuffer.isValid());
 		}
 		else
 		{

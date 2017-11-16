@@ -139,10 +139,16 @@
     <ClInclude Include="..\src\Core\WorldObject.hpp">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Render\DeferredRenderer.hpp">
+      <Filter>Render</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\Core\Mesh.hpp">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Core\Shader.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\PerspectiveCamera.hpp">
       <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
@@ -228,6 +234,12 @@
     </ClCompile>
     <ClCompile Include="..\src\Math\Vec4.cpp">
       <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Render\DeferredRenderer.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Core\WorldObject.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Core\Mesh.cpp" />
     <ClCompile Include="..\src\Core\Shader.cpp">
