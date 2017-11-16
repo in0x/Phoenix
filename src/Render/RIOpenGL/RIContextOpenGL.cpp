@@ -228,7 +228,12 @@ namespace Phoenix
 	{
 		const GlFramebuffer* fb = m_resources->m_framebuffers.getResource(rtHandle);
 		glBindFramebuffer(GL_FRAMEBUFFER, fb->m_id);
-		glClearBufferfv(GL_COLOR, 0, (GLfloat*)&clearColor);
+
+		uint8_t attachments = fb->m_colorAttachCount;
+		for (uint8_t i = 0; i < attachments; ++i)
+		{
+			glClearBufferfv(GL_COLOR, i, (GLfloat*)&clearColor);
+		}
 	}
 
 	void RIContextOpenGL::clearRenderTargetDepth(RenderTargetHandle rtHandle)
