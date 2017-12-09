@@ -397,8 +397,7 @@ namespace Phoenix
 
 		if (!file)
 		{	
-			Logger::errorf("Failed to open OBJ file %s", path.c_str());
-			fclose(file);
+			Logger::errorf("Failed to open MTL file %s", path.c_str());
 		}
 
 		return file;

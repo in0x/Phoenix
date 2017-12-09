@@ -36,10 +36,10 @@ namespace Phoenix
 
 			VertexBufferFormat layout;
 			layout.add({ EAttributeProperty::Position, EAttributeType::Float, 3 },
-			{ sizeof(Vec3), mesh.m_numVertices, import.mesh.vertices.data() });
+			{ sizeof(Vec3), import.mesh.vertices.size(), import.mesh.vertices.data() });
 
 			layout.add({ EAttributeProperty::Normal, EAttributeType::Float, 3 },
-			{ sizeof(Vec3), mesh.m_numIndices, import.mesh.normals.data() });
+			{ sizeof(Vec3), import.mesh.normals.size(), import.mesh.normals.data() });
 
 			mesh.m_vertexbuffer = renderDevice->createVertexBuffer(layout);
 			mesh.m_indexbuffer = renderDevice->createIndexBuffer(sizeof(uint32_t), mesh.m_numIndices, import.mesh.indices.data());
