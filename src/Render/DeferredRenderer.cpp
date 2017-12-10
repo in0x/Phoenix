@@ -74,11 +74,11 @@ namespace Phoenix
 		context->bindUniform(m_uniforms.projTf, &m_projMat);
 	}
 
+	
 	// We'll use the context directly for now, then commands when we refactor.
 	void DeferredRenderer::fillGBuffer(const Entity& entity, IRIContext* context)
 	{
-		Matrix4 transform = Matrix4::identity();
-		context->bindUniform(m_uniforms.modelTf, &transform/*entity.m_transform.toMat4()*/);
+		context->bindUniform(m_uniforms.modelTf, &entity.m_transform.toMat4());
 
 		context->bindUniform(m_uniforms.kDiffuse, &entity.m_material.m_diffuse);
 		context->bindUniform(m_uniforms.kSpecular, &entity.m_material.m_specular);
