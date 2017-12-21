@@ -4,26 +4,33 @@
 #include <assert.h>
 #include <vector>
 #include <unordered_map>
+#include <typeindex>
 
 #include <Math/Vec3.hpp>
 #include <Math/Matrix4.hpp>
 
-namespace Phoenix::ECS	
+namespace Phoenix
 {
 	typedef size_t ComponentID;
 	typedef size_t EntityID;
 
 	class IComponent;
 
+	template <class Type>
+	constexpr std::type_index typeidx()
+	{
+		return std::move(std::type_index(typeid(Type)));
+	}
+	
 	class Entity
 	{
 	public:
 		template <class ComponentType>
 		ComponentType* getComponent()
 		{
-			if (components.find(&typeid(ComponentType)) != components::end())
+			if (components.find(typeidx<ComponentType>()) != components.end())
 			{
-				return static_cast<ComponentType>(components[&typeid(ComponentType)]);
+				return static_cast<ComponentType*>(components[typeidx<ComponentType>()]);
 			}
 			else
 			{
@@ -34,50 +41,48 @@ namespace Phoenix::ECS
 		template <class ComponentType>
 		void addComponent(ComponentType* component)
 		{
-			assert(components.find(&typeid(ComponentType)) == components::end());
-			components[&typeid(ComponentType)] = component;
+			assert(components.find(typeidx<ComponentType>()) == components.end());
+			components[typeidx<ComponentType>()] = component;
 		}
 
 		template <class ComponentType>
 		void removeComponent(ComponentType* component)
 		{
-			assert(components.find(&typeid(ComponentType)) == components::end());
-			components[&typeid(ComponentType)] = nullptr;
+			assert(components.find(typeidx<ComponentType>()) != components.end());
+			components[typeidx<ComponentType>()] = nullptr;
 		}
 
 	private:
-		std::unordered_map<const std::type_info*, IComponent*> components;
+		std::unordered_map<std::type_index, IComponent*> components;
 	};
 
-	namespace Phoenix
+	class IComponent
 	{
-		class IComponent
+	public:
+		virtual ~IComponent() {}
+
+		template <class ComponentType>
+		ComponentType* sibling()
 		{
-			virtual ~IComponent();
+			return m_owningEntity->getComponent<ComponentType>();
+		}
 
-			template <class ComponentType>
-			ComponentType* sibling()
-			{
-				return m_owningEntity->getComponent<ComponentType>();
-			}
-
-		private:
-			Entity* m_owningEntity;
-		};
-	}
+	private:
+		Entity* m_owningEntity;
+	};
 	
-	class World;
+	struct World;
 
 	class ISystem
 	{
-		virtual ~ISystem();
+		virtual ~ISystem() {}
 		void update(World* world, float dt);
 	};
 
 	// Opaque resource type passed around to initialize component
 	class IResource
 	{
-		virtual ~IResource();
+		virtual ~IResource() {}
 	};
 
 	// Possible structure
@@ -101,7 +106,7 @@ namespace Phoenix::ECS
 		// https://gamedev.stackexchange.com/questions/55950/how-can-i-properly-access-the-components-in-my-c-entity-component-systems
 
 		template <class ComponentType>
-		ComponentType* createComponent(IResource* resource); 
+		ComponentType* createComponent(IResource* resource);
 
 		template<class ComponentType>
 		void registerComponentFactory(ComponentType*(*factoryFunc)(IResource*));
@@ -112,6 +117,15 @@ namespace Phoenix::ECS
 		void init();
 		void exit();
 		void update(float dt, World* world);
+	};
+
+	// Test impl
+
+	class TransformComponent : public IComponent
+	{
+		Vec3 position;
+		Vec3 rotation;
+		Vec3 scale;
 	};
 
 	// overwatch

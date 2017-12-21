@@ -13,6 +13,8 @@
 #include "Render/RIOpenGL/RIOpenGL.hpp"
 #include "Render/DeferredRenderer.hpp"
 
+#include "Core/GameFramework/ECS.hpp"
+
 int main(int argc, char** argv)
 {
 	using namespace Phoenix;
@@ -71,6 +73,19 @@ int main(int argc, char** argv)
 	DirectionalLight lightGreen;
 	lightGreen.m_direction = Vec3(0.f, 1.f, 0.f);
 	lightGreen.m_color = Vec3(0.f, 1.f, 0.f);
+
+	// Entity test
+
+	Entity testEntity;
+
+	TransformComponent tfComp;
+
+	testEntity.addComponent(&tfComp);
+	TransformComponent* gotComponent = testEntity.getComponent<TransformComponent>();
+	assert(gotComponent == &tfComp);
+	testEntity.removeComponent(&tfComp);
+
+	//
 
 	while (!window->wantsToClose())
 	{
