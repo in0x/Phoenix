@@ -47,11 +47,11 @@ int main(int argc, char** argv)
 
 	renderInterface.setWindowToRenderTo(window);
 
-	Entity foxEntity;
-	foxEntity.m_mesh = loadRenderMesh("Models/Fox/RedFox.obj", renderDevice);
-	foxEntity.m_material = Material(Vec3(1.f, 1.f, 1.f), Vec3(0.3f, 0.3f, 0.3f), 100.f);
+	Entity entity;
+	entity.m_mesh = loadRenderMesh("Models/Fox/RedFox.obj", renderDevice);
+	entity.m_material = Material(Vec3(1.f, 1.f, 1.f), Vec3(0.3f, 0.3f, 0.3f), 100.f);
 
-	Matrix4 viewTf = lookAtRH(Vec3(0.f, 0.f, 5.f), Vec3(0.f, 0.f, 0.f), Vec3(0.f, 1.f, 0.f));
+	Matrix4 viewTf = lookAtRH(Vec3(0.f, 0.f, 7.f), Vec3(0.f, 0.f, 0.f), Vec3(0.f, 1.f, 0.f));
 	Matrix4 projTf = perspectiveRH(70.f, (float)config.width / (float)config.height, 0.1f, 100.f);
 	
 	renderContext->setDepthTest(EDepth::Enable);
@@ -76,7 +76,7 @@ int main(int argc, char** argv)
 	while (!window->wantsToClose())
 	{
 		renderer.setupGBufferPass(renderContext);
-		renderer.fillGBuffer(foxEntity, renderContext);
+		renderer.fillGBuffer(entity, renderContext);
 
 		renderer.setupLightPass(renderContext);
 		renderer.drawLight(lightRed, renderContext);
