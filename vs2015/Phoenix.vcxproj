@@ -182,6 +182,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\Core\Engine.hpp" />
+    <ClInclude Include="..\src\Core\GameFramework\ECS.hpp" />
+    <ClInclude Include="..\src\Core\GameFramework\Entity.hpp" />
+    <ClInclude Include="..\src\Core\GameFramework\IComponent.hpp" />
     <ClInclude Include="..\src\Core\Mesh.hpp" />
     <ClInclude Include="..\src\Core\PerspectiveCamera.hpp" />
     <ClInclude Include="..\src\Core\Shader.hpp" />

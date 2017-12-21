@@ -151,6 +151,18 @@
     <ClInclude Include="..\src\Core\PerspectiveCamera.hpp">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Core\Engine.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\GameFramework\ECS.hpp">
+      <Filter>Core\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\GameFramework\IComponent.hpp">
+      <Filter>Core\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\GameFramework\Entity.hpp">
+      <Filter>Core\GameFramework</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Core\Clock.cpp">
@@ -273,6 +285,9 @@
     </Filter>
     <Filter Include="Render\RIOpenGL">
       <UniqueIdentifier>{adf98348-3d7d-47f0-aba7-539c004aea75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\GameFramework">
+      <UniqueIdentifier>{9ecc9e16-61cf-4ad8-807b-edad8acbb856}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
