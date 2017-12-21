@@ -21,7 +21,7 @@ const char* GlErrorMessages::msgInvalidFramebufferOperation = "GL Error: Invalid
 
 const char* getGlErrorString(bool& bErrorOccured)
 {
-	GLenum err(glGetError());
+	GLenum err = glGetError();
 
 	switch (err)
 	{

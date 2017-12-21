@@ -76,7 +76,7 @@ namespace Phoenix
 
 	
 	// We'll use the context directly for now, then commands when we refactor.
-	void DeferredRenderer::fillGBuffer(const Entity& entity, IRIContext* context)
+	void DeferredRenderer::fillGBuffer(const WorldObject& entity, IRIContext* context)
 	{
 		context->bindUniform(m_uniforms.modelTf, &entity.m_transform.toMat4());
 

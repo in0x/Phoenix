@@ -47,7 +47,7 @@ int main(int argc, char** argv)
 
 	renderInterface.setWindowToRenderTo(window);
 
-	Entity entity;
+	WorldObject entity;
 	entity.m_mesh = loadRenderMesh("Models/Fox/RedFox.obj", renderDevice);
 	entity.m_material = Material(Vec3(1.f, 1.f, 1.f), Vec3(0.3f, 0.3f, 0.3f), 100.f);
 
@@ -66,7 +66,6 @@ int main(int argc, char** argv)
 
 	DirectionalLight lightBlue;
 	lightBlue.m_direction = Vec3(1.f, 0.f, 0.f);
-	//lightBlue.m_color = Vec3(0.53f, 0.97f, 0.83f);
 	lightBlue.m_color = Vec3(0.f, 0.f, 1.f);
 
 	DirectionalLight lightGreen;

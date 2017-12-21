@@ -43,7 +43,7 @@ namespace Phoenix
 		float m_specularExp;
 	};
 
-	class Entity
+	class WorldObject
 	{
 	public:
 		Transform m_transform;

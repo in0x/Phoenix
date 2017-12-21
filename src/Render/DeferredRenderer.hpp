@@ -10,7 +10,7 @@ namespace Phoenix
 {
 	class IRIDevice;
 	class IRIContext;
-	class Entity;
+	class WorldObject;
 
 	// Placeholder.
 	class DirectionalLight
@@ -27,7 +27,7 @@ namespace Phoenix
 
 		void setupGBufferPass(IRIContext* context);
 
-		void fillGBuffer(const Entity& entity, IRIContext* context);
+		void fillGBuffer(const WorldObject& entity, IRIContext* context);
 
 		void setupLightPass(IRIContext* context);
 
