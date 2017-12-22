@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <assert.h>
 #include <vector>
+#include <stack>
 #include <unordered_map>
 #include <typeindex>
 
@@ -11,26 +12,25 @@
 
 namespace Phoenix
 {
-	typedef size_t ComponentID;
-	typedef size_t EntityID;
-
 	class IComponent;
 
 	template <class Type>
 	constexpr std::type_index typeidx()
 	{
-		return std::move(std::type_index(typeid(Type)));
+		return std::type_index(typeid(Type));
 	}
-	
+
+	typedef size_t EntityID;
+
 	class Entity
 	{
 	public:
 		template <class ComponentType>
 		ComponentType* getComponent()
 		{
-			if (components.find(typeidx<ComponentType>()) != components.end())
+			if (m_components.find(typeidx<ComponentType>()) != m_components.end())
 			{
-				return static_cast<ComponentType*>(components[typeidx<ComponentType>()]);
+				return static_cast<ComponentType*>(m_components[typeidx<ComponentType>()]);
 			}
 			else
 			{
@@ -41,19 +41,32 @@ namespace Phoenix
 		template <class ComponentType>
 		void addComponent(ComponentType* component)
 		{
-			assert(components.find(typeidx<ComponentType>()) == components.end());
-			components[typeidx<ComponentType>()] = component;
+			assert(m_components.find(typeidx<ComponentType>()) == m_components.end());
+			m_components[typeidx<ComponentType>()] = component;
+			component->m_owningEntity = this;
 		}
 
 		template <class ComponentType>
 		void removeComponent(ComponentType* component)
 		{
-			assert(components.find(typeidx<ComponentType>()) != components.end());
-			components[typeidx<ComponentType>()] = nullptr;
+			assert(m_components.find(typeidx<ComponentType>()) != m_components.end());
+			assert(m_components[typeidx<ComponentType>()] == component);
+			m_components[typeidx<ComponentType>()] = nullptr;
+			component->m_owningEntity = nullptr;
+		}
+
+		decltype(auto) begin()
+		{
+			return m_components.begin();
+		}
+
+		decltype(auto) end()
+		{
+			return m_components.end();
 		}
 
 	private:
-		std::unordered_map<std::type_index, IComponent*> components;
+		std::unordered_map<std::type_index, IComponent*> m_components;
 	};
 
 	class IComponent
@@ -61,22 +74,24 @@ namespace Phoenix
 	public:
 		virtual ~IComponent() {}
 
+		virtual void init(IResource* resource) {}
+
 		template <class ComponentType>
 		ComponentType* sibling()
 		{
 			return m_owningEntity->getComponent<ComponentType>();
 		}
 
-	private:
 		Entity* m_owningEntity;
 	};
-	
+
 	struct World;
 
 	class ISystem
 	{
+	public:
 		virtual ~ISystem() {}
-		void update(World* world, float dt);
+		virtual void update(World* world, float dt) = 0;
 	};
 
 	// Opaque resource type passed around to initialize component
@@ -94,22 +109,60 @@ namespace Phoenix
 	//
 	// Components that are rarely looked up by other systems can just be accessed via a GetComponent function.
 
+	typedef IComponent*(*ComponentCreatorFptr)(IResource*);
+
 	struct World
 	{
-		std::vector<Entity> entities;
-		std::vector<ISystem*> systems;
-
-		void registerSystem(ISystem* system);
-
-		// Use template and type_id trickery to register component factories. 
-		// Can use typeid of template type as key to hashmap.
-		// https://gamedev.stackexchange.com/questions/55950/how-can-i-properly-access-the-components-in-my-c-entity-component-systems
+		void registerSystem(ISystem* system)
+		{
+			m_systems.push_back(system);
+		}
 
 		template <class ComponentType>
-		ComponentType* createComponent(IResource* resource);
+		void registerComponentFactory(ComponentCreatorFptr creator)
+		{
+			assert(m_creatorFptrs.find(typeidx<ComponentType>()) == ComponentCreatorFptr.end());
+			components[typeidx<ComponentType>()] = creator;
+		}
 
-		template<class ComponentType>
-		void registerComponentFactory(ComponentType*(*factoryFunc)(IResource*));
+		template <class ComponentType>
+		ComponentType* createComponent(IResource* resource)
+		{
+			return static_cast<ComponentType>(m_creatorFptrs[typeidx<ComponentType>()](resource));
+		}
+
+		EntityID acquireEntity()
+		{
+			if (m_releasedEntities.size() > 0)
+			{
+				EntityID e = m_releasedEntities.top;
+				m_releasedEntities.pop();
+				return e;
+			}
+			else
+			{
+				m_entities.emplace_back();
+				return m_entities.size() - 1;
+			}
+		}
+
+		void releaseEntity(EntityID id)
+		{
+			Entity& e = m_entities[id];
+			for (auto& pair : e)
+			{
+				IComponent* component = pair.second;
+				e.removeComponent(component);
+			}
+		}
+
+		std::vector<ISystem*> m_systems;
+
+		std::vector<Entity> m_entities;
+
+		std::stack<EntityID> m_releasedEntities; // Used to recycle entities
+
+		std::unordered_map<std::type_index, ComponentCreatorFptr> m_creatorFptrs;
 	};
 
 	class Engine
@@ -123,9 +176,17 @@ namespace Phoenix
 
 	class TransformComponent : public IComponent
 	{
+	public:
 		Vec3 position;
 		Vec3 rotation;
 		Vec3 scale;
+	};
+
+	class DirectionalLightComponent : public IComponent 
+	{
+	public:
+		Vec3 m_color;
+		Vec3 m_direction;
 	};
 
 	// overwatch
