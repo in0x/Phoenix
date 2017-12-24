@@ -73,19 +73,14 @@ int main(int argc, char** argv)
 	DirectionalLight lightGreen;
 	lightGreen.m_direction = Vec3(0.f, 1.f, 0.f);
 	lightGreen.m_color = Vec3(0.f, 1.f, 0.f);
+	
+	// ---------------------------------------
 
-	// Entity test
+	ChunkArray<Vec3> testArr(1, 4);
 
-	Entity testEntity;
+	assert(true);
 
-	TransformComponent tfComp;
-
-	testEntity.addComponent(&tfComp);
-	TransformComponent* gotComponent = testEntity.getComponent<TransformComponent>();
-	assert(gotComponent == &tfComp);
-	testEntity.removeComponent(&tfComp);
-
-	//
+	// ---------------------------------------
 
 	while (!window->wantsToClose())
 	{

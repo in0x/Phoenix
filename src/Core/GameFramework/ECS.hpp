@@ -3,95 +3,87 @@
 #include <stdint.h>
 #include <assert.h>
 #include <vector>
-#include <stack>
 #include <unordered_map>
-#include <typeindex>
+#include <memory>
 
-#include <Math/Vec3.hpp>
-#include <Math/Matrix4.hpp>
+#include <Memory/StackAllocator.hpp>
 
 namespace Phoenix
 {
-	class IComponent;
+	// Basic typedef for 64 different kinds of components now, 
+	// can be abstracted if needed to support e.g. larger array
+	// for more bits
+	typedef uint64_t ComponentMask;
+	typedef size_t ComponentTypeId;
+	typedef size_t ComponentId;
 
-	template <class Type>
-	constexpr std::type_index typeidx()
-	{
-		return std::type_index(typeid(Type));
-	}
-
-	typedef size_t EntityID;
-
-	class Entity
-	{
-	public:
-		template <class ComponentType>
-		ComponentType* getComponent()
-		{
-			if (m_components.find(typeidx<ComponentType>()) != m_components.end())
-			{
-				return static_cast<ComponentType*>(m_components[typeidx<ComponentType>()]);
-			}
-			else
-			{
-				return nullptr;
-			}
-		}
-
-		template <class ComponentType>
-		void addComponent(ComponentType* component)
-		{
-			assert(m_components.find(typeidx<ComponentType>()) == m_components.end());
-			m_components[typeidx<ComponentType>()] = component;
-			component->m_owningEntity = this;
-		}
-
-		template <class ComponentType>
-		void removeComponent(ComponentType* component)
-		{
-			assert(m_components.find(typeidx<ComponentType>()) != m_components.end());
-			assert(m_components[typeidx<ComponentType>()] == component);
-			m_components[typeidx<ComponentType>()] = nullptr;
-			component->m_owningEntity = nullptr;
-		}
-
-		decltype(auto) begin()
-		{
-			return m_components.begin();
-		}
-
-		decltype(auto) end()
-		{
-			return m_components.end();
-		}
-
-	private:
-		std::unordered_map<std::type_index, IComponent*> m_components;
-	};
-
-	class IComponent
-	{
-	public:
-		virtual ~IComponent() {}
-
-		virtual void init(IResource* resource) {}
-
-		template <class ComponentType>
-		ComponentType* sibling()
-		{
-			return m_owningEntity->getComponent<ComponentType>();
-		}
-
-		Entity* m_owningEntity;
-	};
+	//template <class Type>
+	//constexpr std::type_index typeidx()
+	//{
+	//	return std::type_index(typeid(Type));
+	//}
 
 	struct World;
+
+	struct Entity
+	{
+		typedef size_t Id;
+
+		Entity(World* world) {}
+
+		Id m_id;
+
+		ComponentMask m_componentMask;
+
+		World* m_worldIn;
+	};
 
 	class ISystem
 	{
 	public:
 		virtual ~ISystem() {}
-		virtual void update(World* world, float dt) = 0;
+		virtual void tick(World* world, float dt) = 0;
+	};
+
+	struct ComponentBase
+	{
+		enum
+		{
+			MaxComponentTypes = (sizeof(ComponentMask) * CHAR_BIT)
+		};
+
+		static size_t s_componentTypeCounter;
+	};
+
+	uint64_t ComponentBase::s_componentTypeCounter = 0;
+
+	template <typename DerivedComponent>
+	struct Component
+	{
+		static ComponentTypeId getType() // Type can be used to lookup eg object pools in world
+		{
+			static ComponentBase::Type type = ComponentBase::s_componentTypeCounter++;
+			assert(typeCount < ComponentBase::MaxComponentTypes);
+			return type;
+		}
+
+		static ComponentMask getMask()
+		{
+			static ComponentMask mask = 1 << getType();
+			return mask;
+		}
+	};
+
+	template <typename T>
+	struct is_derived_component
+	{
+		template <typename U> static std::true_type check(decltype(U::getMask)*);
+		template <typename> static std::false_type check(...);
+
+		typedef decltype(check<T>(0)) result;
+
+	public:
+		static const bool value = result::value;
 	};
 
 	// Opaque resource type passed around to initialize component
@@ -100,130 +92,135 @@ namespace Phoenix
 		virtual ~IResource() {}
 	};
 
-	// Possible structure
-	// Components should be created and stored in the primary systems that tick them.
-	// This ensures that they can be linearly accessed.
-	//
-	// Common components that are accessed in most systems should probably be base members of Entity.
-	// We can figure which should be that later by profiling.
-	//
-	// Components that are rarely looked up by other systems can just be accessed via a GetComponent function.
-
-	typedef IComponent*(*ComponentCreatorFptr)(IResource*);
-
-	struct World
-	{
-		void registerSystem(ISystem* system)
-		{
-			m_systems.push_back(system);
-		}
-
-		template <class ComponentType>
-		void registerComponentFactory(ComponentCreatorFptr creator)
-		{
-			assert(m_creatorFptrs.find(typeidx<ComponentType>()) == ComponentCreatorFptr.end());
-			components[typeidx<ComponentType>()] = creator;
-		}
-
-		template <class ComponentType>
-		ComponentType* createComponent(IResource* resource)
-		{
-			return static_cast<ComponentType>(m_creatorFptrs[typeidx<ComponentType>()](resource));
-		}
-
-		EntityID acquireEntity()
-		{
-			if (m_releasedEntities.size() > 0)
-			{
-				EntityID e = m_releasedEntities.top;
-				m_releasedEntities.pop();
-				return e;
-			}
-			else
-			{
-				m_entities.emplace_back();
-				return m_entities.size() - 1;
-			}
-		}
-
-		void releaseEntity(EntityID id)
-		{
-			Entity& e = m_entities[id];
-			for (auto& pair : e)
-			{
-				IComponent* component = pair.second;
-				e.removeComponent(component);
-			}
-		}
-
-		std::vector<ISystem*> m_systems;
-
-		std::vector<Entity> m_entities;
-
-		std::stack<EntityID> m_releasedEntities; // Used to recycle entities
-
-		std::unordered_map<std::type_index, ComponentCreatorFptr> m_creatorFptrs;
-	};
-
-	class Engine
-	{
-		void init();
-		void exit();
-		void update(float dt, World* world);
-	};
-
-	// Test impl
-
-	class TransformComponent : public IComponent
+	// TODO: Ensure alignment of first alloc per chunk. 
+	class ChunkArrayBase
 	{
 	public:
-		Vec3 position;
-		Vec3 rotation;
-		Vec3 scale;
+		ChunkArrayBase(size_t elemSizeBytes, size_t chunkSizeBytes)
+			: m_sizePerAllocBytes(elemSizeBytes)
+			, m_chunkSizeBytes(chunkSizeBytes)
+			, m_lastAllocIdx(0)
+		{
+		}
+
+		ChunkArrayBase(size_t initialCapacity, size_t elemSizeBytes, size_t chunkSizeBytes)
+			: m_sizePerAllocBytes(elemSizeBytes)
+			, m_chunkSizeBytes(chunkSizeBytes)
+			, m_lastAllocIdx(0)
+		{
+			expandTo(initialCapacity);
+		}
+
+		void expandTo(size_t numElements)
+		{
+			while (capacity() < numElements)
+			{
+				m_chunks.push_back(new StackAllocator(m_chunkSizeBytes));
+			}
+		}
+
+		size_t capacity() const 
+		{
+			return (m_chunkSizeBytes / m_sizePerAllocBytes) * m_chunks.size();
+		}
+
+		void* add()
+		{
+
+		}
+
+		void* operator[](size_t idx)
+		{
+		
+		}
+
+	private:
+		std::vector<StackAllocator*> m_chunks;
+		size_t m_sizePerAllocBytes;
+		size_t m_chunkSizeBytes;
+		size_t m_lastAllocIdx;
 	};
 
-	class DirectionalLightComponent : public IComponent 
+	
+	template<typename T>
+	class ChunkArray : public ChunkArrayBase
 	{
 	public:
-		Vec3 m_color;
-		Vec3 m_direction;
+		class ChunkArray(size_t elementsPerChunk) 
+			: ChunkArrayBase(sizeof(T), elementsPerChunk * sizeof(T))
+		{}
+
+		class ChunkArray(size_t initialCapacity, size_t elementsPerChunk)
+			: ChunkArrayBase(initialCapacity, sizeof(T), elementsPerChunk * sizeof(T))
+		{}	
 	};
 
-	// overwatch
+	struct World {};
 
-	//class EntityAdmin
+	//struct World
 	//{
-	//	array<System*>
-	//	hash_map<EntityID, Entity*>
-	//	object_pool<Component>*
-	//	array<Component*>*
-	//};
-
-	//class System 
-	//{
-	//	virtual ~System();
-	//	void Update(f32);
-	//	void NotifyComponent(Component*)
-	//};
-
-	//class Entity
-	//{
-	//	EntityID
-	//	array<Component*>
-	//	resourceHandle
-	//};
-
-	//class Component
-	//{
-	//	virtual ~Component();
-	//	void Create(resource*)
-	//};
-
-	//void SomeSystem::Update(EntityAdmin* world)
-	//{
-	//	for (SomeComponent* c : ComponentItr<SomeComponent>(world))
+	//	template <typename Comp>
+	//	void registerComponentType()
 	//	{
-	//		doAthing(c, c->Sibling<AnotherComponent>())
+	//		static_assert(is_derived_component<Comp>::value, "Registered component types need to inherit from Component<T>");
+
+	//		ComponentTypeId type = Comp::getType();
+
+	//		if (m_componentPools.size() < type)
+	//		{
+	//			auto pool = std::make_unique<ChunckedPool<Comp>>();
+	//			m_componentPools.push_back(pool);
+	//		}
 	//	}
-	//}
+
+	//	template <typename Comp>
+	//	Comp* createComponent(Entity::Id entityId)
+	//	{
+	//		Entity* entity = getEntity(entityId);
+	//		assert(entity != nullptr);
+
+	//		ChunckedPool<Comp>* pool = getComponentPool<Comp>();
+	//		// TODO: allocate component
+	//		// TODO: register the component on the entity
+	//		// TODO: return the component
+	//	}
+
+	//	template <typename Comp>
+	//	ChunckedPool<Comp>* getComponentPool()
+	//	{
+	//		ComponentTypeId type =  ComponentTypeId::getType();
+	//		assert(m_componentPools.size() < type);
+	//		return static_cast<ChunckedPool<Comp>*>(m_componentPools[type].get());
+	//	}
+
+	//	Entity::Id createEntity()
+	//	{
+	//		// TODO: Check if we can reuse any components
+	//		// TODO: if not, allocate a new one, creating 
+	//		// the id by incrementing a running counter
+	//	}
+
+	//	void destroyEntity(Entity::Id entityId)
+	//	{
+	//		// TODO: Release all owned components
+	//		// TODO: return the entity to reusable list
+	//	}
+
+	//	Entity* getEntity(Entity::Id entityId)
+	//	{
+	//		if (m_entityMap.find(entityId) != m_entityMap.end())
+	//		{
+	//			return &m_entityMap[entityId];
+	//		}
+	//		else
+	//		{
+	//			return nullptr;
+	//		}
+	//	}
+
+	//	std::vector<Entity> m_entities;
+	//	std::unordered_map<Entity::Id, Entity> m_entityMap; 
+	//	std::vector<std::unique_ptr<ChunkArray>> m_componentPools; // Should probably use unique ptr, so we dont have destruction and copy construction
+	//};
 }
+
