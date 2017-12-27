@@ -24,7 +24,7 @@ namespace Phoenix
 
 	StackAllocator::StackAllocator(size_t size)
 	{
-		m_start = reinterpret_cast<char*>(operator new(size));
+		m_start = static_cast<char*>(operator new(size));
 		m_end = m_start + size;
 		m_top = m_start;
 	}
@@ -74,7 +74,7 @@ namespace Phoenix
 	{
 		assert(memory != nullptr);
 
-		char* alignedMem = reinterpret_cast<char*>(memory);
+		char* alignedMem = static_cast<char*>(memory);
 
 		assert((m_start <= alignedMem && m_end >= alignedMem));
 

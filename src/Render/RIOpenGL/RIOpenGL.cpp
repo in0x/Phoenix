@@ -35,7 +35,7 @@ namespace Phoenix
 
 		virtual bool wantsToClose() override
 		{
-			return glfwWindowShouldClose(m_glfwWindow);
+			return glfwWindowShouldClose(m_glfwWindow) == GLFW_TRUE;
 		}
 
 		GLFWwindow* m_glfwWindow;

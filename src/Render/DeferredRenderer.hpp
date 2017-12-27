@@ -23,7 +23,7 @@ namespace Phoenix
 	class DeferredRenderer
 	{
 	public:
-		DeferredRenderer(IRIDevice* renderDevice, size_t gBufferWidth, size_t gBufferHeight);
+		DeferredRenderer(IRIDevice* renderDevice, uint32_t gBufferWidth, uint32_t gBufferHeight);
 
 		void setupGBufferPass(IRIContext* context);
 
