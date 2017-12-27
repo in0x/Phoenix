@@ -15,6 +15,24 @@
 
 #include "Core/GameFramework/ECS.hpp"
 
+namespace Phoenix
+{
+	struct CA : public Component<CA>
+	{
+
+	};
+
+	struct CB : public Component<CB>
+	{
+
+	};
+
+	struct CC : public Component<CC>
+	{
+
+	};
+}
+
 int main(int argc, char** argv)
 {
 	using namespace Phoenix;
@@ -55,7 +73,7 @@ int main(int argc, char** argv)
 
 	Matrix4 viewTf = lookAtRH(Vec3(0.f, 0.f, 7.f), Vec3(0.f, 0.f, 0.f), Vec3(0.f, 1.f, 0.f));
 	Matrix4 projTf = perspectiveRH(70.f, (float)config.width / (float)config.height, 0.1f, 100.f);
-	
+
 	renderContext->setDepthTest(EDepth::Enable);
 
 	DeferredRenderer renderer(renderDevice, config.width, config.height);
@@ -73,12 +91,32 @@ int main(int argc, char** argv)
 	DirectionalLight lightGreen;
 	lightGreen.m_direction = Vec3(0.f, 1.f, 0.f);
 	lightGreen.m_color = Vec3(0.f, 1.f, 0.f);
-	
+
 	// ---------------------------------------
 
-	ChunkArray<Vec3> testArr(1, 4);
+	World world;
+	world.registerComponentType<CA>();
+	world.registerComponentType<CB>();
 
-	assert(true);
+	Entity::Id e = world.createEntity();
+	Entity* eptr = world.getEntity(e);
+
+	eptr->addComponent<CA>();
+	eptr->addComponent<CB>();
+
+	bool bHasComps = eptr->hasComponents<CA, CC>();
+	assert(!bHasComps);
+
+	bHasComps = eptr->hasComponents<CA, CB>();
+	assert(bHasComps);
+
+	bHasComps = eptr->hasComponents<CB>();
+	assert(bHasComps);
+
+	WorldIterator<CA, CB> iter(&world);
+
+	eptr->removeComponent<CA>();
+	eptr->removeComponent<CB>();
 
 	// ---------------------------------------
 

@@ -6,17 +6,12 @@
 #include <unordered_map>
 #include <memory>
 
-#include <Memory/StackAllocator.hpp>
-
 namespace Phoenix
 {
-	// Basic typedef for 64 different kinds of components now, 
-	// can be abstracted if needed to support e.g. larger array
-	// for more bits
 	typedef uint64_t ComponentMask;
 
 	typedef size_t ComponentTypeId;
-	
+
 	class ComponentHandle
 	{
 	public:
@@ -67,9 +62,10 @@ namespace Phoenix
 		void registerComponent(ComponentHandle handle)
 		{
 			assert(m_componentIds.find(Comp::getType()) == m_componentIds.end());
-			
+
 			m_componentIds.emplace(Comp::getType(), handle);
 			m_componentMask |= Comp::getMask();
+
 		}
 
 		template <typename Comp>
@@ -91,6 +87,14 @@ namespace Phoenix
 		bool hasComponent()
 		{
 			return (m_componentMask & Comp::getMask()) == Comp::getMask();
+		}
+
+		template <typename ...Comps>
+		bool hasComponents()
+		{
+			ComponentMask mask = 0;
+			[&](...) {}((mask |= Comps::getMask())...);
+			return (m_componentMask & mask) == mask;
 		}
 
 		template <typename Comp>
@@ -144,9 +148,9 @@ namespace Phoenix
 	uint64_t ComponentBase::s_componentTypeCounter = 0;
 
 	template <typename Derived>
-	struct Component : public ComponentBase 
+	struct Component : public ComponentBase
 	{
-		static ComponentTypeId getType() // Type can be used to lookup eg object pools in world
+		static ComponentTypeId getType()
 		{
 			static ComponentTypeId type = ComponentBase::s_componentTypeCounter++;
 			assert(type < ComponentBase::MaxComponentTypes);
@@ -173,6 +177,18 @@ namespace Phoenix
 	public:
 		static const bool value = result::value;
 	};
+
+	//template <typename T>
+	//constexpr bool contains(ComponentMask& mask) 
+	//{
+	//	return false; 
+	//}
+
+	//template <typename First, typename... Rest>
+	//constexpr bool contains(ComponentMask& mask)
+	//{
+	//	mask |=
+	//}
 
 	// Opaque resource type passed around to initialize component
 	class IResource
@@ -255,13 +271,13 @@ namespace Phoenix
 	class ChunkArray : public ChunkArrayBase
 	{
 	public:
-		class ChunkArray(size_t elementsPerChunk) 
+		class ChunkArray(size_t elementsPerChunk)
 			: ChunkArrayBase(sizeof(T), elementsPerChunk * sizeof(T))
 		{}
 
 		class ChunkArray(size_t elementsPerChunk, size_t initialCapacity)
 			: ChunkArrayBase(sizeof(T), elementsPerChunk * sizeof(T), initialCapacity)
-		{}	
+		{}
 
 		~ChunkArray()
 		{
@@ -282,7 +298,7 @@ namespace Phoenix
 		{
 			return new (alloc()) T(ctorArgs...);
 		}
-	}; 
+	};
 
 	struct World
 	{
@@ -313,6 +329,8 @@ namespace Phoenix
 
 			ChunkArray<Comp>* pool = getComponentPool<Comp>();
 			Comp* comp = pool->add(std::forward(ctorArgs)...);
+			comp->m_usingEntity = entityId;
+
 			entity->registerComponent<Comp>(pool->size());
 			return comp;
 		}
@@ -322,7 +340,7 @@ namespace Phoenix
 		{
 			Entity* entity = getEntity(entityId);
 			assert(entity != nullptr);
-			
+
 			ChunkArray<Comp>* pool = getComponentPool<Comp>();
 			Comp* comp = pool[compId];
 			return comp;
@@ -333,10 +351,6 @@ namespace Phoenix
 		{
 			Entity* entity = getEntity(entityId);
 			entity->unregisterComponent<Comp>();
-			// For now, we just leave the component alive. Linearly iterating components while acessing multiple
-			// in one system is pretty difficult, so we're just gonna tick entities with the right mask for now.
-			// This approach can be probably be sped up by caching the correct entity sets and patching those when
-			// the world is changed.
 		}
 
 		template <typename Comp>
@@ -350,13 +364,13 @@ namespace Phoenix
 		Entity::Id createEntity()
 		{
 			// TODO: Check if we can reuse any entities
-			
+
 			Entity::Id id = m_entityIdCounter++;
 			assert(id < std::numeric_limits<Entity::Id>::max());
-			
+
 			m_entities.emplace_back(id, this);
 			m_entityMap.emplace(id, &m_entities.back());
-			
+
 			return id;
 		}
 
@@ -377,17 +391,33 @@ namespace Phoenix
 
 		std::vector<Entity> m_entities;
 		uint64_t m_entityIdCounter;
-		std::unordered_map<Entity::Id, Entity*> m_entityMap; 
+		std::unordered_map<Entity::Id, Entity*> m_entityMap;
 		std::vector<std::unique_ptr<ChunkArrayBase>> m_componentPools;
 	};
 
 	template <typename ...Components>
 	class WorldIterator
 	{
-		// TODO Build a combined mask from the types of Components
-		// TODO Iterate each entity
-		// TODO Check if the entity statisfies the mask
-		// If yes, stop, else iterate again
+	public:
+		WorldIterator(World* world)
+			: m_componentMask(0)
+			, m_location(0)
+		{
+			[&](...) {}((m_componentMask |= Components::getMask())...);
+		}
+
+		void operator++()
+		{
+			while (!m_world->m_entities[m_location].hasComponents<Components...>() && m_location < m_world->m_entityIdCounter)
+			{
+				m_location++;
+			}
+		}
+	
+	private:
+		World* m_world;
+		size_t m_location;
+		ComponentMask m_componentMask;
 	};
 }
 
