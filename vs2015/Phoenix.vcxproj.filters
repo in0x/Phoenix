@@ -154,14 +154,20 @@
     <ClInclude Include="..\src\Core\Engine.hpp">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Core\GameFramework\ECS.hpp">
-      <Filter>Core\GameFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Core\GameFramework\IComponent.hpp">
-      <Filter>Core\GameFramework</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Core\GameFramework\Entity.hpp">
       <Filter>Core\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\GameFramework\World.hpp">
+      <Filter>Core\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\GameFramework\Component.hpp">
+      <Filter>Core\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\GameFramework\System.hpp">
+      <Filter>Core\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Memory\ChunkArray.hpp">
+      <Filter>Memory</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

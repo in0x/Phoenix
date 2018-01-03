@@ -183,9 +183,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Core\Engine.hpp" />
-    <ClInclude Include="..\src\Core\GameFramework\ECS.hpp" />
+    <ClInclude Include="..\src\Core\GameFramework\Component.hpp" />
     <ClInclude Include="..\src\Core\GameFramework\Entity.hpp" />
-    <ClInclude Include="..\src\Core\GameFramework\IComponent.hpp" />
+    <ClInclude Include="..\src\Core\GameFramework\System.hpp" />
+    <ClInclude Include="..\src\Core\GameFramework\World.hpp" />
     <ClInclude Include="..\src\Core\Mesh.hpp" />
     <ClInclude Include="..\src\Core\PerspectiveCamera.hpp" />
     <ClInclude Include="..\src\Core\Shader.hpp" />
@@ -210,6 +211,7 @@
     <ClInclude Include="..\src\Math\Vec2.hpp" />
     <ClInclude Include="..\src\Math\Vec3.hpp" />
     <ClInclude Include="..\src\Math\Vec4.hpp" />
+    <ClInclude Include="..\src\Memory\ChunkArray.hpp" />
     <ClInclude Include="..\src\Memory\FreeList.hpp" />
     <ClInclude Include="..\src\Memory\MemUtil.hpp" />
     <ClInclude Include="..\src\Memory\PoolAllocator.hpp" />

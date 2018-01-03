@@ -13,25 +13,7 @@
 #include "Render/RIOpenGL/RIOpenGL.hpp"
 #include "Render/DeferredRenderer.hpp"
 
-#include "Core/GameFramework/ECS.hpp"
-
-namespace Phoenix
-{
-	struct CA : public Component<CA>
-	{
-
-	};
-
-	struct CB : public Component<CB>
-	{
-
-	};
-
-	struct CC : public Component<CC>
-	{
-
-	};
-}
+#include "Core/GameFramework/World.hpp"
 
 int main(int argc, char** argv)
 {
@@ -92,33 +74,22 @@ int main(int argc, char** argv)
 	lightGreen.m_direction = Vec3(0.f, 1.f, 0.f);
 	lightGreen.m_color = Vec3(0.f, 1.f, 0.f);
 
-	// ---------------------------------------
+	// ------------------------------------
 
 	World world;
-	world.registerComponentType<CA>();
-	world.registerComponentType<CB>();
+
+	struct TestC : Component<TestC>
+	{};
+
+	world.registerComponentType<TestC>();
 
 	Entity::Id e = world.createEntity();
-	Entity* eptr = world.getEntity(e);
+	
+	world.addComponent<TestC>(e);
+	//world.getComponent<TestC>(); Requiring ID for getting here makes no sense
+	world.removeComponent<TestC>(e);
 
-	eptr->addComponent<CA>();
-	eptr->addComponent<CB>();
-
-	bool bHasComps = eptr->hasComponents<CA, CC>();
-	assert(!bHasComps);
-
-	bHasComps = eptr->hasComponents<CA, CB>();
-	assert(bHasComps);
-
-	bHasComps = eptr->hasComponents<CB>();
-	assert(bHasComps);
-
-	WorldIterator<CA, CB> iter(&world);
-
-	eptr->removeComponent<CA>();
-	eptr->removeComponent<CB>();
-
-	// ---------------------------------------
+	// ------------------------------------
 
 	while (!window->wantsToClose())
 	{
