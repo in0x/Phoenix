@@ -164,7 +164,7 @@ namespace Phoenix
 		Points,
 		Lines,
 		Triangles,
-		Quads
+		TriangleStrips
 	};
 
 	enum class EDepth

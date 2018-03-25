@@ -7,7 +7,7 @@
 #include <Render/RIDevice.hpp>
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "../STB/stb_image.h"
+#include <ThirdParty/STB/stb_image.h>
 
 namespace Phoenix
 {

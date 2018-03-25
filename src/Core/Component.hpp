@@ -65,6 +65,8 @@ namespace Phoenix
 
 	uint64_t ComponentBase::s_componentTypeCounter = 0;
 
+	struct World;
+
 	template <typename Derived>
 	struct Component : public ComponentBase
 	{
@@ -81,7 +83,14 @@ namespace Phoenix
 			return mask;
 		}
 
+		template <typename SiblingType>
+		SiblingType* sibling()
+		{
+			return m_worldIn->getComponent(m_usingEntity);
+		}
+
 		uint64_t m_usingEntity;
+		World* m_worldIn;
 	};
 
 	template <typename T>

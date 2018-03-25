@@ -1,7 +1,7 @@
 #include "DeferredRenderer.hpp"
 
 #include <Core/Shader.hpp>
-#include <Core/WorldObject.hpp>
+//#include <Core/WorldObject.hpp>
 #include <Core/PerspectiveCamera.hpp>
 
 #include <Render/RIDevice.hpp>
@@ -114,6 +114,6 @@ namespace Phoenix
 		context->bindUniform(m_uniforms.lightDirEye, &lightDirEye);
 		context->bindUniform(m_uniforms.lightColor, &light.m_color);
 
-		context->drawLinear(EPrimitive::Triangles, 3, 0);
+		context->drawLinear(EPrimitive::TriangleStrips, 4, 0);
 	}
 }

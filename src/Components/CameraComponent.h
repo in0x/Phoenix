@@ -1,13 +1,15 @@
 #pragma once
 
+#pragma once
+
+#include <Core/Component.hpp>
 #include <Math/PhiMath.hpp>
 
 namespace Phoenix
 {
-	class PerspectiveCamera
+	struct CameraComponent : Component<CameraComponent>
 	{
-	public:
-		PerspectiveCamera(float horizontalFOV, float screenWidth, float screenHeight, float near, float far)
+		CameraComponent(float horizontalFOV, float screenWidth, float screenHeight, float near, float far)
 			: m_horizontalFOV(horizontalFOV)
 			, m_screenWidth(screenWidth)
 			, m_screenHeight(screenHeight)

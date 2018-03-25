@@ -2,7 +2,7 @@
 
 namespace Phoenix
 {
-	class World;
+	struct World;
 
 	class ISystem
 	{

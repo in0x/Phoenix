@@ -43,6 +43,7 @@ namespace Phoenix
 			return s;
 		}
 
+	protected:
 		void* at(size_t idx)
 		{
 			assert(idx <= m_lastAllocIdx);

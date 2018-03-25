@@ -6,14 +6,17 @@
 #include "Core/Logger.hpp"
 #include "Core/Windows/PlatformWindows.hpp"
 
-#include "Core/WorldObject.hpp"
-
 #include "Math/PhiMath.hpp"
 
 #include "Render/RIOpenGL/RIOpenGL.hpp"
 #include "Render/DeferredRenderer.hpp"
 
-#include "Core/GameFramework/World.hpp"
+#include "Core/World.hpp"
+#include "Components/StaticMeshComponent.hpp"
+#include "Components/MaterialComponent.hpp"
+#include "Components/TransformComponent.hpp"
+#include "Components/DirectionalLightComponent.hpp"
+#include "Components/DeferredRenderPrototype.hpp"
 
 int main(int argc, char** argv)
 {
@@ -49,57 +52,51 @@ int main(int argc, char** argv)
 
 	renderInterface.setWindowToRenderTo(window);
 
-	WorldObject entity;
-	entity.m_mesh = loadRenderMesh("Models/Fox/RedFox.obj", renderDevice);
-	entity.m_material = Material(Vec3(1.f, 1.f, 1.f), Vec3(0.3f, 0.3f, 0.3f), 100.f);
-
-	Matrix4 viewTf = lookAtRH(Vec3(0.f, 0.f, 7.f), Vec3(0.f, 0.f, 0.f), Vec3(0.f, 1.f, 0.f));
-	Matrix4 projTf = perspectiveRH(70.f, (float)config.width / (float)config.height, 0.1f, 100.f);
-
-	renderContext->setDepthTest(EDepth::Enable);
-
-	DeferredRenderer renderer(renderDevice, config.width, config.height);
-	renderer.setViewMatrix(viewTf);
-	renderer.setProjectionMatrix(projTf);
-
-	DirectionalLight lightRed;
-	lightRed.m_direction = Vec3(0.f, -1.f, 0.f);
-	lightRed.m_color = Vec3(0.3f, 0.f, 0.f);
-
-	DirectionalLight lightBlue;
-	lightBlue.m_direction = Vec3(1.f, 0.f, 0.f);
-	lightBlue.m_color = Vec3(0.f, 0.f, 1.f);
-
-	DirectionalLight lightGreen;
-	lightGreen.m_direction = Vec3(0.f, 1.f, 0.f);
-	lightGreen.m_color = Vec3(0.f, 1.f, 0.f);
-
-	// ------------------------------------
-
 	World world;
 
-	struct TestC : Component<TestC>
-	{};
-
-	world.registerComponentType<TestC>();
+	world.registerComponentType<TransformComponent>();
 
 	Entity::Id e = world.createEntity();
 	
-	world.addComponent<TestC>(e);
-	//world.getComponent<TestC>(); Requiring ID for getting here makes no sense
-	world.removeComponent<TestC>(e);
+	world.addComponent<TransformComponent>(e);
+	world.removeComponent<TransformComponent>(e);
 
-	// ------------------------------------
+	world.addSingletonComponent<DeferredRenderComponent>();
+
+	//WorldObject entity;
+	//entity.m_mesh = loadRenderMesh("Models/Fox/RedFox.obj", renderDevice);
+	//entity.m_material = Material(Vec3(1.f, 1.f, 1.f), Vec3(0.3f, 0.3f, 0.3f), 100.f);
+
+	//Matrix4 viewTf = lookAtRH(Vec3(0.f, 0.f, 7.f), Vec3(0.f, 0.f, 0.f), Vec3(0.f, 1.f, 0.f));
+	//Matrix4 projTf = perspectiveRH(70.f, (float)config.width / (float)config.height, 0.1f, 100.f);
+
+	//renderContext->setDepthTest(EDepth::Enable);
+
+	//DeferredRenderer renderer(renderDevice, config.width, config.height);
+	//renderer.setViewMatrix(viewTf);
+	//renderer.setProjectionMatrix(projTf);
+
+	//DirectionalLight lightRed;
+	//lightRed.m_direction = Vec3(0.f, -1.f, 0.f);
+	//lightRed.m_color = Vec3(0.3f, 0.f, 0.f);
+
+	//DirectionalLight lightBlue;
+	//lightBlue.m_direction = Vec3(1.f, 0.f, 0.f);
+	//lightBlue.m_color = Vec3(0.f, 0.f, 1.f);
+
+	//DirectionalLight lightGreen;
+	//lightGreen.m_direction = Vec3(0.f, 1.f, 0.f);
+	//lightGreen.m_color = Vec3(0.f, 1.f, 0.f);
 
 	while (!window->wantsToClose())
 	{
-		renderer.setupGBufferPass(renderContext);
-		renderer.fillGBuffer(entity, renderContext);
+		//renderer.setupGBufferPass(renderContext);
+		//renderer.fillGBuffer(entity, renderContext);
 
-		renderer.setupLightPass(renderContext);
-		renderer.drawLight(lightRed, renderContext);
-		renderer.drawLight(lightBlue, renderContext);
-		renderer.drawLight(lightGreen, renderContext);
+		//renderer.setupLightPass(renderContext);
+		//renderer.drawLight(lightRed, renderContext);
+		//renderer.drawLight(lightBlue, renderContext);
+		//renderer.drawLight(lightGreen, renderContext);
 
 		renderContext->endPass();
 

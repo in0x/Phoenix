@@ -24,8 +24,8 @@ namespace Phoenix
 			return GL_LINES;
 		case EPrimitive::Triangles:
 			return GL_TRIANGLES;
-		case EPrimitive::Quads:
-			return GL_QUADS;
+		case EPrimitive::TriangleStrips:
+			return GL_TRIANGLE_STRIP;
 		default:
 			assert(false);
 			return GL_INVALID_ENUM;

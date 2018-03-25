@@ -6,8 +6,8 @@
 #include "RIOpenGLResourceStore.hpp"
 
 #include <Render/RenderWindow.hpp>
-#include <glfw/glfw3.h>
-#include <glew/glew.h>
+#include <ThirdParty/glfw/glfw3.h>
+#include <ThirdParty/glew/glew.h>
 #include <Core/Logger.hpp>
 
 #include <vector>

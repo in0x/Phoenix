@@ -22,12 +22,6 @@
     <ClInclude Include="..\src\Core\Windows\PlatformWindows.hpp">
       <Filter>Core\Windows</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\STB\stb_easy_font.h">
-      <Filter>STB</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\STB\stb_image.h">
-      <Filter>STB</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Core\Texture.hpp">
       <Filter>Core</Filter>
     </ClInclude>
@@ -136,9 +130,6 @@
     <ClInclude Include="..\src\Math\Vec4.hpp">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Core\WorldObject.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Render\DeferredRenderer.hpp">
       <Filter>Render</Filter>
     </ClInclude>
@@ -148,26 +139,47 @@
     <ClInclude Include="..\src\Core\Shader.hpp">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Core\PerspectiveCamera.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Core\Engine.hpp">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Core\GameFramework\Entity.hpp">
-      <Filter>Core\GameFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Core\GameFramework\World.hpp">
-      <Filter>Core\GameFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Core\GameFramework\Component.hpp">
-      <Filter>Core\GameFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Core\GameFramework\System.hpp">
-      <Filter>Core\GameFramework</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Memory\ChunkArray.hpp">
       <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Material.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Component.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\System.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\World.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Components\DirectionalLightComponent.hpp">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Components\MaterialComponent.hpp">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Components\StaticMeshComponent.hpp">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Components\TransformComponent.hpp">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ThirdParty\STB\stb_image.h">
+      <Filter>ThirdParty\STB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ThirdParty\STB\stb_easy_font.h">
+      <Filter>ThirdParty\STB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Components\CameraComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Components\DeferredRenderPrototype.hpp">
+      <Filter>Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -256,9 +268,6 @@
     <ClCompile Include="..\src\Render\DeferredRenderer.cpp">
       <Filter>Render</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Core\WorldObject.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Core\Mesh.cpp" />
     <ClCompile Include="..\src\Core\Shader.cpp">
       <Filter>Core</Filter>
@@ -286,14 +295,20 @@
     <Filter Include="Core\Windows">
       <UniqueIdentifier>{84e9d105-d250-4006-b109-e33573068b95}</UniqueIdentifier>
     </Filter>
-    <Filter Include="STB">
-      <UniqueIdentifier>{982bc338-05d0-424a-a6eb-deec0681d852}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Render\RIOpenGL">
       <UniqueIdentifier>{adf98348-3d7d-47f0-aba7-539c004aea75}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\GameFramework">
-      <UniqueIdentifier>{9ecc9e16-61cf-4ad8-807b-edad8acbb856}</UniqueIdentifier>
+    <Filter Include="Components">
+      <UniqueIdentifier>{92429304-6b35-4c60-8e31-db7743e1a181}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Systems">
+      <UniqueIdentifier>{634c49b2-3878-45cd-9375-f227d9e6467d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty">
+      <UniqueIdentifier>{34ee9684-e2a0-46bd-9438-2e38a3301794}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty\STB">
+      <UniqueIdentifier>{982bc338-05d0-424a-a6eb-deec0681d852}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

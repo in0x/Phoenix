@@ -182,23 +182,27 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\Components\CameraComponent.h" />
+    <ClInclude Include="..\src\Components\DeferredRenderPrototype.hpp" />
+    <ClInclude Include="..\src\Components\DirectionalLightComponent.hpp" />
+    <ClInclude Include="..\src\Components\MaterialComponent.hpp" />
+    <ClInclude Include="..\src\Components\StaticMeshComponent.hpp" />
+    <ClInclude Include="..\src\Components\TransformComponent.hpp" />
+    <ClInclude Include="..\src\Core\Component.hpp" />
     <ClInclude Include="..\src\Core\Engine.hpp" />
-    <ClInclude Include="..\src\Core\GameFramework\Component.hpp" />
-    <ClInclude Include="..\src\Core\GameFramework\Entity.hpp" />
-    <ClInclude Include="..\src\Core\GameFramework\System.hpp" />
-    <ClInclude Include="..\src\Core\GameFramework\World.hpp" />
+    <ClInclude Include="..\src\Core\Material.hpp" />
     <ClInclude Include="..\src\Core\Mesh.hpp" />
-    <ClInclude Include="..\src\Core\PerspectiveCamera.hpp" />
     <ClInclude Include="..\src\Core\Shader.hpp" />
-    <ClInclude Include="..\src\Core\WorldObject.hpp" />
     <ClInclude Include="..\src\Core\FNVHash.hpp" />
     <ClInclude Include="..\src\Core\StringTokenizer.hpp" />
+    <ClInclude Include="..\src\Core\System.hpp" />
     <ClInclude Include="..\src\Core\Texture.hpp" />
     <ClInclude Include="..\src\Core\obj.hpp" />
     <ClInclude Include="..\src\Core\Clock.hpp" />
     <ClInclude Include="..\src\Core\Logger.hpp" />
     <ClInclude Include="..\src\Core\Windows\PhiWindowsInclude.hpp" />
     <ClInclude Include="..\src\Core\Windows\PlatformWindows.hpp" />
+    <ClInclude Include="..\src\Core\World.hpp" />
     <ClInclude Include="..\src\Math\EulerAngles.hpp" />
     <ClInclude Include="..\src\Math\MathStreamOverloads.hpp" />
     <ClInclude Include="..\src\Math\Matrix3.hpp" />
@@ -234,10 +238,10 @@
     <ClInclude Include="..\src\Render\RIResourceContainer.hpp" />
     <ClInclude Include="..\src\Render\RIResourceHandles.hpp" />
     <ClInclude Include="..\src\Render\RIResources.hpp" />
-    <ClInclude Include="..\src\STB\stb_easy_font.h" />
-    <ClInclude Include="..\src\STB\stb_image.h" />
     <ClInclude Include="..\src\Tests\MathTests.hpp" />
     <ClInclude Include="..\src\Tests\MemoryTests.hpp" />
+    <ClInclude Include="..\src\ThirdParty\STB\stb_easy_font.h" />
+    <ClInclude Include="..\src\ThirdParty\STB\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Core\Clock.cpp" />
@@ -248,7 +252,6 @@
     <ClCompile Include="..\src\Core\StringTokenizer.cpp" />
     <ClCompile Include="..\src\Core\Texture.cpp" />
     <ClCompile Include="..\src\Core\Windows\PlatformWindows.cpp" />
-    <ClCompile Include="..\src\Core\WorldObject.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\Math\MathStreamOverloads.cpp" />
     <ClCompile Include="..\src\Math\Matrix3.cpp" />

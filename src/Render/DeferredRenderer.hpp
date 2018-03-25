@@ -12,14 +12,6 @@ namespace Phoenix
 	class IRIContext;
 	class WorldObject;
 
-	// Placeholder.
-	class DirectionalLight
-	{
-	public:
-		Vec3 m_direction;
-		Vec3 m_color;
-	};
-
 	class DeferredRenderer
 	{
 	public:
@@ -31,7 +23,7 @@ namespace Phoenix
 
 		void setupLightPass(IRIContext* context);
 
-		void drawLight(const DirectionalLight& light, IRIContext* context);
+		//void drawLight(const DirectionalLight& light, IRIContext* context);
 
 		void setViewMatrix(const Matrix4& view);
 
