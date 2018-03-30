@@ -182,12 +182,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\Components\CameraComponent.h" />
-    <ClInclude Include="..\src\Components\DeferredRenderPrototype.hpp" />
-    <ClInclude Include="..\src\Components\DirectionalLightComponent.hpp" />
-    <ClInclude Include="..\src\Components\MaterialComponent.hpp" />
-    <ClInclude Include="..\src\Components\StaticMeshComponent.hpp" />
-    <ClInclude Include="..\src\Components\TransformComponent.hpp" />
     <ClInclude Include="..\src\Core\Component.hpp" />
     <ClInclude Include="..\src\Core\Engine.hpp" />
     <ClInclude Include="..\src\Core\Material.hpp" />

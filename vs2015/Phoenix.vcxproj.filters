@@ -157,29 +157,11 @@
     <ClInclude Include="..\src\Core\World.hpp">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Components\DirectionalLightComponent.hpp">
-      <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Components\MaterialComponent.hpp">
-      <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Components\StaticMeshComponent.hpp">
-      <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Components\TransformComponent.hpp">
-      <Filter>Components</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\ThirdParty\STB\stb_image.h">
       <Filter>ThirdParty\STB</Filter>
     </ClInclude>
     <ClInclude Include="..\src\ThirdParty\STB\stb_easy_font.h">
       <Filter>ThirdParty\STB</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Components\CameraComponent.h">
-      <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Components\DeferredRenderPrototype.hpp">
-      <Filter>Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
