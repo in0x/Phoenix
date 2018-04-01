@@ -182,21 +182,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\Core\Component.hpp" />
     <ClInclude Include="..\src\Core\Engine.hpp" />
     <ClInclude Include="..\src\Core\Material.hpp" />
     <ClInclude Include="..\src\Core\Mesh.hpp" />
     <ClInclude Include="..\src\Core\Shader.hpp" />
     <ClInclude Include="..\src\Core\FNVHash.hpp" />
     <ClInclude Include="..\src\Core\StringTokenizer.hpp" />
-    <ClInclude Include="..\src\Core\System.hpp" />
     <ClInclude Include="..\src\Core\Texture.hpp" />
     <ClInclude Include="..\src\Core\obj.hpp" />
     <ClInclude Include="..\src\Core\Clock.hpp" />
     <ClInclude Include="..\src\Core\Logger.hpp" />
     <ClInclude Include="..\src\Core\Windows\PhiWindowsInclude.hpp" />
     <ClInclude Include="..\src\Core\Windows\PlatformWindows.hpp" />
-    <ClInclude Include="..\src\Core\World.hpp" />
     <ClInclude Include="..\src\Math\EulerAngles.hpp" />
     <ClInclude Include="..\src\Math\MathStreamOverloads.hpp" />
     <ClInclude Include="..\src\Math\Matrix3.hpp" />

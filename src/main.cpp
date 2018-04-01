@@ -29,21 +29,6 @@
 		Put the ID in an enum for now -> simple and centralized
 	*/
 
-//	namespace Components
-//	{
-//		enum Type
-//		{
-//			Transform,
-//			StaticMesh,
-//			Material,
-//			DirectionalLight,
-//			Camera,
-//			Max
-//		};
-//
-//		static_assert(Components::Max <= 64, "Currently only 64 unique component types are allowed");
-//	};
-//
 //	struct CCamera
 //	{
 //		CCamera(float horizontalFOV, float screenWidth, float screenHeight, float near, float far)
@@ -115,7 +100,7 @@ namespace Phoenix
 	{
 		bool hasComponent(ComponentTypeId type)
 		{
-			return m_components.find(type) != m_components.end();
+			return m_components.find(type) != m_components.end() && m_components[type] != invalidHandle();
 		}
 
 		std::unordered_map<ComponentTypeId, ComponentHandle> m_components;
@@ -123,121 +108,176 @@ namespace Phoenix
 
 	struct World
 	{
-		~World()
-		{
-			for (ChunkArrayBase* allocator : m_componentAllocators)
-			{
-				delete allocator;
-			}
-		}
-
+		World() = default;
+		~World();
 		World(World&) = delete;
 		World(World&&) = delete;
+
+		void* getComponent(ComponentTypeId type, EntityHandle entityId);
+		void removeComponent(ComponentTypeId type, EntityHandle entityId);
+		bool isComponentTypeRegistered(ComponentTypeId type);
+		EntityHandle createEntity();
 
 		template <typename C>
 		void registerComponentType(size_t initialCapacity = 64)
 		{
+			static_assert(std::is_base_of<Component, C>::value, "Entity components need to derive from Component.");
+
 			ComponentTypeId componentType = getComponentTypeId<C>();
 
-			if (m_componentAllocators.capacity() < componentType)
+			if (isComponentTypeRegistered(componentType))
 			{
-				m_componentAllocators.resize(componentType);
-				ChunkArray<C>* pool = new ChunkArray<Comp>(initialCapacity);
-				m_componentPools.push_back(pool);
-			}
-		}
-
-		ComponentHandle getComponentHandle(ComponentTypeId componentType, EntityHandle entityId)
-		{
-			Entity& entity = m_entities[entityId];
-			
-			if (!entity.hasComponent(componentType))
-			{
-				return invalidHandle();
+				return;
 			}
 
-			return entity.m_components.at(componentType);
+			m_componentAllocators.resize(componentType + 1);
+			ChunkArray<C>* pool = new ChunkArray<C>(initialCapacity);
+			m_componentAllocators[componentType] = pool;
 		}
-		
-		void* getComponent(ComponentTypeId componentType, EntityHandle entityId)
+
+		template <typename C, typename ...CtorArgs>
+		C* addComponent(EntityHandle handle, CtorArgs... ctorArgs)
 		{
-			ComponentHandle handle = getComponentHandle(componentType, entityId);
-			
-			if (handle == invalidHandle())
+			Entity& entity = m_entities[handle];
+			ComponentTypeId type = getComponentTypeId<C>();
+
+			if (entity.hasComponent(type))
 			{
 				return nullptr;
 			}
 
-			return m_componentAllocators[componentType]->at(handle);
-		}
+			ChunkArray<C>* pool = (ChunkArray<C>*)(m_componentAllocators[type]);
+			C* comp = pool->add(std::forward(ctorArgs)...);
+			comp->m_world = this;
+			comp->m_entity = handle;
 
-		void removeComponent(ComponentTypeId componentType, EntityHandle entityId)
-		{
-			// TODO: deregister from entity
-			ComponentHandle handle = getComponentHandle(componentType, entityId);
-			
-			if (handle == invalidHandle())
-			{
-				return;
-			}
-			
-			ChunkArrayBase* allocator = m_componentAllocators[componentType];
-			allocator->swapAndPop(handle);
+			entity.m_components.emplace(type, handle);
+
+			return comp;
 		}
 
 	private:
+		template <typename C>
+		friend class ComponentIterator;
+
+		template <typename C>
+		ChunkArray<C>* getComponentAllocator()
+		{
+			ComponentTypeId type = getComponentTypeId<C>();
+			
+			if (!isComponentTypeRegistered(type))
+			{
+				return nullptr;
+			}
+
+			ChunkArrayBase* baseAlloc = m_componentAllocators[type];
+			return (ChunkArray<C>*)baseAlloc;
+		}
+
+		ComponentHandle getComponentHandle(ComponentTypeId componentType, EntityHandle entityId);
+		
 		std::vector<Entity> m_entities;
 		std::vector<ChunkArrayBase*> m_componentAllocators;
 		uint64_t m_numEntities;
 	};
-	
-	class Component
+
+	struct Component
 	{
-	public:
 		template <typename C>
 		C* sibling()
 		{
-			return m_owningWorld->getComponent(getComponentTypeId<C>(), m_owningEntity);
+			return static_cast<C*>(m_world->getComponent(getComponentTypeId<C>(), m_entity));
 		}
 
-	private:
-		World* m_owningWorld;
-		EntityHandle m_owningEntity;
+		World* m_world;
+		EntityHandle m_entity;
 	};
+
+	World::~World()
+	{
+		for (ChunkArrayBase* allocator : m_componentAllocators)
+		{
+			delete allocator;
+		}
+	}
+
+	ComponentHandle World::getComponentHandle(ComponentTypeId componentType, EntityHandle entityId)
+	{
+		Entity& entity = m_entities[entityId];
+
+		if (!entity.hasComponent(componentType))
+		{
+			return invalidHandle();
+		}
+
+		return entity.m_components.at(componentType);
+	}
+
+	void* World::getComponent(ComponentTypeId componentType, EntityHandle entityId)
+	{
+		ComponentHandle handle = getComponentHandle(componentType, entityId);
+
+		if (handle == invalidHandle())
+		{
+			return nullptr;
+		}
+
+		return m_componentAllocators[componentType]->at(handle);
+	}
+
+	void World::removeComponent(ComponentTypeId componentType, EntityHandle entityId)
+	{
+		ComponentHandle handle = getComponentHandle(componentType, entityId);
+
+		if (handle == invalidHandle())
+		{
+			return;
+		}
+
+		Entity& entity = m_entities[entityId];
+		entity.m_components[componentType] = invalidHandle();
+
+		ChunkArrayBase* allocator = m_componentAllocators[componentType];
+		allocator->swapAndPop(handle);
+
+		// Since we swapped the removed component with the most recently alloced, 
+		// we need to patch the handle map in the entity owning the swapped component. 
+		Component* swappedComp = (Component*)allocator->at(handle);
+		Entity& owningEntity = m_entities[swappedComp->m_entity];
+		owningEntity.m_components[componentType] = handle;
+	}
+
+	bool World::isComponentTypeRegistered(ComponentTypeId type)
+	{
+		return type < m_componentAllocators.size();
+	}
+
+	EntityHandle World::createEntity()
+	{
+		if (m_numEntities >= invalidHandle())
+		{
+			return invalidHandle(); 
+		}
+
+		m_entities.emplace_back();
+		return (EntityHandle)(m_entities.size() - 1);
+	}
 
 	template <typename C>
-	class ComponentIterator
+	class ComponentIterator : public ChunkArrayIterator<C> 
 	{
 	public:
-		ComponentIterator(World* world);
-
-		ComponentIterator begin();
-		ComponentIterator end();
-
-		bool operator ==(const ComponentIterator<C>& other);
-		bool operator !=(const ComponentIterator<C>& other) {return !(*this == other)};
-
-		void operator++();
-
-		C& operator*();
+		ComponentIterator(World* world) : ChunkArrayIterator(nullptr)
+		{
+			m_arr = world->getComponentAllocator<C>();
+		}
 	};
 
-	class ISystem
+	class CDirectionalLight : public Component
 	{
 	public:
-		ISystem(World* world) 
-			: m_world(world)
-		{}
-		
-		virtual ~ISystem() {}
-		virtual void tick(float dt) = 0;
-	
-	protected:
-		World* m_world;
-	};
+		CDirectionalLight() = default;
 
-	struct CDirectionalLight : public Component
-	{
 		Vec3 m_direction;
 		Vec3 m_color;
 	};
@@ -254,11 +294,17 @@ namespace Phoenix
 		float m_specularExp;
 	};
 
-	class DrawStaticMeshSystem : public ISystem
+	struct ISystem
 	{
-		virtual void tick(float dt) override
+		virtual ~ISystem() {}
+		virtual void tick(World* world, float dt) = 0;
+	};
+
+	struct DrawStaticMeshSystem : public ISystem
+	{
+		virtual void tick(World* world, float dt) override
 		{
-			for (CStaticMesh& mesh : ComponentIterator<CStaticMesh>(m_world))
+			for (CStaticMesh& mesh : ComponentIterator<CStaticMesh>(world))
 			{
 				CMaterial* material = mesh.sibling<CMaterial>();
 				// draw(mesh, material);
@@ -303,10 +349,18 @@ int main(int argc, char** argv)
 
 	// ECS Test
 	{
-		getComponentTypeId<CDirectionalLight>();
-
 		World world;
 
+		world.registerComponentType<CDirectionalLight>();
+		world.registerComponentType<CStaticMesh>();
+
+		EntityHandle e = world.createEntity();
+	
+		world.addComponent<CDirectionalLight>(e);
+
+		DrawStaticMeshSystem system;
+
+		system.tick(&world, 0);
 	}
 
 	while (!window->wantsToClose())

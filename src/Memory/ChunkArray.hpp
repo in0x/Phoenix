@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 namespace Phoenix
 {
 	// TODO: Ensure alignment of first alloc per chunk. 
@@ -9,7 +11,7 @@ namespace Phoenix
 		ChunkArrayBase(size_t elemSizeBytes, size_t chunkSizeBytes)
 			: m_sizePerAllocBytes(elemSizeBytes)
 			, m_chunkSizeBytes(chunkSizeBytes)
-			, m_lastAllocIdx(0)
+			, m_nextAllocIdx(0)
 			, m_elemsPerChunk(chunkSizeBytes / elemSizeBytes)
 		{
 		}
@@ -17,7 +19,7 @@ namespace Phoenix
 		ChunkArrayBase(size_t elemSizeBytes, size_t chunkSizeBytes, size_t initialCapacity)
 			: m_sizePerAllocBytes(elemSizeBytes)
 			, m_chunkSizeBytes(chunkSizeBytes)
-			, m_lastAllocIdx(0)
+			, m_nextAllocIdx(0)
 			, m_elemsPerChunk(chunkSizeBytes / elemSizeBytes)
 		{
 			expandTo(initialCapacity);
@@ -39,22 +41,30 @@ namespace Phoenix
 
 		size_t size() const
 		{
-			size_t s = (m_lastAllocIdx / m_elemsPerChunk) * m_elemsPerChunk + (m_lastAllocIdx % m_elemsPerChunk);
+			size_t s = (m_nextAllocIdx / m_elemsPerChunk) * m_elemsPerChunk + (m_nextAllocIdx % m_elemsPerChunk);
 			return s;
 		}
 
-	protected:
 		void* at(size_t idx)
 		{
-			assert(idx <= m_lastAllocIdx);
+			assert(idx <= m_nextAllocIdx);
 			return m_chunks[idx / m_elemsPerChunk] + (idx % m_elemsPerChunk) * m_sizePerAllocBytes;
 		}
 
 		void* alloc()
 		{
-			size_t next = m_lastAllocIdx++;
+			size_t next = m_nextAllocIdx++;
 			expandTo(next);
 			return at(next);
+		}
+
+		void swapAndPop(size_t idx)
+		{
+			void* toRemove = at(idx);
+			void* last = at(m_nextAllocIdx--);
+
+			memcpy(toRemove, last, m_sizePerAllocBytes);
+			memset(last, 0, m_sizePerAllocBytes);
 		}
 
 	private:
@@ -69,14 +79,18 @@ namespace Phoenix
 		std::vector<char*> m_chunks;
 		size_t m_sizePerAllocBytes;
 		size_t m_chunkSizeBytes;
-		size_t m_lastAllocIdx;
+		size_t m_nextAllocIdx;
 		size_t m_elemsPerChunk;
 	};
+
+	template <typename T>
+	class ChunkArrayIterator;
 
 	template<typename T>
 	class ChunkArray : public ChunkArrayBase
 	{
 	public:
+
 		class ChunkArray(size_t elementsPerChunk)
 			: ChunkArrayBase(sizeof(T), elementsPerChunk * sizeof(T))
 		{}
@@ -90,13 +104,18 @@ namespace Phoenix
 			size_t numAlloced = size();
 			for (size_t i = 0; i < numAlloced; ++i)
 			{
-				operator[](i)->~T();
+				operator[](i).~T();
 			}
 		}
 
-		T* operator[](size_t idx)
+		T& operator[](size_t idx)
 		{
-			return static_cast<T*>(at(idx));
+			return *static_cast<T*>(at(idx));
+		}
+
+		const T& operator[](size_t idx) const
+		{
+			return *static_cast<const T*>(at(idx));
 		}
 
 		template <typename ...CtorArgs>
@@ -104,5 +123,88 @@ namespace Phoenix
 		{
 			return new (alloc()) T(ctorArgs...);
 		}
+
+		size_t begin() const 
+		{
+			return 0;
+		}
+
+		size_t end() const
+		{
+			return size();
+		}
 	};
+
+	template <typename T>
+	class ChunkArrayIterator
+	{
+	public:
+		ChunkArrayIterator(ChunkArray<T>* arr)
+			: m_arr(arr)
+		{
+		}
+
+		bool operator==(const ChunkArrayIterator& other) const
+		{
+			return m_current == other.m_current;
+		}
+
+		bool operator!=(const ChunkArrayIterator& other) const
+		{
+			return !(*this == other);
+		};
+
+		bool operator==(size_t otherIdx) const
+		{
+			return m_current == otherIdx;
+		}
+
+		bool operator!=(size_t otherIdx) const
+		{
+			return !(*this == otherIdx);
+		}
+
+		void operator++()
+		{
+			m_current++;
+		}
+
+		T& operator*()
+		{
+			return m_arr->operator[](m_current);
+		}
+
+		const T& operator*() const
+		{
+			return m_arr->operator[](m_current);
+		}
+
+		ChunkArrayIterator begin();
+
+		ChunkArrayIterator end();
+
+	protected:
+		ChunkArrayIterator(ChunkArray<T>* arr, size_t startIndex)
+			: m_arr(arr)
+			, m_current(startIndex)
+		{
+		}
+
+		ChunkArray<T>* m_arr;
+
+	private:
+		size_t m_current;
+	};
+
+	template <typename T>
+	ChunkArrayIterator<T> ChunkArrayIterator<T>::begin()
+	{
+		return ChunkArrayIterator(m_arr, 0);
+	}
+
+	template <typename T>
+	ChunkArrayIterator<T> ChunkArrayIterator<T>::end()
+	{
+		return ChunkArrayIterator(m_arr, m_arr->size());
+	}
 }
