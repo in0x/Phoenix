@@ -12,6 +12,7 @@
 #include "Render/DeferredRenderer.hpp"
 
 #include "Core/Mesh.hpp"
+#include "Core/Material.hpp"
 #include "Memory/ChunkArray.hpp"
 
 #include <unordered_map>
@@ -49,20 +50,6 @@
 //		float m_screenHeight;
 //		float m_near;
 //		float m_far;
-//	};
-//
-//	struct CTransform
-//	{
-//		Vec3 m_translation;
-//		Vec3 m_scale;
-//		Vec3 m_rotation;
-//
-//		Matrix4 toMat4() const
-//		{
-//			return Matrix4::translation(m_translation.x, m_translation.y, m_translation.z)
-//				* Matrix4::rotation(m_rotation.x, m_rotation.y, m_rotation.z)
-//				* Matrix4::scale(m_scale.x, m_scale.y, m_scale.z);
-//		}
 //	};
 
 namespace Phoenix
@@ -145,8 +132,8 @@ namespace Phoenix
 				return nullptr;
 			}
 
-			ChunkArray<C>* pool = (ChunkArray<C>*)(m_componentAllocators[type]);
-			C* comp = pool->add(std::forward(ctorArgs)...);
+			ChunkArray<C>* pool = getComponentAllocator<C>();
+			C* comp = pool->add(ctorArgs...);
 			comp->m_world = this;
 			comp->m_entity = handle;
 
@@ -275,43 +262,100 @@ namespace Phoenix
 		}
 	};
 
-	class CDirectionalLight : public Component
+	struct CDirectionalLight : public Component
 	{
 	public:
-		CDirectionalLight() = default;
+		CDirectionalLight(const Vec3& direction, const Vec3& color)
+			: m_direction(direction)
+			, m_color(color)
+		{}
 
 		Vec3 m_direction;
 		Vec3 m_color;
 	};
 
+	struct CTransform : public Component
+	{
+		CTransform()
+			: m_translation(0.f, 0.f, 0.f)
+			, m_rotation(0.f, 0.f, 0.f)
+			, m_scale(1.f, 1.f, 1.f)
+		{}
+
+		Vec3 m_translation;
+		Vec3 m_scale;
+		Vec3 m_rotation;
+
+		Matrix4 toMat4() const
+		{
+			return Matrix4::translation(m_translation.x, m_translation.y, m_translation.z)
+				* Matrix4::rotation(m_rotation.x, m_rotation.y, m_rotation.z)
+				* Matrix4::scale(m_scale.x, m_scale.y, m_scale.z);
+		}
+	};
+
 	struct CStaticMesh : public Component
 	{
+		CStaticMesh() = default;
+
+		CStaticMesh(const RenderMesh& mesh, const Material& material)
+			: m_mesh(mesh)
+			, m_material(material)
+		{}
+
 		RenderMesh m_mesh;
+		Material m_material;
 	};
 
-	struct CMaterial : public Component
+	class ISystem
 	{
-		Vec3 m_diffuse;
-		Vec3 m_specular;
-		float m_specularExp;
-	};
-
-	struct ISystem
-	{
+	public:
 		virtual ~ISystem() {}
 		virtual void tick(World* world, float dt) = 0;
 	};
 
-	struct DrawStaticMeshSystem : public ISystem
+	class DrawStaticMeshSystem : public ISystem
 	{
+	public:
+		DrawStaticMeshSystem(DeferredRenderer* renderer)
+			: m_renderer(renderer)
+		{}
+
 		virtual void tick(World* world, float dt) override
 		{
+			m_renderer->setupGBufferPass();
+
 			for (CStaticMesh& mesh : ComponentIterator<CStaticMesh>(world))
 			{
-				CMaterial* material = mesh.sibling<CMaterial>();
-				// draw(mesh, material);
+				CTransform* transform = mesh.sibling<CTransform>();
+
+				m_renderer->drawStaticMesh(mesh.m_mesh, transform->toMat4(), mesh.m_material);
 			}
 		}
+
+	private:
+		DeferredRenderer* m_renderer;
+	};
+
+	class DirectionalLightSystem : public ISystem
+	{
+	public:
+		DirectionalLightSystem(DeferredRenderer* renderer)
+			: m_renderer(renderer)
+		{}
+
+		virtual void tick(World* world, float dt) override
+		{
+			m_renderer->setupLightPass();
+
+			for (CDirectionalLight& dirLight : ComponentIterator<CDirectionalLight>(world))
+			{
+				m_renderer->drawLight(dirLight.m_direction, dirLight.m_color);
+			}
+		}
+
+	private:
+		DeferredRenderer* m_renderer;
 	};
 }
 
@@ -336,6 +380,7 @@ int main(int argc, char** argv)
 
 	IRIDevice* renderDevice = renderInterface.getRenderDevice();
 	IRIContext* renderContext = renderInterface.getRenderContex();
+	renderContext->setDepthTest(EDepth::Enable);
 
 	WindowConfig config;
 	config.width = 800;
@@ -349,31 +394,41 @@ int main(int argc, char** argv)
 
 	renderInterface.setWindowToRenderTo(window);
 
-	// ECS Test
-	{
-		World world;
-
-		world.registerComponentType<CDirectionalLight>();
-		world.registerComponentType<CStaticMesh>();
-
-		EntityHandle e = world.createEntity();
+	DeferredRenderer renderer(renderDevice, renderContext, config.width, config.height);
 	
-		world.addComponent<CDirectionalLight>(e);
+	Matrix4 viewTf = lookAtRH(Vec3(0.f, 0.f, 7.f), Vec3(0.f, 0.f, 0.f), Vec3(0.f, 1.f, 0.f));
+	renderer.setViewMatrix(viewTf);
 
-		DrawStaticMeshSystem system;
+	Matrix4 projTf = perspectiveRH(70.f, (float)config.width / (float)config.height, 0.1f, 100.f);
+	renderer.setProjectionMatrix(projTf);
+	
+	World world;
+	world.registerComponentType<CDirectionalLight>();
+	world.registerComponentType<CStaticMesh>();
+	world.registerComponentType<CTransform>();
 
-		system.tick(&world, 0);
-	}
+	RenderMesh foxMesh = loadRenderMesh("Models/Fox/RedFox.obj", renderDevice);
+	Material foxMaterial = Material(Vec3(1.f, 1.f, 1.f), Vec3(0.3f, 0.3f, 0.3f), 100.f);
+	EntityHandle fox = world.createEntity();
+	world.addComponent<CStaticMesh>(fox, foxMesh, foxMaterial);
+	world.addComponent<CTransform>(fox);
+
+	EntityHandle redLight = world.createEntity();
+	world.addComponent<CDirectionalLight>(redLight, Vec3(0.f, -1.f, 0.f), Vec3(0.3f, 0.f, 0.f));
+	
+	EntityHandle blueLight = world.createEntity();
+	world.addComponent<CDirectionalLight>(blueLight, Vec3(1.f, 0.f, 0.f), Vec3(0.f, 0.f, 1.f));
+
+	EntityHandle greenLight = world.createEntity();
+	world.addComponent<CDirectionalLight>(greenLight, Vec3(0.f, 1.f, 0.f), Vec3(0.f, 1.f, 0.f));
+
+	DrawStaticMeshSystem drawMeshSystem(&renderer);
+	DirectionalLightSystem dirLightSystem(&renderer);
 
 	while (!window->wantsToClose())
 	{
-		//renderer.setupGBufferPass(renderContext);
-		//renderer.fillGBuffer(entity, renderContext);
-
-		//renderer.setupLightPass(renderContext);
-		//renderer.drawLight(lightRed, renderContext);
-		//renderer.drawLight(lightBlue, renderContext);
-		//renderer.drawLight(lightGreen, renderContext);
+		drawMeshSystem.tick(&world, 0);
+		dirLightSystem.tick(&world, 0);
 
 		renderContext->endPass();
 

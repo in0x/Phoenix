@@ -10,20 +10,22 @@ namespace Phoenix
 {
 	class IRIDevice;
 	class IRIContext;
-	class WorldObject;
+	
+	struct RenderMesh;
+	class Material;
 
 	class DeferredRenderer
 	{
 	public:
-		DeferredRenderer(IRIDevice* renderDevice, uint32_t gBufferWidth, uint32_t gBufferHeight);
+		DeferredRenderer(IRIDevice* renderDevice, IRIContext* renderContext, uint32_t gBufferWidth, uint32_t gBufferHeight);
 
-		void setupGBufferPass(IRIContext* context);
+		void setupGBufferPass();
 
-		void fillGBuffer(const WorldObject& entity, IRIContext* context);
+		void drawStaticMesh(const RenderMesh& mesh, const Matrix4& transform, const Material& material);
 
-		void setupLightPass(IRIContext* context);
+		void setupLightPass();
 
-		//void drawLight(const DirectionalLight& light, IRIContext* context);
+		void drawLight(Vec3 direction, Vec3 color);
 
 		void setViewMatrix(const Matrix4& view);
 
@@ -41,7 +43,6 @@ namespace Phoenix
 		Texture2DHandle m_depthTex;
 		
 		// NOTE(Phil): I want to replace these groups of uniforms with constant buffers eventually.
-
 		struct Uniforms
 		{
 			UniformHandle modelTf;
@@ -60,5 +61,8 @@ namespace Phoenix
 		ProgramHandle m_directionaLightProgram;
 
 		BlendState m_lightBlendState;
+
+		IRIDevice* m_device;
+		IRIContext* m_context;
 	};
 }

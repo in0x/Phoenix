@@ -1,15 +1,17 @@
 #include "DeferredRenderer.hpp"
 
 #include <Core/Shader.hpp>
-//#include <Core/WorldObject.hpp>
-#include <Core/PerspectiveCamera.hpp>
+#include <Core/Mesh.hpp>
+#include <Core/Material.hpp>
 
 #include <Render/RIDevice.hpp>
 #include <Render/RIContext.hpp>
 
 namespace Phoenix
 {
-	DeferredRenderer::DeferredRenderer(IRIDevice* renderDevice, uint32_t gBufferWidth, uint32_t gBufferHeight)
+	DeferredRenderer::DeferredRenderer(IRIDevice* renderDevice, IRIContext* renderContext, uint32_t gBufferWidth, uint32_t gBufferHeight)
+		: m_device(renderDevice)
+		, m_context(renderContext)
 	{
 		TextureDesc desc;
 		desc.pixelFormat = EPixelFormat::RGBA16F;
@@ -60,60 +62,56 @@ namespace Phoenix
 	{
 		m_projMat = projection;
 	}
-
-	void DeferredRenderer::setupGBufferPass(IRIContext* context)
-	{
-		context->bindRenderTarget(m_gBuffer);
-		context->clearRenderTargetColor(m_gBuffer, RGBA{ 0.f, 0.f, 0.f, 0.f });
-		context->clearRenderTargetDepth(m_gBuffer);
-
-		context->setDepthTest(EDepth::Enable);
-		context->setBlendState(BlendState(EBlend::Disable));
-		context->bindShaderProgram(m_gBufferProgram);
-		context->bindUniform(m_uniforms.viewTf, &m_viewMat);
-		context->bindUniform(m_uniforms.projTf, &m_projMat);
-	}
-
 	
-	// We'll use the context directly for now, then commands when we refactor.
-	void DeferredRenderer::fillGBuffer(const WorldObject& entity, IRIContext* context)
+	void DeferredRenderer::setupGBufferPass()
 	{
-		context->bindUniform(m_uniforms.modelTf, &entity.m_transform.toMat4());
+		m_context->bindRenderTarget(m_gBuffer);
+		m_context->clearRenderTargetColor(m_gBuffer, RGBA{ 0.f, 0.f, 0.f, 0.f });
+		m_context->clearRenderTargetDepth(m_gBuffer);
 
-		context->bindUniform(m_uniforms.kDiffuse, &entity.m_material.m_diffuse);
-		context->bindUniform(m_uniforms.kSpecular, &entity.m_material.m_specular);
-		context->bindUniform(m_uniforms.specExp, &entity.m_material.m_specularExp);
+		m_context->setDepthTest(EDepth::Enable);
+		m_context->setBlendState(BlendState(EBlend::Disable));
+		m_context->bindShaderProgram(m_gBufferProgram);
+		m_context->bindUniform(m_uniforms.viewTf, &m_viewMat);
+		m_context->bindUniform(m_uniforms.projTf, &m_projMat);
+	}
+	
+	void DeferredRenderer::drawStaticMesh(const RenderMesh& mesh, const Matrix4& transform, const Material& material)
+	{
+		m_context->bindUniform(m_uniforms.modelTf, &transform);
 
-		context->drawIndexed(entity.m_mesh.m_vertexbuffer, entity.m_mesh.m_indexbuffer, EPrimitive::Triangles);
+		m_context->bindUniform(m_uniforms.kDiffuse, &material.m_diffuse);
+		m_context->bindUniform(m_uniforms.kSpecular, &material.m_specular);
+		m_context->bindUniform(m_uniforms.specExp, &material.m_specularExp);
+
+		m_context->drawIndexed(mesh.m_vertexbuffer, mesh.m_indexbuffer, EPrimitive::Triangles);
 	}
 
-	void DeferredRenderer::setupLightPass(IRIContext* context)
+	void DeferredRenderer::setupLightPass()
 	{
-		context->bindDefaultRenderTarget();
-		context->setBlendState(m_lightBlendState);
-		context->clearColor();
-		context->clearDepth();
+		m_context->bindDefaultRenderTarget();
+		m_context->setBlendState(m_lightBlendState);
+		m_context->clearColor();
+		m_context->clearDepth();
 
-		context->setDepthTest(EDepth::Disable);
+		m_context->setDepthTest(EDepth::Disable);
 	}
 
-	// Again do this for each light with context directly now, later we 
-	// can produce commands and sort them so we only set this state once.
-	void DeferredRenderer::drawLight(const DirectionalLight& light, IRIContext* context)
+	void DeferredRenderer::drawLight(Vec3 direction, Vec3 color)
 	{
-		context->bindShaderProgram(m_directionaLightProgram);
+		m_context->bindShaderProgram(m_directionaLightProgram);
 
-		context->bindUniform(m_uniforms.projTf, &m_projMat);
+		m_context->bindUniform(m_uniforms.projTf, &m_projMat);
 
-		context->bindTexture(m_normalSpecExpTex);
-		context->bindTexture(m_kDiffuseDepthTex);
-		context->bindTexture(m_kSpecularTex);
+		m_context->bindTexture(m_normalSpecExpTex);
+		m_context->bindTexture(m_kDiffuseDepthTex);
+		m_context->bindTexture(m_kSpecularTex);
 
-		Vec3 lightDirEye = m_viewMat * light.m_direction;
+		Vec3 lightDirEye = m_viewMat * direction;
 
-		context->bindUniform(m_uniforms.lightDirEye, &lightDirEye);
-		context->bindUniform(m_uniforms.lightColor, &light.m_color);
+		m_context->bindUniform(m_uniforms.lightDirEye, &lightDirEye);
+		m_context->bindUniform(m_uniforms.lightColor, &color);
 
-		context->drawLinear(EPrimitive::TriangleStrips, 4, 0);
+		m_context->drawLinear(EPrimitive::TriangleStrips, 4, 0);
 	}
 }

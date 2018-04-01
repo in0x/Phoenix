@@ -8,8 +8,8 @@ namespace Phoenix
 	{
 	public:
 		Material()
-			: m_diffuse(Vec3())
-			, m_specular(Vec3())
+			: m_diffuse()
+			, m_specular()
 			, m_specularExp(0.f)
 		{}
 
