@@ -58,7 +58,8 @@ namespace Phoenix
 			return at(next);
 		}
 
-		void swapAndPop(size_t idx)
+	protected:
+		virtual void swapAndPop(size_t idx)
 		{
 			void* toRemove = at(idx);
 			void* last = at(m_nextAllocIdx--);
@@ -122,6 +123,12 @@ namespace Phoenix
 		T* add(CtorArgs... ctorArgs)
 		{
 			return new (alloc()) T(ctorArgs...);
+		}
+
+		virtual void swapAndPop(size_t idx) override
+		{
+			operator[](idx).~T();
+			ChunkArrayBase::swapAndPop(idx);
 		}
 
 		size_t begin() const 

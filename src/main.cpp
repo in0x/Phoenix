@@ -114,7 +114,6 @@ namespace Phoenix
 		World(World&&) = delete;
 
 		void* getComponent(ComponentTypeId type, EntityHandle entityId);
-		void removeComponent(ComponentTypeId type, EntityHandle entityId);
 		bool isComponentTypeRegistered(ComponentTypeId type);
 		EntityHandle createEntity();
 
@@ -155,6 +154,31 @@ namespace Phoenix
 
 			return comp;
 		}
+
+		template <class C>
+		void removeComponent(EntityHandle entityId)
+		{
+			ComponentTypeId type = getComponentTypeId<C>();
+			ComponentHandle handle = getComponentHandle(type, entityId);
+
+			if (handle == invalidHandle())
+			{
+				return;
+			}
+
+			Entity& entity = m_entities[entityId];
+			entity.m_components[componentType] = invalidHandle();
+
+			ChunkArray<C>* allocator = getComponentAllocator<C>();
+			allocator->swapAndPop(handle);
+
+			// Since we swapped the removed component with the most recently alloced, 
+			// we need to patch the handle map in the entity owning the swapped component. 
+			Component* swappedComp = (Component*)allocator->at(handle);
+			Entity& owningEntity = m_entities[swappedComp->m_entity];
+			owningEntity.m_components[componentType] = handle;
+		}
+
 
 	private:
 		template <typename C>
@@ -223,28 +247,6 @@ namespace Phoenix
 		}
 
 		return m_componentAllocators[componentType]->at(handle);
-	}
-
-	void World::removeComponent(ComponentTypeId componentType, EntityHandle entityId)
-	{
-		ComponentHandle handle = getComponentHandle(componentType, entityId);
-
-		if (handle == invalidHandle())
-		{
-			return;
-		}
-
-		Entity& entity = m_entities[entityId];
-		entity.m_components[componentType] = invalidHandle();
-
-		ChunkArrayBase* allocator = m_componentAllocators[componentType];
-		allocator->swapAndPop(handle);
-
-		// Since we swapped the removed component with the most recently alloced, 
-		// we need to patch the handle map in the entity owning the swapped component. 
-		Component* swappedComp = (Component*)allocator->at(handle);
-		Entity& owningEntity = m_entities[swappedComp->m_entity];
-		owningEntity.m_components[componentType] = handle;
 	}
 
 	bool World::isComponentTypeRegistered(ComponentTypeId type)
