@@ -357,6 +357,24 @@ namespace Phoenix
 	private:
 		DeferredRenderer* m_renderer;
 	};
+
+	class RotatorSystem : public ISystem
+	{
+	public:
+		RotatorSystem(float speed)
+			: m_speed(speed)
+		{}
+
+		virtual void tick(World* world, float dt) override
+		{
+			for (CTransform& transform : ComponentIterator<CTransform>(world))
+			{
+				transform.m_rotation.y += m_speed;
+			}
+		}
+		float m_speed;
+
+	};
 }
 
 int main(int argc, char** argv)
@@ -424,9 +442,11 @@ int main(int argc, char** argv)
 
 	DrawStaticMeshSystem drawMeshSystem(&renderer);
 	DirectionalLightSystem dirLightSystem(&renderer);
+	RotatorSystem rotator(0.5f);
 
 	while (!window->wantsToClose())
 	{
+		rotator.tick(&world, 0);
 		drawMeshSystem.tick(&world, 0);
 		dirLightSystem.tick(&world, 0);
 
