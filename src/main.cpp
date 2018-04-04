@@ -387,8 +387,7 @@ int main(int argc, char** argv)
 	Tests::runMathTests();
 	Tests::runMemoryTests();
 
-	RIOpenGL renderInterface;
-	bool bRIstarted = renderInterface.init();
+	bool bRIstarted = RI::init();
 
 	if (!bRIstarted)
 	{
@@ -396,8 +395,8 @@ int main(int argc, char** argv)
 		assert(false);
 	}
 
-	IRIDevice* renderDevice = renderInterface.getRenderDevice();
-	IRIContext* renderContext = renderInterface.getRenderContex();
+	IRIDevice* renderDevice = RI::getRenderDevice();
+	IRIContext* renderContext = RI::getRenderContex();
 	renderContext->setDepthTest(EDepth::Enable);
 
 	WindowConfig config;
@@ -406,15 +405,14 @@ int main(int argc, char** argv)
 	config.title = "Phoenix";
 	config.bFullscreen = false;
 
-	std::unique_ptr<RenderWindow> windowPtr = renderInterface.createWindow(config);
+	RenderWindow* window = RI::createWindow(config);
 
-	RenderWindow* window = windowPtr.get();
-
-	renderInterface.setWindowToRenderTo(window);
+	RI::setWindowToRenderTo(window);
 
 	DeferredRenderer renderer(renderDevice, renderContext, config.width, config.height);
 	
-	Matrix4 viewTf = lookAtRH(Vec3(0.f, 0.f, 7.f), Vec3(0.f, 0.f, 0.f), Vec3(0.f, 1.f, 0.f));
+	Vec3 cameraPos = Vec3(0.f, 0.f, 7.f);
+	Matrix4 viewTf = lookAtRH(cameraPos, Vec3(0.f, 0.f, 0.f), Vec3(0.f, 1.f, 0.f));
 	renderer.setViewMatrix(viewTf);
 
 	Matrix4 projTf = perspectiveRH(70.f, (float)config.width / (float)config.height, 0.1f, 100.f);
@@ -426,11 +424,13 @@ int main(int argc, char** argv)
 	world.registerComponentType<CTransform>();
 
 	RenderMesh foxMesh = loadRenderMesh("Models/Fox/RedFox.obj", renderDevice);
+	//RenderMesh foxMesh = loadRenderMesh("Models/sponza/sponza.obj", renderDevice);
+
 	Material foxMaterial = Material(Vec3(1.f, 1.f, 1.f), Vec3(0.3f, 0.3f, 0.3f), 100.f);
 	EntityHandle fox = world.createEntity();
 	world.addComponent<CStaticMesh>(fox, foxMesh, foxMaterial);
 	world.addComponent<CTransform>(fox);
-
+	
 	EntityHandle redLight = world.createEntity();
 	world.addComponent<CDirectionalLight>(redLight, Vec3(0.f, -1.f, 0.f), Vec3(0.3f, 0.f, 0.f));
 	
@@ -444,21 +444,61 @@ int main(int argc, char** argv)
 	DirectionalLightSystem dirLightSystem(&renderer);
 	RotatorSystem rotator(0.5f);
 
+	Logger::logf("%d", sizeof(Key::Event));
+
 	while (!window->wantsToClose())
 	{
-		rotator.tick(&world, 0);
+		Platform::pollEvents();
+
+		while (!window->m_keyEvents.isEmpty())
+		{
+			Key::Event* ev = window->m_keyEvents.get();
+
+			Vec3 cameraUpdate;
+			float cameraChange = 0.1f;
+
+			if (ev->m_action == Key::A && (ev->m_action == Key::Press || ev->m_action == Key::Repeat))
+			{
+				cameraUpdate.x += cameraChange;
+			}
+
+			if (ev->m_action == Key::D && (ev->m_action == Key::Press || ev->m_action == Key::Repeat))
+			{
+				cameraUpdate.x -= cameraChange;
+			}
+
+			if (ev->m_action == Key::W && (ev->m_action == Key::Press || ev->m_action == Key::Repeat))
+			{
+				cameraUpdate.y += cameraChange;
+			}
+
+			if (ev->m_action == Key::S && (ev->m_action == Key::Press || ev->m_action == Key::Repeat))
+			{
+				cameraUpdate.y -= cameraChange;
+			}
+
+			if (cameraUpdate.length2() > 0.0f)
+			{
+				cameraPos += cameraUpdate;
+
+				Matrix4 viewTf = lookAtRH(cameraPos, cameraPos + Vec3(0.f, 0.f, -1.0f), Vec3(0.f, 1.f, 0.f));
+				renderer.setViewMatrix(viewTf);
+			}
+		}
+
+		//rotator.tick(&world, 0);
 		drawMeshSystem.tick(&world, 0);
 		dirLightSystem.tick(&world, 0);
 
 		renderContext->endPass();
 
-		renderInterface.swapBufferToWindow(window);
-
-		Platform::pollEvents();
+		RI::swapBufferToWindow(window);
 	}
 
-	renderInterface.exit();
+	RI::destroyWindow(window);
+	RI::exit();
 	Logger::exit();
+
 	return 0;
 }
 

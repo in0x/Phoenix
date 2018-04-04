@@ -14,6 +14,8 @@
 
 namespace Phoenix
 {
+	void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+
 	class GlRenderWindow : public RenderWindow
 	{
 	public:
@@ -25,11 +27,18 @@ namespace Phoenix
 		bool init(const WindowConfig& config)
 		{
 			m_glfwWindow = glfwCreateWindow(config.width, config.height, config.title, nullptr, nullptr);
+
+			if (m_glfwWindow)
+			{
+				glfwSetKeyCallback(m_glfwWindow, &keyCallback);
+			}
+
 			return (nullptr != m_glfwWindow);
 		}
 
 		~GlRenderWindow()
 		{
+			// TODO(phil.welsch): Do we need to unsub from key cb when window is destroyed?
 			glfwDestroyWindow(m_glfwWindow);
 		}
 
@@ -41,61 +50,109 @@ namespace Phoenix
 		GLFWwindow* m_glfwWindow;
 	};
 
-	class RIOpenGL::Impl
+	class RIOpenGLImpl
 	{
 	public:
-		Impl()
+		RIOpenGLImpl()
 			: resources()
 			, device(&resources)
 			, context(&resources)
 		{
 		}
 
+		~RIOpenGLImpl()
+		{
+			for (GlRenderWindow* window : m_pWindows)
+			{
+				delete window;
+			}
+		}
+
 		RIOpenGLResourceStore resources;
 		RIDeviceOpenGL device;
 		RIContextOpenGL context;
+		std::vector<GlRenderWindow*> m_pWindows;
 	};
 
-	RIOpenGL::RIOpenGL()
+	RIOpenGLImpl* g_impl = nullptr;
+
+	GlRenderWindow* windowFromGlfw(GLFWwindow* glfwWindow)
 	{
-		m_pImpl = new RIOpenGL::Impl;
-	}
-	
-	RIOpenGL::~RIOpenGL()
-	{
-		delete m_pImpl;
+		auto iter = std::find_if(g_impl->m_pWindows.begin(), g_impl->m_pWindows.end(),
+			[&glfwWindow](GlRenderWindow* other)
+		{
+			return glfwWindow == other->m_glfwWindow;
+		});
+
+		if (iter == g_impl->m_pWindows.end())
+		{
+			return nullptr;
+		}
+
+		return *iter;
 	}
 
-	std::unique_ptr<RenderWindow> RIOpenGL::createWindow(const WindowConfig& config)
+	RenderWindow* RI::createWindow(const WindowConfig& config)
 	{
-		std::unique_ptr<RenderWindow> window = std::make_unique<GlRenderWindow>();
+		GlRenderWindow* glWindow = new GlRenderWindow;
 
-		GlRenderWindow* glWindow = static_cast<GlRenderWindow*>(window.get());
-		
 		if (!glWindow->init(config))
 		{
+			delete glWindow;
 			Logger::errorf("Failed to create window with title %s", config.title);
 			assert(false);
 			return nullptr;
 		}
 
-		return std::move(window);
+		g_impl->m_pWindows.push_back(glWindow);
+
+		return glWindow;
 	}
 
-	void RIOpenGL::setWindowToRenderTo(RenderWindow* window)
+	void RI::destroyWindow(RenderWindow* window)
+	{
+		if (window == nullptr)
+		{
+			return;
+		}
+
+		GlRenderWindow* glWindow = static_cast<GlRenderWindow*>(window);
+
+		auto iter = std::find_if(g_impl->m_pWindows.begin(), g_impl->m_pWindows.end(),
+			[&glWindow](GlRenderWindow* other)
+		{
+			return glWindow->m_glfwWindow == other->m_glfwWindow;
+		});
+
+		if (iter == g_impl->m_pWindows.end())
+		{
+			return;
+		}
+
+		*iter = nullptr;
+
+		delete window;
+	}
+
+	void RI::setWindowToRenderTo(RenderWindow* window)
 	{
 		GlRenderWindow* glWindow = static_cast<GlRenderWindow*>(window);
 		glfwMakeContextCurrent(glWindow->m_glfwWindow);
 	}
 
-	void RIOpenGL::swapBufferToWindow(RenderWindow* window)
+	void RI::swapBufferToWindow(RenderWindow* window)
 	{
 		GlRenderWindow* glWindow = static_cast<GlRenderWindow*>(window);
 		glfwSwapBuffers(glWindow->m_glfwWindow);
 	}
 
-	bool RIOpenGL::init()
+	bool RI::init()
 	{
+		if (g_impl)
+		{
+			return false;
+		}
+
 		if (!glfwInit())
 		{
 			Logger::error("Failed to initalize GLFW");
@@ -153,23 +210,87 @@ namespace Phoenix
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-		
+
+		g_impl = new RIOpenGLImpl;
 		return true;
 	}
 
-	void RIOpenGL::exit()
+	void RI::exit()
 	{
+		delete g_impl;
 		glfwTerminate();
 	}
 
-	IRIDevice* RIOpenGL::getRenderDevice()
+	IRIDevice* RI::getRenderDevice()
 	{
-		return &m_pImpl->device;
+		return &g_impl->device;
 	}
 	
-	IRIContext* RIOpenGL::getRenderContex()
+	IRIContext* RI::getRenderContex()
 	{
-		return &m_pImpl->context;
+		return &g_impl->context;
+	}
+
+	void keyTypeFromGlfw(int key, int scancode, Key::Event* outEvent)
+	{
+
+#define IMPL_KEY_SWITCH(glfw, value) \
+		case glfw: \
+		{ \
+			outEvent->m_value = value; \
+			return; \
+		} \
+
+		switch (key)
+		{
+			IMPL_KEY_SWITCH(GLFW_KEY_A, Key::A)
+			IMPL_KEY_SWITCH(GLFW_KEY_D, Key::D)
+			IMPL_KEY_SWITCH(GLFW_KEY_S, Key::S)
+			IMPL_KEY_SWITCH(GLFW_KEY_W, Key::W)
+			default:
+			{
+				Logger::warningf("Attempted to convert unhandled key value: %s", glfwGetKeyName(key, scancode));
+				break;
+			}
+		}
+	}
+
+	void actionFromGlfw(int action, Key::Event* outEvent)
+	{
+		switch (action)
+		{
+		case GLFW_PRESS:
+			outEvent->m_action = Key::Press;
+			break;
+		case GLFW_REPEAT:
+			outEvent->m_action = Key::Repeat; 
+			break;
+		case GLFW_RELEASE:
+			outEvent->m_action = Key::Release;
+			break;
+		default:
+			assert(false);
+			Logger::warningf("Attempted to convert unhandled action value");
+			break;
+		}
+	}
+
+	void modifierFromGlfw(int mods, Key::Event* outEvent)
+	{
+		if (mods & GLFW_MOD_SHIFT)
+		{
+			outEvent->m_modifiers |= Key::Shift;
+		}
+
+		if (mods & GLFW_MOD_CONTROL)
+		{
+			outEvent->m_modifiers |= Key::Ctrl;
+		}
+			
+		if (mods & GLFW_MOD_ALT)
+		{
+			outEvent->m_modifiers |= Key::Alt;
+		}
 	}
 
 	namespace Platform
@@ -178,5 +299,25 @@ namespace Phoenix
 		{
 			glfwPollEvents(); 
 		}
+	}
+
+	void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+	{
+		if (key == GLFW_KEY_UNKNOWN)
+		{
+			Logger::warning("Key event with unknow key recieved, discarding.");
+			return;
+		}
+		
+		GlRenderWindow* glWindow = windowFromGlfw(window);
+
+		Key::Event ev;
+
+		// TODO(phil.welsch): Use scancode to detect specific keys (e.g. left vs right shift)
+		keyTypeFromGlfw(key, scancode, &ev);
+		actionFromGlfw(action, &ev);
+		modifierFromGlfw(mods, &ev); 
+
+		glWindow->m_keyEvents.add(ev);
 	}
 }
