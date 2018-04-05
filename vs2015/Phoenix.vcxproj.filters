@@ -154,6 +154,27 @@
     <ClInclude Include="..\src\ThirdParty\STB\stb_easy_font.h">
       <Filter>ThirdParty\STB</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Core\World.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Component.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\EcsTypes.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Components\CTransform.hpp">
+      <Filter>Core\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Components\CStaticMesh.hpp">
+      <Filter>Core\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Components\CDirectionalLight.hpp">
+      <Filter>Core\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Components\CCamera.hpp">
+      <Filter>Core\Components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Core\Clock.cpp">
@@ -279,6 +300,9 @@
     </Filter>
     <Filter Include="ThirdParty\STB">
       <UniqueIdentifier>{982bc338-05d0-424a-a6eb-deec0681d852}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Components">
+      <UniqueIdentifier>{ad1093e0-5f69-4d27-a3ad-a457af490b91}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

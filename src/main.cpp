@@ -11,12 +11,11 @@
 #include "Render/RIOpenGL/RIOpenGL.hpp"
 #include "Render/DeferredRenderer.hpp"
 
-#include "Core/Mesh.hpp"
-#include "Core/Material.hpp"
-#include "Memory/ChunkArray.hpp"
+#include "Core/Components/CDirectionalLight.hpp"
+#include "Core/Components/CStaticMesh.hpp"
+#include "Core/Components/CTransform.hpp"
 
-#include <unordered_map>
-#include <atomic>
+#include <chrono>
 
 //namespace Phoenix
 //{
@@ -30,282 +29,8 @@
 		Put the ID in an enum for now -> simple and centralized
 	*/
 
-//	struct CCamera
-//	{
-//		CCamera(float horizontalFOV, float screenWidth, float screenHeight, float near, float far)
-//			: m_horizontalFOV(horizontalFOV)
-//			, m_screenWidth(screenWidth)
-//			, m_screenHeight(screenHeight)
-//			, m_near(near)
-//			, m_far(far)
-//		{}
-//
-//		Matrix4 getProjection()
-//		{
-//			return perspectiveRH(m_horizontalFOV, m_screenWidth / m_screenHeight, m_near, m_far);
-//		}
-//
-//		float m_horizontalFOV;
-//		float m_screenWidth;
-//		float m_screenHeight;
-//		float m_near;
-//		float m_far;
-//	};
-
 namespace Phoenix
 {
-	typedef uint64_t ComponentTypeId;
-	typedef uint64_t ComponentHandle;
-	typedef uint64_t EntityHandle; 
-	
-	uint64_t invalidHandle() // Consider bringing back Handle type.
-	{
-		return std::numeric_limits<uint64_t>::max();
-	}
-
-	struct ComponentTypeIdGenerator
-	{
-		static ComponentTypeId NextId()
-		{
-			return s_ComponentTypeIdCounter++;
-		}
-
-	private:
-		static std::atomic<ComponentTypeId> s_ComponentTypeIdCounter;
-	};
-
-	std::atomic<ComponentTypeId> ComponentTypeIdGenerator::s_ComponentTypeIdCounter = 0;
-
-	template <typename C>
-	ComponentTypeId getComponentTypeId()
-	{
-		static ComponentTypeId thisId = ComponentTypeIdGenerator::NextId();
-		return thisId;
-	}
-
-	struct Entity
-	{
-		bool hasComponent(ComponentTypeId type)
-		{
-			return m_components.find(type) != m_components.end() && m_components[type] != invalidHandle();
-		}
-
-		std::unordered_map<ComponentTypeId, ComponentHandle> m_components;
-	};
-
-	struct World
-	{
-		World() = default;
-		~World();
-		World(World&) = delete;
-		World(World&&) = delete;
-
-		void* getComponent(ComponentTypeId type, EntityHandle entityId);
-		bool isComponentTypeRegistered(ComponentTypeId type);
-		EntityHandle createEntity();
-
-		template <typename C>
-		void registerComponentType(size_t initialCapacity = 64)
-		{
-			static_assert(std::is_base_of<Component, C>::value, "Entity components need to derive from Component.");
-
-			ComponentTypeId componentType = getComponentTypeId<C>();
-
-			if (isComponentTypeRegistered(componentType))
-			{
-				return;
-			}
-
-			m_componentAllocators.resize(componentType + 1);
-			ChunkArray<C>* pool = new ChunkArray<C>(initialCapacity);
-			m_componentAllocators[componentType] = pool;
-		}
-
-		template <typename C, typename ...CtorArgs>
-		C* addComponent(EntityHandle handle, CtorArgs... ctorArgs)
-		{
-			Entity& entity = m_entities[handle];
-			ComponentTypeId type = getComponentTypeId<C>();
-
-			if (entity.hasComponent(type))
-			{
-				return nullptr;
-			}
-
-			ChunkArray<C>* pool = getComponentAllocator<C>();
-			C* comp = pool->add(ctorArgs...);
-			comp->m_world = this;
-			comp->m_entity = handle;
-
-			entity.m_components.emplace(type, handle);
-
-			return comp;
-		}
-
-		template <class C>
-		void removeComponent(EntityHandle entityId)
-		{
-			ComponentTypeId type = getComponentTypeId<C>();
-			ComponentHandle handle = getComponentHandle(type, entityId);
-
-			if (handle == invalidHandle())
-			{
-				return;
-			}
-
-			Entity& entity = m_entities[entityId];
-			entity.m_components[componentType] = invalidHandle();
-
-			ChunkArray<C>* allocator = getComponentAllocator<C>();
-			allocator->swapAndPop(handle);
-
-			// Since we swapped the removed component with the most recently alloced, 
-			// we need to patch the handle map in the entity owning the swapped component. 
-			Component* swappedComp = (Component*)allocator->at(handle);
-			Entity& owningEntity = m_entities[swappedComp->m_entity];
-			owningEntity.m_components[componentType] = handle;
-		}
-
-
-	private:
-		template <typename C>
-		friend class ComponentIterator;
-
-		template <typename C>
-		ChunkArray<C>* getComponentAllocator()
-		{
-			ComponentTypeId type = getComponentTypeId<C>();
-			
-			if (!isComponentTypeRegistered(type))
-			{
-				return nullptr;
-			}
-
-			ChunkArrayBase* baseAlloc = m_componentAllocators[type];
-			return (ChunkArray<C>*)baseAlloc;
-		}
-
-		ComponentHandle getComponentHandle(ComponentTypeId componentType, EntityHandle entityId);
-		
-		std::vector<Entity> m_entities;
-		std::vector<ChunkArrayBase*> m_componentAllocators;
-		uint64_t m_numEntities;
-	};
-
-	struct Component
-	{
-		template <typename C>
-		C* sibling()
-		{
-			return static_cast<C*>(m_world->getComponent(getComponentTypeId<C>(), m_entity));
-		}
-
-		World* m_world;
-		EntityHandle m_entity;
-	};
-
-	World::~World()
-	{
-		for (ChunkArrayBase* allocator : m_componentAllocators)
-		{
-			delete allocator;
-		}
-	}
-
-	ComponentHandle World::getComponentHandle(ComponentTypeId componentType, EntityHandle entityId)
-	{
-		Entity& entity = m_entities[entityId];
-
-		if (!entity.hasComponent(componentType))
-		{
-			return invalidHandle();
-		}
-
-		return entity.m_components.at(componentType);
-	}
-
-	void* World::getComponent(ComponentTypeId componentType, EntityHandle entityId)
-	{
-		ComponentHandle handle = getComponentHandle(componentType, entityId);
-
-		if (handle == invalidHandle())
-		{
-			return nullptr;
-		}
-
-		return m_componentAllocators[componentType]->at(handle);
-	}
-
-	bool World::isComponentTypeRegistered(ComponentTypeId type)
-	{
-		return type < m_componentAllocators.size();
-	}
-
-	EntityHandle World::createEntity()
-	{
-		if (m_numEntities >= invalidHandle())
-		{
-			return invalidHandle(); 
-		}
-
-		m_entities.emplace_back();
-		return (EntityHandle)(m_entities.size() - 1);
-	}
-
-	template <typename C>
-	class ComponentIterator : public ChunkArrayIterator<C> 
-	{
-	public:
-		ComponentIterator(World* world) : ChunkArrayIterator(nullptr)
-		{
-			m_arr = world->getComponentAllocator<C>();
-		}
-	};
-
-	struct CDirectionalLight : public Component
-	{
-	public:
-		CDirectionalLight(const Vec3& direction, const Vec3& color)
-			: m_direction(direction)
-			, m_color(color)
-		{}
-
-		Vec3 m_direction;
-		Vec3 m_color;
-	};
-
-	struct CTransform : public Component
-	{
-		CTransform()
-			: m_translation(0.f, 0.f, 0.f)
-			, m_rotation(0.f, 0.f, 0.f)
-			, m_scale(1.f, 1.f, 1.f)
-		{}
-
-		Vec3 m_translation;
-		Vec3 m_scale;
-		Vec3 m_rotation;
-
-		Matrix4 toMat4() const
-		{
-			return Matrix4::translation(m_translation.x, m_translation.y, m_translation.z)
-				* Matrix4::rotation(m_rotation.x, m_rotation.y, m_rotation.z)
-				* Matrix4::scale(m_scale.x, m_scale.y, m_scale.z);
-		}
-	};
-
-	struct CStaticMesh : public Component
-	{
-		CStaticMesh() = default;
-
-		CStaticMesh(const RenderMesh& mesh, const Material& material)
-			: m_mesh(mesh)
-			, m_material(material)
-		{}
-
-		RenderMesh m_mesh;
-		Material m_material;
-	};
 
 	class ISystem
 	{
@@ -444,46 +169,53 @@ int main(int argc, char** argv)
 	DirectionalLightSystem dirLightSystem(&renderer);
 	RotatorSystem rotator(0.5f);
 
-	Logger::logf("%d", sizeof(Key::Event));
+	using Clock = std::chrono::high_resolution_clock;
+	using pointInTime = std::chrono::time_point<std::chrono::high_resolution_clock>;
+	 
+	pointInTime lastTime = Clock::now();
 
 	while (!window->wantsToClose())
 	{
 		Platform::pollEvents();
 
+		pointInTime currentTime = Clock::now();
+		std::chrono::duration<float> timeSpan = currentTime - lastTime;
+		float dt = timeSpan.count();
+
+		Vec3 cameraUpdate;
+		float cameraChange = 0.05f;
+
 		while (!window->m_keyEvents.isEmpty())
 		{
 			Key::Event* ev = window->m_keyEvents.get();
 
-			Vec3 cameraUpdate;
-			float cameraChange = 0.1f;
-
-			if (ev->m_action == Key::A && (ev->m_action == Key::Press || ev->m_action == Key::Repeat))
+			if (ev->m_value == Key::A && (ev->m_action == Key::Press || ev->m_action == Key::Repeat))
 			{
-				cameraUpdate.x += cameraChange;
+				cameraUpdate.x -= cameraChange * dt;
 			}
 
-			if (ev->m_action == Key::D && (ev->m_action == Key::Press || ev->m_action == Key::Repeat))
+			if (ev->m_value == Key::D && (ev->m_action == Key::Press || ev->m_action == Key::Repeat))
 			{
-				cameraUpdate.x -= cameraChange;
+				cameraUpdate.x += cameraChange * dt;
 			}
 
-			if (ev->m_action == Key::W && (ev->m_action == Key::Press || ev->m_action == Key::Repeat))
+			if (ev->m_value == Key::W && (ev->m_action == Key::Press || ev->m_action == Key::Repeat))
 			{
-				cameraUpdate.y += cameraChange;
+				cameraUpdate.y += cameraChange * dt;
 			}
 
-			if (ev->m_action == Key::S && (ev->m_action == Key::Press || ev->m_action == Key::Repeat))
+			if (ev->m_value == Key::S && (ev->m_action == Key::Press || ev->m_action == Key::Repeat))
 			{
-				cameraUpdate.y -= cameraChange;
+				cameraUpdate.y -= cameraChange * dt;
 			}
+		}
 
-			if (cameraUpdate.length2() > 0.0f)
-			{
-				cameraPos += cameraUpdate;
+		if (cameraUpdate.length2() > 0.0f)
+		{
+			cameraPos += cameraUpdate;
 
-				Matrix4 viewTf = lookAtRH(cameraPos, cameraPos + Vec3(0.f, 0.f, -1.0f), Vec3(0.f, 1.f, 0.f));
-				renderer.setViewMatrix(viewTf);
-			}
+			Matrix4 viewTf = lookAtRH(cameraPos, cameraPos + Vec3(0.f, 0.f, -1.0f), Vec3(0.f, 1.f, 0.f));
+			renderer.setViewMatrix(viewTf);
 		}
 
 		//rotator.tick(&world, 0);

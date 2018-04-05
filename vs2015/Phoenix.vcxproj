@@ -182,6 +182,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\Core\Component.hpp" />
+    <ClInclude Include="..\src\Core\Components\CCamera.hpp" />
+    <ClInclude Include="..\src\Core\Components\CDirectionalLight.hpp" />
+    <ClInclude Include="..\src\Core\Components\CStaticMesh.hpp" />
+    <ClInclude Include="..\src\Core\Components\CTransform.hpp" />
+    <ClInclude Include="..\src\Core\EcsTypes.hpp" />
     <ClInclude Include="..\src\Core\Engine.hpp" />
     <ClInclude Include="..\src\Core\Material.hpp" />
     <ClInclude Include="..\src\Core\Mesh.hpp" />
@@ -194,6 +200,7 @@
     <ClInclude Include="..\src\Core\Logger.hpp" />
     <ClInclude Include="..\src\Core\Windows\PhiWindowsInclude.hpp" />
     <ClInclude Include="..\src\Core\Windows\PlatformWindows.hpp" />
+    <ClInclude Include="..\src\Core\World.hpp" />
     <ClInclude Include="..\src\Math\EulerAngles.hpp" />
     <ClInclude Include="..\src\Math\MathStreamOverloads.hpp" />
     <ClInclude Include="..\src\Math\Matrix3.hpp" />
