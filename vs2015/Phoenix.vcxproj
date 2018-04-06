@@ -214,6 +214,7 @@
     <ClInclude Include="..\src\Math\Vec3.hpp" />
     <ClInclude Include="..\src\Math\Vec4.hpp" />
     <ClInclude Include="..\src\Memory\ChunkArray.hpp" />
+    <ClInclude Include="..\src\Memory\CircularBuffer.hpp" />
     <ClInclude Include="..\src\Memory\FreeList.hpp" />
     <ClInclude Include="..\src\Memory\MemUtil.hpp" />
     <ClInclude Include="..\src\Memory\PoolAllocator.hpp" />
@@ -238,8 +239,15 @@
     <ClInclude Include="..\src\Render\RIResources.hpp" />
     <ClInclude Include="..\src\Tests\MathTests.hpp" />
     <ClInclude Include="..\src\Tests\MemoryTests.hpp" />
+    <ClInclude Include="..\src\ThirdParty\glew\eglew.h" />
+    <ClInclude Include="..\src\ThirdParty\glew\glew.h" />
+    <ClInclude Include="..\src\ThirdParty\glew\glxew.h" />
+    <ClInclude Include="..\src\ThirdParty\glew\wglew.h" />
+    <ClInclude Include="..\src\ThirdParty\glfw\glfw3.h" />
+    <ClInclude Include="..\src\ThirdParty\glfw\glfw3native.h" />
     <ClInclude Include="..\src\ThirdParty\STB\stb_easy_font.h" />
     <ClInclude Include="..\src\ThirdParty\STB\stb_image.h" />
+    <ClInclude Include="..\src\ThirdParty\tinyobj\tiny_obj_loader.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Core\Clock.cpp" />
@@ -274,6 +282,7 @@
     <ClCompile Include="..\src\Render\RIOpenGL\RIOpenGL.cpp" />
     <ClCompile Include="..\src\Tests\MathTests.cpp" />
     <ClCompile Include="..\src\Tests\MemoryTests.cpp" />
+    <ClCompile Include="..\src\ThirdParty\tinyobj\tiny_obj_loader.cc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -17,21 +17,9 @@
 
 #include <chrono>
 
-//namespace Phoenix
-//{
-	/*
-		Linear arrays of components
-		Deletion by pop and swap -> allows for linear runs over arrays
-		Entities -> ComponentIndex lookup map
-		Components have type ids
-		Register in world with type ids
-		Type ids used to lookup component arrays
-		Put the ID in an enum for now -> simple and centralized
-	*/
 
 namespace Phoenix
 {
-
 	class ISystem
 	{
 	public:
@@ -100,6 +88,18 @@ namespace Phoenix
 		float m_speed;
 
 	};
+
+	EntityHandle createMeshEntity(World* world, IRIDevice* renderDevice, const char* meshPath)
+	{
+		RenderMesh mesh = loadRenderMesh(meshPath, renderDevice);
+		Material material = Material(Vec3(1.f, 1.f, 1.f), Vec3(0.3f, 0.3f, 0.3f), 100.f);
+
+		EntityHandle entity = world->createEntity();
+		world->addComponent<CStaticMesh>(entity, mesh, material);
+		world->addComponent<CTransform>(entity);
+
+		return entity;
+	}
 }
 
 int main(int argc, char** argv)
@@ -148,23 +148,11 @@ int main(int argc, char** argv)
 	world.registerComponentType<CStaticMesh>();
 	world.registerComponentType<CTransform>();
 
-	RenderMesh foxMesh = loadRenderMesh("Models/Fox/RedFox.obj", renderDevice);
-	//RenderMesh foxMesh = loadRenderMesh("Models/sponza/sponza.obj", renderDevice);
-
-	Material foxMaterial = Material(Vec3(1.f, 1.f, 1.f), Vec3(0.3f, 0.3f, 0.3f), 100.f);
-	EntityHandle fox = world.createEntity();
-	world.addComponent<CStaticMesh>(fox, foxMesh, foxMaterial);
-	world.addComponent<CTransform>(fox);
+	EntityHandle fox = createMeshEntity(&world, renderDevice, "Models/Fox/RedFox.obj");
 	
-	EntityHandle redLight = world.createEntity();
-	world.addComponent<CDirectionalLight>(redLight, Vec3(0.f, -1.f, 0.f), Vec3(0.3f, 0.f, 0.f));
+	EntityHandle light = world.createEntity();
+	world.addComponent<CDirectionalLight>(light, Vec3(-0.5f, -0.5f, 0.f), Vec3(0.4f, 0.4f, 0.4f));
 	
-	EntityHandle blueLight = world.createEntity();
-	world.addComponent<CDirectionalLight>(blueLight, Vec3(1.f, 0.f, 0.f), Vec3(0.f, 0.f, 1.f));
-
-	EntityHandle greenLight = world.createEntity();
-	world.addComponent<CDirectionalLight>(greenLight, Vec3(0.f, 1.f, 0.f), Vec3(0.f, 1.f, 0.f));
-
 	DrawStaticMeshSystem drawMeshSystem(&renderer);
 	DirectionalLightSystem dirLightSystem(&renderer);
 	RotatorSystem rotator(0.5f);
@@ -173,6 +161,9 @@ int main(int argc, char** argv)
 	using pointInTime = std::chrono::time_point<std::chrono::high_resolution_clock>;
 	 
 	pointInTime lastTime = Clock::now();
+
+	float prevMouseX = 0.0f;
+	float prevMouseY = 0.0f;
 
 	while (!window->wantsToClose())
 	{
@@ -201,12 +192,12 @@ int main(int argc, char** argv)
 
 			if (ev->m_value == Key::W && (ev->m_action == Key::Press || ev->m_action == Key::Repeat))
 			{
-				cameraUpdate.y += cameraChange * dt;
+				cameraUpdate.z += cameraChange * dt;
 			}
 
 			if (ev->m_value == Key::S && (ev->m_action == Key::Press || ev->m_action == Key::Repeat))
 			{
-				cameraUpdate.y -= cameraChange * dt;
+				cameraUpdate.z -= cameraChange * dt;
 			}
 		}
 
@@ -218,7 +209,17 @@ int main(int argc, char** argv)
 			renderer.setViewMatrix(viewTf);
 		}
 
-		//rotator.tick(&world, 0);
+		MouseState mouse = window->m_mouseState;
+
+		if (mouse.m_x != prevMouseX || mouse.m_y != prevMouseY)
+		{
+			prevMouseX = mouse.m_x;
+			prevMouseY = mouse.m_y;
+
+			Logger::logf("New mouse pos: X -> %f	Y -> %f", mouse.m_x, mouse.m_y);
+		}
+
+		rotator.tick(&world, 0);
 		drawMeshSystem.tick(&world, 0);
 		dirLightSystem.tick(&world, 0);
 

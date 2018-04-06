@@ -1,13 +1,26 @@
 #include "Mesh.hpp"
 
-#include <Core/obj.hpp>
 #include <core/Logger.hpp>
 #include <Render/RIDevice.hpp>
 
 #include <assert.h>
 
+#define IMPORT_OBJ_PHI 1
+#define IMPORT_OBJ_TINYOBJ 0
+
+#if IMPORT_OBJ_PHI
+#include <Core/obj.hpp>
+#endif
+
+#if IMPORT_OBJ_TINYOBJ
+#define TINYOBJLOADER_IMPLEMENTATION
+#include <ThirdParty/tinyobj/tiny_obj_loader.h>
+#endif
+
 namespace Phoenix
 {
+#if IMPORT_OBJ_PHI
+
 	RenderMesh loadRenderMesh(const char* path, IRIDevice* renderDevice)
 	{
 		RenderMesh mesh;
@@ -55,4 +68,15 @@ namespace Phoenix
 
 		return mesh;
 	}
+
+#endif // IMPORT_OBJ_PHI
+
+#if IMPORT_OBJ_TINYOBJ
+
+	RenderMesh loadRenderMesh(const char* path, IRIDevice* renderDevice)
+	{
+		
+	}
+
+#endif // IMPORT_OBJ_TINYOBJ
 }

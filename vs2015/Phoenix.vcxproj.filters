@@ -175,6 +175,30 @@
     <ClInclude Include="..\src\Core\Components\CCamera.hpp">
       <Filter>Core\Components</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\ThirdParty\tinyobj\tiny_obj_loader.h">
+      <Filter>ThirdParty\tinyobj</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ThirdParty\glfw\glfw3native.h">
+      <Filter>ThirdParty\glfw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ThirdParty\glfw\glfw3.h">
+      <Filter>ThirdParty\glfw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ThirdParty\glew\eglew.h">
+      <Filter>ThirdParty\glew</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ThirdParty\glew\glew.h">
+      <Filter>ThirdParty\glew</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ThirdParty\glew\glxew.h">
+      <Filter>ThirdParty\glew</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ThirdParty\glew\wglew.h">
+      <Filter>ThirdParty\glew</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Memory\CircularBuffer.hpp">
+      <Filter>Memory</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Core\Clock.cpp">
@@ -269,6 +293,9 @@
     <ClCompile Include="..\src\Core\Windows\PlatformWindows.cpp">
       <Filter>Core\Windows</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\ThirdParty\tinyobj\tiny_obj_loader.cc">
+      <Filter>ThirdParty\tinyobj</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Math">
@@ -303,6 +330,15 @@
     </Filter>
     <Filter Include="Core\Components">
       <UniqueIdentifier>{ad1093e0-5f69-4d27-a3ad-a457af490b91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty\tinyobj">
+      <UniqueIdentifier>{ecfa8507-d6b6-426e-9029-4bf533496f7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty\glfw">
+      <UniqueIdentifier>{08fcebc6-0db7-4025-8a8b-edfc3b36d549}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty\glew">
+      <UniqueIdentifier>{2308732d-604e-4035-aaf0-b3a6a339f3e7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
