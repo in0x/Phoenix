@@ -17,6 +17,11 @@
 
 #include <chrono>
 
+template <typename T>
+T clamp(T lo, T v, T hi)
+{
+	return v < lo ? lo : hi < v ? hi : v;
+}
 
 namespace Phoenix
 {
@@ -86,7 +91,6 @@ namespace Phoenix
 			}
 		}
 		float m_speed;
-
 	};
 
 	EntityHandle createMeshEntity(World* world, IRIDevice* renderDevice, const char* meshPath)
@@ -100,7 +104,61 @@ namespace Phoenix
 
 		return entity;
 	}
+
+	struct Camera
+	{
+		Vec3 m_position;
+		Vec3 m_xAxis;
+		Vec3 m_zAxis; 
+		Vec3 m_yAxis;
+
+		Camera()
+			: m_position(0.f, 0.f, 0.f)
+			, m_xAxis(1.0f, 0.0f, 0.0f)
+			, m_zAxis(0.0f, 0.0f, 1.0f)
+			, m_yAxis(0.0f, 1.0f, 0.0f)
+		{}
+
+		void moveRight(float d) 
+		{
+			m_position += m_xAxis * d;
+		}
+
+		void moveForward(float d) 
+		{
+			m_position += m_zAxis * d;
+		}
+
+		void pitch(float angle)
+		{
+			Matrix4 r = Matrix4::rotation(angle, m_xAxis);
+			m_yAxis = r * m_yAxis;
+			m_zAxis = r * m_zAxis;
+		}
+
+		void yaw(float angle)
+		{
+			Matrix4 r = Matrix4::rotation(angle, Vec3(0.0f, 1.0f, 0.0f));
+			m_xAxis = r * m_xAxis;
+			m_zAxis = r * m_zAxis;
+		}
+
+		Matrix4 updateViewMatrix()
+		{	
+			m_zAxis = m_zAxis.normalize(); 
+			m_yAxis = m_zAxis.cross(m_xAxis).normalized();
+			m_xAxis = m_yAxis.cross(m_zAxis).normalized(); 
+
+			return Matrix4{
+				m_xAxis.x, m_xAxis.y, m_xAxis.z, -(m_xAxis.dot(m_position)),
+				m_yAxis.x, m_yAxis.y, m_yAxis.z, -(m_yAxis.dot(m_position)),
+				m_zAxis.x, m_zAxis.y, m_zAxis.z, -(m_zAxis.dot(m_position)),
+				0,		 0,		  0,		1
+			};
+		}
+	};
 }
+
 
 int main(int argc, char** argv)
 {
@@ -136,8 +194,9 @@ int main(int argc, char** argv)
 
 	DeferredRenderer renderer(renderDevice, renderContext, config.width, config.height);
 	
-	Vec3 cameraPos = Vec3(0.f, 0.f, 7.f);
-	Matrix4 viewTf = lookAtRH(cameraPos, Vec3(0.f, 0.f, 0.f), Vec3(0.f, 1.f, 0.f));
+	Vec3 cameraPos(0.f, 0.f, 7.f);
+	Vec3 cameraForward(0.0f, 0.0f, 1.0f);
+	Matrix4 viewTf = lookAtRH(cameraPos, (cameraPos + cameraForward).normalized(), Vec3(0.f, 1.f, 0.f));
 	renderer.setViewMatrix(viewTf);
 
 	Matrix4 projTf = perspectiveRH(70.f, (float)config.width / (float)config.height, 0.1f, 100.f);
@@ -153,6 +212,9 @@ int main(int argc, char** argv)
 	EntityHandle light = world.createEntity();
 	world.addComponent<CDirectionalLight>(light, Vec3(-0.5f, -0.5f, 0.f), Vec3(0.4f, 0.4f, 0.4f));
 	
+	EntityHandle light2 = world.createEntity();
+	world.addComponent<CDirectionalLight>(light2, Vec3(0.5f, -0.5f, 0.f), Vec3(0.4f, 0.4f, 0.4f));
+
 	DrawStaticMeshSystem drawMeshSystem(&renderer);
 	DirectionalLightSystem dirLightSystem(&renderer);
 	RotatorSystem rotator(0.5f);
@@ -162,8 +224,12 @@ int main(int argc, char** argv)
 	 
 	pointInTime lastTime = Clock::now();
 
-	float prevMouseX = 0.0f;
-	float prevMouseY = 0.0f;
+	Platform::pollEvents();
+
+	float prevMouseX = window->m_mouseState.m_x;
+	float prevMouseY = window->m_mouseState.m_y;
+
+	Camera camera;
 
 	while (!window->wantsToClose())
 	{
@@ -173,8 +239,7 @@ int main(int argc, char** argv)
 		std::chrono::duration<float> timeSpan = currentTime - lastTime;
 		float dt = timeSpan.count();
 
-		Vec3 cameraUpdate;
-		float cameraChange = 0.05f;
+		float cameraChange = 0.05f * dt;
 
 		while (!window->m_keyEvents.isEmpty())
 		{
@@ -182,44 +247,46 @@ int main(int argc, char** argv)
 
 			if (ev->m_value == Key::A && (ev->m_action == Key::Press || ev->m_action == Key::Repeat))
 			{
-				cameraUpdate.x -= cameraChange * dt;
+				camera.moveRight(-cameraChange);
 			}
 
 			if (ev->m_value == Key::D && (ev->m_action == Key::Press || ev->m_action == Key::Repeat))
 			{
-				cameraUpdate.x += cameraChange * dt;
+				camera.moveRight(cameraChange);
 			}
 
 			if (ev->m_value == Key::W && (ev->m_action == Key::Press || ev->m_action == Key::Repeat))
 			{
-				cameraUpdate.z += cameraChange * dt;
+				camera.moveForward(-cameraChange);
 			}
 
 			if (ev->m_value == Key::S && (ev->m_action == Key::Press || ev->m_action == Key::Repeat))
 			{
-				cameraUpdate.z -= cameraChange * dt;
+				camera.moveForward(cameraChange);
 			}
-		}
-
-		if (cameraUpdate.length2() > 0.0f)
-		{
-			cameraPos += cameraUpdate;
-
-			Matrix4 viewTf = lookAtRH(cameraPos, cameraPos + Vec3(0.f, 0.f, -1.0f), Vec3(0.f, 1.f, 0.f));
-			renderer.setViewMatrix(viewTf);
 		}
 
 		MouseState mouse = window->m_mouseState;
 
 		if (mouse.m_x != prevMouseX || mouse.m_y != prevMouseY)
 		{
+			if (mouse.m_leftDown)
+			{
+				float sens = 25.0f;
+				float dx = -radians(sens * ((mouse.m_x - prevMouseX) / config.width) * dt);
+				float dy = -radians(sens * ((mouse.m_y - prevMouseY) / config.height) * dt);
+
+				camera.yaw(dx);
+				camera.pitch(dy);
+			}
+
 			prevMouseX = mouse.m_x;
 			prevMouseY = mouse.m_y;
-
-			Logger::logf("New mouse pos: X -> %f	Y -> %f", mouse.m_x, mouse.m_y);
 		}
 
-		rotator.tick(&world, 0);
+		renderer.setViewMatrix(camera.updateViewMatrix());
+
+		//rotator.tick(&world, 0);
 		drawMeshSystem.tick(&world, 0);
 		dirLightSystem.tick(&world, 0);
 

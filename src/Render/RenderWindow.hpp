@@ -63,6 +63,7 @@ namespace Phoenix
 	{	
 		float m_x;
 		float m_y;
+		bool m_leftDown; //temp
 	};
 
 	class RenderWindow

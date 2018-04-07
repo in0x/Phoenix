@@ -231,7 +231,7 @@ namespace Phoenix
 
 	Matrix4 Matrix4::inverse() const
 	{
-		auto det = determinant();
+		float det = determinant();
 		assert(det);
 		return adjoint() / det;
 	}
@@ -262,33 +262,33 @@ namespace Phoenix
 	}
 
 
-	Matrix4 Matrix4::scale(float x, float y, float z)
+	Matrix4 Matrix4::scale(const Vec3& values)
 	{
 		return Matrix4
 		{
-			x, 0, 0, 0,
-			0, y, 0, 0,
-			0, 0, z, 0,
+			values.x, 0, 0, 0,
+			0, values.y, 0, 0,
+			0, 0, values.z, 0,
 			0, 0, 0, 1
 		};
 	}
 
-	Matrix4 Matrix4::translation(float x, float y, float z)
+	Matrix4 Matrix4::translation(const Vec3& values)
 	{
 		return Matrix4
 		{
-			1, 0, 0, x,
-			0, 1, 0, y,
-			0, 0, 1, z,
+			1, 0, 0, values.x,
+			0, 1, 0, values.y,
+			0, 0, 1, values.z,
 			0, 0, 0, 1
 		};
 	}
 
-	Matrix4 Matrix4::rotation(float x, float y, float z)
+	Matrix4 Matrix4::rotation(const Vec3& values)
 	{
-		auto radX = radians(x);
-		auto radY = radians(y);
-		auto radZ = radians(z);
+		float radX = radians(values.x);
+		float radY = radians(values.y);
+		float radZ = radians(values.z);
 
 		float A = std::cos(radX);
 		float B = std::sin(radX);
@@ -306,6 +306,38 @@ namespace Phoenix
 		};
 	}
 
+	Matrix4 Matrix4::rotation(float angle, const Vec3& axis)
+	{
+		float c = cos(angle);
+		float s = sin(angle);
+		float t = 1.0f - c;
+
+		Vec3 ax = axis.normalized();
+	
+		Matrix4 rot;
+
+		rot(0,0) = c + ax.x * ax.x * t;
+		rot(1,1) = c + ax.y * ax.y * t;
+		rot(2,2) = c + ax.z * ax.z * t;
+
+		float tmp1 = ax.x * ax.y * t;
+		float tmp2 = ax.z * s;
+		rot(1,0) = tmp1 + tmp2;
+		rot(0,1) = tmp1 - tmp2;
+		
+		tmp1 = ax.x * ax.z * t;
+		tmp2 = ax.y * s;
+		rot(2,0) = tmp1 - tmp2;
+		rot(0,2) = tmp1 + tmp2;    
+		
+		tmp1 = ax.y * ax.z * t;
+		tmp2 = ax.x * s;
+		rot(2,1) = tmp1 + tmp2;
+		rot(1,2) = tmp1 - tmp2;
+
+		return rot;
+	}
+	
 	Matrix4 Matrix4::identity()
 	{
 		return Matrix4{ 1, 0, 0, 0,

@@ -78,10 +78,10 @@ namespace Phoenix {
 		Matrix3 asMatrix3() const;
 		EulerAngles asEulerAngles() const;
 
-		static Matrix4 scale(float x, float y, float z);
-		static Matrix4 translation(float x, float y, float z);
-		static Matrix4 rotation(float x, float y, float z);
-
+		static Matrix4 scale(const Vec3& values);
+		static Matrix4 translation(const Vec3& values);
+		static Matrix4 rotation(const Vec3& values); // TODO(phil.welsch): Convert these to vec3s...
+		static Matrix4 rotation(float angle, const Vec3& axis);
 		static Matrix4 identity();
 	};
 

@@ -16,6 +16,7 @@ namespace Phoenix
 {
 	void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 	void mouseMoveCallback(GLFWwindow* window, double x, double y);
+	void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 
 	class GlRenderWindow : public RenderWindow
 	{
@@ -33,6 +34,7 @@ namespace Phoenix
 			{
 				glfwSetKeyCallback(m_glfwWindow, &keyCallback);
 				glfwSetCursorPosCallback(m_glfwWindow, &mouseMoveCallback);
+				glfwSetMouseButtonCallback(m_glfwWindow, &mouseButtonCallback);
 			}
 
 			return (nullptr != m_glfwWindow);
@@ -328,5 +330,29 @@ namespace Phoenix
 		GlRenderWindow* renderWindow = windowFromGlfw(window);
 		renderWindow->m_mouseState.m_x = x;
 		renderWindow->m_mouseState.m_y = y;
+	}
+
+	void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+	{
+		/*	GLFW_MOUSE_BUTTON
+
+			if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
+				popup_menu();*/
+
+		GlRenderWindow* renderWindow = windowFromGlfw(window);
+
+		if (button == GLFW_MOUSE_BUTTON_LEFT)
+		{
+			if (action == GLFW_PRESS)
+			{
+				renderWindow->m_mouseState.m_leftDown = true;
+			}
+
+			if (action == GLFW_RELEASE)
+			{
+				renderWindow->m_mouseState.m_leftDown = false;
+			}
+		}
+
 	}
 }
