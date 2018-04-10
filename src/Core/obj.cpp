@@ -2,7 +2,8 @@
 
 #include <functional>
 #include <algorithm>
-#include <cassert>
+#include <assert.h>
+#include <memory>
 #include <map>
 
 #include <Core/StringTokenizer.hpp>
@@ -125,7 +126,7 @@ namespace Phoenix
 
 				if (bDataExists)
 				{
-					pConvertedMesh->indices.push_back(index);
+					pConvertedMesh->indices.emplace_back(index);
 				}
 				else
 				{
@@ -199,26 +200,26 @@ namespace Phoenix
 
 	void ObjIndexer::addV(const PackedVertexData& data)
 	{
-		pConvertedMesh->vertices.push_back(data.vertex);
+		pConvertedMesh->vertices.emplace_back(data.vertex);
 	}
 
 	void ObjIndexer::addVN(const PackedVertexData& data)
 	{
-		pConvertedMesh->vertices.push_back(data.vertex);
-		pConvertedMesh->normals.push_back(data.normal);
+		pConvertedMesh->vertices.emplace_back(data.vertex);
+		pConvertedMesh->normals.emplace_back(data.normal);
 	}
 
 	void ObjIndexer::addVT(const PackedVertexData& data)
 	{
-		pConvertedMesh->vertices.push_back(data.vertex);
-		pConvertedMesh->uvs.push_back(data.uv);
+		pConvertedMesh->vertices.emplace_back(data.vertex);
+		pConvertedMesh->uvs.emplace_back(data.uv);
 	}
 
 	void ObjIndexer::addVTN(const PackedVertexData& data)
 	{
-		pConvertedMesh->vertices.push_back(data.vertex);
-		pConvertedMesh->normals.push_back(data.normal);
-		pConvertedMesh->uvs.push_back(data.uv);
+		pConvertedMesh->vertices.emplace_back(data.vertex);
+		pConvertedMesh->normals.emplace_back(data.normal);
+		pConvertedMesh->uvs.emplace_back(data.uv);
 	}
 
 	void ObjIndexer::addDataAndIndex(const PackedVertexData& data)
@@ -227,7 +228,7 @@ namespace Phoenix
 
 		unsigned int index = static_cast<unsigned int>(packed.size());
 		packed[data] = index;
-		pConvertedMesh->indices.push_back(index);
+		pConvertedMesh->indices.emplace_back(index);
 	}
 
 	class ObjParser
@@ -480,12 +481,12 @@ namespace Phoenix
 
 	void ObjParser::selectFaceType(const char* faceToken)
 	{
-		if (find(faceToken, "/") == std::string::npos) // f a b c -> Vertex
+		if (findFirst(faceToken, "/") == std::string::npos) // f a b c -> Vertex
 		{
 			vertexParser = &ObjParser::parseFaceVertexV;
 			faceDelimiter = " ";
 		}
-		else if (find(faceToken, "//") != std::string::npos) // f a//u b//v c//w -> Vertex//Normal
+		else if (findFirst(faceToken, "//") != std::string::npos) // f a//u b//v c//w -> Vertex//Normal
 		{
 			vertexParser = &ObjParser::parseFaceVertexVN;
 			faceDelimiter = "//";

@@ -1,18 +1,24 @@
 #pragma once
+
 #include <vector>
-#include <string>
+#include <stdint.h>
 
 namespace Phoenix
 {
-	float strToFloat(const char* string);
-	int strToInt(const char* string);
+	float strToFloat(const char* str);
+	int32_t strToInt(const char* str);
 
-	bool compare(const char* token, const char* other);
+	bool compare(const char* str, const char* other);
 
-	// If found, returns the index of toFind in token. Retunrs std::string::npos
-	// otherwise. Optionally, pos can be used to start the search at a specific 
-	// point within token.
-	size_t find(const char* token, const char* toFind, size_t pos = 0);
+	// If found, returns the index of toFind in str. Returns -1
+	// otherwise. Optionally, pos can be used to start the search   
+	// at a specific point within str.
+	int32_t findFirst(const char* str, const char* toFind, size_t pos = 0);
+
+	// If found, returns the index of the last occurence of toFind in str.
+	// Returns -1 otherwise. Optionally, pos can be used to start the search 
+	// at a specific point within str.
+	int32_t findLast(const char* str, const char* toFind, size_t pos = 0);
 	
 	// Replaces all trailing whitespace in string with the null character.
 	void trimTrailingWhitespace(char* string);
@@ -22,7 +28,7 @@ namespace Phoenix
 	// place while acting like a separate string when used with functions
 	// that terminate on encountering the null character.
 	// Returns a vector of char* each pointing to the beginning of the next token.
-	std::vector<char*> tokenize(char* string, const char* delimiter);
+	std::vector<char*> tokenize(char* str, const char* delimiter);
 
-	size_t subStrCount(const char* string, const char* substr);
+	size_t subStrCount(const char* str, const char* substr);
 }

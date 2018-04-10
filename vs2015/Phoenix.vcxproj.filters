@@ -286,15 +286,14 @@
     <ClCompile Include="..\src\Render\DeferredRenderer.cpp">
       <Filter>Render</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Core\Mesh.cpp" />
     <ClCompile Include="..\src\Core\Shader.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Core\Windows\PlatformWindows.cpp">
       <Filter>Core\Windows</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\ThirdParty\tinyobj\tiny_obj_loader.cc">
-      <Filter>ThirdParty\tinyobj</Filter>
+    <ClCompile Include="..\src\Core\Mesh.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -1,34 +1,35 @@
 #pragma once
+
 #include "StringTokenizer.hpp"
 
 namespace Phoenix
 {
-	float strToFloat(const char* string)
+	float strToFloat(const char* str)
 	{
 		float real = 0.f;
 		bool neg = false;
-		if (*string == '-')
+		if (*str == '-')
 		{
 			neg = true;
-			++string;
+			++str;
 		}
 
-		while (*string >= '0' && *string <= '9')
+		while (*str >= '0' && *str <= '9')
 		{
-			real = (real * 10.f) + (*string - '0');
-			++string;
+			real = (real * 10.f) + (*str - '0');
+			++str;
 		}
 
-		if (*string == '.')
+		if (*str == '.')
 		{
 			float fract = 0.f;
 			int fractLen = 0;
-			++string;
+			++str;
 
-			while (*string >= '0' && *string <= '9')
+			while (*str >= '0' && *str <= '9')
 			{
-				fract = (fract*10.f) + (*string - '0');
-				++string;
+				fract = (fract*10.f) + (*str - '0');
+				++str;
 				++fractLen;
 			}
 
@@ -39,30 +40,30 @@ namespace Phoenix
 			real = -real;
 		}
 
-		if (*string == 'e')
+		if (*str == 'e')
 		{
-			++string;
-			int pow = strToInt(string);
+			++str;
+			int pow = strToInt(str);
 			return real * (std::pow(10.f, pow));
 		}
 
 		return real;
 	}
 
-	int strToInt(const char* string)
+	int32_t strToInt(const char* str)
 	{
-		int real = 0;
+		int32_t real = 0;
 		bool neg = false;
-		if (*string == '-')
+		if (*str == '-')
 		{
 			neg = true;
-			++string;
+			++str;
 		}
 
-		while (*string >= '0' && *string <= '9')
+		while (*str >= '0' && *str <= '9')
 		{
-			real = (real * 10) + (*string - '0');
-			++string;
+			real = (real * 10) + (*str - '0');
+			++str;
 		}
 
 		if (neg)
@@ -72,59 +73,89 @@ namespace Phoenix
 		return real;
 	}
 
-	bool compare(const char* token, const char* other)
+	bool compare(const char* str, const char* other)
 	{
-		return strcmp(token, other) == 0;
+		return strcmp(str, other) == 0;
 	}
 
-	// Returns first index of substring if found, else std::string::npos;
-	size_t find(const char* token, const char* toFind, size_t pos)
+	// Returns first index of substring if found, else -1;
+	int32_t findFirst(const char* str, const char* toFind, size_t pos)
 	{
 		size_t tokenSize = strlen(toFind);
 
-		const char* current = token + pos;
+		const char* current = str + pos;
 
 		while ((current = strstr(current, toFind)) != nullptr)
 		{
 			if (strncmp(current, toFind, tokenSize) == 0)
 			{
-				return current - token;
+				return current - str;
 			}
 		}
 
-		return std::string::npos;
+		return -1;
 	}
 
-	void trimTrailingWhitespace(char* string)
+	int32_t findLast(const char* str, const char* toFind, size_t pos)
 	{
-		size_t i = strlen(string);
+		/*int32_t current = -1;
+		int32_t last = 0;
+	
+		str += pos;
 
-		while (i > 0 && string[i - 1] == ' ')
+		do
 		{
-			string[--i] = '\0';
+			last = current;
+			current = findFirst(str + pos, toFind);
+			pos = last;
+		} while (current != -1);
+
+		return last;*/
+	
+		int32_t current = 0;
+		int32_t last = 0;
+
+		str += pos;
+
+		while (current != -1)
+		{
+			last = current;
+			current = findFirst(str, toFind, current + 1);
+		}
+
+		return last;
+	}
+
+	void trimTrailingWhitespace(char* str)
+	{
+		size_t i = strlen(str);
+
+		while (i > 0 && str[i - 1] == ' ')
+		{
+			str[--i] = '\0';
 		}
 	}
 
-	std::vector<char*> tokenize(char* string, const char* delimiter)
+	std::vector<char*> tokenize(char* str, const char* delimiter)
 	{
 		std::vector<char*> tokens;
 
 		size_t pos = 0;
 		const size_t delimiterLength = strlen(delimiter);
 
-		const size_t delimiterCount = subStrCount(string, delimiter) + 1;
+		const size_t delimiterCount = subStrCount(str, delimiter) + 1;
 		tokens.reserve(delimiterCount);
 
-		char* first = string;
+		char* first = str;
 		tokens.push_back(first);
 
-		while ((pos = find(string, delimiter, pos)) != std::string::npos)
+		while ((pos = findFirst(str, delimiter, pos)) != std::string::npos)
 		{
 			tokens.push_back(first + pos + delimiterLength);
 
 			for (size_t i = pos; i < pos + delimiterLength; ++i)
 			{
-				string[i] = '\0';
+				str[i] = '\0';
 			}
 
 			pos += delimiterLength;
@@ -133,12 +164,12 @@ namespace Phoenix
 		return tokens;
 	}
 
-	size_t subStrCount(const char* string, const char* substr)
+	size_t subStrCount(const char* str, const char* substr)
 	{
 		size_t count = 0;
 		size_t pos = 0;
 		
-		while ((pos = find(string, substr, pos)) != std::string::npos)
+		while ((pos = findFirst(str, substr, pos)) != std::string::npos)
 		{
 			++count;
 			++pos;

@@ -282,7 +282,6 @@
     <ClCompile Include="..\src\Render\RIOpenGL\RIOpenGL.cpp" />
     <ClCompile Include="..\src\Tests\MathTests.cpp" />
     <ClCompile Include="..\src\Tests\MemoryTests.cpp" />
-    <ClCompile Include="..\src\ThirdParty\tinyobj\tiny_obj_loader.cc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
