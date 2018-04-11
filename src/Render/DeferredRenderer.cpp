@@ -76,7 +76,7 @@ namespace Phoenix
 		m_context->bindUniform(m_uniforms.projTf, &m_projMat);
 	}
 	
-	void DeferredRenderer::drawStaticMesh(const RenderMesh& mesh, const Matrix4& transform, const Material& material)
+	void DeferredRenderer::drawStaticMesh(const StaticMesh& mesh, const Matrix4& transform, const Material& material)
 	{
 		m_context->bindUniform(m_uniforms.modelTf, &transform);
 
@@ -84,7 +84,14 @@ namespace Phoenix
 		m_context->bindUniform(m_uniforms.kSpecular, &material.m_specular);
 		m_context->bindUniform(m_uniforms.specExp, &material.m_specularExp);
 
-		m_context->drawIndexed(mesh.m_vertexbuffer, mesh.m_indexbuffer, EPrimitive::Triangles);
+		if (mesh.m_indexbuffer.isValid() && mesh.m_numIndices > 0)
+		{
+			m_context->drawIndexed(mesh.m_vertexbuffer, mesh.m_indexbuffer, EPrimitive::Triangles);
+		}
+		else
+		{
+			m_context->drawLinear(mesh.m_vertexbuffer, EPrimitive::Triangles, mesh.m_numVertices);
+		}
 	}
 
 	void DeferredRenderer::setupLightPass()

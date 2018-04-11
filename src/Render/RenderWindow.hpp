@@ -13,6 +13,17 @@ namespace Phoenix
 		bool bFullscreen;
 	};
 
+	struct Input
+	{
+		enum Action
+		{
+			Release,
+			Press,
+			Repeat,
+			NumActions
+		};
+	};
+
 	struct Key
 	{
 		enum Value
@@ -22,14 +33,6 @@ namespace Phoenix
 			S,
 			W,
 			NumValues,
-		};
-		
-		enum Action
-		{
-			Press, 
-			Repeat,
-			Release,
-			NumActions
 		};
 		
 		enum Modifier
@@ -44,12 +47,12 @@ namespace Phoenix
 		{
 			Event()
 				: m_value(NumValues)
-				, m_action(NumActions)
+				, m_action(Input::NumActions)
 				, m_modifiers(0)
 			{}
 
 			Value m_value;
-			Action m_action;
+			Input::Action m_action;
 			int m_modifiers;
 
 			bool hasModifier(Modifier mod)
@@ -60,10 +63,21 @@ namespace Phoenix
 	};
 
 	struct MouseState
-	{	
+	{		
+		enum Button
+		{
+			Left,
+			Right,
+			Middle,
+			Mouse4,
+			Mouse5,
+			NumButtons
+		};
+
 		float m_x;
 		float m_y;
-		bool m_leftDown; //temp
+
+		Input::Action m_buttonStates[NumButtons];
 	};
 
 	class RenderWindow

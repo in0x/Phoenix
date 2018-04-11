@@ -11,7 +11,7 @@ namespace Phoenix
 	class IRIDevice;
 	class IRIContext;
 	
-	struct RenderMesh;
+	struct StaticMesh;
 	class Material;
 
 	class DeferredRenderer
@@ -21,7 +21,7 @@ namespace Phoenix
 
 		void setupGBufferPass();
 
-		void drawStaticMesh(const RenderMesh& mesh, const Matrix4& transform, const Material& material);
+		void drawStaticMesh(const StaticMesh& mesh, const Matrix4& transform, const Material& material);
 
 		void setupLightPass();
 

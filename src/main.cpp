@@ -93,16 +93,21 @@ namespace Phoenix
 		float m_speed;
 	};
 
-	EntityHandle createMeshEntity(World* world, IRIDevice* renderDevice, const char* meshPath)
+	std::vector<EntityHandle> createMeshEntities(World* world, IRIDevice* renderDevice, const char* meshPath)
 	{
-		RenderMesh mesh = loadRenderMesh(meshPath, renderDevice);
+		std::vector<EntityHandle> entities;
+		std::vector<StaticMesh> meshes = loadRenderMesh(meshPath, renderDevice);
 		Material material = Material(Vec3(1.f, 1.f, 1.f), Vec3(0.3f, 0.3f, 0.3f), 100.f);
 
-		EntityHandle entity = world->createEntity();
-		world->addComponent<CStaticMesh>(entity, mesh, material);
-		world->addComponent<CTransform>(entity);
-
-		return entity;
+		for (StaticMesh mesh : meshes)
+		{
+			EntityHandle entity = world->createEntity();
+			world->addComponent<CStaticMesh>(entity, mesh, material);
+			world->addComponent<CTransform>(entity);
+			entities.push_back(entity);
+		}
+	
+		return entities;
 	}
 
 	struct Camera
@@ -188,9 +193,9 @@ int main(int argc, char** argv)
 	config.title = "Phoenix";
 	config.bFullscreen = false;
 
-	RenderWindow* window = RI::createWindow(config);
+	RenderWindow* gameWindow = RI::createWindow(config);
 
-	RI::setWindowToRenderTo(window);
+	RI::setWindowToRenderTo(gameWindow);
 
 	DeferredRenderer renderer(renderDevice, renderContext, config.width, config.height);
 	
@@ -199,7 +204,7 @@ int main(int argc, char** argv)
 	Matrix4 viewTf = lookAtRH(cameraPos, (cameraPos + cameraForward).normalized(), Vec3(0.f, 1.f, 0.f));
 	renderer.setViewMatrix(viewTf);
 
-	Matrix4 projTf = perspectiveRH(70.f, (float)config.width / (float)config.height, 0.1f, 100.f);
+	Matrix4 projTf = perspectiveRH(70.f, (float)config.width / (float)config.height, 0.1f, 10000.f);
 	renderer.setProjectionMatrix(projTf);
 	
 	World world;
@@ -207,7 +212,9 @@ int main(int argc, char** argv)
 	world.registerComponentType<CStaticMesh>();
 	world.registerComponentType<CTransform>();
 
-	EntityHandle fox = createMeshEntity(&world, renderDevice, "Models/Fox/RedFox.obj");
+	auto fox = createMeshEntities(&world, renderDevice, "Models/Fox/RedFox.obj");
+
+	auto sponza = createMeshEntities(&world, renderDevice, "Models/sponza/sponza.obj");
 	
 	EntityHandle light = world.createEntity();
 	world.addComponent<CDirectionalLight>(light, Vec3(-0.5f, -0.5f, 0.f), Vec3(0.4f, 0.4f, 0.4f));
@@ -226,12 +233,12 @@ int main(int argc, char** argv)
 
 	Platform::pollEvents();
 
-	float prevMouseX = window->m_mouseState.m_x;
-	float prevMouseY = window->m_mouseState.m_y;
+	float prevMouseX = gameWindow->m_mouseState.m_x;
+	float prevMouseY = gameWindow->m_mouseState.m_y;
 
 	Camera camera;
 
-	while (!window->wantsToClose())
+	while (!gameWindow->wantsToClose())
 	{
 		Platform::pollEvents();
 
@@ -241,36 +248,36 @@ int main(int argc, char** argv)
 
 		float cameraChange = 0.05f * dt;
 
-		while (!window->m_keyEvents.isEmpty())
+		while (!gameWindow->m_keyEvents.isEmpty())
 		{
-			Key::Event* ev = window->m_keyEvents.get();
+			Key::Event* ev = gameWindow->m_keyEvents.get();
 
-			if (ev->m_value == Key::A && (ev->m_action == Key::Press || ev->m_action == Key::Repeat))
+			if (ev->m_value == Key::A && (ev->m_action == Input::Press || ev->m_action == Input::Repeat))
 			{
 				camera.moveRight(-cameraChange);
 			}
 
-			if (ev->m_value == Key::D && (ev->m_action == Key::Press || ev->m_action == Key::Repeat))
+			if (ev->m_value == Key::D && (ev->m_action == Input::Press || ev->m_action == Input::Repeat))
 			{
 				camera.moveRight(cameraChange);
 			}
 
-			if (ev->m_value == Key::W && (ev->m_action == Key::Press || ev->m_action == Key::Repeat))
+			if (ev->m_value == Key::W && (ev->m_action == Input::Press || ev->m_action == Input::Repeat))
 			{
 				camera.moveForward(-cameraChange);
 			}
 
-			if (ev->m_value == Key::S && (ev->m_action == Key::Press || ev->m_action == Key::Repeat))
+			if (ev->m_value == Key::S && (ev->m_action == Input::Press || ev->m_action == Input::Repeat))
 			{
 				camera.moveForward(cameraChange);
 			}
 		}
 
-		MouseState mouse = window->m_mouseState;
+		MouseState mouse = gameWindow->m_mouseState;
 
 		if (mouse.m_x != prevMouseX || mouse.m_y != prevMouseY)
 		{
-			if (mouse.m_leftDown)
+			if (mouse.m_buttonStates[MouseState::Left] == Input::Press)
 			{
 				float sens = 25.0f;
 				float dx = -radians(sens * ((mouse.m_x - prevMouseX) / config.width) * dt);
@@ -292,10 +299,10 @@ int main(int argc, char** argv)
 
 		renderContext->endPass();
 
-		RI::swapBufferToWindow(window);
+		RI::swapBufferToWindow(gameWindow);
 	}
 
-	RI::destroyWindow(window);
+	RI::destroyWindow(gameWindow);
 	RI::exit();
 	Logger::exit();
 

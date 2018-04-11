@@ -10,12 +10,12 @@ namespace Phoenix
 	{
 		CStaticMesh() = default;
 
-		CStaticMesh(const RenderMesh& mesh, const Material& material)
+		CStaticMesh(const StaticMesh& mesh, const Material& material)
 			: m_mesh(mesh)
 			, m_material(material)
 		{}
 
-		RenderMesh m_mesh;
+		StaticMesh m_mesh;
 		Material m_material;
 	};
 }

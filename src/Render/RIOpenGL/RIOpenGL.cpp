@@ -259,23 +259,20 @@ namespace Phoenix
 		}
 	}
 
-	void actionFromGlfw(int action, Key::Event* outEvent)
+	Input::Action actionFromGlfw(int action)
 	{
 		switch (action)
 		{
 		case GLFW_PRESS:
-			outEvent->m_action = Key::Press;
-			break;
+			return Input::Press;
 		case GLFW_REPEAT:
-			outEvent->m_action = Key::Repeat; 
-			break;
+			return Input::Repeat;
 		case GLFW_RELEASE:
-			outEvent->m_action = Key::Release;
-			break;
+			return Input::Release;
 		default:
 			assert(false);
-			Logger::warningf("Attempted to convert unhandled action value");
-			break;
+			Logger::warningf("Attempted to convert unhandled input action value");
+			return Input::NumActions;
 		}
 	}
 
@@ -294,6 +291,30 @@ namespace Phoenix
 		if (mods & GLFW_MOD_ALT)
 		{
 			outEvent->m_modifiers |= Key::Alt;
+		}
+	}
+
+	MouseState::Button mouseButtonFromGlfw(int button)
+	{
+
+#define IMPL_KEY_SWITCH(glfw, value) \
+		case glfw: \
+		{ \
+			return value; \
+		} \
+
+		switch (button)
+		{
+			IMPL_KEY_SWITCH(GLFW_MOUSE_BUTTON_LEFT, MouseState::Left)
+			IMPL_KEY_SWITCH(GLFW_MOUSE_BUTTON_RIGHT, MouseState::Right)
+			IMPL_KEY_SWITCH(GLFW_MOUSE_BUTTON_MIDDLE, MouseState::Middle)
+			IMPL_KEY_SWITCH(GLFW_MOUSE_BUTTON_4, MouseState::Mouse4)
+			IMPL_KEY_SWITCH(GLFW_MOUSE_BUTTON_5, MouseState::Mouse5)
+		default:
+			{
+				Logger::warningf("Attempted to convert unhandled button value: %d", button);
+				break;
+			}
 		}
 	}
 
@@ -319,7 +340,7 @@ namespace Phoenix
 
 		// TODO(phil.welsch): Use scancode to detect specific keys (e.g. left vs right shift)
 		keyTypeFromGlfw(key, scancode, &ev);
-		actionFromGlfw(action, &ev);
+		ev.m_action = actionFromGlfw(action);
 		modifierFromGlfw(mods, &ev); 
 
 		renderWindow->m_keyEvents.add(ev);
@@ -334,25 +355,9 @@ namespace Phoenix
 
 	void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 	{
-		/*	GLFW_MOUSE_BUTTON
-
-			if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
-				popup_menu();*/
-
 		GlRenderWindow* renderWindow = windowFromGlfw(window);
+		MouseState& state = renderWindow->m_mouseState;
 
-		if (button == GLFW_MOUSE_BUTTON_LEFT)
-		{
-			if (action == GLFW_PRESS)
-			{
-				renderWindow->m_mouseState.m_leftDown = true;
-			}
-
-			if (action == GLFW_RELEASE)
-			{
-				renderWindow->m_mouseState.m_leftDown = false;
-			}
-		}
-
+		state.m_buttonStates[mouseButtonFromGlfw(button)] = actionFromGlfw(action);
 	}
 }
