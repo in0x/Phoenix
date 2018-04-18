@@ -10,9 +10,6 @@
     <ClInclude Include="..\src\Tests\MathTests.hpp">
       <Filter>Test</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Core\obj.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Core\StringTokenizer.hpp">
       <Filter>Core</Filter>
     </ClInclude>
@@ -206,9 +203,6 @@
     </ClCompile>
     <ClCompile Include="..\src\Tests\MathTests.cpp">
       <Filter>Test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Core\obj.cpp">
-      <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\Core\StringTokenizer.cpp">

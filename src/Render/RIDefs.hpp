@@ -122,7 +122,7 @@ namespace Phoenix
 
 		void add(const VertexAttrib::Decl& decl, const VertexAttrib::Data& data)
 		{
-			if (auto currentAttrib = has(decl.m_property))
+			if (VertexAttrib* currentAttrib = has(decl.m_property))
 			{
 				*currentAttrib = { decl, data };
 				return;
@@ -148,7 +148,7 @@ namespace Phoenix
 
 		VertexAttrib* has(EAttributeProperty attribType)
 		{
-			for (auto& attrib : m_attribs)
+			for (VertexAttrib& attrib : m_attribs)
 			{
 				if (attrib.m_decl.m_property == attribType)
 					return &attrib;

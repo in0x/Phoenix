@@ -195,7 +195,6 @@
     <ClInclude Include="..\src\Core\FNVHash.hpp" />
     <ClInclude Include="..\src\Core\StringTokenizer.hpp" />
     <ClInclude Include="..\src\Core\Texture.hpp" />
-    <ClInclude Include="..\src\Core\obj.hpp" />
     <ClInclude Include="..\src\Core\Clock.hpp" />
     <ClInclude Include="..\src\Core\Logger.hpp" />
     <ClInclude Include="..\src\Core\Windows\PhiWindowsInclude.hpp" />
@@ -253,7 +252,6 @@
     <ClCompile Include="..\src\Core\Clock.cpp" />
     <ClCompile Include="..\src\Core\Logger.cpp" />
     <ClCompile Include="..\src\Core\Mesh.cpp" />
-    <ClCompile Include="..\src\Core\obj.cpp" />
     <ClCompile Include="..\src\Core\Shader.cpp" />
     <ClCompile Include="..\src\Core\StringTokenizer.cpp" />
     <ClCompile Include="..\src\Core\Texture.cpp" />

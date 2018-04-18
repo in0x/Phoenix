@@ -2,6 +2,7 @@
 
 in vec4 positionEye;
 in vec4 normalEye;
+in vec2 uv;
 
 uniform vec3 kDiffuse;
 uniform vec3 kSpecular;

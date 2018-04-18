@@ -188,8 +188,8 @@ int main(int argc, char** argv)
 	renderContext->setDepthTest(EDepth::Enable);
 
 	WindowConfig config;
-	config.width = 800;
-	config.height = 600;
+	config.width = 1280;
+	config.height = 720;
 	config.title = "Phoenix";
 	config.bFullscreen = false;
 
@@ -212,7 +212,7 @@ int main(int argc, char** argv)
 	world.registerComponentType<CStaticMesh>();
 	world.registerComponentType<CTransform>();
 
-	auto fox = createMeshEntities(&world, renderDevice, "Models/Fox/RedFox.obj");
+	//auto fox = createMeshEntities(&world, renderDevice, "Models/Fox/RedFox.obj");
 
 	auto sponza = createMeshEntities(&world, renderDevice, "Models/sponza/sponza.obj");
 	

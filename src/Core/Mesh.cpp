@@ -4,86 +4,35 @@
 #include <Render/RIDevice.hpp>
 
 #include <assert.h>
-#include <memory>
 
-#define IMPORT_OBJ_PHI 0
-#define IMPORT_OBJ_TINYOBJ 1
-
-#if IMPORT_OBJ_PHI
-#include <Core/obj.hpp>
-#endif
-
-#if IMPORT_OBJ_TINYOBJ
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <ThirdParty/tinyobj/tiny_obj_loader.h>
+
 #include <Math/Vec3.hpp>
 #include <Math/Vec2.hpp>
-#endif
+
+/*
+	TODO:
+	Load in UVS
+
+	Possible solution:
+	Default uvs if none are present with default textures.
+	Not sure how valid this is. I guess I could use a "clear" default texture?
+	And then have every uv be 0,0
+
+	Then the default pbr values get blended with the texture values?
+
+	If no texture present, use a default 1x1 pixel white texture. Then multiply with material value.
+*/
 
 namespace Phoenix
 {
-#if IMPORT_OBJ_PHI
-
-	StaticMesh loadRenderMesh(const char* path, IRIDevice* renderDevice)
-	{
-		StaticMesh mesh;
-
-		const char* fileDot = strrchr(path, '.');
-		size_t pathLen = strlen(path);
-		if (nullptr == fileDot)
-		{
-			assert(false);
-			Logger::errorf("Could not locate file ending in path %s while loading RenderMesh", path);
-			return mesh;
-		}
-
-		if (strcmp(".obj", fileDot) == 0)
-		{
-			const char* lastSlash = strrchr(path, '/');
-			lastSlash++;
-
-			std::string pathToAsset(path, lastSlash);
-			std::string assetName(lastSlash, path + pathLen);
-
-			OBJImport import = loadObj(pathToAsset, assetName);
-
-			mesh.m_numVertices = import.mesh.vertices.size();
-			mesh.m_numIndices = import.mesh.indices.size();
-
-			VertexBufferFormat layout;
-			layout.add({ EAttributeProperty::Position, EAttributeType::Float, 3 },
-			{ sizeof(Vec3), import.mesh.vertices.size(), import.mesh.vertices.data() });
-
-			layout.add({ EAttributeProperty::Normal, EAttributeType::Float, 3 },
-			{ sizeof(Vec3), import.mesh.normals.size(), import.mesh.normals.data() });
-
-			mesh.m_vertexbuffer = renderDevice->createVertexBuffer(layout);
-			mesh.m_indexbuffer = renderDevice->createIndexBuffer(sizeof(uint32_t), mesh.m_numIndices, import.mesh.indices.data());
-
-			assert(mesh.m_vertexbuffer.isValid());
-			assert(mesh.m_indexbuffer.isValid());
-		}
-		else
-		{
-			assert(false);
-			Logger::errorf("Attempted to load unsuppored Mesh Type %s while loading RenderMesh", path);
-		}
-
-		return mesh;
-	}
-
-#endif // IMPORT_OBJ_PHI
-
-#if IMPORT_OBJ_TINYOBJ
-
-
-	// Repurpose ObjIndexer to produce this from tinyobj import
-	// Each shape gets written into a submesh. I'm currently making 
+	// I'm currently making 
 	// the assumption that each shape has one material, I should
 	// verify that with atleast an assert.
-	struct SubMesh
+	struct MeshImport
 	{
-		SubMesh()
+		MeshImport()
 			: m_numVertices(0)
 			, m_vertices(nullptr)
 			, m_normals(nullptr)
@@ -108,15 +57,17 @@ namespace Phoenix
 		int32_t materialID;
 	};
 
-	SubMesh convertForOpenGL(float* vertices, float* normals, const tinyobj::shape_t& shape)
+	MeshImport convertForOpenGL(float* vertices, float* normals, float* uvs, const tinyobj::shape_t& shape)
 	{
-		SubMesh mesh;
+		MeshImport mesh;
+	
 		size_t numIndices = shape.mesh.indices.size();
 		mesh.m_numVertices = numIndices;
-
 		mesh.m_vertices = new Vec3[numIndices];
 		mesh.m_normals = new Vec3[numIndices];
+		mesh.m_uvs = new Vec2[numIndices];
 
+		assert(shape.mesh.num_face_vertices[0] == 3);
 		size_t vertsInFace = 3;
 
 		for (size_t indexOffset = 0; indexOffset < numIndices; indexOffset += vertsInFace)
@@ -127,21 +78,28 @@ namespace Phoenix
 
 				Vec3* v = mesh.m_vertices + indexOffset + vertex;
 				Vec3* n = mesh.m_normals + indexOffset + vertex;
+				Vec2* t = mesh.m_uvs + indexOffset + vertex;
 
-				v->x = vertices[3 * idx.vertex_index + 0];
-				v->y = vertices[3 * idx.vertex_index + 1];
-				v->z = vertices[3 * idx.vertex_index + 2];
+				size_t vertexIdx = 3 * idx.vertex_index;
+				v->x = vertices[vertexIdx + 0];
+				v->y = vertices[vertexIdx + 1];
+				v->z = vertices[vertexIdx + 2];
 
-				n->x = normals[3 * idx.normal_index + 0];
-				n->y = normals[3 * idx.normal_index + 1];
-				n->z = normals[3 * idx.normal_index + 2];
+				size_t normalIdx = 3 * idx.normal_index;
+				n->x = normals[normalIdx + 0];
+				n->y = normals[normalIdx + 1];
+				n->z = normals[normalIdx + 2];
+
+				size_t uvIdx = 2 * idx.texcoord_index;
+				t->x = uvs[uvIdx + 0];
+				t->y = uvs[uvIdx + 1];
 			}
 		}
 
 		return mesh;
 	}
 
-	std::vector<SubMesh> loadObj(const char* filename, const char* mtlDir = "Models/sponza/", bool triangulate = true)
+	std::vector<MeshImport> loadObj(const char* filename, const char* mtlDir = nullptr, bool triangulate = true)
 	{
 		tinyobj::attrib_t attrib;
 		std::vector<tinyobj::shape_t> shapes;
@@ -149,59 +107,92 @@ namespace Phoenix
 
 		std::string err;
 		bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, filename, mtlDir, triangulate);
-		
+
 		assert(ret);
 
-		Logger::log(err.c_str());
+		Logger::warning(err.c_str());
 
 		bool bHasVerts = attrib.vertices.size() > 0;
 		bool bHasNorms = attrib.normals.size() > 0;
 		bool bHasUvs = attrib.texcoords.size() > 0;
 
-		assert(bHasVerts && bHasNorms);
+		assert(bHasVerts && bHasNorms && bHasUvs);
 
-		std::vector<SubMesh> submeshes;
+		std::vector<MeshImport> submeshes;
 
 		for (tinyobj::shape_t shape : shapes)
 		{
-			SubMesh submesh = convertForOpenGL(attrib.vertices.data(), attrib.normals.data(), shape);
+			MeshImport submesh = convertForOpenGL(attrib.vertices.data(), attrib.normals.data(), attrib.texcoords.data(), shape);
 			submeshes.push_back(submesh);
 		}
 
+		// TODO: Patch uvs if not existant
+
 		return submeshes;
 	}
-	
-	std::vector<StaticMesh> loadRenderMesh(const char* path, IRIDevice* renderDevice)
-	{
-		std::vector<SubMesh> submeshes = loadObj(path);
-		
-		std::vector<StaticMesh> imports;
 
-		for (SubMesh submesh : submeshes)
+	std::vector<StaticMesh> importObj(const char* assetPath, const char* mtlPath, IRIDevice* renderDevice)
+	{
+		std::vector<MeshImport> imports = loadObj(assetPath, mtlPath);
+
+		std::vector<StaticMesh> meshes;
+
+		for (MeshImport import : imports)
 		{
 			StaticMesh mesh;
 
-			size_t numVertices = submesh.m_numVertices;
+			size_t numVertices = import.m_numVertices;
 
 			mesh.m_numVertices = numVertices;
 
 			VertexBufferFormat layout;
 			layout.add({ EAttributeProperty::Position, EAttributeType::Float, 3 },
-			{ sizeof(Vec3), numVertices, submesh.m_vertices });
+			{ sizeof(Vec3), numVertices, import.m_vertices });
 
 			layout.add({ EAttributeProperty::Normal, EAttributeType::Float, 3 },
-			{ sizeof(Vec3), numVertices, submesh.m_normals });
+			{ sizeof(Vec3), numVertices, import.m_normals });
+
+			layout.add({ EAttributeProperty::TexCoord, EAttributeType::Float, 2 },
+			{ sizeof(Vec2), numVertices, import.m_uvs });
 
 			mesh.m_vertexbuffer = renderDevice->createVertexBuffer(layout);
-			mesh.m_numVertices = submesh.m_numVertices;
+			mesh.m_numVertices = import.m_numVertices;
 
 			assert(mesh.m_vertexbuffer.isValid());
 
-			imports.push_back(mesh);
+			meshes.push_back(mesh);
+
+			import.free();
 		}
-		
-		return imports;
+
+		return meshes;
 	}
 
-#endif // IMPORT_OBJ_TINYOBJ
+	std::vector<StaticMesh> loadRenderMesh(const char* path, IRIDevice* renderDevice)
+	{
+		const char* fileDot = strrchr(path, '.');
+		size_t pathLen = strlen(path);
+		if (nullptr == fileDot)
+		{
+			assert(false);
+			Logger::errorf("Could not locate file ending in path %s while loading Mesh", path);
+			return {};
+		}
+
+		if (strcmp(".obj", fileDot) == 0)
+		{
+			const char* lastSlash = strrchr(path, '/');
+			lastSlash++;
+
+			std::string pathToAsset(path, lastSlash);
+			std::string assetName(lastSlash, path + pathLen);
+
+			return importObj(path, pathToAsset.c_str(), renderDevice);
+		}
+		else
+		{
+			assert(false);
+			Logger::errorf("Attempted to load unsuppored Mesh Type %s while loading Mesh", path);
+		}
+	}
 }
