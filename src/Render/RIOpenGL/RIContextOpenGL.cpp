@@ -35,8 +35,8 @@ namespace Phoenix
 	uint32_t RIContextOpenGL::getMaxTextureUnits() const
 	{
 		GLint maxTextureUnits;
-		glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxTextureUnits);
-		return static_cast<uint32_t>(maxTextureUnits);
+		glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxTextureUnits);
+		return static_cast<uint32_t>(maxTextureUnits) - 1;
 	}
 
 	void RIContextOpenGL::drawLinear(EPrimitive primitives, uint32_t count, uint32_t start)
@@ -203,10 +203,16 @@ namespace Phoenix
 		}
 
 		assert(glUniform.m_glType == getSamplerType(binding.texturetype));
-		//assert(m_boundState.activeTextureCount < getMaxTextureUnits());
+		assert(m_boundState.activeTextureCount < getMaxTextureUnits());
 
+		checkGlErrorOccured();
 		glActiveTexture(GL_TEXTURE0 + m_boundState.activeTextureCount);
+		checkGlErrorOccured();
+
+		checkGlErrorOccured();
 		glBindTexture(binding.texturetype, binding.texID);
+		checkGlErrorOccured();
+
 		setUniform(glUniform, &m_boundState.activeTextureCount, EUniformType::Int);
 
 		m_boundState.activeTextureCount++;
@@ -223,7 +229,18 @@ namespace Phoenix
 		const GlTextureCube* texture = m_resources->m_textureCubes.getResource(handle);
 		bindTextureBase({ *texture, texture->m_glTex.m_id, GL_TEXTURE_CUBE_MAP });
 	}
-	
+
+	void RIContextOpenGL::unbindTextures()
+	{
+		for (uint8_t activeTexture = 0; activeTexture < m_boundState.activeTextureCount; ++activeTexture)
+		{
+			glActiveTexture(GL_TEXTURE0 + activeTexture);
+			glBindTexture(GL_TEXTURE_2D, 0); 
+		}
+
+		m_boundState.activeTextureCount = 0;
+	}
+
 	void RIContextOpenGL::clearRenderTargetColor(RenderTargetHandle rtHandle, const RGBA& clearColor)
 	{
 		const GlFramebuffer* fb = m_resources->m_framebuffers.getResource(rtHandle);
@@ -390,12 +407,12 @@ namespace Phoenix
 		}
 
 		glEnable(GL_BLEND);
-		
+
 		glBlendEquationSeparate(toGlBlendOp(state.m_blendOpRGB), toGlBlendOp(state.m_blendOpA));
-		
+
 		glBlendFuncSeparate(toGlBlendFactor(state.m_factorSrcRGB)
-						  , toGlBlendFactor(state.m_factorDstRGB)
-						  , toGlBlendFactor(state.m_factorSrcA)
-						  , toGlBlendFactor(state.m_factorDstA));
+			, toGlBlendFactor(state.m_factorDstRGB)
+			, toGlBlendFactor(state.m_factorSrcA)
+			, toGlBlendFactor(state.m_factorDstA));
 	}
 }

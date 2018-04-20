@@ -41,6 +41,8 @@ namespace Phoenix
 
 		virtual void bindTexture(TextureCubeHandle handle) override;
 
+		virtual void unbindTextures() override;
+
 		virtual void bindRenderTarget(RenderTargetHandle handle) override;
 
 		virtual void bindDefaultRenderTarget() override;

@@ -33,6 +33,8 @@ namespace Phoenix
 
 		virtual void bindTexture(TextureCubeHandle handle) = 0;
 
+		virtual void unbindTextures() = 0;
+
 		virtual void bindRenderTarget(RenderTargetHandle handle) = 0;
 
 		virtual void bindDefaultRenderTarget() = 0;
