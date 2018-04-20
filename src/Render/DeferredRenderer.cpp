@@ -80,7 +80,7 @@ namespace Phoenix
 	{
 		if (mesh.m_numMaterials == 0)
 		{
-			//Logger::warning("Trying to draw static mesh with no material, this is currently not handled. Skipping drawing.");
+			Logger::warning("Trying to draw static mesh with no material, this is currently not handled. Skipping drawing.");
 			return;
 		}
 
@@ -91,42 +91,26 @@ namespace Phoenix
 			const Material& material = mesh.m_materials[0];
 
 			m_context->bindTexture(material.m_diffuseTex);
-
 			m_context->drawIndexed(mesh.m_vertexbuffer, mesh.m_indexbuffer, EPrimitive::Triangles);
 		}
 		else
 		{
-			if (mesh.m_numMaterials == 1)
+			size_t materialIdx = 0;
+
+			for (; materialIdx < mesh.m_numMaterials - 1; ++materialIdx)
 			{
-				const Material& material = mesh.m_materials[0];
-
-				m_context->bindTexture(material.m_diffuseTex);
-
-				m_context->drawLinear(mesh.m_vertexbuffer, EPrimitive::Triangles, mesh.m_numVertices);
-				m_context->endPass(); // "Reset" texture bindings TODO: turn this into an actual reset function
-			}
-			else
-			{
-				size_t materialIdx = 0;
-
-				for (; materialIdx < mesh.m_numMaterials - 1; ++materialIdx)
-				{
-					const Material& material = mesh.m_materials[materialIdx];
-					size_t currVertexIdx = mesh.m_vertexFrom[materialIdx];
-
-					m_context->bindTexture(material.m_diffuseTex);
-
-					m_context->drawLinear(mesh.m_vertexbuffer, EPrimitive::Triangles, mesh.m_vertexFrom[materialIdx + 1] - currVertexIdx, currVertexIdx);
-					m_context->endPass(); // "Reset" texture bindings TODO: turn this into an actual reset function
-				}
-
-				const Material& material = mesh.m_materials[materialIdx]; // TODO I think i can remove the == 1 case if I check here if there are more than 1
+				const Material& material = mesh.m_materials[materialIdx];
 				size_t currVertexIdx = mesh.m_vertexFrom[materialIdx];
 
 				m_context->bindTexture(material.m_diffuseTex);
-
-				m_context->drawLinear(mesh.m_vertexbuffer, EPrimitive::Triangles, mesh.m_numVertices - currVertexIdx, currVertexIdx);
+				m_context->drawLinear(mesh.m_vertexbuffer, EPrimitive::Triangles, mesh.m_vertexFrom[materialIdx + 1] - currVertexIdx, currVertexIdx);
 			}
+
+			const Material& material = mesh.m_materials[materialIdx];
+			size_t currVertexIdx = mesh.m_vertexFrom[materialIdx];
+
+			m_context->bindTexture(material.m_diffuseTex);
+			m_context->drawLinear(mesh.m_vertexbuffer, EPrimitive::Triangles, mesh.m_numVertices - currVertexIdx, currVertexIdx);
 		}
 	}
 
