@@ -190,6 +190,7 @@
     <ClInclude Include="..\src\Core\EcsTypes.hpp" />
     <ClInclude Include="..\src\Core\Engine.hpp" />
     <ClInclude Include="..\src\Core\Mesh.hpp" />
+    <ClInclude Include="..\src\Core\Serialize.hpp" />
     <ClInclude Include="..\src\Core\Shader.hpp" />
     <ClInclude Include="..\src\Core\FNVHash.hpp" />
     <ClInclude Include="..\src\Core\StringTokenizer.hpp" />

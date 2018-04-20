@@ -19,6 +19,8 @@
 
 #include <Render/RIOpenGL/OpenGL.hpp>
 
+#include "Core/Serialize.hpp"
+
 namespace Phoenix
 {
 	class ISystem
@@ -184,7 +186,27 @@ int main(int argc, char** argv)
 
 	Camera camera;
 	
-	checkGlErrorOccured();
+	{
+		size_t w = 3;
+
+		WriteArchive ar = createWriteArchive(sizeof(size_t));
+	
+		serialize(ar, w);
+
+		writeArchiveToDisk("SerialTest/sizet.bin", ar);
+
+		destroyArchive(ar);
+	}
+	
+	{
+		size_t r = 0;
+
+		ReadArchive ar = createReadArchive("SerialTest/sizet.bin");
+
+		serialize(ar, r);
+
+		destroyArchive(ar);
+	}
 
 	while (!gameWindow->wantsToClose())
 	{
