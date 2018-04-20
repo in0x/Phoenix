@@ -111,9 +111,9 @@ namespace Phoenix
 
 		desc.numMips = numMips;
 
-		desc.wrapU = ETextureWrap::ClampToEdge;
-		desc.wrapV = ETextureWrap::ClampToEdge;
-		desc.wrapW = ETextureWrap::ClampToEdge;
+		desc.wrapU = ETextureWrap::Repeat;
+		desc.wrapV = ETextureWrap::Repeat;
+		desc.wrapW = ETextureWrap::Repeat;
 
 		return desc;
 	}
