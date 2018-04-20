@@ -5,6 +5,7 @@
 
 #include <Render/RIDefs.hpp>
 #include <Render/RIDevice.hpp>
+#include <Render/RIContext.hpp>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <ThirdParty/STB/stb_image.h>
@@ -26,19 +27,17 @@ namespace Phoenix
 		}
 	}
 
-	Texture loadTexture(const char* path)
+	void loadTexture(const char* path, Texture* outTexture)
 	{
-		Logger::logf("Loading texture %s", path);
-
-		Texture texture;
+		//Logger::logf("Loading texture %s", path);
 
 		int width = 0;
 		int height = 0;
 		int components = 0;
 
-		texture.m_data = stbi_load(path, &width, &height, &components, 0);
+		outTexture->m_data = stbi_load(path, &width, &height, &components, 0);
 		
-		if (nullptr == texture.m_data)
+		if (nullptr == outTexture->m_data)
 		{
 			Logger::errorf("Failed to load texture with error: %s", stbi_failure_reason());
 			assert(false);
@@ -50,11 +49,9 @@ namespace Phoenix
 			Logger::warningf("Texture has none power-of-2 dimensions: Width %d, Height: %d", width, height);
 		}
 
-		texture.m_width = static_cast<uint32_t>(width);
-		texture.m_height = static_cast<uint32_t>(height);
-		texture.m_components = static_cast<uint8_t>(components);
-
-		return texture;
+		outTexture->m_width = static_cast<uint32_t>(width);
+		outTexture->m_height = static_cast<uint32_t>(height);
+		outTexture->m_components = static_cast<uint8_t>(components);
 	}
 
 	void destroyTexture(Texture& texture)
@@ -121,14 +118,18 @@ namespace Phoenix
 		return desc;
 	}
 
-	Texture2DHandle loadRenderTexture2D(const char* path, const char* nameInShader, IRIDevice* renderDevice)
+	Texture2DHandle loadRenderTexture2D(const char* path, const char* nameInShader, IRIDevice* renderDevice, IRIContext* renderContext)
 	{
-		Texture tex = loadTexture(path);
+		Texture tex;
+		loadTexture(path, &tex);
 
 		TextureDesc desc = createDesc(tex, ETextureFilter::Linear, ETextureFilter::Linear);
 		Texture2DHandle tex2D = renderDevice->createTexture2D(desc, nameInShader);
-		
+
 		assert(tex2D.isValid());
+
+		renderContext->uploadTextureData(tex2D, tex.m_data);
+
 		return tex2D;
 	}
 }

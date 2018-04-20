@@ -7,6 +7,7 @@
 namespace Phoenix
 {
 	class IRIDevice;
+	class IRIContext;
 
 	class Texture
 	{
@@ -20,7 +21,7 @@ namespace Phoenix
 		uint8_t m_components;
 	};
 
-	Texture loadTexture(const char* path);
+	void loadTexture(const char* path, Texture* outTexture);
 	
 	// Can optionally be used to unload texture data early.
 	// Texture also unloads when destructed.
@@ -28,5 +29,5 @@ namespace Phoenix
 	
 	void flipTextureHorizontal(Texture& texture);
 
-	Texture2DHandle loadRenderTexture2D(const char* path, const char* nameInShader, IRIDevice* renderDevice);
+	Texture2DHandle loadRenderTexture2D(const char* path, const char* nameInShader, IRIDevice* renderDevice, IRIContext* renderContext);
 }

@@ -2,7 +2,6 @@
 
 #include <Core/Component.hpp>
 #include <Core/Mesh.hpp>
-#include <Core/Material.hpp>
 
 namespace Phoenix
 {
@@ -10,12 +9,10 @@ namespace Phoenix
 	{
 		CStaticMesh() = default;
 
-		CStaticMesh(const StaticMesh& mesh, const Material& material)
+		CStaticMesh(const StaticMesh& mesh)
 			: m_mesh(mesh)
-			, m_material(material)
 		{}
 
 		StaticMesh m_mesh;
-		Material m_material;
 	};
 }

@@ -203,7 +203,7 @@ namespace Phoenix
 		}
 
 		assert(glUniform.m_glType == getSamplerType(binding.texturetype));
-		assert(m_boundState.activeTextureCount < getMaxTextureUnits());
+		//assert(m_boundState.activeTextureCount < getMaxTextureUnits());
 
 		glActiveTexture(GL_TEXTURE0 + m_boundState.activeTextureCount);
 		glBindTexture(binding.texturetype, binding.texID);
@@ -223,7 +223,7 @@ namespace Phoenix
 		const GlTextureCube* texture = m_resources->m_textureCubes.getResource(handle);
 		bindTextureBase({ *texture, texture->m_glTex.m_id, GL_TEXTURE_CUBE_MAP });
 	}
-
+	
 	void RIContextOpenGL::clearRenderTargetColor(RenderTargetHandle rtHandle, const RGBA& clearColor)
 	{
 		const GlFramebuffer* fb = m_resources->m_framebuffers.getResource(rtHandle);

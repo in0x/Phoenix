@@ -46,6 +46,12 @@ namespace Phoenix
 
 		return (diff <= larger * maxRelDif);
 	}
+
+	template <typename T>
+	T clamp(T lo, T v, T hi)
+	{
+		return v < lo ? lo : hi < v ? hi : v;
+	}
 	
 	Matrix4 lookAtRH(Vec3& cameraPos, Vec3& target, Vec3& up);
 	Matrix4 perspectiveRH(float yFOV, float aspect, float near, float far);		

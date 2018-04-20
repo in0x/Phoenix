@@ -12,7 +12,7 @@ namespace Phoenix
 	class IRIContext;
 	
 	struct StaticMesh;
-	class Material;
+	struct Material;
 
 	class DeferredRenderer
 	{
@@ -21,7 +21,7 @@ namespace Phoenix
 
 		void setupGBufferPass();
 
-		void drawStaticMesh(const StaticMesh& mesh, const Matrix4& transform, const Material& material);
+		void drawStaticMesh(const StaticMesh& mesh, const Matrix4& transform);
 
 		void setupLightPass();
 

@@ -4,9 +4,12 @@ in vec4 positionEye;
 in vec4 normalEye;
 in vec2 uv;
 
-uniform vec3 kDiffuse;
+// legacy
 uniform vec3 kSpecular;
 uniform float specularExp;
+
+// new 
+uniform sampler2D matDiffuseTex;
 
 layout (location = 0) out vec4 normalRGBSpecExpA;
 layout (location = 1) out vec4 kDiffuseRGBDepthA;
@@ -17,7 +20,7 @@ void main()
 	normalRGBSpecExpA.xyz = normalize(normalEye.xyz);
 	normalRGBSpecExpA.w = specularExp;
 	
-	kDiffuseRGBDepthA.xyz = kDiffuse;
+	kDiffuseRGBDepthA.xyz = texture(matDiffuseTex, uv).xyz;
 	kDiffuseRGBDepthA.w = positionEye.z;
 	
 	kSpecularRGB = kSpecular;

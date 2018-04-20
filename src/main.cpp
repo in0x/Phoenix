@@ -17,12 +17,6 @@
 
 #include <chrono>
 
-template <typename T>
-T clamp(T lo, T v, T hi)
-{
-	return v < lo ? lo : hi < v ? hi : v;
-}
-
 namespace Phoenix
 {
 	class ISystem
@@ -47,7 +41,7 @@ namespace Phoenix
 			{
 				CTransform* transform = mesh.sibling<CTransform>();
 
-				m_renderer->drawStaticMesh(mesh.m_mesh, transform->toMat4(), mesh.m_material);
+				m_renderer->drawStaticMesh(mesh.m_mesh, transform->toMat4());
 			}
 		}
 
@@ -93,16 +87,15 @@ namespace Phoenix
 		float m_speed;
 	};
 
-	std::vector<EntityHandle> createMeshEntities(World* world, IRIDevice* renderDevice, const char* meshPath)
+	std::vector<EntityHandle> createMeshEntities(World* world, IRIDevice* renderDevice, IRIContext* renderContext, const char* meshPath)
 	{
 		std::vector<EntityHandle> entities;
-		std::vector<StaticMesh> meshes = loadRenderMesh(meshPath, renderDevice);
-		Material material = Material(Vec3(1.f, 1.f, 1.f), Vec3(0.3f, 0.3f, 0.3f), 100.f);
+		std::vector<StaticMesh> meshes = loadRenderMesh(meshPath, renderDevice, renderContext);
 
 		for (StaticMesh mesh : meshes)
 		{
 			EntityHandle entity = world->createEntity();
-			world->addComponent<CStaticMesh>(entity, mesh, material);
+			world->addComponent<CStaticMesh>(entity, mesh);
 			world->addComponent<CTransform>(entity);
 			entities.push_back(entity);
 		}
@@ -214,7 +207,7 @@ int main(int argc, char** argv)
 
 	//auto fox = createMeshEntities(&world, renderDevice, "Models/Fox/RedFox.obj");
 
-	auto sponza = createMeshEntities(&world, renderDevice, "Models/sponza/sponza.obj");
+	std::vector<EntityHandle> sponza = createMeshEntities(&world, renderDevice, renderContext, "Models/sponza/sponza.obj");
 	
 	EntityHandle light = world.createEntity();
 	world.addComponent<CDirectionalLight>(light, Vec3(-0.5f, -0.5f, 0.f), Vec3(0.4f, 0.4f, 0.4f));

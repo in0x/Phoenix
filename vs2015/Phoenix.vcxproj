@@ -189,7 +189,6 @@
     <ClInclude Include="..\src\Core\Components\CTransform.hpp" />
     <ClInclude Include="..\src\Core\EcsTypes.hpp" />
     <ClInclude Include="..\src\Core\Engine.hpp" />
-    <ClInclude Include="..\src\Core\Material.hpp" />
     <ClInclude Include="..\src\Core\Mesh.hpp" />
     <ClInclude Include="..\src\Core\Shader.hpp" />
     <ClInclude Include="..\src\Core\FNVHash.hpp" />

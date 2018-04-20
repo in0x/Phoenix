@@ -142,9 +142,6 @@
     <ClInclude Include="..\src\Memory\ChunkArray.hpp">
       <Filter>Memory</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Core\Material.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\ThirdParty\STB\stb_image.h">
       <Filter>ThirdParty\STB</Filter>
     </ClInclude>

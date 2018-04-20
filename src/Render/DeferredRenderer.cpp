@@ -2,7 +2,7 @@
 
 #include <Core/Shader.hpp>
 #include <Core/Mesh.hpp>
-#include <Core/Material.hpp>
+#include <Core/Logger.hpp>
 
 #include <Render/RIDevice.hpp>
 #include <Render/RIContext.hpp>
@@ -26,7 +26,7 @@ namespace Phoenix
 		desc.pixelFormat = EPixelFormat::RGB16F;
 		m_kSpecularTex = renderDevice->createTexture2D(desc, "kSpecularRGB_tex");
 
-		desc.pixelFormat = EPixelFormat::Depth32F; 
+		desc.pixelFormat = EPixelFormat::Depth32F;
 		m_depthTex = renderDevice->createTexture2D(desc, "depth_tex");
 
 		RenderTargetDesc gBufferDesc;
@@ -62,7 +62,7 @@ namespace Phoenix
 	{
 		m_projMat = projection;
 	}
-	
+
 	void DeferredRenderer::setupGBufferPass()
 	{
 		m_context->bindRenderTarget(m_gBuffer);
@@ -75,22 +75,58 @@ namespace Phoenix
 		m_context->bindUniform(m_uniforms.viewTf, &m_viewMat);
 		m_context->bindUniform(m_uniforms.projTf, &m_projMat);
 	}
-	
-	void DeferredRenderer::drawStaticMesh(const StaticMesh& mesh, const Matrix4& transform, const Material& material)
-	{
-		m_context->bindUniform(m_uniforms.modelTf, &transform);
 
-		m_context->bindUniform(m_uniforms.kDiffuse, &material.m_diffuse);
-		m_context->bindUniform(m_uniforms.kSpecular, &material.m_specular);
-		m_context->bindUniform(m_uniforms.specExp, &material.m_specularExp);
+	void DeferredRenderer::drawStaticMesh(const StaticMesh& mesh, const Matrix4& transform)
+	{
+		if (mesh.m_numMaterials == 0)
+		{
+			//Logger::warning("Trying to draw static mesh with no material, this is currently not handled. Skipping drawing.");
+			return;
+		}
+
+		m_context->bindUniform(m_uniforms.modelTf, &transform);
 
 		if (mesh.m_indexbuffer.isValid() && mesh.m_numIndices > 0)
 		{
+			const Material& material = mesh.m_materials[0];
+
+			m_context->bindTexture(material.m_diffuseTex);
+
 			m_context->drawIndexed(mesh.m_vertexbuffer, mesh.m_indexbuffer, EPrimitive::Triangles);
 		}
 		else
 		{
-			m_context->drawLinear(mesh.m_vertexbuffer, EPrimitive::Triangles, mesh.m_numVertices);
+			if (mesh.m_numMaterials == 1)
+			{
+				const Material& material = mesh.m_materials[0];
+
+				m_context->bindTexture(material.m_diffuseTex);
+
+				m_context->drawLinear(mesh.m_vertexbuffer, EPrimitive::Triangles, mesh.m_numVertices);
+				m_context->endPass(); // "Reset" texture bindings TODO: turn this into an actual reset function
+			}
+			else
+			{
+				size_t materialIdx = 0;
+
+				for (; materialIdx < mesh.m_numMaterials - 1; ++materialIdx)
+				{
+					const Material& material = mesh.m_materials[materialIdx];
+					size_t currVertexIdx = mesh.m_vertexFrom[materialIdx];
+
+					m_context->bindTexture(material.m_diffuseTex);
+
+					m_context->drawLinear(mesh.m_vertexbuffer, EPrimitive::Triangles, mesh.m_vertexFrom[materialIdx + 1] - currVertexIdx, currVertexIdx);
+					m_context->endPass(); // "Reset" texture bindings TODO: turn this into an actual reset function
+				}
+
+				const Material& material = mesh.m_materials[materialIdx]; // TODO I think i can remove the == 1 case if I check here if there are more than 1
+				size_t currVertexIdx = mesh.m_vertexFrom[materialIdx];
+
+				m_context->bindTexture(material.m_diffuseTex);
+
+				m_context->drawLinear(mesh.m_vertexbuffer, EPrimitive::Triangles, mesh.m_numVertices - currVertexIdx, currVertexIdx);
+			}
 		}
 	}
 
@@ -108,11 +144,10 @@ namespace Phoenix
 	{
 		m_context->bindShaderProgram(m_directionaLightProgram);
 
-		m_context->bindUniform(m_uniforms.projTf, &m_projMat);
+		//m_context->bindUniform(m_uniforms.projTf, &m_projMat);
 
 		m_context->bindTexture(m_normalSpecExpTex);
 		m_context->bindTexture(m_kDiffuseDepthTex);
-		m_context->bindTexture(m_kSpecularTex);
 
 		Vec3 lightDirEye = m_viewMat * direction;
 

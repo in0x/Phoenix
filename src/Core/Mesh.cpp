@@ -1,15 +1,16 @@
 #include "Mesh.hpp"
 
 #include <Core/Logger.hpp>
+#include <Core/Texture.hpp>
 #include <Render/RIDevice.hpp>
+#include <Render/RIContext.hpp>
+#include <Math/Vec2.hpp>
 
 #include <assert.h>
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <ThirdParty/tinyobj/tiny_obj_loader.h>
 
-#include <Math/Vec3.hpp>
-#include <Math/Vec2.hpp>
 
 /*
 	TODO:
@@ -20,16 +21,23 @@
 	Not sure how valid this is. I guess I could use a "clear" default texture?
 	And then have every uv be 0,0
 
-	Then the default pbr values get blended with the texture values?
+	Create 1x1 texture with material value if no texture available.
 
-	If no texture present, use a default 1x1 pixel white texture. Then multiply with material value.
+	Or 1x1 white texture? But does that mean that tex and constant values should always be multiplied?
 */
 
 namespace Phoenix
 {
-	// I'm currently making 
-	// the assumption that each shape has one material, I should
-	// verify that with atleast an assert.
+	struct MaterialImport
+	{
+		std::string m_diffuseTex;
+		std::string m_roughnessTex;
+		std::string m_normalTex;
+		std::string m_metallicTex;
+
+		size_t m_vertexFrom;
+	};
+
 	struct MeshImport
 	{
 		MeshImport()
@@ -47,17 +55,17 @@ namespace Phoenix
 		}
 
 		// Each submesh has m_size verts, norms and uvs (if present)
-		// so indexing works properly
+		// so indexing works properly.
 		size_t m_numVertices;
 
 		Vec3* m_vertices;
 		Vec3* m_normals;
 		Vec2* m_uvs;
 
-		int32_t materialID;
+		std::vector<MaterialImport> m_matImports;
 	};
 
-	MeshImport convertForOpenGL(float* vertices, float* normals, float* uvs, const tinyobj::shape_t& shape)
+	MeshImport convertForOpenGLVNT(float* vertices, float* normals, float* uvs, const tinyobj::shape_t& shape, const std::vector<tinyobj::material_t>& materials)
 	{
 		MeshImport mesh;
 	
@@ -70,8 +78,32 @@ namespace Phoenix
 		assert(shape.mesh.num_face_vertices[0] == 3);
 		size_t vertsInFace = 3;
 
+		int lastMaterialIdx = -1;
+
+		if (shape.mesh.material_ids[0] == -1)
+		{
+			Logger::warningf("Shape %s does not have a material, this needs to be assigned a default material!", shape.name.c_str());
+			Logger::warning("This shape will be skipped when drawing.");
+		}
+
 		for (size_t indexOffset = 0; indexOffset < numIndices; indexOffset += vertsInFace)
 		{
+			if (shape.mesh.material_ids[indexOffset / 3] != lastMaterialIdx)
+			{
+				lastMaterialIdx = shape.mesh.material_ids[indexOffset / 3];
+
+				const tinyobj::material_t& mtl = materials[lastMaterialIdx];
+
+				mesh.m_matImports.emplace_back();
+				MaterialImport& matImport = mesh.m_matImports.back();
+
+				matImport.m_diffuseTex = mtl.diffuse_texname;
+				matImport.m_roughnessTex = mtl.specular_highlight_texname;
+				matImport.m_metallicTex = mtl.ambient_texname;
+				matImport.m_normalTex = mtl.bump_texname;
+				matImport.m_vertexFrom = indexOffset;
+			}
+
 			for (size_t vertex = 0; vertex < vertsInFace; vertex++)
 			{
 				tinyobj::index_t idx = shape.mesh.indices[indexOffset + vertex];
@@ -122,16 +154,64 @@ namespace Phoenix
 
 		for (tinyobj::shape_t shape : shapes)
 		{
-			MeshImport submesh = convertForOpenGL(attrib.vertices.data(), attrib.normals.data(), attrib.texcoords.data(), shape);
+			MeshImport submesh = convertForOpenGLVNT(attrib.vertices.data(), attrib.normals.data(), attrib.texcoords.data(), shape, materials);
 			submeshes.push_back(submesh);
 		}
-
-		// TODO: Patch uvs if not existant
 
 		return submeshes;
 	}
 
-	std::vector<StaticMesh> importObj(const char* assetPath, const char* mtlPath, IRIDevice* renderDevice)
+	void createBuffers(const MeshImport& import, StaticMesh* outMesh, IRIDevice* renderDevice)
+	{
+		size_t numVertices = import.m_numVertices;
+
+		outMesh->m_numVertices = numVertices;
+
+		VertexBufferFormat layout;
+		layout.add({ EAttributeProperty::Position, EAttributeType::Float, 3 },
+		{ sizeof(Vec3), numVertices, import.m_vertices });
+
+		layout.add({ EAttributeProperty::Normal, EAttributeType::Float, 3 },
+		{ sizeof(Vec3), numVertices, import.m_normals });
+
+		layout.add({ EAttributeProperty::TexCoord, EAttributeType::Float, 2 },
+		{ sizeof(Vec2), numVertices, import.m_uvs });
+
+		outMesh->m_vertexbuffer = renderDevice->createVertexBuffer(layout);
+		outMesh->m_numVertices = import.m_numVertices;
+
+		assert(outMesh->m_vertexbuffer.isValid());
+	}
+
+	void createMaterials(const MeshImport& import, StaticMesh* outMesh, const char* mtlPath, IRIDevice* renderDevice, IRIContext* renderContext)
+	{
+		size_t matIdx = 0;
+
+		for (const MaterialImport matImport : import.m_matImports)
+		{
+			outMesh->m_vertexFrom[matIdx] = matImport.m_vertexFrom;
+			Material* material = &outMesh->m_materials[matIdx];
+
+			assert(!matImport.m_diffuseTex.empty());
+				
+			if (!matImport.m_diffuseTex.empty())
+			{
+				material->m_diffuseTex = loadRenderTexture2D((mtlPath + matImport.m_diffuseTex).c_str(), "matDiffuseTex", renderDevice, renderContext);
+				assert(material->m_diffuseTex.isValid());
+			}
+
+			matIdx++;
+			if (matIdx >= StaticMesh::MAX_MATERIALS)
+			{
+				Logger::warning("Mesh import exceeds max number of StaticMesh materials. Skipping rest of mtl imports.");
+				break;
+			}
+		}
+
+		outMesh->m_numMaterials = std::min(matIdx, (size_t)StaticMesh::MAX_MATERIALS);
+	}
+
+	std::vector<StaticMesh> importObj(const char* assetPath, const char* mtlPath, IRIDevice* renderDevice, IRIContext* renderContext)
 	{
 		std::vector<MeshImport> imports = loadObj(assetPath, mtlPath);
 
@@ -139,28 +219,10 @@ namespace Phoenix
 
 		for (MeshImport import : imports)
 		{
-			StaticMesh mesh;
+			meshes.emplace_back();
 
-			size_t numVertices = import.m_numVertices;
-
-			mesh.m_numVertices = numVertices;
-
-			VertexBufferFormat layout;
-			layout.add({ EAttributeProperty::Position, EAttributeType::Float, 3 },
-			{ sizeof(Vec3), numVertices, import.m_vertices });
-
-			layout.add({ EAttributeProperty::Normal, EAttributeType::Float, 3 },
-			{ sizeof(Vec3), numVertices, import.m_normals });
-
-			layout.add({ EAttributeProperty::TexCoord, EAttributeType::Float, 2 },
-			{ sizeof(Vec2), numVertices, import.m_uvs });
-
-			mesh.m_vertexbuffer = renderDevice->createVertexBuffer(layout);
-			mesh.m_numVertices = import.m_numVertices;
-
-			assert(mesh.m_vertexbuffer.isValid());
-
-			meshes.push_back(mesh);
+			createBuffers(import, &meshes.back(), renderDevice);
+			createMaterials(import, &meshes.back(), mtlPath, renderDevice, renderContext);
 
 			import.free();
 		}
@@ -168,7 +230,7 @@ namespace Phoenix
 		return meshes;
 	}
 
-	std::vector<StaticMesh> loadRenderMesh(const char* path, IRIDevice* renderDevice)
+	std::vector<StaticMesh> loadRenderMesh(const char* path, IRIDevice* renderDevice, IRIContext* renderContext)
 	{
 		const char* fileDot = strrchr(path, '.');
 		size_t pathLen = strlen(path);
@@ -187,7 +249,7 @@ namespace Phoenix
 			std::string pathToAsset(path, lastSlash);
 			std::string assetName(lastSlash, path + pathLen);
 
-			return importObj(path, pathToAsset.c_str(), renderDevice);
+			return importObj(path, pathToAsset.c_str(), renderDevice, renderContext);
 		}
 		else
 		{
