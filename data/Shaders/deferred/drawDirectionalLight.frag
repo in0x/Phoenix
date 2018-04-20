@@ -9,7 +9,7 @@ uniform vec3 lightColor;
 in vec2 texCoord;
 in vec4 rayEye;
 
-out vec4 color;
+layout (location = 0) out vec4 color;
 
 void main()
 {

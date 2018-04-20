@@ -22,7 +22,7 @@ namespace Phoenix
 
 		desc.pixelFormat = EPixelFormat::RGBA16F;
 		m_kDiffuseDepthTex = renderDevice->createTexture2D(desc, "kDiffuseRGBDepthA_tex");
-
+		
 		desc.pixelFormat = EPixelFormat::RGB16F;
 		m_kSpecularTex = renderDevice->createTexture2D(desc, "kSpecularRGB_tex");
 
@@ -37,6 +37,14 @@ namespace Phoenix
 
 		m_gBuffer = renderDevice->createRenderTarget(gBufferDesc);
 
+		desc.pixelFormat = EPixelFormat::RGBA16F;
+		m_kFinalTex = renderDevice->createTexture2D(desc, "kfinalRGBA_tex");
+
+		RenderTargetDesc backBufferDesc;
+		backBufferDesc.colorAttachs[RenderTargetDesc::Color0] = m_kFinalTex;
+
+		m_backBuffer = renderDevice->createRenderTarget(backBufferDesc);
+
 		m_uniforms.modelTf = renderDevice->createUniform("modelTf", EUniformType::Mat4);
 		m_uniforms.viewTf = renderDevice->createUniform("viewTf", EUniformType::Mat4);
 		m_uniforms.projTf = renderDevice->createUniform("projectionTf", EUniformType::Mat4);
@@ -50,6 +58,8 @@ namespace Phoenix
 
 		m_gBufferProgram = loadShaderProgram(renderDevice, "Shaders/deferred/buildGBuffer.vert", "Shaders/deferred/buildGBuffer.frag");
 		m_directionaLightProgram = loadShaderProgram(renderDevice, "Shaders/deferred/drawDirectionalLight.vert", "Shaders/deferred/drawDirectionalLight.frag");
+		m_copyToBackBufferProgram = loadShaderProgram(renderDevice, "Shaders/deferred/copyToBackBuffer.vert", "Shaders/deferred/copyToBackBuffer.frag");
+
 		m_lightBlendState = BlendState(EBlendOp::Add, EBlendFactor::One, EBlendFactor::One);
 	}
 
@@ -70,6 +80,7 @@ namespace Phoenix
 		m_context->clearRenderTargetDepth(m_gBuffer);
 
 		m_context->setDepthTest(EDepth::Enable);
+		m_context->setDepthWrite(EDepth::Enable);
 		m_context->setBlendState(BlendState(EBlend::Disable));
 		m_context->bindShaderProgram(m_gBufferProgram);
 		m_context->bindUniform(m_uniforms.viewTf, &m_viewMat);
@@ -112,32 +123,50 @@ namespace Phoenix
 			m_context->bindTexture(material.m_diffuseTex);
 			m_context->drawLinear(mesh.m_vertexbuffer, EPrimitive::Triangles, mesh.m_numVertices - currVertexIdx, currVertexIdx);
 		}
+
+		m_context->unbindTextures();
 	}
 
 	void DeferredRenderer::setupLightPass()
 	{
-		m_context->bindDefaultRenderTarget();
-		m_context->setBlendState(m_lightBlendState);
-		m_context->clearColor();
-		m_context->clearDepth();
-
+		m_context->bindRenderTarget(m_backBuffer);
+		m_context->clearRenderTargetColor(m_backBuffer, RGBA{ 0.f, 0.f, 0.f, 0.f });
+		
+		m_context->setBlendState(m_lightBlendState);	
 		m_context->setDepthTest(EDepth::Disable);
-	}
-
-	void DeferredRenderer::drawLight(Vec3 direction, Vec3 color)
-	{
+		
 		m_context->bindShaderProgram(m_directionaLightProgram);
 
 		//m_context->bindUniform(m_uniforms.projTf, &m_projMat);
 
 		m_context->bindTexture(m_normalSpecExpTex);
 		m_context->bindTexture(m_kDiffuseDepthTex);
+	}
 
+	void DeferredRenderer::drawLight(Vec3 direction, Vec3 color)
+	{
 		Vec3 lightDirEye = m_viewMat * direction;
 
 		m_context->bindUniform(m_uniforms.lightDirEye, &lightDirEye);
 		m_context->bindUniform(m_uniforms.lightColor, &color);
+		m_context->drawLinear(EPrimitive::TriangleStrips, 4, 0);
+	}
+
+	void DeferredRenderer::copyFinalColorToBackBuffer()
+	{
+		m_context->unbindTextures();
+
+		m_context->bindDefaultRenderTarget();
+		m_context->clearColor();
+		m_context->clearDepth();
+
+		m_context->setDepthTest(EDepth::Disable);
+
+		m_context->bindShaderProgram(m_copyToBackBufferProgram);
+		m_context->bindTexture(m_kFinalTex);
 
 		m_context->drawLinear(EPrimitive::TriangleStrips, 4, 0);
+
+		m_context->unbindTextures();
 	}
 }

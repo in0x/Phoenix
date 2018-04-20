@@ -36,18 +36,22 @@ namespace Phoenix
 		// Evaluates the shading equation for this light using the values written into the GBuffer.
 		void drawLight(Vec3 direction, Vec3 color);
 
+		// Applies gamma correction to the final color values and copies them into the default framebuffer. 
+		void copyFinalColorToBackBuffer();
 
 	private:
 		Matrix4 m_viewMat;
 		Matrix4 m_projMat;
 
 		RenderTargetHandle m_gBuffer;
-		
 		Texture2DHandle m_kDiffuseDepthTex;
 		Texture2DHandle m_kSpecularTex;
 		Texture2DHandle m_normalSpecExpTex;
 		Texture2DHandle m_depthTex;
-		
+
+		RenderTargetHandle m_backBuffer;
+		Texture2DHandle m_kFinalTex;
+
 		// NOTE(Phil): I want to replace these groups of uniforms with constant buffers eventually.
 		struct Uniforms
 		{
@@ -65,6 +69,7 @@ namespace Phoenix
 
 		ProgramHandle m_gBufferProgram;
 		ProgramHandle m_directionaLightProgram;
+		ProgramHandle m_copyToBackBufferProgram;
 
 		BlendState m_lightBlendState;
 
