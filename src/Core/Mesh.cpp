@@ -11,11 +11,7 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <ThirdParty/tinyobj/tiny_obj_loader.h>
 
-
 /*
-	TODO:
-	Load in UVS
-
 	Possible solution:
 	Default uvs if none are present with default textures.
 	Not sure how valid this is. I guess I could use a "clear" default texture?
@@ -65,7 +61,8 @@ namespace Phoenix
 		std::vector<MaterialImport> m_matImports;
 	};
 
-	MeshImport convertForOpenGLVNT(float* vertices, float* normals, float* uvs, const tinyobj::shape_t& shape, const std::vector<tinyobj::material_t>& materials)
+	// Converts the mesh into a format usable by rendering APIs i.e. creates linear buffers that have a complete set of values for each vertex.
+	MeshImport convertForRenderApiVNT(float* vertices, float* normals, float* uvs, const tinyobj::shape_t& shape, const std::vector<tinyobj::material_t>& materials)
 	{
 		MeshImport mesh;
 	
@@ -131,6 +128,7 @@ namespace Phoenix
 		return mesh;
 	}
 
+	// Loads the.obj file and its mtl(s) and converts the mesh into a format drawable by our renderer.
 	std::vector<MeshImport> loadObj(const char* filename, const char* mtlDir = nullptr, bool triangulate = true)
 	{
 		tinyobj::attrib_t attrib;
@@ -154,13 +152,14 @@ namespace Phoenix
 
 		for (tinyobj::shape_t shape : shapes)
 		{
-			MeshImport submesh = convertForOpenGLVNT(attrib.vertices.data(), attrib.normals.data(), attrib.texcoords.data(), shape, materials);
+			MeshImport submesh = convertForRenderApiVNT(attrib.vertices.data(), attrib.normals.data(), attrib.texcoords.data(), shape, materials);
 			submeshes.push_back(submesh);
 		}
 
 		return submeshes;
 	}
 
+	// Creates the mesh's GPU resources.
 	void createBuffers(const MeshImport& import, StaticMesh* outMesh, IRIDevice* renderDevice)
 	{
 		size_t numVertices = import.m_numVertices;
@@ -183,6 +182,7 @@ namespace Phoenix
 		assert(outMesh->m_vertexbuffer.isValid());
 	}
 
+	// Fills out our Material structure using the import and creates the necessary GPU resources.
 	void createMaterials(const MeshImport& import, StaticMesh* outMesh, const char* mtlPath, IRIDevice* renderDevice, IRIContext* renderContext)
 	{
 		size_t matIdx = 0;
@@ -211,6 +211,7 @@ namespace Phoenix
 		outMesh->m_numMaterials = std::min(matIdx, (size_t)StaticMesh::MAX_MATERIALS);
 	}
 
+	// Loads the .obj file and its mtl(s), converts the mesh into a format drawable by our renderer and creates the GPU resources.
 	std::vector<StaticMesh> importObj(const char* assetPath, const char* mtlPath, IRIDevice* renderDevice, IRIContext* renderContext)
 	{
 		std::vector<MeshImport> imports = loadObj(assetPath, mtlPath);
@@ -230,7 +231,7 @@ namespace Phoenix
 		return meshes;
 	}
 
-	std::vector<StaticMesh> loadRenderMesh(const char* path, IRIDevice* renderDevice, IRIContext* renderContext)
+	std::vector<StaticMesh> loadStaticMesh(const char* path, IRIDevice* renderDevice, IRIContext* renderContext)
 	{
 		const char* fileDot = strrchr(path, '.');
 		size_t pathLen = strlen(path);

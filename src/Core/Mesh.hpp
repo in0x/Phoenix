@@ -37,9 +37,10 @@ namespace Phoenix
 		};
 
 		Material m_materials[MAX_MATERIALS]; // TODO: Replace with references.
-		size_t m_vertexFrom[MAX_MATERIALS];
-		size_t m_numMaterials;
+		size_t m_vertexFrom[MAX_MATERIALS]; // From what vertex the materials applies. Enables multiple materials.
+		uint8_t m_numMaterials;
 	};
 
-	std::vector<StaticMesh> loadRenderMesh(const char* path, IRIDevice* renderDevice, IRIContext* renderContext);
+	// Imports the specified mesh and the associated materials.
+	std::vector<StaticMesh> loadStaticMesh(const char* path, IRIDevice* renderDevice, IRIContext* renderContext);
 }

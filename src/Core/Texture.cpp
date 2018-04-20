@@ -12,21 +12,6 @@
 
 namespace Phoenix
 {
-	Texture::Texture()
-		: m_data(nullptr)
-		, m_height(0)
-		, m_width(0)
-		, m_components(0)
-	{}
-
-	Texture::~Texture()
-	{
-		if (nullptr != m_data)
-		{
-			stbi_image_free(m_data);
-		}
-	}
-
 	void loadTexture(const char* path, Texture* outTexture)
 	{
 		//Logger::logf("Loading texture %s", path);
@@ -54,13 +39,13 @@ namespace Phoenix
 		outTexture->m_components = static_cast<uint8_t>(components);
 	}
 
-	void destroyTexture(Texture& texture)
+	void destroyTexture(Texture* texture)
 	{
-		stbi_image_free(texture.m_data);
-		texture.m_data = nullptr;
-		texture.m_height = 0;
-		texture.m_width = 0;
-		texture.m_components = 0;
+		stbi_image_free(texture->m_data);
+		texture->m_data = nullptr;
+		texture->m_height = 0;
+		texture->m_width = 0;
+		texture->m_components = 0;
 	}
 
 	void flipTextureHorizontal(Texture& texture)
@@ -129,6 +114,8 @@ namespace Phoenix
 		assert(tex2D.isValid());
 
 		renderContext->uploadTextureData(tex2D, tex.m_data);
+
+		destroyTexture(&tex);
 
 		return tex2D;
 	}

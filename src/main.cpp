@@ -17,6 +17,8 @@
 
 #include <chrono>
 
+#include <Render/RIOpenGL/OpenGL.hpp>
+
 namespace Phoenix
 {
 	class ISystem
@@ -24,50 +26,6 @@ namespace Phoenix
 	public:
 		virtual ~ISystem() {}
 		virtual void tick(World* world, float dt) = 0;
-	};
-
-	class DrawStaticMeshSystem : public ISystem
-	{
-	public:
-		DrawStaticMeshSystem(DeferredRenderer* renderer)
-			: m_renderer(renderer)
-		{}
-
-		virtual void tick(World* world, float dt) override
-		{
-			m_renderer->setupGBufferPass();
-
-			for (CStaticMesh& mesh : ComponentIterator<CStaticMesh>(world))
-			{
-				CTransform* transform = mesh.sibling<CTransform>();
-
-				m_renderer->drawStaticMesh(mesh.m_mesh, transform->toMat4());
-			}
-		}
-
-	private:
-		DeferredRenderer* m_renderer;
-	};
-
-	class DirectionalLightSystem : public ISystem
-	{
-	public:
-		DirectionalLightSystem(DeferredRenderer* renderer)
-			: m_renderer(renderer)
-		{}
-
-		virtual void tick(World* world, float dt) override
-		{
-			m_renderer->setupLightPass();
-
-			for (CDirectionalLight& dirLight : ComponentIterator<CDirectionalLight>(world))
-			{
-				m_renderer->drawLight(dirLight.m_direction, dirLight.m_color);
-			}
-		}
-
-	private:
-		DeferredRenderer* m_renderer;
 	};
 
 	class RotatorSystem : public ISystem
@@ -84,13 +42,14 @@ namespace Phoenix
 				transform.m_rotation.y += m_speed;
 			}
 		}
+
 		float m_speed;
 	};
 
 	std::vector<EntityHandle> createMeshEntities(World* world, IRIDevice* renderDevice, IRIContext* renderContext, const char* meshPath)
 	{
 		std::vector<EntityHandle> entities;
-		std::vector<StaticMesh> meshes = loadRenderMesh(meshPath, renderDevice, renderContext);
+		std::vector<StaticMesh> meshes = loadStaticMesh(meshPath, renderDevice, renderContext);
 
 		for (StaticMesh mesh : meshes)
 		{
@@ -205,8 +164,6 @@ int main(int argc, char** argv)
 	world.registerComponentType<CStaticMesh>();
 	world.registerComponentType<CTransform>();
 
-	//auto fox = createMeshEntities(&world, renderDevice, "Models/Fox/RedFox.obj");
-
 	std::vector<EntityHandle> sponza = createMeshEntities(&world, renderDevice, renderContext, "Models/sponza/sponza.obj");
 	
 	EntityHandle light = world.createEntity();
@@ -214,10 +171,6 @@ int main(int argc, char** argv)
 	
 	EntityHandle light2 = world.createEntity();
 	world.addComponent<CDirectionalLight>(light2, Vec3(0.5f, -0.5f, 0.f), Vec3(0.4f, 0.4f, 0.4f));
-
-	DrawStaticMeshSystem drawMeshSystem(&renderer);
-	DirectionalLightSystem dirLightSystem(&renderer);
-	RotatorSystem rotator(0.5f);
 
 	using Clock = std::chrono::high_resolution_clock;
 	using pointInTime = std::chrono::time_point<std::chrono::high_resolution_clock>;
@@ -230,6 +183,8 @@ int main(int argc, char** argv)
 	float prevMouseY = gameWindow->m_mouseState.m_y;
 
 	Camera camera;
+	
+	checkGlErrorOccured();
 
 	while (!gameWindow->wantsToClose())
 	{
@@ -239,7 +194,7 @@ int main(int argc, char** argv)
 		std::chrono::duration<float> timeSpan = currentTime - lastTime;
 		float dt = timeSpan.count();
 
-		float cameraChange = 0.05f * dt;
+		float cameraChange = 0.5f * dt;
 
 		while (!gameWindow->m_keyEvents.isEmpty())
 		{
@@ -286,12 +241,24 @@ int main(int argc, char** argv)
 
 		renderer.setViewMatrix(camera.updateViewMatrix());
 
-		//rotator.tick(&world, 0);
-		drawMeshSystem.tick(&world, 0);
-		dirLightSystem.tick(&world, 0);
+		renderer.setupGBufferPass();
 
-		renderContext->endPass();
+		for (CStaticMesh& mesh : ComponentIterator<CStaticMesh>(&world))
+		{
+			CTransform* transform = mesh.sibling<CTransform>();
 
+			renderer.drawStaticMesh(mesh.m_mesh, transform->toMat4());
+		}
+
+		renderer.setupLightPass();
+
+		for (CDirectionalLight& dirLight : ComponentIterator<CDirectionalLight>(&world))
+		{
+			renderer.drawLight(dirLight.m_direction, dirLight.m_color);
+		}
+
+		renderer.copyFinalColorToBackBuffer();
+	
 		RI::swapBufferToWindow(gameWindow);
 	}
 

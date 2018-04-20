@@ -9,12 +9,8 @@ namespace Phoenix
 	class IRIDevice;
 	class IRIContext;
 
-	class Texture
+	struct Texture
 	{
-	public:
-		Texture();
-		~Texture();
-
 		uint8_t* m_data;
 		uint32_t m_height;	
 		uint32_t m_width;		
@@ -25,9 +21,10 @@ namespace Phoenix
 	
 	// Can optionally be used to unload texture data early.
 	// Texture also unloads when destructed.
-	void destroyTexture(Texture& texture);
+	void destroyTexture(Texture* texture);
 	
 	void flipTextureHorizontal(Texture& texture);
 
+	// Loads the texture, creates a GPU resource for it and discards the CPU copy.
 	Texture2DHandle loadRenderTexture2D(const char* path, const char* nameInShader, IRIDevice* renderDevice, IRIContext* renderContext);
 }
