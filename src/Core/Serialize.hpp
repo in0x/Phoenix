@@ -49,10 +49,11 @@ namespace Phoenix
 			{
 				size_t newSize = m_size * 2;
 				uint8_t* newBuffer = new uint8_t[newSize];
-				memcpy(newBuffer, m_data, m_numBytesWritten);
+				
 				memset(newBuffer, 0, newSize);
+				memcpy(newBuffer, m_data, m_numBytesWritten);
 
-				delete m_data;
+				delete[] m_data;
 				m_data = newBuffer;
 			}
 
