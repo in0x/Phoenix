@@ -45,20 +45,29 @@ namespace Phoenix
 
 		virtual void serialize(void* data, size_t numBytes) override
 		{
-			if (m_size - m_numBytesWritten < numBytes)
-			{
-				size_t newSize = m_size * 2;
-				uint8_t* newBuffer = new uint8_t[newSize];
-				
-				memset(newBuffer, 0, newSize);
-				memcpy(newBuffer, m_data, m_numBytesWritten);
-
-				delete[] m_data;
-				m_data = newBuffer;
-			}
-
+			reserve(numBytes);
 			memcpy(m_data + m_numBytesWritten, data, numBytes);
 			m_numBytesWritten += numBytes;
+		}
+
+		// Ensures numBytes are available in the archive's 
+		// buffer. Grows the buffer if necessary.
+		void reserve(size_t numBytes)
+		{
+			if (m_size - m_numBytesWritten >= numBytes)
+			{
+				return;
+			}
+
+			size_t newSize = m_size * 2;
+			uint8_t* newBuffer = new uint8_t[newSize];
+
+			memset(newBuffer, 0, newSize);
+			memcpy(newBuffer, m_data, m_numBytesWritten);
+
+			delete[] m_data;
+			m_data = newBuffer;
+			m_size = newSize;
 		}
 	};
 
