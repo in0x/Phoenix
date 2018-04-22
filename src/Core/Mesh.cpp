@@ -39,21 +39,8 @@ namespace Phoenix
 
 	struct MeshImport
 	{
-		MeshImport()
-			: m_numVertices(0)
-			, m_vertices(nullptr)
-			, m_normals(nullptr)
-			, m_uvs(nullptr)
-		{}
-
-		size_t m_numVertices;
-
-		Vec3* m_vertices;
-		Vec3* m_normals;
-		Vec2* m_uvs;
-
+		MeshData m_meshData;
 		std::vector<MaterialImport> m_matImports;
-
 		std::string m_name;
 	};
 
@@ -63,13 +50,11 @@ namespace Phoenix
 		MeshImport mesh;
 	
 		size_t numIndices = shape.mesh.indices.size();
-		mesh.m_numVertices = numIndices;
+		mesh.m_meshData.m_numVertices = numIndices;
 
-		//mesh.m_vertices = new Vec3[numIndices + 1]; 
-		//mesh.m_vertices[numIndices] = Vec3(42, 42, 42);
-		mesh.m_vertices = new Vec3[numIndices];
-		mesh.m_normals = new Vec3[numIndices];
-		mesh.m_uvs = new Vec2[numIndices];
+		mesh.m_meshData.m_vertices.reserve(numIndices);
+		mesh.m_meshData.m_normals.reserve(numIndices);
+		mesh.m_meshData.m_uvs.reserve(numIndices);
 
 		mesh.m_name = shape.name;
 
@@ -112,28 +97,15 @@ namespace Phoenix
 
 				tinyobj::index_t idx = shape.mesh.indices[indexOffset + vertex];
 
-				Vec3* v = mesh.m_vertices + indexOffset + vertex;
-				Vec3* n = mesh.m_normals + indexOffset + vertex;
-				Vec2* t = mesh.m_uvs + indexOffset + vertex;
-
 				size_t vertexIdx = 3 * idx.vertex_index;
-				v->x = vertices[vertexIdx + 0];
-				v->y = vertices[vertexIdx + 1];
-				v->z = vertices[vertexIdx + 2];
-
 				size_t normalIdx = 3 * idx.normal_index;
-				n->x = normals[normalIdx + 0];
-				n->y = normals[normalIdx + 1];
-				n->z = normals[normalIdx + 2];
-
 				size_t uvIdx = 2 * idx.texcoord_index;
-				t->x = uvs[uvIdx + 0];
-				t->y = uvs[uvIdx + 1];
+
+				mesh.m_meshData.m_vertices.emplace_back(vertices[vertexIdx + 0], vertices[vertexIdx + 1], vertices[vertexIdx + 2]);
+				mesh.m_meshData.m_normals.emplace_back(normals[normalIdx + 0], normals[normalIdx + 1], normals[normalIdx + 2]);
+				mesh.m_meshData.m_uvs.emplace_back(uvs[uvIdx + 0], uvs[uvIdx + 1]);
 			}
 		}
-
-		//mesh.m_vertices[0] = Vec3(1337, 1337, 1337);
-		//mesh.m_vertices[numIndices - 1] = Vec3(25, 25, 25);
 
 		return mesh;
 	}
@@ -160,7 +132,7 @@ namespace Phoenix
 
 		std::vector<MeshImport> submeshes;
 
-		for (tinyobj::shape_t shape : shapes)
+		for (const tinyobj::shape_t& shape : shapes)
 		{
 			MeshImport submesh = convertForRenderApiVNT(attrib.vertices.data(), attrib.normals.data(), attrib.texcoords.data(), shape, materials);
 			submeshes.push_back(submesh);
@@ -170,25 +142,21 @@ namespace Phoenix
 	}
 
 	// Creates the mesh's GPU resources.
-	void createBuffers(const MeshImport& import, StaticMesh* outMesh, IRIDevice* renderDevice)
+	void createBuffers(StaticMesh* outMesh, IRIDevice* renderDevice)
 	{
-		size_t numVertices = import.m_numVertices;
+		size_t numVertices = outMesh->m_data.m_numVertices;
 
 		VertexBufferFormat layout;
 		layout.add({ EAttributeProperty::Position, EAttributeType::Float, 3 },
-		{ sizeof(Vec3), numVertices, import.m_vertices });
+		{ sizeof(Vec3), numVertices, outMesh->m_data.m_vertices.data() });
 
 		layout.add({ EAttributeProperty::Normal, EAttributeType::Float, 3 },
-		{ sizeof(Vec3), numVertices, import.m_normals });
+		{ sizeof(Vec3), numVertices, outMesh->m_data.m_normals.data() });
 
 		layout.add({ EAttributeProperty::TexCoord, EAttributeType::Float, 2 },
-		{ sizeof(Vec2), numVertices, import.m_uvs });
+		{ sizeof(Vec2), numVertices, outMesh->m_data.m_uvs.data() });
 
 		outMesh->m_vertexbuffer = renderDevice->createVertexBuffer(layout);
-		outMesh->m_data.m_numVertices = import.m_numVertices;
-		outMesh->m_data.m_vertices = import.m_vertices;
-		outMesh->m_data.m_normals = import.m_normals;
-		outMesh->m_data.m_uvs = import.m_uvs;
 
 		assert(outMesh->m_vertexbuffer.isValid());
 	}
@@ -198,7 +166,7 @@ namespace Phoenix
 	{
 		size_t matIdx = 0;
 
-		for (const MaterialImport matImport : import.m_matImports)
+		for (const MaterialImport& matImport : import.m_matImports)
 		{
 			outMesh->m_vertexFrom[matIdx] = matImport.m_vertexFrom;
 			Material* material = &outMesh->m_materials[matIdx];
@@ -208,7 +176,7 @@ namespace Phoenix
 			if (!matImport.m_diffuseTex.empty())
 			{
 				material->m_diffuseTex = createTextureAsset((mtlPath + matImport.m_diffuseTex).c_str(), "matDiffuseTex", renderDevice, renderContext);
-				assert(material->m_diffuseTex.m_handle.isValid());
+				assert(material->m_diffuseTex.m_resourceHandle.isValid());
 			}
 
 			material->m_name = matImport.m_name;
@@ -231,21 +199,22 @@ namespace Phoenix
 
 		std::vector<StaticMesh> meshes;
 
-		for (MeshImport import : imports)
+		for (const MeshImport& import : imports)
 		{
 			meshes.emplace_back();
-
 			StaticMesh* mesh = &meshes.back();
+			
 			mesh->m_name = import.m_name;
+			mesh->m_data = import.m_meshData; // TODO: Should be a move 
 
-			createBuffers(import, mesh, renderDevice);
+			createBuffers(mesh, renderDevice);
 			createMaterials(import, mesh, mtlPath, renderDevice, renderContext);
 		}
 
 		return meshes;
 	}
 
-	std::vector<StaticMesh> loadStaticMesh(const char* path, IRIDevice* renderDevice, IRIContext* renderContext)
+	std::vector<StaticMesh> importObj(const char* path, IRIDevice* renderDevice, IRIContext* renderContext)
 	{
 		const char* fileDot = strrchr(path, '.');
 		size_t pathLen = strlen(path);
@@ -269,17 +238,17 @@ namespace Phoenix
 		else
 		{
 			assert(false);
-			Logger::errorf("Attempted to load unsuppored Mesh Type %s while loading Mesh", path);
+			Logger::errorf("Attempted to load unsuppored Mesh Type %s while loading obj", path);
 			return{};
 		}
 	}
 
 	void serialize(Archive& ar, MeshData& data)
 	{
-		ar.serialize(&data.m_numVertices, sizeof(size_t));
-		ar.serialize(&data.m_vertices, sizeof(Vec3) * data.m_numVertices);
-		ar.serialize(&data.m_normals, sizeof(Vec3) * data.m_numVertices);
-		ar.serialize(&data.m_uvs, sizeof(Vec2) * data.m_numVertices);
+		serialize(ar, data.m_numVertices);
+		serialize(ar, data.m_vertices);
+		serialize(ar, data.m_normals);
+		serialize(ar, data.m_uvs);
 	}
 
 	void serialize(Archive& ar, Material& material)
@@ -290,13 +259,8 @@ namespace Phoenix
 	
 	void serialize(Archive& ar, StaticMesh& mesh)
 	{
-		//serialize(ar, mesh.m_data);
+		serialize(ar, mesh.m_data);
 
-		ar.serialize(&mesh.m_data.m_numVertices, sizeof(size_t));
-		ar.serialize(&mesh.m_data.m_vertices, sizeof(Vec3) * mesh.m_data.m_numVertices);
-		ar.serialize(&mesh.m_data.m_normals, sizeof(Vec3) * mesh.m_data.m_numVertices);
-		ar.serialize(&mesh.m_data.m_uvs, sizeof(Vec2) * mesh.m_data.m_numVertices);
-		
 		ar.serialize(&mesh.m_numMaterials, sizeof(uint8_t));
 
 		for (uint8_t i = 0; i < mesh.m_numMaterials; ++i)
@@ -306,5 +270,29 @@ namespace Phoenix
 		}
 
 		serialize(ar, mesh.m_name);
+	}
+
+	StaticMesh loadStaticMesh(const char* path, IRIDevice* renderDevice, IRIContext* renderContext)
+	{
+		ReadArchive ar;
+		StaticMesh mesh;
+
+		ArchiveError err = createReadArchive(path, &ar);
+
+		assert(err == ArchiveError::NoError);
+		if (err != ArchiveError::NoError)
+		{
+			return mesh;
+		}
+
+		serialize(ar, mesh);
+		createBuffers(&mesh, renderDevice);
+
+		for (uint8_t i = 0; i < mesh.m_numMaterials; ++i)
+		{
+			initializeTextureAsset(&mesh.m_materials[i].m_diffuseTex, renderDevice, renderContext);
+		}
+
+		return mesh;
 	}
 }

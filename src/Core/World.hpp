@@ -34,7 +34,7 @@ namespace Phoenix
 		}
 
 		template <typename C, typename ...CtorArgs>
-		C* addComponent(EntityHandle handle, CtorArgs... ctorArgs)
+		C* addComponent(EntityHandle handle, CtorArgs&&... ctorArgs)
 		{
 			Entity& entity = m_entities[handle];
 			ComponentTypeId type = getComponentTypeId<C>();
@@ -45,7 +45,7 @@ namespace Phoenix
 			}
 
 			ChunkArray<C>* pool = getComponentAllocator<C>();
-			C* comp = pool->add(ctorArgs...);
+			C* comp = pool->add(std::forward<CtorArgs>(ctorArgs)...);
 			comp->m_world = this;
 			comp->m_entity = handle;
 

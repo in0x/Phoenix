@@ -54,9 +54,10 @@ namespace Phoenix
 	{
 		NoError,
 		Open,
-		WriteToDisk,
-		ReadFromDisk,
-		ReadFromDiskEmpty,
+		Write,
+		Read,
+		ReadEmpty,
+		ReadEarlyEOF,
 		NumErrorTypes
 	};
 

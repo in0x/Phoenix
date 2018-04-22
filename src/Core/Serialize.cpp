@@ -40,12 +40,6 @@ namespace Phoenix
 		size_t newSize = (m_size + numBytes) * 2;
 		uint8_t* newBuffer = new uint8_t[newSize];
 
-		if (newBuffer == nullptr)
-		{
-			Logger::error("Fuck");
-			return;
-		}
-
 		memset(newBuffer, 0, newSize);
 		memcpy(newBuffer, m_data, m_numBytesWritten);
 
@@ -56,22 +50,18 @@ namespace Phoenix
 
 	void createWriteArchive(size_t initialBytes, WriteArchive* outAr)
 	{
-		//WriteArchive ar;
-
 		outAr->m_numBytesWritten = 0;
 		outAr->m_data = new uint8_t[initialBytes];
 		outAr->m_size = initialBytes;
 
 		memset(outAr->m_data, 0, initialBytes);
-
-		//return ar;
 	}
 
 	ArchiveError writeArchiveToDisk(const char* path, const WriteArchive& ar)
 	{
 		ArchiveError err = ArchiveError::NoError;
 
-		FILE* file = fopen(path, "w");
+		FILE* file = fopen(path, "wb");
 
 		if (!file)
 		{
@@ -84,7 +74,7 @@ namespace Phoenix
 		if (bytesWrittenToDisk != ar.m_numBytesWritten)
 		{
 			Logger::errorf("Failed writing archive %s to disk, file is likely invalid.", path);
-			err = ArchiveError::WriteToDisk;
+			err = ArchiveError::Write;
 		}
 
 		fclose(file);
@@ -96,7 +86,7 @@ namespace Phoenix
 	{
 		ArchiveError err = ArchiveError::NoError;
 
-		FILE* file = fopen(path, "r");
+		FILE* file = fopen(path, "rb");
 
 		if (!file)
 		{
@@ -111,7 +101,7 @@ namespace Phoenix
 		{
 			Logger::errorf("Archive \"%s\" is empty.", path);
 			fclose(file);
-			return ArchiveError::ReadFromDiskEmpty;
+			return ArchiveError::ReadEmpty;
 		}
 
 		outAr->m_data = new uint8_t[length];
@@ -126,7 +116,12 @@ namespace Phoenix
 		if (numBytesRead != length)
 		{
 			Logger::errorf("Failed reading archive %s from disk, file is likely invalid.", path);
-			err = ArchiveError::ReadFromDisk;
+			err = ArchiveError::Read;
+	
+			if (feof(file))
+			{
+				err = ArchiveError::ReadEarlyEOF;
+			}
 		}
 
 		fclose(file);
@@ -138,11 +133,6 @@ namespace Phoenix
 	{
 		delete[] ar.m_data;
 	}
-
-	//static void serialize(Archive& ar, size_t& sizet)
-	//{
-	//	ar.serialize(&sizet, sizeof(size_t));
-	//}
 
 	struct SerialTest
 	{

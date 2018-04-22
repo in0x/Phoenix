@@ -106,26 +106,45 @@ namespace Phoenix
 
 	Texture2D createTextureAsset(const char* path, const char* nameInShader, IRIDevice* renderDevice, IRIContext* renderContext)
 	{
-		TextureData tex;
-		loadTextureData(path, &tex);
+		TextureData data;
+		loadTextureData(path, &data);
 
-		TextureDesc desc = createDesc(tex, ETextureFilter::Linear, ETextureFilter::Linear);
+		TextureDesc desc = createDesc(data, ETextureFilter::Linear, ETextureFilter::Linear);
 		Texture2DHandle tex2D = renderDevice->createTexture2D(desc, nameInShader);
 
 		assert(tex2D.isValid());
 
-		renderContext->uploadTextureData(tex2D, tex.m_data);
+		renderContext->uploadTextureData(tex2D, data.m_data);
 
-		destroyTextureData(&tex);
+		destroyTextureData(&data);
 
 		Texture2D texture;
 
-		texture.m_handle = tex2D;
+		texture.m_resourceName = nameInShader;
+		texture.m_resourceHandle = tex2D;
 		texture.m_desc = desc;
 
-		texture.m_assetPath = path;
+		texture.m_sourcePath = path;
 		
 		return texture;
+	}
+
+	void initializeTextureAsset(Texture2D* texture, IRIDevice* renderDevice, IRIContext* renderContext)
+	{
+		TextureData data;
+		loadTextureData(texture->m_sourcePath.c_str(), &data);
+
+		TextureDesc desc = createDesc(data, ETextureFilter::Linear, ETextureFilter::Linear);
+		Texture2DHandle tex2D = renderDevice->createTexture2D(desc, texture->m_resourceName.c_str());
+
+		assert(tex2D.isValid());
+
+		renderContext->uploadTextureData(tex2D, data.m_data);
+
+		destroyTextureData(&data);
+
+		texture->m_resourceHandle = tex2D;
+		texture->m_desc = desc;
 	}
 
 	void serialize(Archive& ar, TextureDesc& desc)
@@ -143,7 +162,8 @@ namespace Phoenix
 
 	void serialize(Archive& ar, Texture2D& texture)
 	{
-		serialize(ar, texture.m_assetPath);
+		serialize(ar, texture.m_sourcePath);
+		serialize(ar, texture.m_resourceName);
 		serialize(ar, texture.m_desc);
 	}
 }

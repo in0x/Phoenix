@@ -3,6 +3,8 @@
 #include <Core/Serialize.hpp>
 
 #include <string>
+#include <vector>
+#include <assert.h>
 
 namespace Phoenix
 {
@@ -27,15 +29,36 @@ namespace Phoenix
 		}
 		else
 		{
-			size_t len = string.length();
+			assert(!string.empty());
+
+			size_t len = string.size() + 1;
 			serialize(ar, len);
 
 			char* buf = new char[len];
 	
-			memcpy(buf, string.c_str(), len);
+			strcpy(buf, string.c_str());
 			ar.serialize(buf, len);
 		
 			delete[] buf;
+		}
+	}
+
+	template <class T>
+	static void serialize(Archive& ar, std::vector<T>& vector)
+	{
+		if (ar.isWriting())
+		{
+			size_t size = vector.size();
+			serialize(ar, size); 
+			ar.serialize(vector.data(), sizeof(T) * vector.size());
+		}
+		else
+		{
+			size_t size = 0;
+			serialize(ar, size);
+
+			vector.reserve(size);
+			ar.serialize(vector.data(), sizeof(T) * size);
 		}
 	}
 }

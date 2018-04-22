@@ -91,7 +91,7 @@ namespace Phoenix
 	{
 		if (mesh.m_numMaterials == 0)
 		{
-			Logger::warning("Trying to draw static mesh with no material, this is currently not handled. Skipping drawing.");
+			//Logger::warning("Trying to draw static mesh with no material, this is currently not handled. Skipping drawing.");
 			return;
 		}
 
@@ -104,14 +104,14 @@ namespace Phoenix
 			const Material& material = mesh.m_materials[materialIdx];
 			size_t currVertexIdx = mesh.m_vertexFrom[materialIdx];
 
-			m_context->bindTexture(material.m_diffuseTex.m_handle);
+			m_context->bindTexture(material.m_diffuseTex.m_resourceHandle);
 			m_context->drawLinear(mesh.m_vertexbuffer, EPrimitive::Triangles, mesh.m_vertexFrom[materialIdx + 1] - currVertexIdx, currVertexIdx);
 		}
 
 		const Material& material = mesh.m_materials[materialIdx];
 		size_t currVertexIdx = mesh.m_vertexFrom[materialIdx];
 
-		m_context->bindTexture(material.m_diffuseTex.m_handle);
+		m_context->bindTexture(material.m_diffuseTex.m_resourceHandle);
 		m_context->drawLinear(mesh.m_vertexbuffer, EPrimitive::Triangles, mesh.m_data.m_numVertices - currVertexIdx, currVertexIdx);
 
 		m_context->unbindTextures();

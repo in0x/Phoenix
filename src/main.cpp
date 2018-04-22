@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <chrono>
 
 #include "Tests/MathTests.hpp"
 #include "Tests/MemoryTests.hpp"
@@ -15,11 +16,11 @@
 #include "Core/Components/CStaticMesh.hpp"
 #include "Core/Components/CTransform.hpp"
 
-#include <chrono>
-
-#include <Render/RIOpenGL/OpenGL.hpp>
+#include "Render/RIOpenGL/OpenGL.hpp"
 
 #include "Core/Serialize.hpp"
+
+#include "ThirdParty/dirent/dirent.h"
 
 namespace Phoenix
 {
@@ -48,27 +49,35 @@ namespace Phoenix
 		float m_speed;
 	};
 
-	std::vector<EntityHandle> createMeshEntities(World* world, IRIDevice* renderDevice, IRIContext* renderContext, const char* meshPath)
+	std::vector<EntityHandle> meshEntitiesFromObj(World* world, IRIDevice* renderDevice, IRIContext* renderContext, const char* meshPath)
 	{
 		std::vector<EntityHandle> entities;
-		std::vector<StaticMesh> meshes = loadStaticMesh(meshPath, renderDevice, renderContext);
+		std::vector<StaticMesh> meshes = importObj(meshPath, renderDevice, renderContext);
 
-		for (StaticMesh mesh : meshes)
+		for (StaticMesh& mesh : meshes)
 		{
 			EntityHandle entity = world->createEntity();
 			world->addComponent<CStaticMesh>(entity, mesh);
 			world->addComponent<CTransform>(entity);
 			entities.push_back(entity);
 		}
-	
+
 		return entities;
+	}
+
+	EntityHandle createMeshEntity(World* world, StaticMesh& mesh, IRIDevice* renderDevice, IRIContext* renderContext)
+	{
+		EntityHandle entity = world->createEntity();
+		world->addComponent<CStaticMesh>(entity, mesh);
+		world->addComponent<CTransform>(entity);
+		return entity;
 	}
 
 	struct Camera
 	{
 		Vec3 m_position;
 		Vec3 m_xAxis;
-		Vec3 m_zAxis; 
+		Vec3 m_zAxis;
 		Vec3 m_yAxis;
 
 		Camera()
@@ -78,12 +87,12 @@ namespace Phoenix
 			, m_yAxis(0.0f, 1.0f, 0.0f)
 		{}
 
-		void moveRight(float d) 
+		void moveRight(float d)
 		{
 			m_position += m_xAxis * d;
 		}
 
-		void moveForward(float d) 
+		void moveForward(float d)
 		{
 			m_position += m_zAxis * d;
 		}
@@ -103,10 +112,10 @@ namespace Phoenix
 		}
 
 		Matrix4 updateViewMatrix()
-		{	
-			m_zAxis = m_zAxis.normalize(); 
+		{
+			m_zAxis = m_zAxis.normalize();
 			m_yAxis = m_zAxis.cross(m_xAxis).normalized();
-			m_xAxis = m_yAxis.cross(m_zAxis).normalized(); 
+			m_xAxis = m_yAxis.cross(m_zAxis).normalized();
 
 			return Matrix4{
 				m_xAxis.x, m_xAxis.y, m_xAxis.z, -(m_xAxis.dot(m_position)),
@@ -153,7 +162,7 @@ int main(int argc, char** argv)
 	RI::setWindowToRenderTo(gameWindow);
 
 	DeferredRenderer renderer(renderDevice, renderContext, config.width, config.height);
-	
+
 	Vec3 cameraPos(0.f, 0.f, 7.f);
 	Vec3 cameraForward(0.0f, 0.0f, 1.0f);
 	Matrix4 viewTf = lookAtRH(cameraPos, (cameraPos + cameraForward).normalized(), Vec3(0.f, 1.f, 0.f));
@@ -161,23 +170,81 @@ int main(int argc, char** argv)
 
 	Matrix4 projTf = perspectiveRH(70.f, (float)config.width / (float)config.height, 0.1f, 10000.f);
 	renderer.setProjectionMatrix(projTf);
-	
+
 	World world;
 	world.registerComponentType<CDirectionalLight>();
 	world.registerComponentType<CStaticMesh>();
 	world.registerComponentType<CTransform>();
 
-	std::vector<EntityHandle> sponza = createMeshEntities(&world, renderDevice, renderContext, "Models/sponza/sponza.obj");
+#define PHI_WRITE 0
+#define PHI_LOAD 1
+
+	// write
+#if PHI_WRITE
+	{
+		std::vector<EntityHandle> sponza = meshEntitiesFromObj(&world, renderDevice, renderContext, "Models/sponza/sponza.obj");
+
+		for (CStaticMesh& mesh : ComponentIterator<CStaticMesh>(&world))
+		{
+			WriteArchive ar;
+			createWriteArchive(sizeof(StaticMesh), &ar);
+
+			std::string savePath = "SerialTest/" + mesh.m_mesh.m_name + ".sm";
+
+			serialize(ar, mesh.m_mesh);
+
+			writeArchiveToDisk(savePath.c_str(), ar);
+			destroyArchive(ar);
+		}
+	}
+#endif // WRITE
+
+#if PHI_LOAD
+	// load
+	{
+		std::string sponzaPath("SerialTest/");
+
+		DIR *dir;
+		struct dirent *ent;
+		if ((dir = opendir(sponzaPath.c_str())) != NULL)
+		{
+			/* print all the files and directories within directory */
+			while ((ent = readdir(dir)) != NULL)
+			{
+				const char* fileDot = strrchr(ent->d_name, '.');
+				if (nullptr == fileDot)
+				{
+					continue;
+				}
+
+				if (strcmp(".sm", fileDot) != 0)
+				{
+					continue;
+				}
+
+				StaticMesh sm = loadStaticMesh((sponzaPath + ent->d_name).c_str(), renderDevice, renderContext);
+				createMeshEntity(&world, sm, renderDevice, renderContext);
+			}
+			closedir(dir);
+		}
+		else
+		{
+			/* could not open directory */
+			perror("");
+			return EXIT_FAILURE;
+		}
+	}
+#endif // LOAD
 
 	EntityHandle light = world.createEntity();
 	world.addComponent<CDirectionalLight>(light, Vec3(-0.5f, -0.5f, 0.f), Vec3(0.4f, 0.4f, 0.4f));
-	
+
 	EntityHandle light2 = world.createEntity();
 	world.addComponent<CDirectionalLight>(light2, Vec3(0.5f, -0.5f, 0.f), Vec3(0.4f, 0.4f, 0.4f));
 
 	using Clock = std::chrono::high_resolution_clock;
 	using pointInTime = std::chrono::time_point<std::chrono::high_resolution_clock>;
-	 
+
 	pointInTime lastTime = Clock::now();
 
 	Platform::pollEvents();
@@ -189,21 +256,6 @@ int main(int argc, char** argv)
 
 	int numMesh = 0;
 
-	for (CStaticMesh& mesh : ComponentIterator<CStaticMesh>(&world))
-	{
-		WriteArchive ar;
-		createWriteArchive(sizeof(StaticMesh), &ar);
-
-		std::string savePath = "SerialTest/" + mesh.m_mesh.m_name;
-
-		serialize(ar, mesh.m_mesh);
-	
-		writeArchiveToDisk(savePath.c_str(), ar);
-		destroyArchive(ar);
-	
-		numMesh++;
-		//Logger::logf("Serial mesh # %d", numMesh);
-	}
 
 	while (!gameWindow->wantsToClose())
 	{
@@ -277,7 +329,7 @@ int main(int argc, char** argv)
 		}
 
 		renderer.copyFinalColorToBackBuffer();
-	
+
 		RI::swapBufferToWindow(gameWindow);
 	}
 

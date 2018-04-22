@@ -240,6 +240,7 @@
     <ClInclude Include="..\src\Render\RIResources.hpp" />
     <ClInclude Include="..\src\Tests\MathTests.hpp" />
     <ClInclude Include="..\src\Tests\MemoryTests.hpp" />
+    <ClInclude Include="..\src\ThirdParty\dirent\dirent.h" />
     <ClInclude Include="..\src\ThirdParty\glew\eglew.h" />
     <ClInclude Include="..\src\ThirdParty\glew\glew.h" />
     <ClInclude Include="..\src\ThirdParty\glew\glxew.h" />
@@ -254,7 +255,10 @@
     <ClCompile Include="..\src\Core\Clock.cpp" />
     <ClCompile Include="..\src\Core\Logger.cpp" />
     <ClCompile Include="..\src\Core\Mesh.cpp" />
-    <ClCompile Include="..\src\Core\Serialize.cpp" />
+    <ClCompile Include="..\src\Core\Serialize.cpp">
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Disabled</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Disabled</Optimization>
+    </ClCompile>
     <ClCompile Include="..\src\Core\Shader.cpp" />
     <ClCompile Include="..\src\Core\StringTokenizer.cpp" />
     <ClCompile Include="..\src\Core\Texture.cpp" />
