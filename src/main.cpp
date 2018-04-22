@@ -128,6 +128,7 @@ int main(int argc, char** argv)
 
 	Tests::runMathTests();
 	Tests::runMemoryTests();
+	Tests::runSerializeTests();
 
 	bool bRIstarted = RI::init();
 
@@ -167,7 +168,7 @@ int main(int argc, char** argv)
 	world.registerComponentType<CTransform>();
 
 	std::vector<EntityHandle> sponza = createMeshEntities(&world, renderDevice, renderContext, "Models/sponza/sponza.obj");
-	
+
 	EntityHandle light = world.createEntity();
 	world.addComponent<CDirectionalLight>(light, Vec3(-0.5f, -0.5f, 0.f), Vec3(0.4f, 0.4f, 0.4f));
 	
@@ -185,27 +186,23 @@ int main(int argc, char** argv)
 	float prevMouseY = gameWindow->m_mouseState.m_y;
 
 	Camera camera;
-	
+
+	int numMesh = 0;
+
+	for (CStaticMesh& mesh : ComponentIterator<CStaticMesh>(&world))
 	{
-		size_t w = 3;
+		WriteArchive ar;
+		createWriteArchive(sizeof(StaticMesh), &ar);
 
-		WriteArchive ar = createWriteArchive(sizeof(size_t));
+		std::string savePath = "SerialTest/" + mesh.m_mesh.m_name;
+
+		serialize(ar, mesh.m_mesh);
 	
-		serialize(ar, w);
-
-		writeArchiveToDisk("SerialTest/sizet.bin", ar);
-
+		writeArchiveToDisk(savePath.c_str(), ar);
 		destroyArchive(ar);
-	}
 	
-	{
-		size_t r = 0;
-
-		ReadArchive ar = createReadArchive("SerialTest/sizet.bin");
-
-		serialize(ar, r);
-
-		destroyArchive(ar);
+		numMesh++;
+		//Logger::logf("Serial mesh # %d", numMesh);
 	}
 
 	while (!gameWindow->wantsToClose())

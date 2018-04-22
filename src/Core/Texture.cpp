@@ -2,8 +2,9 @@
 
 #include "Texture.hpp"
 #include <Core/Logger.hpp>
+#include <Core/Serialize.hpp>
+#include <Core/SerialUtil.hpp>
 
-#include <Render/RIDefs.hpp>
 #include <Render/RIDevice.hpp>
 #include <Render/RIContext.hpp>
 
@@ -12,7 +13,7 @@
 
 namespace Phoenix
 {
-	void loadTexture(const char* path, Texture* outTexture)
+	void loadTextureData(const char* path, TextureData* outTexture)
 	{
 		//Logger::logf("Loading texture %s", path);
 
@@ -39,7 +40,7 @@ namespace Phoenix
 		outTexture->m_components = static_cast<uint8_t>(components);
 	}
 
-	void destroyTexture(Texture* texture)
+	void destroyTextureData(TextureData* texture)
 	{
 		stbi_image_free(texture->m_data);
 		texture->m_data = nullptr;
@@ -48,7 +49,7 @@ namespace Phoenix
 		texture->m_components = 0;
 	}
 
-	void flipTextureHorizontal(Texture& texture)
+	void flipTextureHorizontal(TextureData& texture)
 	{
 		uint32_t halfHeight = texture.m_height / 2;
 		uint32_t widthBytes = texture.m_width * texture.m_components;
@@ -72,7 +73,7 @@ namespace Phoenix
 		}
 	}
 
-	TextureDesc createDesc(const Texture& texture, ETextureFilter minFilter, ETextureFilter magFilter, uint8_t numMips = 0)
+	TextureDesc createDesc(const TextureData& texture, ETextureFilter minFilter, ETextureFilter magFilter, uint8_t numMips = 0)
 	{
 		TextureDesc desc;
 		desc.width = texture.m_width;
@@ -103,10 +104,10 @@ namespace Phoenix
 		return desc;
 	}
 
-	Texture2DHandle loadRenderTexture2D(const char* path, const char* nameInShader, IRIDevice* renderDevice, IRIContext* renderContext)
+	Texture2D createTextureAsset(const char* path, const char* nameInShader, IRIDevice* renderDevice, IRIContext* renderContext)
 	{
-		Texture tex;
-		loadTexture(path, &tex);
+		TextureData tex;
+		loadTextureData(path, &tex);
 
 		TextureDesc desc = createDesc(tex, ETextureFilter::Linear, ETextureFilter::Linear);
 		Texture2DHandle tex2D = renderDevice->createTexture2D(desc, nameInShader);
@@ -115,8 +116,34 @@ namespace Phoenix
 
 		renderContext->uploadTextureData(tex2D, tex.m_data);
 
-		destroyTexture(&tex);
+		destroyTextureData(&tex);
 
-		return tex2D;
+		Texture2D texture;
+
+		texture.m_handle = tex2D;
+		texture.m_desc = desc;
+
+		texture.m_assetPath = path;
+		
+		return texture;
+	}
+
+	void serialize(Archive& ar, TextureDesc& desc)
+	{
+		ar.serialize(&desc.width, sizeof(uint32_t));
+		ar.serialize(&desc.height, sizeof(uint32_t));
+		ar.serialize(&desc.pixelFormat, sizeof(EPixelFormat));
+		ar.serialize(&desc.minFilter, sizeof(ETextureFilter));
+		ar.serialize(&desc.magFilter, sizeof(ETextureFilter));
+		ar.serialize(&desc.wrapU, sizeof(ETextureWrap));
+		ar.serialize(&desc.wrapV, sizeof(ETextureWrap));
+		ar.serialize(&desc.wrapW, sizeof(ETextureWrap));
+		ar.serialize(&desc.numMips, sizeof(uint8_t));
+	}
+
+	void serialize(Archive& ar, Texture2D& texture)
+	{
+		serialize(ar, texture.m_assetPath);
+		serialize(ar, texture.m_desc);
 	}
 }

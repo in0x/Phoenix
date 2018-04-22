@@ -2,9 +2,10 @@
 
 #include <Core/Logger.hpp>
 #include <Core/Texture.hpp>
+#include <Core/Serialize.hpp>
+#include <Core/SerialUtil.hpp>
 #include <Render/RIDevice.hpp>
 #include <Render/RIContext.hpp>
-#include <Math/Vec2.hpp>
 
 #include <assert.h>
 
@@ -32,6 +33,8 @@ namespace Phoenix
 		std::string m_metallicTex;
 
 		size_t m_vertexFrom;
+
+		std::string m_name;
 	};
 
 	struct MeshImport
@@ -43,15 +46,6 @@ namespace Phoenix
 			, m_uvs(nullptr)
 		{}
 
-		void free()
-		{
-			delete[] m_vertices;
-			delete[] m_normals;
-			delete[] m_uvs;
-		}
-
-		// Each submesh has m_size verts, norms and uvs (if present)
-		// so indexing works properly.
 		size_t m_numVertices;
 
 		Vec3* m_vertices;
@@ -59,6 +53,8 @@ namespace Phoenix
 		Vec2* m_uvs;
 
 		std::vector<MaterialImport> m_matImports;
+
+		std::string m_name;
 	};
 
 	// Converts the mesh into a format usable by rendering APIs i.e. creates linear buffers that have a complete set of values for each vertex.
@@ -68,9 +64,14 @@ namespace Phoenix
 	
 		size_t numIndices = shape.mesh.indices.size();
 		mesh.m_numVertices = numIndices;
+
+		//mesh.m_vertices = new Vec3[numIndices + 1]; 
+		//mesh.m_vertices[numIndices] = Vec3(42, 42, 42);
 		mesh.m_vertices = new Vec3[numIndices];
 		mesh.m_normals = new Vec3[numIndices];
 		mesh.m_uvs = new Vec2[numIndices];
+
+		mesh.m_name = shape.name;
 
 		assert(shape.mesh.num_face_vertices[0] == 3);
 		size_t vertsInFace = 3;
@@ -82,6 +83,8 @@ namespace Phoenix
 			Logger::warningf("Shape %s does not have a material, this needs to be assigned a default material!", shape.name.c_str());
 			Logger::warning("This shape will be skipped when drawing.");
 		}
+
+		assert((numIndices % 3) == 0);
 
 		for (size_t indexOffset = 0; indexOffset < numIndices; indexOffset += vertsInFace)
 		{
@@ -99,10 +102,14 @@ namespace Phoenix
 				matImport.m_metallicTex = mtl.ambient_texname;
 				matImport.m_normalTex = mtl.bump_texname;
 				matImport.m_vertexFrom = indexOffset;
+				
+				matImport.m_name = mtl.name.c_str();
 			}
 
 			for (size_t vertex = 0; vertex < vertsInFace; vertex++)
 			{
+				assert((indexOffset + vertex) < numIndices);
+
 				tinyobj::index_t idx = shape.mesh.indices[indexOffset + vertex];
 
 				Vec3* v = mesh.m_vertices + indexOffset + vertex;
@@ -124,6 +131,9 @@ namespace Phoenix
 				t->y = uvs[uvIdx + 1];
 			}
 		}
+
+		//mesh.m_vertices[0] = Vec3(1337, 1337, 1337);
+		//mesh.m_vertices[numIndices - 1] = Vec3(25, 25, 25);
 
 		return mesh;
 	}
@@ -164,8 +174,6 @@ namespace Phoenix
 	{
 		size_t numVertices = import.m_numVertices;
 
-		outMesh->m_numVertices = numVertices;
-
 		VertexBufferFormat layout;
 		layout.add({ EAttributeProperty::Position, EAttributeType::Float, 3 },
 		{ sizeof(Vec3), numVertices, import.m_vertices });
@@ -177,7 +185,10 @@ namespace Phoenix
 		{ sizeof(Vec2), numVertices, import.m_uvs });
 
 		outMesh->m_vertexbuffer = renderDevice->createVertexBuffer(layout);
-		outMesh->m_numVertices = import.m_numVertices;
+		outMesh->m_data.m_numVertices = import.m_numVertices;
+		outMesh->m_data.m_vertices = import.m_vertices;
+		outMesh->m_data.m_normals = import.m_normals;
+		outMesh->m_data.m_uvs = import.m_uvs;
 
 		assert(outMesh->m_vertexbuffer.isValid());
 	}
@@ -196,9 +207,11 @@ namespace Phoenix
 				
 			if (!matImport.m_diffuseTex.empty())
 			{
-				material->m_diffuseTex = loadRenderTexture2D((mtlPath + matImport.m_diffuseTex).c_str(), "matDiffuseTex", renderDevice, renderContext);
-				assert(material->m_diffuseTex.isValid());
+				material->m_diffuseTex = createTextureAsset((mtlPath + matImport.m_diffuseTex).c_str(), "matDiffuseTex", renderDevice, renderContext);
+				assert(material->m_diffuseTex.m_handle.isValid());
 			}
+
+			material->m_name = matImport.m_name;
 
 			matIdx++;
 			if (matIdx >= StaticMesh::MAX_MATERIALS)
@@ -222,10 +235,11 @@ namespace Phoenix
 		{
 			meshes.emplace_back();
 
-			createBuffers(import, &meshes.back(), renderDevice);
-			createMaterials(import, &meshes.back(), mtlPath, renderDevice, renderContext);
+			StaticMesh* mesh = &meshes.back();
+			mesh->m_name = import.m_name;
 
-			import.free();
+			createBuffers(import, mesh, renderDevice);
+			createMaterials(import, mesh, mtlPath, renderDevice, renderContext);
 		}
 
 		return meshes;
@@ -256,6 +270,41 @@ namespace Phoenix
 		{
 			assert(false);
 			Logger::errorf("Attempted to load unsuppored Mesh Type %s while loading Mesh", path);
+			return{};
 		}
+	}
+
+	void serialize(Archive& ar, MeshData& data)
+	{
+		ar.serialize(&data.m_numVertices, sizeof(size_t));
+		ar.serialize(&data.m_vertices, sizeof(Vec3) * data.m_numVertices);
+		ar.serialize(&data.m_normals, sizeof(Vec3) * data.m_numVertices);
+		ar.serialize(&data.m_uvs, sizeof(Vec2) * data.m_numVertices);
+	}
+
+	void serialize(Archive& ar, Material& material)
+	{
+		serialize(ar, material.m_name);
+		serialize(ar, material.m_diffuseTex);
+	}
+	
+	void serialize(Archive& ar, StaticMesh& mesh)
+	{
+		//serialize(ar, mesh.m_data);
+
+		ar.serialize(&mesh.m_data.m_numVertices, sizeof(size_t));
+		ar.serialize(&mesh.m_data.m_vertices, sizeof(Vec3) * mesh.m_data.m_numVertices);
+		ar.serialize(&mesh.m_data.m_normals, sizeof(Vec3) * mesh.m_data.m_numVertices);
+		ar.serialize(&mesh.m_data.m_uvs, sizeof(Vec2) * mesh.m_data.m_numVertices);
+		
+		ar.serialize(&mesh.m_numMaterials, sizeof(uint8_t));
+
+		for (uint8_t i = 0; i < mesh.m_numMaterials; ++i)
+		{
+			serialize(ar, mesh.m_materials[i]);
+			ar.serialize(&mesh.m_vertexFrom[i], sizeof(size_t));
+		}
+
+		serialize(ar, mesh.m_name);
 	}
 }

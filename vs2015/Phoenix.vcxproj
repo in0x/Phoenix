@@ -182,6 +182,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\Core\Assets.hpp" />
     <ClInclude Include="..\src\Core\Component.hpp" />
     <ClInclude Include="..\src\Core\Components\CCamera.hpp" />
     <ClInclude Include="..\src\Core\Components\CDirectionalLight.hpp" />
@@ -191,6 +192,7 @@
     <ClInclude Include="..\src\Core\Engine.hpp" />
     <ClInclude Include="..\src\Core\Mesh.hpp" />
     <ClInclude Include="..\src\Core\Serialize.hpp" />
+    <ClInclude Include="..\src\Core\SerialUtil.hpp" />
     <ClInclude Include="..\src\Core\Shader.hpp" />
     <ClInclude Include="..\src\Core\FNVHash.hpp" />
     <ClInclude Include="..\src\Core\StringTokenizer.hpp" />
@@ -252,6 +254,7 @@
     <ClCompile Include="..\src\Core\Clock.cpp" />
     <ClCompile Include="..\src\Core\Logger.cpp" />
     <ClCompile Include="..\src\Core\Mesh.cpp" />
+    <ClCompile Include="..\src\Core\Serialize.cpp" />
     <ClCompile Include="..\src\Core\Shader.cpp" />
     <ClCompile Include="..\src\Core\StringTokenizer.cpp" />
     <ClCompile Include="..\src\Core\Texture.cpp" />

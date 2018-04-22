@@ -196,6 +196,12 @@
     <ClInclude Include="..\src\Core\Serialize.hpp">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Core\Assets.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\SerialUtil.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Core\Clock.cpp">
@@ -287,6 +293,9 @@
       <Filter>Core\Windows</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Core\Mesh.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Core\Serialize.cpp">
       <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>

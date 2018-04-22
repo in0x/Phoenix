@@ -97,32 +97,22 @@ namespace Phoenix
 
 		m_context->bindUniform(m_uniforms.modelTf, &transform);
 
-		if (mesh.m_indexbuffer.isValid() && mesh.m_numIndices > 0)
+		size_t materialIdx = 0;
+
+		for (; materialIdx < mesh.m_numMaterials - 1; ++materialIdx)
 		{
-			const Material& material = mesh.m_materials[0];
-
-			m_context->bindTexture(material.m_diffuseTex);
-			m_context->drawIndexed(mesh.m_vertexbuffer, mesh.m_indexbuffer, EPrimitive::Triangles);
-		}
-		else
-		{
-			size_t materialIdx = 0;
-
-			for (; materialIdx < mesh.m_numMaterials - 1; ++materialIdx)
-			{
-				const Material& material = mesh.m_materials[materialIdx];
-				size_t currVertexIdx = mesh.m_vertexFrom[materialIdx];
-
-				m_context->bindTexture(material.m_diffuseTex);
-				m_context->drawLinear(mesh.m_vertexbuffer, EPrimitive::Triangles, mesh.m_vertexFrom[materialIdx + 1] - currVertexIdx, currVertexIdx);
-			}
-
 			const Material& material = mesh.m_materials[materialIdx];
 			size_t currVertexIdx = mesh.m_vertexFrom[materialIdx];
 
-			m_context->bindTexture(material.m_diffuseTex);
-			m_context->drawLinear(mesh.m_vertexbuffer, EPrimitive::Triangles, mesh.m_numVertices - currVertexIdx, currVertexIdx);
+			m_context->bindTexture(material.m_diffuseTex.m_handle);
+			m_context->drawLinear(mesh.m_vertexbuffer, EPrimitive::Triangles, mesh.m_vertexFrom[materialIdx + 1] - currVertexIdx, currVertexIdx);
 		}
+
+		const Material& material = mesh.m_materials[materialIdx];
+		size_t currVertexIdx = mesh.m_vertexFrom[materialIdx];
+
+		m_context->bindTexture(material.m_diffuseTex.m_handle);
+		m_context->drawLinear(mesh.m_vertexbuffer, EPrimitive::Triangles, mesh.m_data.m_numVertices - currVertexIdx, currVertexIdx);
 
 		m_context->unbindTextures();
 	}
