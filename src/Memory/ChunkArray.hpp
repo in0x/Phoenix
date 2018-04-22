@@ -120,9 +120,9 @@ namespace Phoenix
 		}
 
 		template <typename ...CtorArgs>
-		T* add(CtorArgs... ctorArgs)
+		T* add(CtorArgs&&... ctorArgs)
 		{
-			return new (alloc()) T(ctorArgs...);
+			return new (alloc()) T(std::forward<CtorArgs>(ctorArgs)...);
 		}
 
 		virtual void swapAndPop(size_t idx) override
