@@ -205,7 +205,7 @@ namespace Phoenix
 			StaticMesh* mesh = &meshes.back();
 			
 			mesh->m_name = import.m_name;
-			mesh->m_data = import.m_meshData; // TODO: Should be a move 
+			mesh->m_data = std::move(import.m_meshData);
 
 			createBuffers(mesh, renderDevice);
 			createMaterials(import, mesh, mtlPath, renderDevice, renderContext);

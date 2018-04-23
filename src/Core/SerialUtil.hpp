@@ -57,7 +57,7 @@ namespace Phoenix
 			size_t size = 0;
 			serialize(ar, size);
 
-			vector.reserve(size);
+			vector.resize(size);
 			ar.serialize(vector.data(), sizeof(T) * size);
 		}
 	}

@@ -65,10 +65,10 @@ namespace Phoenix
 		return entities;
 	}
 
-	EntityHandle createMeshEntity(World* world, StaticMesh& mesh, IRIDevice* renderDevice, IRIContext* renderContext)
+	EntityHandle createMeshEntity(World* world, StaticMesh&& mesh, IRIDevice* renderDevice, IRIContext* renderContext)
 	{
 		EntityHandle entity = world->createEntity();
-		world->addComponent<CStaticMesh>(entity, mesh);
+		world->addComponent<CStaticMesh>(entity, std::move(mesh));
 		world->addComponent<CTransform>(entity);
 		return entity;
 	}
@@ -223,7 +223,7 @@ int main(int argc, char** argv)
 				}
 
 				StaticMesh sm = loadStaticMesh((sponzaPath + ent->d_name).c_str(), renderDevice, renderContext);
-				createMeshEntity(&world, sm, renderDevice, renderContext);
+				createMeshEntity(&world, std::move(sm), renderDevice, renderContext);
 			}
 			closedir(dir);
 		}
@@ -318,7 +318,7 @@ int main(int argc, char** argv)
 		{
 			CTransform* transform = mesh.sibling<CTransform>();
 
-			renderer.drawStaticMesh(mesh.m_mesh, transform->toMat4());
+			renderer.drawStaticMesh(mesh.m_mesh, transform->m_cached);
 		}
 
 		renderer.setupLightPass();

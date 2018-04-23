@@ -12,6 +12,10 @@ namespace Phoenix
 		CStaticMesh(const StaticMesh& mesh)
 			: m_mesh(mesh)
 		{}
+		
+		CStaticMesh(StaticMesh&& mesh)
+			: m_mesh(std::move(mesh))
+		{}
 
 		StaticMesh m_mesh;
 	};
