@@ -55,14 +55,14 @@ namespace Phoenix
 		}
 	};
 
-	using VertexBufferHandle =	 ResourceHandle<size_t, 1024, EResourceHandleType::EVertexBuffer>;
-	using IndexBufferHandle =	 ResourceHandle<size_t, 1024, EResourceHandleType::EIndexBuffer>;
-	using VertexShaderHandle =	 ResourceHandle<size_t, 1024, EResourceHandleType::EVertexShader>;
-	using FragmentShaderHandle = ResourceHandle<size_t, 1024, EResourceHandleType::EFragmentShader>;
-	using ProgramHandle =		 ResourceHandle<size_t, 1024, EResourceHandleType::EProgram>;
-	using UniformHandle =		 ResourceHandle<size_t, 1024, EResourceHandleType::EUniform>;
-	using UniformBufferHandle =  ResourceHandle<size_t, 1024, EResourceHandleType::EUniformBuffer>;
-	using Texture2DHandle =		 ResourceHandle<size_t, 1024, EResourceHandleType::ETexture2D>;
-	using TextureCubeHandle =	 ResourceHandle<size_t, 1024, EResourceHandleType::ETextureCube>;
-	using RenderTargetHandle =	 ResourceHandle<size_t, 1024, EResourceHandleType::ERenderTarget>;
+	using VertexBufferHandle =	 ResourceHandle<size_t, 65536, EResourceHandleType::EVertexBuffer>;
+	using IndexBufferHandle =	 ResourceHandle<size_t, 65536, EResourceHandleType::EIndexBuffer>;
+	using VertexShaderHandle =	 ResourceHandle<size_t, 65536, EResourceHandleType::EVertexShader>;
+	using FragmentShaderHandle = ResourceHandle<size_t, 65536, EResourceHandleType::EFragmentShader>;
+	using ProgramHandle =		 ResourceHandle<size_t, 65536, EResourceHandleType::EProgram>;
+	using UniformHandle =		 ResourceHandle<size_t, 65536, EResourceHandleType::EUniform>;
+	using UniformBufferHandle =  ResourceHandle<size_t, 65536, EResourceHandleType::EUniformBuffer>;
+	using Texture2DHandle =		 ResourceHandle<size_t, 65536, EResourceHandleType::ETexture2D>;
+	using TextureCubeHandle =	 ResourceHandle<size_t, 65536, EResourceHandleType::ETextureCube>;
+	using RenderTargetHandle =	 ResourceHandle<size_t, 65536, EResourceHandleType::ERenderTarget>;
 }
