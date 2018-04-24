@@ -179,6 +179,24 @@ namespace Phoenix
 				assert(material->m_diffuseTex.m_resourceHandle.isValid());
 			}
 
+			if (!matImport.m_roughnessTex.empty())
+			{
+				material->m_roughnessTex = createTextureAsset((mtlPath + matImport.m_roughnessTex).c_str(), "matRoughnessTex", renderDevice, renderContext);
+				assert(material->m_roughnessTex.m_resourceHandle.isValid());
+			}
+
+			if (!matImport.m_metallicTex.empty())
+			{
+				material->m_metallicTex = createTextureAsset((mtlPath + matImport.m_metallicTex).c_str(), "matMetallicTex", renderDevice, renderContext);
+				assert(material->m_metallicTex.m_resourceHandle.isValid());
+			}
+
+			if (!matImport.m_metallicTex.empty())
+			{
+				material->m_normalTex = createTextureAsset((mtlPath + matImport.m_normalTex).c_str(), "matNormalTex", renderDevice, renderContext);
+				assert(material->m_normalTex.m_resourceHandle.isValid());
+			}
+
 			material->m_name = matImport.m_name;
 
 			matIdx++;

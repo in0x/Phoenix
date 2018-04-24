@@ -19,9 +19,9 @@ namespace Phoenix
 		std::string m_name;
 
 		Texture2D m_diffuseTex; 
-		/*	Texture2DHandle m_roughnessTex;
-			Texture2DHandle m_metallicTex;
-			Texture2DHandle m_normalTex;*/
+		Texture2D m_roughnessTex;
+		Texture2D m_metallicTex;
+		Texture2D m_normalTex;
 	};
 
 	struct MeshData
