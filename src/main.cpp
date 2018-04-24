@@ -229,9 +229,7 @@ int main(int argc, char** argv)
 		}
 		else
 		{
-			/* could not open directory */
-			perror("");
-			return EXIT_FAILURE;
+			Logger::errorf("Failed to open directory %s", sponzaPath.c_str());
 		}
 	}
 #endif // LOAD

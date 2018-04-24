@@ -273,6 +273,9 @@ namespace Phoenix
 	{
 		serialize(ar, material.m_name);
 		serialize(ar, material.m_diffuseTex);
+		serialize(ar, material.m_roughnessTex);
+		serialize(ar, material.m_metallicTex);
+		serialize(ar, material.m_normalTex);
 	}
 	
 	void serialize(Archive& ar, StaticMesh& mesh)
@@ -309,6 +312,9 @@ namespace Phoenix
 		for (uint8_t i = 0; i < mesh.m_numMaterials; ++i)
 		{
 			initializeTextureAsset(&mesh.m_materials[i].m_diffuseTex, renderDevice, renderContext);
+			initializeTextureAsset(&mesh.m_materials[i].m_roughnessTex, renderDevice, renderContext);
+			initializeTextureAsset(&mesh.m_materials[i].m_metallicTex, renderDevice, renderContext);
+			initializeTextureAsset(&mesh.m_materials[i].m_normalTex, renderDevice, renderContext);
 		}
 
 		return mesh;
