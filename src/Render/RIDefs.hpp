@@ -252,6 +252,8 @@ namespace Phoenix
 	enum class EPixelFormat
 	{
 		None,
+		R8,
+		RG8,
 		R8G8B8,
 		R8G8B8A8,
 		RGB16F,

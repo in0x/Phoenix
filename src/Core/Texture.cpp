@@ -86,9 +86,9 @@ namespace Phoenix
 		case 3:
 		{ desc.pixelFormat = EPixelFormat::R8G8B8; } break;
 		case 2:
-		{ assert(false); } break;
+		{ desc.pixelFormat = EPixelFormat::RG8; } break;
 		case 1:
-		{ assert(false); } break;
+		{ desc.pixelFormat = EPixelFormat::R8; } break;
 		default: { assert(false); } break;
 		}
 
