@@ -10,6 +10,9 @@ uniform float specularExp;
 
 // new 
 uniform sampler2D matDiffuseTex;
+uniform sampler2D matRoughnessTex;
+uniform sampler2D matMetallicTex;
+uniform sampler2D matNormalTex;
 
 layout (location = 0) out vec4 normalRGBSpecExpA;
 layout (location = 1) out vec4 kDiffuseRGBDepthA;
@@ -21,6 +24,11 @@ void main()
 	normalRGBSpecExpA.w = specularExp;
 	
 	kDiffuseRGBDepthA.xyz = texture(matDiffuseTex, uv).xyz;
+	
+	kDiffuseRGBDepthA.xyz += texture(matRoughnessTex, uv).xyz;
+	kDiffuseRGBDepthA.xyz += texture(matMetallicTex, uv).xyz;
+	kDiffuseRGBDepthA.xyz += texture(matNormalTex, uv).xyz;
+	
 	kDiffuseRGBDepthA.w = positionEye.z;
 	
 	kSpecularRGB = kSpecular;

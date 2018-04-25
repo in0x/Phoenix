@@ -171,31 +171,23 @@ namespace Phoenix
 			outMesh->m_vertexFrom[matIdx] = matImport.m_vertexFrom;
 			Material* material = &outMesh->m_materials[matIdx];
 
-			assert(!matImport.m_diffuseTex.empty());
-				
-			if (!matImport.m_diffuseTex.empty())
-			{
-				material->m_diffuseTex = createTextureAsset((mtlPath + matImport.m_diffuseTex).c_str(), "matDiffuseTex", renderDevice, renderContext);
-				assert(material->m_diffuseTex.m_resourceHandle.isValid());
-			}
+			const char* defaultWhiteTexPath = "Textures/Default1x1White.tga";
 
-			if (!matImport.m_roughnessTex.empty())
-			{
-				material->m_roughnessTex = createTextureAsset((mtlPath + matImport.m_roughnessTex).c_str(), "matRoughnessTex", renderDevice, renderContext);
-				assert(material->m_roughnessTex.m_resourceHandle.isValid());
-			}
+			std::string diffuseTexPath = matImport.m_diffuseTex.empty() ? defaultWhiteTexPath : (mtlPath + matImport.m_diffuseTex);
+			material->m_diffuseTex = createTextureAsset(diffuseTexPath.c_str(), "matDiffuseTex", renderDevice, renderContext);
+			assert(material->m_diffuseTex.m_resourceHandle.isValid());			
 
-			if (!matImport.m_metallicTex.empty())
-			{
-				material->m_metallicTex = createTextureAsset((mtlPath + matImport.m_metallicTex).c_str(), "matMetallicTex", renderDevice, renderContext);
-				assert(material->m_metallicTex.m_resourceHandle.isValid());
-			}
-
-			if (!matImport.m_metallicTex.empty())
-			{
-				material->m_normalTex = createTextureAsset((mtlPath + matImport.m_normalTex).c_str(), "matNormalTex", renderDevice, renderContext);
-				assert(material->m_normalTex.m_resourceHandle.isValid());
-			}
+			std::string roughnessTexPath = matImport.m_roughnessTex.empty() ? defaultWhiteTexPath : (mtlPath + matImport.m_roughnessTex);
+			material->m_roughnessTex = createTextureAsset(roughnessTexPath.c_str(), "matRoughnessTex", renderDevice, renderContext);
+			assert(material->m_roughnessTex.m_resourceHandle.isValid());			
+		
+			std::string metallicTexPath = matImport.m_metallicTex.empty() ? defaultWhiteTexPath : (mtlPath + matImport.m_metallicTex);
+			material->m_metallicTex = createTextureAsset(metallicTexPath.c_str(), "matMetallicTex", renderDevice, renderContext);
+			assert(material->m_metallicTex.m_resourceHandle.isValid());
+			
+			std::string normalTexPath = matImport.m_normalTex.empty() ? defaultWhiteTexPath : (mtlPath + matImport.m_normalTex);
+			material->m_normalTex = createTextureAsset(normalTexPath.c_str(), "matNormalTex", renderDevice, renderContext);
+			assert(material->m_normalTex.m_resourceHandle.isValid());
 
 			material->m_name = matImport.m_name;
 
@@ -311,10 +303,10 @@ namespace Phoenix
 
 		for (uint8_t i = 0; i < mesh.m_numMaterials; ++i)
 		{
-			initializeTextureAsset(&mesh.m_materials[i].m_diffuseTex, renderDevice, renderContext);
-			initializeTextureAsset(&mesh.m_materials[i].m_roughnessTex, renderDevice, renderContext);
-			initializeTextureAsset(&mesh.m_materials[i].m_metallicTex, renderDevice, renderContext);
-			initializeTextureAsset(&mesh.m_materials[i].m_normalTex, renderDevice, renderContext);
+			initTextureAsset(&mesh.m_materials[i].m_diffuseTex, renderDevice, renderContext);
+			initTextureAsset(&mesh.m_materials[i].m_roughnessTex, renderDevice, renderContext);
+			initTextureAsset(&mesh.m_materials[i].m_metallicTex, renderDevice, renderContext);
+			initTextureAsset(&mesh.m_materials[i].m_normalTex, renderDevice, renderContext);
 		}
 
 		return mesh;

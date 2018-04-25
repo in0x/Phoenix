@@ -75,5 +75,7 @@ namespace Phoenix
 
 		IRIDevice* m_device;
 		IRIContext* m_context;
+
+		void drawStaticMeshWithMaterial(VertexBufferHandle vb, const Material& material, size_t numVertices, size_t vertexFrom);
 	};
 }

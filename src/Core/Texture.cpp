@@ -110,33 +110,6 @@ namespace Phoenix
 		return desc;
 	}
 
-	/*Texture2D createTextureAsset(const char* path, const char* nameInShader, IRIDevice* renderDevice, IRIContext* renderContext)
-	{
-		TextureData data;
-		Texture2D texture;
-
-		if (!loadTextureData(path, &data))
-		{
-			Logger::warningf("Failed to load data for texture %s. Cannot initialize texture further", path);
-			return texture;
-		}
-
-		TextureDesc desc = createDesc(data, ETextureFilter::Linear, ETextureFilter::Linear);
-		Texture2DHandle tex2D = renderDevice->createTexture2D(desc, nameInShader);
-
-		assert(tex2D.isValid());
-
-		renderContext->uploadTextureData(tex2D, data.m_data);
-
-		texture.m_resourceName = nameInShader;
-		texture.m_resourceHandle = tex2D;
-		texture.m_desc = desc;
-
-		texture.m_sourcePath = path;
-		
-		return texture;
-	}*/
-
 	Texture2D createTextureAsset(const char* path, const char* nameInShader, IRIDevice* renderDevice, IRIContext* renderContext)
 	{
 		Texture2D texture;
@@ -144,12 +117,12 @@ namespace Phoenix
 		texture.m_resourceName = nameInShader;
 		texture.m_sourcePath = path;
 
-		initializeTextureAsset(&texture, renderDevice, renderContext);
+		initTextureAsset(&texture, renderDevice, renderContext);
 		
 		return texture;
 	}
 
-	void initializeTextureAsset(Texture2D* texture, IRIDevice* renderDevice, IRIContext* renderContext)
+	void initTextureAsset(Texture2D* texture, IRIDevice* renderDevice, IRIContext* renderContext)
 	{
 		TextureData data;
 
