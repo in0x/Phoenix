@@ -205,6 +205,9 @@
     <ClInclude Include="..\src\ThirdParty\dirent\dirent.h">
       <Filter>ThirdParty\dirent</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Core\FileSystem.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Core\Clock.cpp">
@@ -299,6 +302,9 @@
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Core\Serialize.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Core\FileSystem.cpp">
       <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>

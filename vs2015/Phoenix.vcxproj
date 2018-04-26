@@ -190,6 +190,7 @@
     <ClInclude Include="..\src\Core\Components\CTransform.hpp" />
     <ClInclude Include="..\src\Core\EcsTypes.hpp" />
     <ClInclude Include="..\src\Core\Engine.hpp" />
+    <ClInclude Include="..\src\Core\FileSystem.hpp" />
     <ClInclude Include="..\src\Core\Mesh.hpp" />
     <ClInclude Include="..\src\Core\Serialize.hpp" />
     <ClInclude Include="..\src\Core\SerialUtil.hpp" />
@@ -253,6 +254,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Core\Clock.cpp" />
+    <ClCompile Include="..\src\Core\FileSystem.cpp" />
     <ClCompile Include="..\src\Core\Logger.cpp" />
     <ClCompile Include="..\src\Core\Mesh.cpp" />
     <ClCompile Include="..\src\Core\Serialize.cpp">
