@@ -99,12 +99,6 @@ namespace Phoenix
 
 	void DeferredRenderer::drawStaticMesh(const StaticMesh& mesh, const Matrix4& transform)
 	{
-		if (mesh.m_numMaterials == 0)
-		{
-			//Logger::warning("Trying to draw static mesh with no material, this is currently not handled. Skipping drawing.");
-			return;
-		}
-
 		m_context->bindUniform(m_uniforms.modelTf, &transform);
 
 		size_t materialIdx = 0;

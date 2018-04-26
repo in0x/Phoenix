@@ -165,13 +165,12 @@ namespace Phoenix
 	void createMaterials(const MeshImport& import, StaticMesh* outMesh, const char* mtlPath, IRIDevice* renderDevice, IRIContext* renderContext)
 	{
 		size_t matIdx = 0;
+		const char* defaultWhiteTexPath = "Textures/Default1x1White.tga";
 
 		for (const MaterialImport& matImport : import.m_matImports)
 		{
 			outMesh->m_vertexFrom[matIdx] = matImport.m_vertexFrom;
 			Material* material = &outMesh->m_materials[matIdx];
-
-			const char* defaultWhiteTexPath = "Textures/Default1x1White.tga";
 
 			std::string diffuseTexPath = matImport.m_diffuseTex.empty() ? defaultWhiteTexPath : (mtlPath + matImport.m_diffuseTex);
 			material->m_diffuseTex = createTextureAsset(diffuseTexPath.c_str(), "matDiffuseTex", renderDevice, renderContext);
@@ -197,6 +196,29 @@ namespace Phoenix
 				Logger::warning("Mesh import exceeds max number of StaticMesh materials. Skipping rest of mtl imports.");
 				break;
 			}
+		}
+
+		// If no mats were imported, assign a default mat.
+		if (matIdx == 0)
+		{
+			outMesh->m_vertexFrom[matIdx] = 0;
+			Material* material = &outMesh->m_materials[matIdx];
+
+			material->m_diffuseTex = createTextureAsset(defaultWhiteTexPath, "matDiffuseTex", renderDevice, renderContext);
+			assert(material->m_diffuseTex.m_resourceHandle.isValid());
+
+			material->m_roughnessTex = createTextureAsset(defaultWhiteTexPath, "matRoughnessTex", renderDevice, renderContext);
+			assert(material->m_roughnessTex.m_resourceHandle.isValid());
+
+			material->m_metallicTex = createTextureAsset(defaultWhiteTexPath, "matMetallicTex", renderDevice, renderContext);
+			assert(material->m_metallicTex.m_resourceHandle.isValid());
+
+			material->m_normalTex = createTextureAsset(defaultWhiteTexPath, "matNormalTex", renderDevice, renderContext);
+			assert(material->m_normalTex.m_resourceHandle.isValid());
+
+			material->m_name = "defaultMaterial";
+
+			matIdx++;
 		}
 
 		outMesh->m_numMaterials = std::min(matIdx, (size_t)StaticMesh::MAX_MATERIALS);
