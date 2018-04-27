@@ -375,14 +375,12 @@ namespace Phoenix
 		}
 	}
 
-	void createTextureBase(RITexture& texture, GlTextureBase& glTex, const TextureDesc& desc, const char* name, GLenum textureType)
+	void createTextureBase(RITexture& texture, GlTextureBase& glTex, const TextureDesc& desc, GLenum textureType)
 	{
-		glTex.m_pixelFormat = toGlFormat(desc.pixelFormat);
 		glTex.m_components = toGlComponents(desc.pixelFormat);
 		glTex.m_dataType = toGlTexDatatype(desc.pixelFormat);
+		glTex.m_pixelFormat = toGlFormat(desc.pixelFormat);
 		texture.m_numMips = desc.numMips;
-		texture.m_namehash = HashFNV<const char*>()(name);
-		strncpy(texture.m_debugName, name, RITexture::MAX_NAME_LENGTH);
 
 		glGenTextures(1, &glTex.m_id);
 		glActiveTexture(GL_TEXTURE0);
@@ -405,12 +403,12 @@ namespace Phoenix
 		glTexParameteri(textureType, GL_TEXTURE_WRAP_R, toGlWrap(desc.wrapW));
 	}
 
-	Texture2DHandle	RIDeviceOpenGL::createTexture2D(const TextureDesc& desc, const char* name)
+	Texture2DHandle	RIDeviceOpenGL::createTexture2D(const TextureDesc& desc)
 	{
 		Texture2DHandle handle = m_resources->m_texture2Ds.allocateResource();
 		GlTexture2D* texture = m_resources->m_texture2Ds.getResource(handle);
 
-		createTextureBase(*texture, texture->m_glTex, desc, name, GL_TEXTURE_2D);
+		createTextureBase(*texture, texture->m_glTex, desc, GL_TEXTURE_2D);
 
 		texture->m_width = desc.width;
 		texture->m_height = desc.height;
@@ -429,12 +427,12 @@ namespace Phoenix
 		return handle;
 	}
 
-	TextureCubeHandle RIDeviceOpenGL::createTextureCube(const TextureDesc& desc, const char* name)
+	TextureCubeHandle RIDeviceOpenGL::createTextureCube(const TextureDesc& desc)
 	{
 		TextureCubeHandle handle = m_resources->m_textureCubes.allocateResource();
 		GlTextureCube* texture = m_resources->m_textureCubes.getResource(handle);
 
-		createTextureBase(*texture, texture->m_glTex, desc, name, GL_TEXTURE_CUBE_MAP);
+		createTextureBase(*texture, texture->m_glTex, desc, GL_TEXTURE_CUBE_MAP);
 
 		assert(desc.width == desc.height);
 		texture->m_size = desc.width;

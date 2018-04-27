@@ -16,6 +16,7 @@ namespace Phoenix
 		std::string m_resourceName;
 
 		Texture2DHandle m_resourceHandle;
+		UniformHandle m_sampler;
 		TextureDesc m_desc;
 
 		bool isValid() const

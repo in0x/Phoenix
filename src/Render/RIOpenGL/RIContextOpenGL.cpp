@@ -188,46 +188,45 @@ namespace Phoenix
 		}
 	}
 
-	void RIContextOpenGL::bindTextureBase(const TextureBind& binding)
+	void RIContextOpenGL::bindTextureBase(UniformHandle samplerHandle, const TextureBind& binding)
 	{
 		const GlProgram* program = m_boundState.program;
 		assert(nullptr != program);
 
+		const RIUniform* uniform = m_resources->m_uniforms.getResource(samplerHandle);
+
 		GlUniform glUniform;
-		bool bIsActive = m_resources->m_actualUniforms.getUniformIfExisting(binding.texture.m_namehash, program->m_id, glUniform);
+		bool bIsActive = m_resources->m_actualUniforms.getUniformIfExisting(uniform->m_nameHash, program->m_id, glUniform);
 
 		if (!bIsActive)
 		{
-			Logger::errorf("Texture %s does not have an equivalent sampler in currently bound program", binding.texture.m_debugName);
+			Logger::errorf("Texture %s does not have an equivalent sampler in currently bound program", uniform->m_debugName);
 			return;
 		}
 
 		assert(glUniform.m_glType == getSamplerType(binding.texturetype));
 		assert(m_boundState.activeTextureCount < getMaxTextureUnits());
 
-		checkGlErrorOccured();
 		glActiveTexture(GL_TEXTURE0 + m_boundState.activeTextureCount);
-		checkGlErrorOccured();
-
-		checkGlErrorOccured();
 		glBindTexture(binding.texturetype, binding.texID);
-		checkGlErrorOccured();
-
+		
 		setUniform(glUniform, &m_boundState.activeTextureCount, EUniformType::Int);
 
 		m_boundState.activeTextureCount++;
+
+		checkGlErrorOccured();
 	}
 
-	void RIContextOpenGL::bindTexture(Texture2DHandle handle)
+	void RIContextOpenGL::bindTexture(UniformHandle samplerHandle, Texture2DHandle texHandle)
 	{
-		const GlTexture2D* texture = m_resources->m_texture2Ds.getResource(handle);
-		bindTextureBase({ *texture, texture->m_glTex.m_id, GL_TEXTURE_2D });
+		const GlTexture2D* texture = m_resources->m_texture2Ds.getResource(texHandle);
+		bindTextureBase(samplerHandle, { *texture, texture->m_glTex.m_id, GL_TEXTURE_2D });
 	}
 
-	void RIContextOpenGL::bindTexture(TextureCubeHandle handle)
+	void RIContextOpenGL::bindTexture(UniformHandle samplerHandle, TextureCubeHandle texHandle)
 	{
-		const GlTextureCube* texture = m_resources->m_textureCubes.getResource(handle);
-		bindTextureBase({ *texture, texture->m_glTex.m_id, GL_TEXTURE_CUBE_MAP });
+		const GlTextureCube* texture = m_resources->m_textureCubes.getResource(texHandle);
+		bindTextureBase(samplerHandle, { *texture, texture->m_glTex.m_id, GL_TEXTURE_CUBE_MAP });
 	}
 
 	void RIContextOpenGL::unbindTextures()

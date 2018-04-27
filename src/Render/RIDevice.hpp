@@ -24,9 +24,9 @@ namespace Phoenix
 		
 		virtual ProgramHandle		 createProgram(VertexShaderHandle vs, FragmentShaderHandle fs) = 0;
 		
-		virtual Texture2DHandle		 createTexture2D(const TextureDesc& desc, const char* name) = 0;
+		virtual Texture2DHandle		 createTexture2D(const TextureDesc& desc) = 0;
 		
-		virtual TextureCubeHandle	 createTextureCube(const TextureDesc& desc, const char* name) = 0;
+		virtual TextureCubeHandle	 createTextureCube(const TextureDesc& desc) = 0;
 		
 		virtual RenderTargetHandle	 createRenderTarget(const RenderTargetDesc& desc) = 0;
 		

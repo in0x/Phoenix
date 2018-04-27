@@ -59,7 +59,10 @@ namespace Phoenix
 		Vec3,
 		Vec4,
 		Mat3,
-		Mat4
+		Mat4,
+		Sampler1D,
+		Sampler2D,
+		SamplerCube
 	};
 
 	// NOTE(Phil): Decl and data should likely be seperated into

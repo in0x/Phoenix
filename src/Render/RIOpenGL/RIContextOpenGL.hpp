@@ -37,9 +37,9 @@ namespace Phoenix
 
 		virtual void uploadTextureData(TextureCubeHandle handle, ETextureCubeSide side, const void* data) override;
 
-		virtual void bindTexture(Texture2DHandle handle) override;
+		virtual void bindTexture(UniformHandle samplerHandle, Texture2DHandle texHandle) override;
 
-		virtual void bindTexture(TextureCubeHandle handle) override;
+		virtual void bindTexture(UniformHandle samplerHandle, TextureCubeHandle texHandle) override;
 
 		virtual void unbindTextures() override;
 
@@ -62,7 +62,7 @@ namespace Phoenix
 		virtual uint32_t getMaxTextureUnits() const override;
 
 	private:
-		void bindTextureBase(const TextureBind& binding);
+		void bindTextureBase(UniformHandle samplerHandle, const TextureBind& binding);
 
 		const RIOpenGLResourceStore* m_resources;
 

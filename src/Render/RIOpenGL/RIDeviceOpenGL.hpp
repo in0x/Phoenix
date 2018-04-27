@@ -27,9 +27,9 @@ namespace Phoenix
 		
 		virtual ProgramHandle		 createProgram(VertexShaderHandle vsHandle, FragmentShaderHandle fsHandle) override;
 		
-		virtual Texture2DHandle		 createTexture2D(const TextureDesc& desc, const char* name) override;
+		virtual Texture2DHandle		 createTexture2D(const TextureDesc& desc) override;
 		
-		virtual TextureCubeHandle	 createTextureCube(const TextureDesc& desc, const char* name) override;
+		virtual TextureCubeHandle	 createTextureCube(const TextureDesc& desc) override;
 		
 		virtual RenderTargetHandle	 createRenderTarget(const RenderTargetDesc& desc) override;
 		

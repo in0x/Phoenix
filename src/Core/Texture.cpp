@@ -135,13 +135,15 @@ namespace Phoenix
 		}
 
 		TextureDesc desc = createDesc(data, ETextureFilter::Linear, ETextureFilter::Linear);
-		Texture2DHandle tex2D = renderDevice->createTexture2D(desc, texture->m_resourceName.c_str());
-
+		Texture2DHandle tex2D = renderDevice->createTexture2D(desc);
+		UniformHandle sampler = renderDevice->createUniform(texture->m_resourceName.c_str(), EUniformType::Sampler2D);
 		assert(tex2D.isValid());
+		assert(sampler.isValid());
 
 		renderContext->uploadTextureData(tex2D, data.m_data);
-
+		
 		texture->m_resourceHandle = tex2D;
+		texture->m_sampler = sampler;
 		texture->m_desc = desc;
 	}
 

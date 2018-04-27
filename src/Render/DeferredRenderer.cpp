@@ -18,16 +18,21 @@ namespace Phoenix
 		desc.width = gBufferWidth;
 		desc.height = gBufferHeight;
 
-		m_normalSpecExpTex = renderDevice->createTexture2D(desc, "normalRGBSpecExpA_tex");
+		m_normalSpecExpTex = renderDevice->createTexture2D(desc);
 
 		desc.pixelFormat = EPixelFormat::RGBA16F;
-		m_kDiffuseDepthTex = renderDevice->createTexture2D(desc, "kDiffuseRGBDepthA_tex");
-		
+		m_kDiffuseDepthTex = renderDevice->createTexture2D(desc);
+
 		desc.pixelFormat = EPixelFormat::RGB16F;
-		m_kSpecularTex = renderDevice->createTexture2D(desc, "kSpecularRGB_tex");
+		m_kSpecularTex = renderDevice->createTexture2D(desc);
 
 		desc.pixelFormat = EPixelFormat::Depth32F;
-		m_depthTex = renderDevice->createTexture2D(desc, "depth_tex");
+		m_depthTex = renderDevice->createTexture2D(desc);
+
+		m_uniforms.normalSpecExpTexSampler = renderDevice->createUniform("normalRGBSpecExpA_tex", EUniformType::Sampler2D);
+		m_uniforms.diffuseDepthTexSampler = renderDevice->createUniform("kDiffuseRGBDepthA_tex", EUniformType::Sampler2D);
+		m_uniforms.specularTexSampler = renderDevice->createUniform("kSpecularRGB_tex", EUniformType::Sampler2D);
+		m_uniforms.depthTexSampler = renderDevice->createUniform("depth_tex", EUniformType::Sampler2D);
 
 		RenderTargetDesc gBufferDesc;
 		gBufferDesc.colorAttachs[RenderTargetDesc::Color0] = m_normalSpecExpTex;
@@ -38,7 +43,8 @@ namespace Phoenix
 		m_gBuffer = renderDevice->createRenderTarget(gBufferDesc);
 
 		desc.pixelFormat = EPixelFormat::RGBA16F;
-		m_kFinalTex = renderDevice->createTexture2D(desc, "kfinalRGBA_tex");
+		m_kFinalTex = renderDevice->createTexture2D(desc);
+		m_uniforms.finalTexSampler = renderDevice->createUniform("kfinalRGBA_tex", EUniformType::Sampler2D);
 
 		RenderTargetDesc backBufferDesc;
 		backBufferDesc.colorAttachs[RenderTargetDesc::Color0] = m_kFinalTex;
@@ -89,11 +95,11 @@ namespace Phoenix
 
 	void DeferredRenderer::drawStaticMeshWithMaterial(VertexBufferHandle vb, const Material& material, size_t numVertices, size_t vertexFrom)
 	{
-		m_context->bindTexture(material.m_diffuseTex.m_resourceHandle);
-		m_context->bindTexture(material.m_metallicTex.m_resourceHandle);
-		m_context->bindTexture(material.m_normalTex.m_resourceHandle);
-		m_context->bindTexture(material.m_roughnessTex.m_resourceHandle);
-	
+		m_context->bindTexture(material.m_diffuseTex.m_sampler,   material.m_diffuseTex.m_resourceHandle);
+		m_context->bindTexture(material.m_metallicTex.m_sampler,  material.m_metallicTex.m_resourceHandle);
+		m_context->bindTexture(material.m_normalTex.m_sampler,    material.m_normalTex.m_resourceHandle);
+		m_context->bindTexture(material.m_roughnessTex.m_sampler, material.m_roughnessTex.m_resourceHandle);
+
 		m_context->drawLinear(vb, EPrimitive::Triangles, numVertices, vertexFrom);
 	}
 
@@ -121,16 +127,16 @@ namespace Phoenix
 	{
 		m_context->bindRenderTarget(m_backBuffer);
 		m_context->clearRenderTargetColor(m_backBuffer, RGBA{ 0.f, 0.f, 0.f, 0.f });
-		
-		m_context->setBlendState(m_lightBlendState);	
+
+		m_context->setBlendState(m_lightBlendState);
 		m_context->setDepthTest(EDepth::Disable);
-		
+
 		m_context->bindShaderProgram(m_directionaLightProgram);
 
 		//m_context->bindUniform(m_uniforms.projTf, &m_projMat);
 
-		m_context->bindTexture(m_normalSpecExpTex);
-		m_context->bindTexture(m_kDiffuseDepthTex);
+		m_context->bindTexture(m_uniforms.normalSpecExpTexSampler, m_normalSpecExpTex);
+		m_context->bindTexture(m_uniforms.diffuseDepthTexSampler, m_kDiffuseDepthTex);
 	}
 
 	void DeferredRenderer::drawLight(Vec3 direction, Vec3 color)
@@ -153,7 +159,7 @@ namespace Phoenix
 		m_context->setDepthTest(EDepth::Disable);
 
 		m_context->bindShaderProgram(m_copyToBackBufferProgram);
-		m_context->bindTexture(m_kFinalTex);
+		m_context->bindTexture(m_uniforms.finalTexSampler, m_kFinalTex);
 
 		m_context->drawLinear(EPrimitive::TriangleStrips, 4, 0);
 

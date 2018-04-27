@@ -65,6 +65,13 @@ namespace Phoenix
 
 			UniformHandle lightDirEye;
 			UniformHandle lightColor;
+
+			UniformHandle diffuseDepthTexSampler;
+			UniformHandle specularTexSampler;
+			UniformHandle normalSpecExpTexSampler;
+			UniformHandle depthTexSampler;
+
+			UniformHandle finalTexSampler;
 		} m_uniforms;
 
 		ProgramHandle m_gBufferProgram;

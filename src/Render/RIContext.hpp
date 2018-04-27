@@ -29,9 +29,9 @@ namespace Phoenix
 
 		virtual void uploadTextureData(TextureCubeHandle handle, ETextureCubeSide side, const void* data) = 0;
 
-		virtual void bindTexture(Texture2DHandle handle) = 0;
+		virtual void bindTexture(UniformHandle samplerHandle, Texture2DHandle texHandle) = 0;
 
-		virtual void bindTexture(TextureCubeHandle handle) = 0;
+		virtual void bindTexture(UniformHandle samplerHandle, TextureCubeHandle texHandle) = 0;
 
 		virtual void unbindTextures() = 0;
 
