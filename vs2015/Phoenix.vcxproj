@@ -182,7 +182,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\Core\Assets.hpp" />
+    <ClInclude Include="..\src\Core\AssetRegistry.hpp" />
+    <ClInclude Include="..\src\Core\Camera.hpp" />
     <ClInclude Include="..\src\Core\Component.hpp" />
     <ClInclude Include="..\src\Core\Components\CCamera.hpp" />
     <ClInclude Include="..\src\Core\Components\CDirectionalLight.hpp" />
@@ -253,6 +254,8 @@
     <ClInclude Include="..\src\ThirdParty\tinyobj\tiny_obj_loader.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\Core\AssetRegistry.cpp" />
+    <ClCompile Include="..\src\Core\Camera.cpp" />
     <ClCompile Include="..\src\Core\Clock.cpp" />
     <ClCompile Include="..\src\Core\FileSystem.cpp" />
     <ClCompile Include="..\src\Core\Logger.cpp" />

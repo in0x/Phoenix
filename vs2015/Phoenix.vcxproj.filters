@@ -196,9 +196,6 @@
     <ClInclude Include="..\src\Core\Serialize.hpp">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Core\Assets.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Core\SerialUtil.hpp">
       <Filter>Core</Filter>
     </ClInclude>
@@ -206,6 +203,12 @@
       <Filter>ThirdParty\dirent</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Core\FileSystem.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Camera.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\AssetRegistry.hpp">
       <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
@@ -305,6 +308,12 @@
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Core\FileSystem.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Core\Camera.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Core\AssetRegistry.cpp">
       <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
