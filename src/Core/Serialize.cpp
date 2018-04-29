@@ -57,16 +57,16 @@ namespace Phoenix
 		memset(outAr->m_data, 0, initialBytes);
 	}
 
-	ArchiveError writeArchiveToDisk(const char* path, const WriteArchive& ar)
+	EArchiveError writeArchiveToDisk(const char* path, const WriteArchive& ar)
 	{
-		ArchiveError err = ArchiveError::NoError;
+		EArchiveError err = EArchiveError::NoError;
 
 		FILE* file = fopen(path, "wb");
 
 		if (!file)
 		{
 			Logger::errorf("Failed to open archive \"%s\" for writing.", path);
-			return ArchiveError::Open;
+			return EArchiveError::Open;
 		}
 
 		size_t bytesWrittenToDisk = fwrite(ar.m_data, 1, ar.m_numBytesWritten, file);
@@ -74,24 +74,24 @@ namespace Phoenix
 		if (bytesWrittenToDisk != ar.m_numBytesWritten)
 		{
 			Logger::errorf("Failed writing archive %s to disk, file is likely invalid.", path);
-			err = ArchiveError::Write;
+			err = EArchiveError::Write;
 		}
 
 		fclose(file);
 
-		return ArchiveError::NoError;
+		return EArchiveError::NoError;
 	}
 
-	ArchiveError createReadArchive(const char* path, ReadArchive* outAr)
+	EArchiveError createReadArchive(const char* path, ReadArchive* outAr)
 	{
-		ArchiveError err = ArchiveError::NoError;
+		EArchiveError err = EArchiveError::NoError;
 
 		FILE* file = fopen(path, "rb");
 
 		if (!file)
 		{
 			Logger::errorf("Failed to open archive \"%s\" for reading.", path);
-			return ArchiveError::Open;
+			return EArchiveError::Open;
 		}
 
 		fseek(file, 0, SEEK_END);
@@ -101,7 +101,7 @@ namespace Phoenix
 		{
 			Logger::errorf("Archive \"%s\" is empty.", path);
 			fclose(file);
-			return ArchiveError::ReadEmpty;
+			return EArchiveError::ReadEmpty;
 		}
 
 		outAr->m_data = new uint8_t[length];
@@ -116,11 +116,11 @@ namespace Phoenix
 		if (numBytesRead != length)
 		{
 			Logger::errorf("Failed reading archive %s from disk, file is likely invalid.", path);
-			err = ArchiveError::Read;
+			err = EArchiveError::Read;
 	
 			if (feof(file))
 			{
-				err = ArchiveError::ReadEarlyEOF;
+				err = EArchiveError::ReadEarlyEOF;
 			}
 		}
 

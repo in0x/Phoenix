@@ -13,23 +13,12 @@ namespace Phoenix
 	struct Texture2D
 	{
 		std::string m_sourcePath;
-		std::string m_resourceName;
-
 		Texture2DHandle m_resourceHandle;
-		UniformHandle m_sampler;
 		TextureDesc m_desc;
-
-		bool isValid() const
-		{
-			return !m_sourcePath.empty() && !m_resourceName.empty() && m_resourceHandle.isValid();
-		}
 	};
 
-	// Loads the texture, creates a GPU resource for it and discards the CPU copy.
-	Texture2D createTextureAsset(const char* path, const char* nameInShader, IRIDevice* renderDevice, IRIContext* renderContext);
-
 	// Creates the GPU resources for texture asset. Used for assets that are loaded in from disk.
-	void initTextureAsset(Texture2D* texture, IRIDevice* renderDevice, IRIContext* renderContext);
+	Texture2D initTextureAsset(const char* path, IRIDevice* renderDevice, IRIContext* renderContext);
 
 	struct Archive;
 	void serialize(Archive& ar, Texture2D& texture);

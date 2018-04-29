@@ -50,7 +50,7 @@ namespace Phoenix
 		virtual bool isWriting() { return true; };
 	};
 
-	enum class ArchiveError
+	enum class EArchiveError
 	{
 		NoError,
 		Open,
@@ -64,9 +64,9 @@ namespace Phoenix
 	//WriteArchive createWriteArchive(size_t initialBytes);
 	void createWriteArchive(size_t initialBytes, WriteArchive* outAr);
 
-	ArchiveError writeArchiveToDisk(const char* path, const WriteArchive& ar);
+	EArchiveError writeArchiveToDisk(const char* path, const WriteArchive& ar);
 
-	ArchiveError createReadArchive(const char* path, ReadArchive* outAr);
+	EArchiveError createReadArchive(const char* path, ReadArchive* outAr);
 
 	void destroyArchive(Archive& ar);
 

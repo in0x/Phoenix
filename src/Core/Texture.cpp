@@ -110,41 +110,28 @@ namespace Phoenix
 		return desc;
 	}
 
-	Texture2D createTextureAsset(const char* path, const char* nameInShader, IRIDevice* renderDevice, IRIContext* renderContext)
+	Texture2D initTextureAsset(const char* path, IRIDevice* renderDevice, IRIContext* renderContext)
 	{
 		Texture2D texture;
-
-		texture.m_resourceName = nameInShader;
 		texture.m_sourcePath = path;
 
-		initTextureAsset(&texture, renderDevice, renderContext);
-		
-		return texture;
-	}
-
-	void initTextureAsset(Texture2D* texture, IRIDevice* renderDevice, IRIContext* renderContext)
-	{
 		TextureData data;
-
-		const char* path = texture->m_sourcePath.c_str();
-
 		if (!loadTextureData(path, &data))
 		{
 			Logger::warningf("Failed to load data for texture %s. Cannot initialize texture further", path);
-			return;
+			return texture;
 		}
 
 		TextureDesc desc = createDesc(data, ETextureFilter::Linear, ETextureFilter::Linear);
 		Texture2DHandle tex2D = renderDevice->createTexture2D(desc);
-		UniformHandle sampler = renderDevice->createUniform(texture->m_resourceName.c_str(), EUniformType::Sampler2D);
 		assert(tex2D.isValid());
-		assert(sampler.isValid());
-
+		
 		renderContext->uploadTextureData(tex2D, data.m_data);
 		
-		texture->m_resourceHandle = tex2D;
-		texture->m_sampler = sampler;
-		texture->m_desc = desc;
+		texture.m_resourceHandle = tex2D;
+		texture.m_desc = desc;
+
+		return texture;
 	}
 
 	void serialize(Archive& ar, TextureDesc& desc)
@@ -162,8 +149,6 @@ namespace Phoenix
 
 	void serialize(Archive& ar, Texture2D& texture)
 	{
-		serialize(ar, texture.m_sourcePath);
-		serialize(ar, texture.m_resourceName);
 		serialize(ar, texture.m_desc);
 	}
 }

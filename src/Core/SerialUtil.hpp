@@ -13,6 +13,11 @@ namespace Phoenix
 		ar.serialize(&sizet, sizeof(size_t));
 	}
 
+	static void serialize(Archive& ar, uint8_t& sizet)
+	{
+		ar.serialize(&sizet, sizeof(uint8_t));
+	}
+
 	static void serialize(Archive& ar, std::string& string)
 	{
 		if (ar.isReading())

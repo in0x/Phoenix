@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <chrono>
 
 #include "Tests/MathTests.hpp"
 #include "Tests/MemoryTests.hpp"
@@ -7,8 +8,8 @@
 #include "Core/FileSystem.hpp"
 #include "Core/StringTokenizer.hpp"
 #include "Core/Serialize.hpp"
-#include "Core/Clock.hpp"
 #include "Core/Camera.hpp"
+#include "Core/AssetRegistry.hpp"
 
 #include "Core/Windows/PlatformWindows.hpp"
 
@@ -24,10 +25,10 @@
 
 namespace Phoenix
 {
-	std::vector<EntityHandle> meshEntitiesFromObj(World* world, IRIDevice* renderDevice, IRIContext* renderContext, const char* meshPath)
+	std::vector<EntityHandle> meshEntitiesFromObj(World* world, IRIDevice* renderDevice, IRIContext* renderContext, const char* meshPath, AssetRegistry* assets)
 	{
 		std::vector<EntityHandle> entities;
-		std::vector<StaticMesh> meshes = importObj(meshPath, renderDevice, renderContext);
+		std::vector<StaticMesh> meshes = importObj(meshPath, renderDevice, renderContext, assets);
 
 		for (StaticMesh& mesh : meshes)
 		{
@@ -40,7 +41,7 @@ namespace Phoenix
 		return entities;
 	}
 
-	EntityHandle createMeshEntity(World* world, StaticMesh&& mesh, IRIDevice* renderDevice, IRIContext* renderContext)
+	EntityHandle createMeshEntity(World* world, StaticMesh&& mesh)
 	{
 		EntityHandle entity = world->createEntity();
 		world->addComponent<CStaticMesh>(entity, std::move(mesh));
@@ -97,6 +98,24 @@ int main(int argc, char** argv)
 	world.registerComponentType<CStaticMesh>();
 	world.registerComponentType<CTransform>();
 
+	AssetRegistry assets(renderDevice, renderContext);
+
+#define PHI_WRITE 0
+#define PHI_LOAD 1
+
+#if PHI_WRITE
+	{
+		std::vector<EntityHandle> sponza = meshEntitiesFromObj(&world, renderDevice, renderContext, "Models/sponza/sponza.obj", &assets);
+
+		for (CStaticMesh& mesh : ComponentIterator<CStaticMesh>(&world))
+		{
+			std::string savePath = "SerialTest/" + mesh.m_mesh.m_name + ".sm";
+			saveStaticMesh(mesh.m_mesh, savePath.c_str());
+		}
+	}
+#endif // PHI_WRITE
+
+#if PHI_LOAD 
 	const char* sponzaPath = "SerialTest/";
 
 	std::vector<std::string> sponzaFiles = getFilesInDirectory(sponzaPath);
@@ -108,9 +127,10 @@ int main(int argc, char** argv)
 			continue;
 		}
 
-		StaticMesh sm = loadStaticMesh((sponzaPath + file).c_str(), renderDevice, renderContext);
-		createMeshEntity(&world, std::move(sm), renderDevice, renderContext);
-	}	
+		StaticMesh sm = loadStaticMesh((sponzaPath + file).c_str(), renderDevice, renderContext, &assets);
+		createMeshEntity(&world, std::move(sm));
+	}
+#endif // PHI_LOAD
 
 	EntityHandle light = world.createEntity();
 	world.addComponent<CDirectionalLight>(light, Vec3(-0.5f, -0.5f, 0.f), Vec3(0.4f, 0.4f, 0.4f));
@@ -118,11 +138,11 @@ int main(int argc, char** argv)
 	EntityHandle light2 = world.createEntity();
 	world.addComponent<CDirectionalLight>(light2, Vec3(0.5f, -0.5f, 0.f), Vec3(0.4f, 0.4f, 0.4f));
 
-	Clock clock;
-	clock.start();
+	using Clock = std::chrono::high_resolution_clock;
+	using pointInTime = std::chrono::time_point<std::chrono::high_resolution_clock>;
 	
-	double lastTime = clock.getElapsedS();
-
+	pointInTime lastTime = Clock::now();
+	
 	Platform::pollEvents();
 
 	float prevMouseX = gameWindow->m_mouseState.m_x;
@@ -134,9 +154,10 @@ int main(int argc, char** argv)
 	{
 		Platform::pollEvents();
 
-		double currentTime = clock.getElapsedS();
-		double dt = currentTime - lastTime;
-		
+		pointInTime currentTime = Clock::now();
+		std::chrono::duration<float> timeSpan = currentTime - lastTime;
+		float dt = timeSpan.count();
+
 		float cameraChange = 0.5f * dt;
 
 		while (!gameWindow->m_keyEvents.isEmpty())
@@ -170,7 +191,7 @@ int main(int argc, char** argv)
 		{
 			if (mouse.m_buttonStates[MouseState::Left] == Input::Press)
 			{
-				float sens = 25.0f;
+				float sens = 20.0f;
 				float dx = -radians(sens * ((mouse.m_x - prevMouseX) / config.width) * dt);
 				float dy = -radians(sens * ((mouse.m_y - prevMouseY) / config.height) * dt);
 

@@ -67,6 +67,11 @@ namespace Phoenix
 		m_copyToBackBufferProgram = loadShaderProgram(renderDevice, "Shaders/deferred/copyToBackBuffer.vert", "Shaders/deferred/copyToBackBuffer.frag");
 
 		m_lightBlendState = BlendState(EBlendOp::Add, EBlendFactor::One, EBlendFactor::One);
+
+		m_uniforms.matDiffuseSampler = renderDevice->createUniform("matDiffuseTex", EUniformType::Sampler2D);
+		m_uniforms.matRoughnessSampler = renderDevice->createUniform("matRoughnessTex", EUniformType::Sampler2D);
+		m_uniforms.matMetallicSampler = renderDevice->createUniform("matMetallicTex", EUniformType::Sampler2D);
+		m_uniforms.matNormalSampler = renderDevice->createUniform("matNormalTex", EUniformType::Sampler2D);
 	}
 
 	void DeferredRenderer::setViewMatrix(const Matrix4& view)
@@ -95,10 +100,10 @@ namespace Phoenix
 
 	void DeferredRenderer::drawStaticMeshWithMaterial(VertexBufferHandle vb, const Material& material, size_t numVertices, size_t vertexFrom)
 	{
-		m_context->bindTexture(material.m_diffuseTex.m_sampler,   material.m_diffuseTex.m_resourceHandle);
-		m_context->bindTexture(material.m_metallicTex.m_sampler,  material.m_metallicTex.m_resourceHandle);
-		m_context->bindTexture(material.m_normalTex.m_sampler,    material.m_normalTex.m_resourceHandle);
-		m_context->bindTexture(material.m_roughnessTex.m_sampler, material.m_roughnessTex.m_resourceHandle);
+		m_context->bindTexture(m_uniforms.matDiffuseSampler, material.m_diffuseTex->m_resourceHandle);
+		m_context->bindTexture(m_uniforms.matMetallicSampler, material.m_metallicTex->m_resourceHandle);
+		m_context->bindTexture(m_uniforms.matNormalSampler, material.m_normalTex->m_resourceHandle);
+		m_context->bindTexture(m_uniforms.matRoughnessSampler, material.m_roughnessTex->m_resourceHandle);
 
 		m_context->drawLinear(vb, EPrimitive::Triangles, numVertices, vertexFrom);
 	}

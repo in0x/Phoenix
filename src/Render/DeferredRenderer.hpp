@@ -72,6 +72,11 @@ namespace Phoenix
 			UniformHandle depthTexSampler;
 
 			UniformHandle finalTexSampler;
+
+			UniformHandle matDiffuseSampler;
+			UniformHandle matRoughnessSampler;
+			UniformHandle matMetallicSampler;
+			UniformHandle matNormalSampler;
 		} m_uniforms;
 
 		ProgramHandle m_gBufferProgram;

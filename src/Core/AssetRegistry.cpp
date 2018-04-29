@@ -8,8 +8,16 @@ namespace Phoenix
 		: m_renderDevice(renderDevice)
 		, m_renderContext(renderContext)
 	{}
+
+	AssetRegistry::~AssetRegistry()
+	{
+		for (Texture2D* tex : m_textures)
+		{
+			delete tex;
+		}
+	}
 	
-	int32_t AssetRegistry::isAssetLoaded(const char* path, AssetType type)
+	int32_t AssetRegistry::isAssetLoaded(const char* path, EAssetType type)
 	{
 		auto dictEntry = m_assets.find(path);
 
@@ -23,18 +31,23 @@ namespace Phoenix
 		}
 	}
 	
-	const Texture2D* AssetRegistry::getTexture(const char* path)
+	Texture2D* AssetRegistry::getTexture(const char* path)
 	{
-		//int32_t location = isAssetLoaded(path, AssetType::Texture);
-		//
-		//if (location != invalidAsset)
-		//{
-		//	return m_textures[location].get();
-		//}
+		int32_t location = isAssetLoaded(path, EAssetType::Texture);
 
-		//createTextureAsset(path)
+		if (location != invalidAsset)
+		{
+			return m_textures[location];
+		}
+
+		Texture2D* tex = new Texture2D();
+		Texture2D other = initTextureAsset(path, m_renderDevice, m_renderContext);
+		*tex = other;
 		
-		return nullptr;
+		m_textures.push_back(tex);
+		m_assets.emplace(path, AssetRef{ EAssetType::Texture, m_textures.size() - 1 });
+		
+		return tex;
 	}
 	
 	/*Material* AssetRegistry::getMaterial(const char* path)

@@ -4,6 +4,8 @@
 #include <Core/Texture.hpp>
 #include <Core/Serialize.hpp>
 #include <Core/SerialUtil.hpp>
+#include <Core/AssetRegistry.hpp>
+
 #include <Render/RIDevice.hpp>
 #include <Render/RIContext.hpp>
 
@@ -162,32 +164,26 @@ namespace Phoenix
 	}
 
 	// Fills out our Material structure using the import and creates the necessary GPU resources.
-	void createMaterials(const MeshImport& import, StaticMesh* outMesh, const char* mtlPath, IRIDevice* renderDevice, IRIContext* renderContext)
+	void createMaterials(const MeshImport& import, StaticMesh* outMesh, const char* mtlPath, AssetRegistry* assets)
 	{
 		size_t matIdx = 0;
 		const char* defaultWhiteTexPath = "Textures/Default1x1White.tga";
+
+		Texture2D* defaultTex = assets->getTexture(defaultWhiteTexPath);
 
 		for (const MaterialImport& matImport : import.m_matImports)
 		{
 			outMesh->m_vertexFrom[matIdx] = matImport.m_vertexFrom;
 			Material* material = &outMesh->m_materials[matIdx];
 
-			std::string diffuseTexPath = matImport.m_diffuseTex.empty() ? defaultWhiteTexPath : (mtlPath + matImport.m_diffuseTex);
-			material->m_diffuseTex = createTextureAsset(diffuseTexPath.c_str(), "matDiffuseTex", renderDevice, renderContext);
-			assert(material->m_diffuseTex.m_resourceHandle.isValid());			
-
-			std::string roughnessTexPath = matImport.m_roughnessTex.empty() ? defaultWhiteTexPath : (mtlPath + matImport.m_roughnessTex);
-			material->m_roughnessTex = createTextureAsset(roughnessTexPath.c_str(), "matRoughnessTex", renderDevice, renderContext);
-			assert(material->m_roughnessTex.m_resourceHandle.isValid());			
-		
-			std::string metallicTexPath = matImport.m_metallicTex.empty() ? defaultWhiteTexPath : (mtlPath + matImport.m_metallicTex);
-			material->m_metallicTex = createTextureAsset(metallicTexPath.c_str(), "matMetallicTex", renderDevice, renderContext);
-			assert(material->m_metallicTex.m_resourceHandle.isValid());
+			material->m_diffuseTex = !matImport.m_diffuseTex.empty() ? assets->getTexture((mtlPath + matImport.m_diffuseTex).c_str()) : defaultTex;
 			
-			std::string normalTexPath = matImport.m_normalTex.empty() ? defaultWhiteTexPath : (mtlPath + matImport.m_normalTex);
-			material->m_normalTex = createTextureAsset(normalTexPath.c_str(), "matNormalTex", renderDevice, renderContext);
-			assert(material->m_normalTex.m_resourceHandle.isValid());
+			material->m_roughnessTex = !matImport.m_roughnessTex.empty() ? assets->getTexture((mtlPath + matImport.m_roughnessTex).c_str()) : defaultTex;
 
+			material->m_metallicTex = !matImport.m_metallicTex.empty() ? assets->getTexture((mtlPath + matImport.m_metallicTex).c_str()) : defaultTex;
+			
+			material->m_normalTex = !matImport.m_normalTex.empty() ? assets->getTexture((mtlPath + matImport.m_normalTex).c_str()) : defaultTex;
+			
 			material->m_name = matImport.m_name;
 
 			matIdx++;
@@ -204,18 +200,11 @@ namespace Phoenix
 			outMesh->m_vertexFrom[matIdx] = 0;
 			Material* material = &outMesh->m_materials[matIdx];
 
-			material->m_diffuseTex = createTextureAsset(defaultWhiteTexPath, "matDiffuseTex", renderDevice, renderContext);
-			assert(material->m_diffuseTex.m_resourceHandle.isValid());
-
-			material->m_roughnessTex = createTextureAsset(defaultWhiteTexPath, "matRoughnessTex", renderDevice, renderContext);
-			assert(material->m_roughnessTex.m_resourceHandle.isValid());
-
-			material->m_metallicTex = createTextureAsset(defaultWhiteTexPath, "matMetallicTex", renderDevice, renderContext);
-			assert(material->m_metallicTex.m_resourceHandle.isValid());
-
-			material->m_normalTex = createTextureAsset(defaultWhiteTexPath, "matNormalTex", renderDevice, renderContext);
-			assert(material->m_normalTex.m_resourceHandle.isValid());
-
+			material->m_diffuseTex = defaultTex;			
+			material->m_roughnessTex = defaultTex;
+			material->m_metallicTex = defaultTex;
+			material->m_normalTex = defaultTex;
+		
 			material->m_name = "defaultMaterial";
 
 			matIdx++;
@@ -225,7 +214,7 @@ namespace Phoenix
 	}
 
 	// Loads the .obj file and its mtl(s), converts the mesh into a format drawable by our renderer and creates the GPU resources.
-	std::vector<StaticMesh> importObj(const char* assetPath, const char* mtlPath, IRIDevice* renderDevice, IRIContext* renderContext)
+	std::vector<StaticMesh> importObjContents(const char* assetPath, const char* mtlPath, IRIDevice* renderDevice, IRIContext* renderContext, AssetRegistry* assets)
 	{
 		std::vector<MeshImport> imports = loadObj(assetPath, mtlPath);
 
@@ -240,13 +229,13 @@ namespace Phoenix
 			mesh->m_data = std::move(import.m_meshData);
 
 			createBuffers(mesh, renderDevice);
-			createMaterials(import, mesh, mtlPath, renderDevice, renderContext);
+			createMaterials(import, mesh, mtlPath, assets);
 		}
 
 		return meshes;
 	}
 
-	std::vector<StaticMesh> importObj(const char* path, IRIDevice* renderDevice, IRIContext* renderContext)
+	std::vector<StaticMesh> importObj(const char* path, IRIDevice* renderDevice, IRIContext* renderContext, AssetRegistry* assets)
 	{
 		const char* fileDot = strrchr(path, '.');
 		size_t pathLen = strlen(path);
@@ -265,7 +254,7 @@ namespace Phoenix
 			std::string pathToAsset(path, lastSlash);
 			std::string assetName(lastSlash, path + pathLen);
 
-			return importObj(path, pathToAsset.c_str(), renderDevice, renderContext);
+			return importObjContents(path, pathToAsset.c_str(), renderDevice, renderContext, assets);
 		}
 		else
 		{
@@ -274,6 +263,23 @@ namespace Phoenix
 			return{};
 		}
 	}
+
+	struct MaterialExport
+	{
+		MaterialExport() = default;
+
+		MaterialExport(const Material& material)
+			: m_diffuseTexPath(material.m_diffuseTex->m_sourcePath)
+			, m_roughnessTexPath(material.m_roughnessTex->m_sourcePath)
+			, m_metallicTexPath(material.m_metallicTex->m_sourcePath)
+			, m_normalTexPath(material.m_normalTex->m_sourcePath)
+		{}
+
+		std::string m_diffuseTexPath;
+		std::string m_roughnessTexPath;
+		std::string m_metallicTexPath;
+		std::string m_normalTexPath;
+	};
 
 	void serialize(Archive& ar, MeshData& data)
 	{
@@ -286,36 +292,56 @@ namespace Phoenix
 	void serialize(Archive& ar, Material& material)
 	{
 		serialize(ar, material.m_name);
-		serialize(ar, material.m_diffuseTex);
-		serialize(ar, material.m_roughnessTex);
-		serialize(ar, material.m_metallicTex);
-		serialize(ar, material.m_normalTex);
 	}
 	
 	void serialize(Archive& ar, StaticMesh& mesh)
 	{
 		serialize(ar, mesh.m_data);
-
-		ar.serialize(&mesh.m_numMaterials, sizeof(uint8_t));
+		serialize(ar, mesh.m_name);
+		serialize(ar, mesh.m_numMaterials);
 
 		for (uint8_t i = 0; i < mesh.m_numMaterials; ++i)
 		{
 			serialize(ar, mesh.m_materials[i]);
-			ar.serialize(&mesh.m_vertexFrom[i], sizeof(size_t));
+			serialize(ar, mesh.m_vertexFrom[i]);
 		}
-
-		serialize(ar, mesh.m_name);
 	}
 
-	StaticMesh loadStaticMesh(const char* path, IRIDevice* renderDevice, IRIContext* renderContext)
+	void serialize(Archive& ar, MaterialExport& exp)
+	{
+		serialize(ar, exp.m_diffuseTexPath);
+		serialize(ar, exp.m_roughnessTexPath);
+		serialize(ar, exp.m_metallicTexPath);
+		serialize(ar, exp.m_normalTexPath);
+	}
+
+	void saveStaticMesh(StaticMesh& mesh, const char* path)
+	{
+		WriteArchive ar;
+		createWriteArchive(sizeof(StaticMesh), &ar);
+
+		serialize(ar, mesh);
+
+		for (uint8_t i = 0; i < mesh.m_numMaterials; ++i)
+		{
+			MaterialExport exp(mesh.m_materials[i]);
+			serialize(ar, exp);
+		}
+		
+		EArchiveError err = writeArchiveToDisk(path, ar);
+		assert(err == EArchiveError::NoError);
+		destroyArchive(ar);
+	}
+
+	StaticMesh loadStaticMesh(const char* path, IRIDevice* renderDevice, IRIContext* renderContext, AssetRegistry* assets)
 	{
 		ReadArchive ar;
 		StaticMesh mesh;
 
-		ArchiveError err = createReadArchive(path, &ar);
+		EArchiveError err = createReadArchive(path, &ar);
 
-		assert(err == ArchiveError::NoError);
-		if (err != ArchiveError::NoError)
+		assert(err == EArchiveError::NoError);
+		if (err != EArchiveError::NoError)
 		{
 			return mesh;
 		}
@@ -325,10 +351,15 @@ namespace Phoenix
 
 		for (uint8_t i = 0; i < mesh.m_numMaterials; ++i)
 		{
-			initTextureAsset(&mesh.m_materials[i].m_diffuseTex, renderDevice, renderContext);
-			initTextureAsset(&mesh.m_materials[i].m_roughnessTex, renderDevice, renderContext);
-			initTextureAsset(&mesh.m_materials[i].m_metallicTex, renderDevice, renderContext);
-			initTextureAsset(&mesh.m_materials[i].m_normalTex, renderDevice, renderContext);
+			MaterialExport exp;
+			serialize(ar, exp);
+
+			Material& mat = mesh.m_materials[i];
+
+			mat.m_diffuseTex = assets->getTexture(exp.m_diffuseTexPath.c_str());
+			mat.m_roughnessTex = assets->getTexture(exp.m_roughnessTexPath.c_str());
+			mat.m_metallicTex = assets->getTexture(exp.m_metallicTexPath.c_str());
+			mat.m_normalTex = assets->getTexture(exp.m_normalTexPath.c_str());
 		}
 
 		return mesh;

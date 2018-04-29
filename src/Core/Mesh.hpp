@@ -13,15 +13,16 @@ namespace Phoenix
 {	
 	class IRIDevice;
 	class IRIContext;
-
+	class AssetRegistry;
+	
 	struct Material
 	{
 		std::string m_name;
 
-		Texture2D m_diffuseTex; 
-		Texture2D m_roughnessTex;
-		Texture2D m_metallicTex;
-		Texture2D m_normalTex;
+		Texture2D* m_diffuseTex; 
+		Texture2D* m_roughnessTex;
+		Texture2D* m_metallicTex;
+		Texture2D* m_normalTex;
 	};
 
 	struct MeshData
@@ -59,12 +60,14 @@ namespace Phoenix
 	};
 
 	// Imports the specified mesh and the associated materials.
-	std::vector<StaticMesh> importObj(const char* path, IRIDevice* renderDevice, IRIContext* renderContext);
+	std::vector<StaticMesh> importObj(const char* path, IRIDevice* renderDevice, IRIContext* renderContext, AssetRegistry* assets);
 
 	// Load a StaticMesh from disk.
-	StaticMesh loadStaticMesh(const char* path, IRIDevice* renderDevice, IRIContext* renderContext);
+	StaticMesh loadStaticMesh(const char* path, IRIDevice* renderDevice, IRIContext* renderContext, AssetRegistry* assets);
+
+	// Save a StaticMesh to disk.
+	void saveStaticMesh(StaticMesh& mesh, const char* path);
 
 	struct Archive;
 	void serialize(Archive& ar, StaticMesh& mesh);
-	void serialize(Archive& ar, Material& material);
 }

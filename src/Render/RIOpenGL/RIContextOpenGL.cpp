@@ -122,7 +122,7 @@ namespace Phoenix
 		} break;
 		};
 
-		checkGlErrorOccured();
+		assert(!checkGlErrorOccured());
 	}
 
 	bool isBasicUniformType(GLenum glType)
@@ -210,11 +210,11 @@ namespace Phoenix
 		glActiveTexture(GL_TEXTURE0 + m_boundState.activeTextureCount);
 		glBindTexture(binding.texturetype, binding.texID);
 		
-		setUniform(glUniform, &m_boundState.activeTextureCount, EUniformType::Int);
-
+		glUniform1iv(glUniform.m_location, glUniform.m_numElements, reinterpret_cast<const GLint*>(&m_boundState.activeTextureCount));
+	
 		m_boundState.activeTextureCount++;
 
-		checkGlErrorOccured();
+		assert(!checkGlErrorOccured());
 	}
 
 	void RIContextOpenGL::bindTexture(UniformHandle samplerHandle, Texture2DHandle texHandle)
@@ -275,7 +275,7 @@ namespace Phoenix
 			texture->m_glTex.m_dataType,
 			data);
 
-		checkGlErrorOccured();
+		assert(!checkGlErrorOccured());
 	}
 
 	void RIContextOpenGL::uploadTextureData(TextureCubeHandle handle, ETextureCubeSide side, const void* data)
@@ -293,13 +293,13 @@ namespace Phoenix
 			texture->m_glTex.m_dataType,
 			data);
 
-		checkGlErrorOccured();
+		assert(!checkGlErrorOccured());
 	}
 
 	void RIContextOpenGL::endPass()
 	{
 		m_boundState.activeTextureCount = 0;
-		checkGlErrorOccured();
+		assert(!checkGlErrorOccured());
 	}
 
 	void RIContextOpenGL::bindRenderTarget(RenderTargetHandle handle)
