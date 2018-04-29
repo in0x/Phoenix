@@ -37,9 +37,9 @@ namespace Phoenix
 		
 		enum Modifier
 		{
-			Shift = 1,
-			Ctrl = 2,
-			Alt = 4,
+			Shift = 1 << 0,
+			Ctrl  = 1 << 1,
+			Alt   = 1 << 2,
 			NumModifiers = 0
 		};
 
@@ -57,7 +57,7 @@ namespace Phoenix
 
 			bool hasModifier(Modifier mod)
 			{
-				return m_modifiers & mod;
+				return (m_modifiers & mod) != 0;
 			}
 		};
 	};

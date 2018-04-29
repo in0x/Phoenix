@@ -210,11 +210,11 @@ namespace Phoenix
 			matIdx++;
 		}
 
-		outMesh->m_numMaterials = std::min(matIdx, (size_t)StaticMesh::MAX_MATERIALS);
+		outMesh->m_numMaterials = static_cast<uint8_t>(std::min(matIdx, (size_t)StaticMesh::MAX_MATERIALS));
 	}
 
 	// Loads the .obj file and its mtl(s), converts the mesh into a format drawable by our renderer and creates the GPU resources.
-	std::vector<StaticMesh> importObjContents(const char* assetPath, const char* mtlPath, IRIDevice* renderDevice, IRIContext* renderContext, AssetRegistry* assets)
+	std::vector<StaticMesh> importObjContents(const char* assetPath, const char* mtlPath, IRIDevice* renderDevice, AssetRegistry* assets)
 	{
 		std::vector<MeshImport> imports = loadObj(assetPath, mtlPath);
 
@@ -235,7 +235,7 @@ namespace Phoenix
 		return meshes;
 	}
 
-	std::vector<StaticMesh> importObj(const char* path, IRIDevice* renderDevice, IRIContext* renderContext, AssetRegistry* assets)
+	std::vector<StaticMesh> importObj(const char* path, IRIDevice* renderDevice, AssetRegistry* assets)
 	{
 		const char* fileDot = strrchr(path, '.');
 		size_t pathLen = strlen(path);
@@ -254,7 +254,7 @@ namespace Phoenix
 			std::string pathToAsset(path, lastSlash);
 			std::string assetName(lastSlash, path + pathLen);
 
-			return importObjContents(path, pathToAsset.c_str(), renderDevice, renderContext, assets);
+			return importObjContents(path, pathToAsset.c_str(), renderDevice, assets);
 		}
 		else
 		{
@@ -333,7 +333,7 @@ namespace Phoenix
 		destroyArchive(ar);
 	}
 
-	StaticMesh loadStaticMesh(const char* path, IRIDevice* renderDevice, IRIContext* renderContext, AssetRegistry* assets)
+	StaticMesh loadStaticMesh(const char* path, IRIDevice* renderDevice, AssetRegistry* assets)
 	{
 		ReadArchive ar;
 		StaticMesh mesh;

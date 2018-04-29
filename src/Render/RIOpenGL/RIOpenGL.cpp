@@ -297,7 +297,7 @@ namespace Phoenix
 	MouseState::Button mouseButtonFromGlfw(int button)
 	{
 
-#define IMPL_KEY_SWITCH(glfw, value) \
+#define IMPL_BT_SWITCH(glfw, value) \
 		case glfw: \
 		{ \
 			return value; \
@@ -305,15 +305,15 @@ namespace Phoenix
 
 		switch (button)
 		{
-			IMPL_KEY_SWITCH(GLFW_MOUSE_BUTTON_LEFT, MouseState::Left)
-			IMPL_KEY_SWITCH(GLFW_MOUSE_BUTTON_RIGHT, MouseState::Right)
-			IMPL_KEY_SWITCH(GLFW_MOUSE_BUTTON_MIDDLE, MouseState::Middle)
-			IMPL_KEY_SWITCH(GLFW_MOUSE_BUTTON_4, MouseState::Mouse4)
-			IMPL_KEY_SWITCH(GLFW_MOUSE_BUTTON_5, MouseState::Mouse5)
+			IMPL_BT_SWITCH(GLFW_MOUSE_BUTTON_LEFT, MouseState::Left)
+			IMPL_BT_SWITCH(GLFW_MOUSE_BUTTON_RIGHT, MouseState::Right)
+			IMPL_BT_SWITCH(GLFW_MOUSE_BUTTON_MIDDLE, MouseState::Middle)
+			IMPL_BT_SWITCH(GLFW_MOUSE_BUTTON_4, MouseState::Mouse4)
+			IMPL_BT_SWITCH(GLFW_MOUSE_BUTTON_5, MouseState::Mouse5)
 		default:
 			{
 				Logger::warningf("Attempted to convert unhandled button value: %d", button);
-				break;
+				return MouseState::NumButtons;
 			}
 		}
 	}
@@ -338,7 +338,6 @@ namespace Phoenix
 
 		Key::Event ev;
 
-		// TODO(phil.welsch): Use scancode to detect specific keys (e.g. left vs right shift)
 		keyTypeFromGlfw(key, scancode, &ev);
 		ev.m_action = actionFromGlfw(action);
 		modifierFromGlfw(mods, &ev); 
@@ -349,12 +348,13 @@ namespace Phoenix
 	void mouseMoveCallback(GLFWwindow* window, double x, double y)
 	{
 		GlRenderWindow* renderWindow = windowFromGlfw(window);
-		renderWindow->m_mouseState.m_x = x;
-		renderWindow->m_mouseState.m_y = y;
+		renderWindow->m_mouseState.m_x = static_cast<float>(x);
+		renderWindow->m_mouseState.m_y = static_cast<float>(y);
 	}
 
 	void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 	{
+		(void)mods;
 		GlRenderWindow* renderWindow = windowFromGlfw(window);
 		MouseState& state = renderWindow->m_mouseState;
 

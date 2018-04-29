@@ -98,7 +98,7 @@ namespace Phoenix
 		m_context->bindUniform(m_uniforms.projTf, &m_projMat);
 	}
 
-	void DeferredRenderer::drawStaticMeshWithMaterial(VertexBufferHandle vb, const Material& material, size_t numVertices, size_t vertexFrom)
+	void DeferredRenderer::drawStaticMeshWithMaterial(VertexBufferHandle vb, const Material& material, uint32_t numVertices, uint32_t vertexFrom)
 	{
 		m_context->bindTexture(m_uniforms.matDiffuseSampler, material.m_diffuseTex->m_resourceHandle);
 		m_context->bindTexture(m_uniforms.matMetallicSampler, material.m_metallicTex->m_resourceHandle);

@@ -89,7 +89,7 @@ namespace Phoenix
 		{
 			if (strncmp(current, toFind, tokenSize) == 0)
 			{
-				return current - str;
+				return static_cast<int32_t>(current - str);
 			}
 		}
 

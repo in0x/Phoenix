@@ -22,13 +22,12 @@
 #include "Core/Components/CStaticMesh.hpp"
 #include "Core/Components/CTransform.hpp"
 
-
 namespace Phoenix
 {
 	std::vector<EntityHandle> meshEntitiesFromObj(World* world, IRIDevice* renderDevice, IRIContext* renderContext, const char* meshPath, AssetRegistry* assets)
 	{
 		std::vector<EntityHandle> entities;
-		std::vector<StaticMesh> meshes = importObj(meshPath, renderDevice, renderContext, assets);
+		std::vector<StaticMesh> meshes = importObj(meshPath, renderDevice, assets);
 
 		for (StaticMesh& mesh : meshes)
 		{
@@ -52,6 +51,10 @@ namespace Phoenix
 
 int main(int argc, char** argv)
 {
+#define UNUSED(x) (void)x
+	UNUSED(argc);
+	UNUSED(argv);
+
 	using namespace Phoenix;
 
 	Logger::init(true, false, 1024);
@@ -87,7 +90,8 @@ int main(int argc, char** argv)
 
 	Vec3 cameraPos(0.f, 0.f, 7.f);
 	Vec3 cameraForward(0.0f, 0.0f, 1.0f);
-	Matrix4 viewTf = lookAtRH(cameraPos, (cameraPos + cameraForward).normalized(), Vec3(0.f, 1.f, 0.f));
+	Vec3 cameraUp = Vec3(0.f, 1.f, 0.f);
+	Matrix4 viewTf = lookAtRH(cameraPos, (cameraPos + cameraForward).normalized(), cameraUp);
 	renderer.setViewMatrix(viewTf);
 
 	Matrix4 projTf = perspectiveRH(70.f, (float)config.width / (float)config.height, 0.1f, 10000.f);
@@ -127,7 +131,7 @@ int main(int argc, char** argv)
 			continue;
 		}
 
-		StaticMesh sm = loadStaticMesh((sponzaPath + file).c_str(), renderDevice, renderContext, &assets);
+		StaticMesh sm = loadStaticMesh((sponzaPath + file).c_str(), renderDevice, &assets);
 		createMeshEntity(&world, std::move(sm));
 	}
 #endif // PHI_LOAD

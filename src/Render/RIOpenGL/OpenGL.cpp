@@ -61,7 +61,7 @@ bool checkGlErrorOccured()
 {
 #if PHI_SLOW_GL_ERROR_CHECK 
 	bool bErrorOccured;
-	const char* errorMsg = getGlErrorString(bErrorOccured);
+	getGlErrorString(bErrorOccured);
 	assert(!bErrorOccured);
 	return bErrorOccured;
 #else

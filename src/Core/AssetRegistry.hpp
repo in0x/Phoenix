@@ -20,7 +20,7 @@ namespace Phoenix
 	struct AssetRef
 	{
 		EAssetType m_type;
-		size_t m_location;
+		int64_t m_location;
 	};
 
 	class AssetRegistry
@@ -42,8 +42,8 @@ namespace Phoenix
 		IRIDevice* m_renderDevice;
 		IRIContext* m_renderContext;
 
-		int32_t isAssetLoaded(const char* path, EAssetType type);
-		const int32_t invalidAsset = -1;
+		int64_t isAssetLoaded(const char* path, EAssetType type);
+		const int64_t invalidAsset = -1;
 
 		std::unordered_map<std::string, AssetRef> m_assets;
 	

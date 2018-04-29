@@ -59,7 +59,7 @@ namespace Phoenix
 
 		if (0 == count)
 		{
-			count = ib->m_numElements;
+			count = static_cast<uint32_t>(ib->m_numElements);
 		}
 
 		glDrawElements(toGlPrimitive(primitives), count, GL_UNSIGNED_INT, (GLvoid*)(sizeof(GLubyte) * startIndex));

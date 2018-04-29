@@ -60,10 +60,10 @@ namespace Phoenix
 	};
 
 	// Imports the specified mesh and the associated materials.
-	std::vector<StaticMesh> importObj(const char* path, IRIDevice* renderDevice, IRIContext* renderContext, AssetRegistry* assets);
+	std::vector<StaticMesh> importObj(const char* path, IRIDevice* renderDevice, AssetRegistry* assets);
 
 	// Load a StaticMesh from disk.
-	StaticMesh loadStaticMesh(const char* path, IRIDevice* renderDevice, IRIContext* renderContext, AssetRegistry* assets);
+	StaticMesh loadStaticMesh(const char* path, IRIDevice* renderDevice, AssetRegistry* assets);
 
 	// Save a StaticMesh to disk.
 	void saveStaticMesh(StaticMesh& mesh, const char* path);

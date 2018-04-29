@@ -9,38 +9,9 @@ namespace Phoenix { namespace Tests
 {
 	void runMathTests()
 	{
-		legacyTests();
 		vec3Tests();
 		matrix4Tests();
 		planeTests();
-	}
-
-	void legacyTests()
-	{
-		std::cout << lookAtRH(Vec3( 0,0,2 ), Vec3( 0,0,0 ), Vec3( 0,1,0 )) << '\n';
-		std::cout << perspectiveRH(90.f, 1920.f / 1080.f, 0.5f, 20.f) << '\n';
-
-		float det = Matrix3(3, 1, 2,
-			4, -1, 2,
-			9, 2, 3).determinant();
-
-		assert(det == 19.f);
-
-		Quaternion quat{ 4, 2, 3, 1 };
-		assert(quat.magnitude() == 1.f);
-
-		EulerAngles angles{ 64, 81, 39 };
-		auto mat = Matrix3::fromEulerAngles(angles);
-
-		auto mat4 = mat.asMatrix4();
-		mat = mat4.asMatrix3();
-
-		auto backAngles = mat.asEulerAngles();
-		std::cout << backAngles << '\n';
-
-		/*quat = Quaternion::fromEulerAngles(angles); // TODO(Phil): fromEulerAngles doesnt work.
-		auto qAngles = quat.asEulerAngles();
-		assert(angles == qAngles);*/
 	}
 
 	void vec3Tests()

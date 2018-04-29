@@ -27,7 +27,7 @@ namespace Phoenix
 
 	void* PoolAllocator::allocate(size_t size, Alignment alignment)
 	{
-		assert(alignment.fitsInto(m_alignment));
+		assert(alignment.fitsInto(m_alignment) && size > 0);
 		return m_freeList.allocate();
 	}
 

@@ -73,7 +73,7 @@ namespace Phoenix
 				decl.m_numElements,
 				toGlAttribType(decl.m_type),
 				data.m_bNormalize,
-				data.m_size,
+				static_cast<GLsizei>(data.m_size),
 				nullptr);
 		}
 
@@ -530,8 +530,9 @@ namespace Phoenix
 				GlTexture2D* texture = m_resources->m_texture2Ds.getResource(texHandle);
 				fb->m_attachedTextures[i] = texture;
 
-				glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, texture->m_glTex.m_id, 0);
-				fb->m_colorAttachments[i] = GL_COLOR_ATTACHMENT0 + i;
+				GLenum attachNum = static_cast<GLenum>(GL_COLOR_ATTACHMENT0 + i);
+				glFramebufferTexture(GL_FRAMEBUFFER, attachNum, texture->m_glTex.m_id, 0);
+				fb->m_colorAttachments[i] = attachNum;
 			
 				bHasAnyColors = true;
 				fb->m_colorAttachCount++;

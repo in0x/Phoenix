@@ -17,7 +17,7 @@ namespace Phoenix
 		}
 	}
 	
-	int32_t AssetRegistry::isAssetLoaded(const char* path, EAssetType type)
+	int64_t AssetRegistry::isAssetLoaded(const char* path, EAssetType type)
 	{
 		auto dictEntry = m_assets.find(path);
 
@@ -33,7 +33,7 @@ namespace Phoenix
 	
 	Texture2D* AssetRegistry::getTexture(const char* path)
 	{
-		int32_t location = isAssetLoaded(path, EAssetType::Texture);
+		int64_t location = isAssetLoaded(path, EAssetType::Texture);
 
 		if (location != invalidAsset)
 		{
@@ -45,7 +45,7 @@ namespace Phoenix
 		*tex = other;
 		
 		m_textures.push_back(tex);
-		m_assets.emplace(path, AssetRef{ EAssetType::Texture, m_textures.size() - 1 });
+		m_assets.emplace(path, AssetRef{ EAssetType::Texture, static_cast<int64_t>(m_textures.size() - 1) });
 		
 		return tex;
 	}
