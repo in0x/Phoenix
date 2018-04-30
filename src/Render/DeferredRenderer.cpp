@@ -138,10 +138,11 @@ namespace Phoenix
 
 		m_context->bindShaderProgram(m_directionaLightProgram);
 
-		//m_context->bindUniform(m_uniforms.projTf, &m_projMat);
+		m_context->bindUniform(m_uniforms.projTf, &m_projMat);
 
 		m_context->bindTexture(m_uniforms.normalSpecExpTexSampler, m_normalSpecExpTex);
 		m_context->bindTexture(m_uniforms.diffuseDepthTexSampler, m_kDiffuseDepthTex);
+		m_context->bindTexture(m_uniforms.specularTexSampler, m_kSpecularTex);
 	}
 
 	void DeferredRenderer::drawLight(Vec3 direction, Vec3 color)

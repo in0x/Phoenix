@@ -14,17 +14,6 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <ThirdParty/tinyobj/tiny_obj_loader.h>
 
-/*
-	Possible solution:
-	Default uvs if none are present with default textures.
-	Not sure how valid this is. I guess I could use a "clear" default texture?
-	And then have every uv be 0,0
-
-	Create 1x1 texture with material value if no texture available.
-
-	Or 1x1 white texture? But does that mean that tex and constant values should always be multiplied?
-*/
-
 namespace Phoenix
 {
 	struct MaterialImport

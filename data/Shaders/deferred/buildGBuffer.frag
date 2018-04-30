@@ -25,9 +25,9 @@ void main()
 	
 	kDiffuseRGBDepthA.xyz = texture(matDiffuseTex, uv).xyz;
 	
-	kDiffuseRGBDepthA.xyz += texture(matRoughnessTex, uv).xyz;
-	kDiffuseRGBDepthA.xyz += texture(matMetallicTex, uv).xyz;
-	kDiffuseRGBDepthA.xyz += texture(matNormalTex, uv).xyz;
+	kDiffuseRGBDepthA.xyz += texture(matRoughnessTex, uv).xyz * 0.000001;
+	kDiffuseRGBDepthA.xyz += texture(matMetallicTex, uv).xyz * 0.000001;
+	kDiffuseRGBDepthA.xyz += texture(matNormalTex, uv).xyz * 0.000001;
 	
 	kDiffuseRGBDepthA.w = positionEye.z;
 	
