@@ -49,12 +49,8 @@ namespace Phoenix
 	}
 }
 
-int main(int argc, char** argv)
+void run()
 {
-#define UNUSED(x) (void)x
-	UNUSED(argc);
-	UNUSED(argv);
-
 	using namespace Phoenix;
 
 	Logger::init(true, false, 1024);
@@ -234,7 +230,15 @@ int main(int argc, char** argv)
 	RI::exit();
 	Logger::exit();
 
-	return 0;
 }
 
+int main(int argc, char** argv)
+{
+#define UNUSED(x) (void)x
+	UNUSED(argc);
+	UNUSED(argv);
 
+	run();
+
+	return 0;
+}

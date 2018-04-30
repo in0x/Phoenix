@@ -362,6 +362,8 @@ namespace Phoenix
 			mat.m_normalTex = assets->getTexture(exp.m_normalTexPath.c_str());
 		}
 
+		destroyArchive(ar);
+
 		return mesh;
 	}
 }
