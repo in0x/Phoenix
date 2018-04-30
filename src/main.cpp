@@ -24,7 +24,7 @@
 
 namespace Phoenix
 {
-	std::vector<EntityHandle> meshEntitiesFromObj(World* world, IRIDevice* renderDevice, IRIContext* renderContext, const char* meshPath, AssetRegistry* assets)
+	std::vector<EntityHandle> meshEntitiesFromObj(World* world, IRIDevice* renderDevice, const char* meshPath, AssetRegistry* assets)
 	{
 		std::vector<EntityHandle> entities;
 		std::vector<StaticMesh> meshes = importObj(meshPath, renderDevice, assets);
@@ -135,8 +135,8 @@ void run()
 	EntityHandle light = world.createEntity();
 	world.addComponent<CDirectionalLight>(light, Vec3(-0.5f, -0.5f, 0.f), Vec3(0.4f, 0.4f, 0.4f));
 
-	EntityHandle light2 = world.createEntity();
-	world.addComponent<CDirectionalLight>(light2, Vec3(0.5f, -0.5f, 0.f), Vec3(0.4f, 0.4f, 0.4f));
+	//EntityHandle light2 = world.createEntity();
+	//world.addComponent<CDirectionalLight>(light2, Vec3(0.5f, -0.5f, 0.f), Vec3(0.4f, 0.4f, 0.4f));
 
 	using Clock = std::chrono::high_resolution_clock;
 	using pointInTime = std::chrono::time_point<std::chrono::high_resolution_clock>;
@@ -150,6 +150,11 @@ void run()
 
 	Camera camera;
 
+	Vec2 cameraVelocity;
+	float cameraAccel = 30.0f;
+	float cameraDrag = 0.9f;
+	float cameraVelMax = 200.0f;
+
 	while (!gameWindow->wantsToClose())
 	{
 		Platform::pollEvents();
@@ -157,33 +162,48 @@ void run()
 		pointInTime currentTime = Clock::now();
 		std::chrono::duration<float> timeSpan = currentTime - lastTime;
 		float dt = timeSpan.count();
+		lastTime = currentTime;
 
-		float cameraChange = 0.5f * dt;
+		cameraVelocity *= cameraDrag;
 
-		while (!gameWindow->m_keyEvents.isEmpty())
+		float cameraAccelThisFrame = cameraAccel;
+
+		Input::Action state_a = gameWindow->m_keyStates[Key::A].m_action;
+		if (state_a == Input::Press || state_a == Input::Repeat)
 		{
-			Key::Event* ev = gameWindow->m_keyEvents.get();
-
-			if (ev->m_value == Key::A && (ev->m_action == Input::Press || ev->m_action == Input::Repeat))
-			{
-				camera.moveRight(-cameraChange);
-			}
-
-			if (ev->m_value == Key::D && (ev->m_action == Input::Press || ev->m_action == Input::Repeat))
-			{
-				camera.moveRight(cameraChange);
-			}
-
-			if (ev->m_value == Key::W && (ev->m_action == Input::Press || ev->m_action == Input::Repeat))
-			{
-				camera.moveForward(-cameraChange);
-			}
-
-			if (ev->m_value == Key::S && (ev->m_action == Input::Press || ev->m_action == Input::Repeat))
-			{
-				camera.moveForward(cameraChange);
-			}
+			cameraVelocity.x -= cameraAccelThisFrame;
 		}
+
+		Input::Action state_d = gameWindow->m_keyStates[Key::D].m_action;
+		if (state_d == Input::Press || state_d == Input::Repeat)
+		{
+			cameraVelocity.x += cameraAccelThisFrame;
+		}
+
+		Input::Action state_w = gameWindow->m_keyStates[Key::W].m_action;
+		if (state_w == Input::Press || state_w == Input::Repeat)
+		{
+			cameraVelocity.y -= cameraAccelThisFrame;
+		}
+
+		Input::Action state_s = gameWindow->m_keyStates[Key::S].m_action;
+		if (state_s == Input::Press || state_s == Input::Repeat)
+		{
+			cameraVelocity.y += cameraAccelThisFrame;
+		}
+
+		float cameraVelLen = cameraVelocity.length();
+
+		if (cameraVelLen > cameraVelMax)
+		{
+			cameraVelocity.normalize();
+			cameraVelocity *= cameraVelMax;
+		}
+
+		camera.moveRight(cameraVelocity.x * dt);
+		camera.moveForward(cameraVelocity.y * dt);
+
+		Logger::logf("(%f | %f)", cameraVelocity.x, cameraVelocity.y);
 
 		MouseState mouse = gameWindow->m_mouseState;
 
@@ -191,9 +211,8 @@ void run()
 		{
 			if (mouse.m_buttonStates[MouseState::Left] == Input::Press)
 			{
-				float sens = 20.0f;
-				float dx = -radians(sens * ((mouse.m_x - prevMouseX) / config.width) * dt);
-				float dy = -radians(sens * ((mouse.m_y - prevMouseY) / config.height) * dt);
+				float dx = -radians(4.0f * config.width * ((mouse.m_x - prevMouseX) / config.width) * dt);
+				float dy = -radians(4.0f * config.height * ((mouse.m_y - prevMouseY) / config.height) * dt);
 
 				camera.yaw(dx);
 				camera.pitch(dy);

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <stdint.h>
-#include <Memory/CircularBuffer.hpp>
 
 namespace Phoenix
 {
@@ -43,22 +42,10 @@ namespace Phoenix
 			NumModifiers = 0
 		};
 
-		struct Event
+		struct State
 		{
-			Event()
-				: m_value(NumValues)
-				, m_action(Input::NumActions)
-				, m_modifiers(0)
-			{}
-
-			Value m_value;
 			Input::Action m_action;
 			int m_modifiers;
-
-			bool hasModifier(Modifier mod)
-			{
-				return (m_modifiers & mod) != 0;
-			}
 		};
 	};
 
@@ -88,12 +75,7 @@ namespace Phoenix
 
 		virtual bool wantsToClose() { return false; }
 
-		enum
-		{
-			MAX_KEY_EVENTS = 128
-		};
-
-		CircularBuffer<Key::Event, MAX_KEY_EVENTS> m_keyEvents;
+		Key::State m_keyStates[Key::Value::NumValues];
 		MouseState m_mouseState;
 	};
 }

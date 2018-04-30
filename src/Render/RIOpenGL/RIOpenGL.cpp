@@ -235,14 +235,13 @@ namespace Phoenix
 		return &g_impl->context;
 	}
 
-	void keyTypeFromGlfw(int key, int scancode, Key::Event* outEvent)
+	Key::Value keyTypeFromGlfw(int key, int scancode)
 	{
 
 #define IMPL_KEY_SWITCH(glfw, value) \
 		case glfw: \
 		{ \
-			outEvent->m_value = value; \
-			return; \
+			return value; \
 		} \
 
 		switch (key)
@@ -254,7 +253,7 @@ namespace Phoenix
 			default:
 			{
 				Logger::warningf("Attempted to convert unhandled key value: %s", glfwGetKeyName(key, scancode));
-				break;
+				return Key::NumValues;
 			}
 		}
 	}
@@ -276,22 +275,26 @@ namespace Phoenix
 		}
 	}
 
-	void modifierFromGlfw(int mods, Key::Event* outEvent)
+	int modifierFromGlfw(int mods)
 	{
+		int totalMods = 0;
+
 		if (mods & GLFW_MOD_SHIFT)
 		{
-			outEvent->m_modifiers |= Key::Shift;
+			totalMods |= Key::Shift;
 		}
 
 		if (mods & GLFW_MOD_CONTROL)
 		{
-			outEvent->m_modifiers |= Key::Ctrl;
+			totalMods |= Key::Ctrl;
 		}
 			
 		if (mods & GLFW_MOD_ALT)
 		{
-			outEvent->m_modifiers |= Key::Alt;
+			totalMods |= Key::Alt;
 		}
+	
+		return totalMods;
 	}
 
 	MouseState::Button mouseButtonFromGlfw(int button)
@@ -336,13 +339,9 @@ namespace Phoenix
 		
 		GlRenderWindow* renderWindow = windowFromGlfw(window);
 
-		Key::Event ev;
-
-		keyTypeFromGlfw(key, scancode, &ev);
-		ev.m_action = actionFromGlfw(action);
-		modifierFromGlfw(mods, &ev); 
-
-		renderWindow->m_keyEvents.add(ev);
+		Key::Value value = keyTypeFromGlfw(key, scancode);
+		renderWindow->m_keyStates[value].m_action = actionFromGlfw(action);
+		renderWindow->m_keyStates[value].m_modifiers = modifierFromGlfw(mods);
 	}
 
 	void mouseMoveCallback(GLFWwindow* window, double x, double y)
