@@ -228,11 +228,14 @@ void run()
 			renderer.drawStaticMesh(mesh.m_mesh, transform->m_cached);
 		}
 
-		renderer.setupLightPass();
+		renderer.setupAmbientLightPass();
+		renderer.drawAmbientLight();
+
+		renderer.setupDirectionalLightPass();
 
 		for (CDirectionalLight& dirLight : ComponentIterator<CDirectionalLight>(&world))
 		{
-			renderer.drawLight(dirLight.m_direction, dirLight.m_color);
+			renderer.drawDirectionalLight(dirLight.m_direction, dirLight.m_color);
 		}
 
 		renderer.copyFinalColorToBackBuffer();

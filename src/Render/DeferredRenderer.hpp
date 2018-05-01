@@ -29,12 +29,16 @@ namespace Phoenix
 		// Draws the material values needed for shading from this StaticMesh into the GBuffer.
 		void drawStaticMesh(const StaticMesh& mesh, const Matrix4& transform);
 
+		void setupAmbientLightPass();
+
+		void drawAmbientLight();
+
 		// Sets up the state needed to evaluate the shading equation. Needs to be called after filling the Gbuffer and before submitting
 		// the first light.
-		void setupLightPass();
+		void setupDirectionalLightPass();
 
 		// Evaluates the shading equation for this light using the values written into the GBuffer.
-		void drawLight(Vec3 direction, Vec3 color);
+		void drawDirectionalLight(Vec3 direction, Vec3 color);
 
 		// Applies gamma correction to the final color values and copies them into the default framebuffer. 
 		void copyFinalColorToBackBuffer();
@@ -76,6 +80,7 @@ namespace Phoenix
 		} m_uniforms;
 
 		ProgramHandle m_gBufferProgram;
+		ProgramHandle m_ambientLightProgram;
 		ProgramHandle m_directionaLightProgram;
 		ProgramHandle m_copyToBackBufferProgram;
 

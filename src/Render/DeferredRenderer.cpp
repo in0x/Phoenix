@@ -59,6 +59,7 @@ namespace Phoenix
 		m_uniforms.lightColor = renderDevice->createUniform("lightColor", EUniformType::Vec3);
 
 		m_gBufferProgram = loadShaderProgram(renderDevice, "Shaders/deferred/buildGBuffer.vert", "Shaders/deferred/buildGBuffer.frag");
+		m_ambientLightProgram = loadShaderProgram(renderDevice, "Shaders/deferred/drawAmbientLight.vert", "Shaders/deferred/drawAmbientLight.frag");
 		m_directionaLightProgram = loadShaderProgram(renderDevice, "Shaders/deferred/drawDirectionalLight.vert", "Shaders/deferred/drawDirectionalLight.frag");
 		m_copyToBackBufferProgram = loadShaderProgram(renderDevice, "Shaders/deferred/copyToBackBuffer.vert", "Shaders/deferred/copyToBackBuffer.frag");
 
@@ -82,6 +83,8 @@ namespace Phoenix
 
 	void DeferredRenderer::setupGBufferPass()
 	{
+		m_context->clearRenderTargetColor(m_backBuffer, RGBA{ 0.f, 0.f, 0.f, 0.f });
+		
 		m_context->bindRenderTarget(m_gBuffer);
 		m_context->clearRenderTargetColor(m_gBuffer, RGBA{ 0.f, 0.f, 0.f, 0.f });
 		m_context->clearRenderTargetDepth(m_gBuffer);
@@ -124,11 +127,28 @@ namespace Phoenix
 		m_context->unbindTextures();
 	}
 
-	void DeferredRenderer::setupLightPass()
+
+	void DeferredRenderer::setupAmbientLightPass()
 	{
 		m_context->bindRenderTarget(m_backBuffer);
-		m_context->clearRenderTargetColor(m_backBuffer, RGBA{ 0.f, 0.f, 0.f, 0.f });
 
+		m_context->setBlendState(m_lightBlendState);
+		m_context->setDepthTest(EDepth::Disable);
+
+		m_context->bindShaderProgram(m_ambientLightProgram);
+	
+		m_context->bindTexture(m_uniforms.diffuseDepthTexSampler, m_kDiffuseDepthTex);
+	}
+
+	void DeferredRenderer::drawAmbientLight()
+	{
+		m_context->drawLinear(EPrimitive::TriangleStrips, 4, 0);
+	}
+
+	void DeferredRenderer::setupDirectionalLightPass()
+	{
+		m_context->bindRenderTarget(m_backBuffer);
+		
 		m_context->setBlendState(m_lightBlendState);
 		m_context->setDepthTest(EDepth::Disable);
 
@@ -141,7 +161,7 @@ namespace Phoenix
 		m_context->bindTexture(m_uniforms.specularTexSampler, m_kSpecularTex);
 	}
 
-	void DeferredRenderer::drawLight(Vec3 direction, Vec3 color)
+	void DeferredRenderer::drawDirectionalLight(Vec3 direction, Vec3 color)
 	{
 		Vec3 lightDirEye = m_viewMat * direction;
 
