@@ -54,11 +54,7 @@ namespace Phoenix
 		m_uniforms.modelTf = renderDevice->createUniform("modelTf", EUniformType::Mat4);
 		m_uniforms.viewTf = renderDevice->createUniform("viewTf", EUniformType::Mat4);
 		m_uniforms.projTf = renderDevice->createUniform("projectionTf", EUniformType::Mat4);
-
-		m_uniforms.kDiffuse = renderDevice->createUniform("kDiffuse", EUniformType::Vec3);
-		m_uniforms.kSpecular = renderDevice->createUniform("kSpecular", EUniformType::Vec3);
-		m_uniforms.specExp = renderDevice->createUniform("specularExp", EUniformType::Float);
-
+ 
 		m_uniforms.lightDirEye = renderDevice->createUniform("lightDirectionEye", EUniformType::Vec3);
 		m_uniforms.lightColor = renderDevice->createUniform("lightColor", EUniformType::Vec3);
 

@@ -135,8 +135,8 @@ void run()
 	EntityHandle light = world.createEntity();
 	world.addComponent<CDirectionalLight>(light, Vec3(-0.5f, -0.5f, 0.f), Vec3(0.4f, 0.4f, 0.4f));
 
-	//EntityHandle light2 = world.createEntity();
-	//world.addComponent<CDirectionalLight>(light2, Vec3(0.5f, -0.5f, 0.f), Vec3(0.4f, 0.4f, 0.4f));
+	EntityHandle light2 = world.createEntity();
+	world.addComponent<CDirectionalLight>(light2, Vec3(0.5f, -0.5f, 0.f), Vec3(0.4f, 0.4f, 0.4f));
 
 	using Clock = std::chrono::high_resolution_clock;
 	using pointInTime = std::chrono::time_point<std::chrono::high_resolution_clock>;
@@ -202,8 +202,6 @@ void run()
 
 		camera.moveRight(cameraVelocity.x * dt);
 		camera.moveForward(cameraVelocity.y * dt);
-
-		Logger::logf("(%f | %f)", cameraVelocity.x, cameraVelocity.y);
 
 		MouseState mouse = gameWindow->m_mouseState;
 

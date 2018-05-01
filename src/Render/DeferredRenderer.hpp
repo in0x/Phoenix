@@ -59,10 +59,6 @@ namespace Phoenix
 			UniformHandle viewTf;
 			UniformHandle projTf;
 
-			UniformHandle kDiffuse;
-			UniformHandle kSpecular;
-			UniformHandle specExp;
-
 			UniformHandle lightDirEye;
 			UniformHandle lightColor;
 
