@@ -110,7 +110,61 @@ namespace Phoenix
 		return desc;
 	}
 
-	Texture2D initTextureAsset(const char* path, IRIDevice* renderDevice, IRIContext* renderContext)
+	bool isLinearSpace(EPixelFormat pf)
+	{
+		return pf == EPixelFormat::R8G8B8 || pf == EPixelFormat::R8G8B8A8;
+	}
+
+	bool isSrgbSpace(EPixelFormat pf)
+	{
+		return pf == EPixelFormat::SRGB8 || pf == EPixelFormat::SRGBA8;
+	}
+
+	EPixelFormat linearToSrgb(EPixelFormat pf)
+	{
+		switch (pf)
+		{
+		case EPixelFormat::R8G8B8:
+			return EPixelFormat::SRGB8;
+		case EPixelFormat::R8G8B8A8:
+			return EPixelFormat::SRGBA8;
+		default:
+			return pf;
+		}
+	}
+
+	EPixelFormat srgbToLinear(EPixelFormat pf)
+	{
+		switch (pf)
+		{
+		case EPixelFormat::SRGB8:
+			return EPixelFormat::R8G8B8;
+		case EPixelFormat::SRGBA8:
+			return EPixelFormat::R8G8B8A8;
+		default:
+			return pf;
+		}
+	}
+
+	void setDescFromHints(TextureDesc* desc, const TextureCreationHints* hints)
+	{
+		if (isLinearSpace(desc->pixelFormat) && hints->colorSpace == ETextrueColorSpace::SRGB)
+		{
+			desc->pixelFormat = linearToSrgb(desc->pixelFormat);
+		}
+		else if (isSrgbSpace(desc->pixelFormat) && hints->colorSpace == ETextrueColorSpace::Linear)
+		{
+			desc->pixelFormat = srgbToLinear(desc->pixelFormat);
+		}
+
+		desc->magFilter = hints->magFilter;
+		desc->minFilter = hints->minFilter;
+		desc->wrapU = hints->wrapU;
+		desc->wrapV = hints->wrapV;
+		desc->wrapW = hints->wrapW;
+	}
+
+	Texture2D initTextureAsset(const char* path, const TextureCreationHints* hints, IRIDevice* renderDevice, IRIContext* renderContext)
 	{
 		Texture2D texture;
 		texture.m_sourcePath = path;
@@ -123,6 +177,12 @@ namespace Phoenix
 		}
 
 		TextureDesc desc = createDesc(data, ETextureFilter::Linear, ETextureFilter::Linear);
+
+		if (hints)
+		{
+			setDescFromHints(&desc, hints);
+		}
+
 		Texture2DHandle tex2D = renderDevice->createTexture2D(desc);
 		assert(tex2D.isValid());
 		

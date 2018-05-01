@@ -259,6 +259,8 @@ namespace Phoenix
 		RG8,
 		R8G8B8,
 		R8G8B8A8,
+		SRGB8,
+		SRGBA8,
 		RGB16F,
 		RGBA16F,
 		RGB32F,

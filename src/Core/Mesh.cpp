@@ -16,6 +16,41 @@
 
 namespace Phoenix
 {
+	TextureCreationHints* getDiffuseHints()
+	{
+		static TextureCreationHints hints;
+		hints.colorSpace = ETextrueColorSpace::SRGB;
+		hints.wrapU = ETextureWrap::Repeat;
+		hints.wrapV = ETextureWrap::Repeat;
+		hints.wrapW = ETextureWrap::Repeat;
+		return &hints;
+	}
+
+	TextureCreationHints* getNonDiffuseHints()
+	{	
+		static TextureCreationHints hints;
+		hints.colorSpace = ETextrueColorSpace::Linear;
+		hints.wrapU = ETextureWrap::Repeat;
+		hints.wrapV = ETextureWrap::Repeat;
+		hints.wrapW = ETextureWrap::Repeat;
+		return &hints;
+	}
+
+	TextureCreationHints* getRoughnessHints()
+	{
+		return getNonDiffuseHints();
+	}
+
+	TextureCreationHints* getMetallicHints()
+	{
+		return getNonDiffuseHints();
+	}
+
+	TextureCreationHints* getNormalsHints()
+	{
+		return getNonDiffuseHints();
+	}
+
 	struct MaterialImport
 	{
 		std::string m_diffuseTex;
@@ -165,13 +200,13 @@ namespace Phoenix
 			outMesh->m_vertexFrom[matIdx] = matImport.m_vertexFrom;
 			Material* material = &outMesh->m_materials[matIdx];
 
-			material->m_diffuseTex = !matImport.m_diffuseTex.empty() ? assets->getTexture((mtlPath + matImport.m_diffuseTex).c_str()) : defaultTex;
+			material->m_diffuseTex = !matImport.m_diffuseTex.empty() ? assets->getTexture((mtlPath + matImport.m_diffuseTex).c_str(), getDiffuseHints()) : defaultTex;
 			
-			material->m_roughnessTex = !matImport.m_roughnessTex.empty() ? assets->getTexture((mtlPath + matImport.m_roughnessTex).c_str()) : defaultTex;
+			material->m_roughnessTex = !matImport.m_roughnessTex.empty() ? assets->getTexture((mtlPath + matImport.m_roughnessTex).c_str(), getRoughnessHints()) : defaultTex;
 
-			material->m_metallicTex = !matImport.m_metallicTex.empty() ? assets->getTexture((mtlPath + matImport.m_metallicTex).c_str()) : defaultTex;
+			material->m_metallicTex = !matImport.m_metallicTex.empty() ? assets->getTexture((mtlPath + matImport.m_metallicTex).c_str(), getMetallicHints()) : defaultTex;
 			
-			material->m_normalTex = !matImport.m_normalTex.empty() ? assets->getTexture((mtlPath + matImport.m_normalTex).c_str()) : defaultTex;
+			material->m_normalTex = !matImport.m_normalTex.empty() ? assets->getTexture((mtlPath + matImport.m_normalTex).c_str(), getNormalsHints()) : defaultTex;
 			
 			material->m_name = matImport.m_name;
 
@@ -345,10 +380,10 @@ namespace Phoenix
 
 			Material& mat = mesh.m_materials[i];
 
-			mat.m_diffuseTex = assets->getTexture(exp.m_diffuseTexPath.c_str());
-			mat.m_roughnessTex = assets->getTexture(exp.m_roughnessTexPath.c_str());
-			mat.m_metallicTex = assets->getTexture(exp.m_metallicTexPath.c_str());
-			mat.m_normalTex = assets->getTexture(exp.m_normalTexPath.c_str());
+			mat.m_diffuseTex = assets->getTexture(exp.m_diffuseTexPath.c_str(), getDiffuseHints());
+			mat.m_roughnessTex = assets->getTexture(exp.m_roughnessTexPath.c_str(), getRoughnessHints());
+			mat.m_metallicTex = assets->getTexture(exp.m_metallicTexPath.c_str(), getMetallicHints());
+			mat.m_normalTex = assets->getTexture(exp.m_normalTexPath.c_str(), getNormalsHints());
 		}
 
 		destroyArchive(ar);

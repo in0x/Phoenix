@@ -34,10 +34,8 @@ namespace Phoenix
 		//static AssetRegistry loadFromDisk(const char* pathToArchive, IRIDevice* renderDevice, IRIContext* renderContext);
 
 		// TODO: Is this a good interface? Would it be better to have explicit exists, register and get for the user to call?
-		struct Texture2D* getTexture(const char* path);
-	/*	struct Material* getMaterial(const char* path);
-		struct StaticMesh* getMesh(const char* path);
-	*/
+		struct Texture2D* getTexture(const char* path, const struct TextureCreationHints* hints = nullptr);
+	
 	private:
 		IRIDevice* m_renderDevice;
 		IRIContext* m_renderContext;
@@ -48,7 +46,5 @@ namespace Phoenix
 		std::unordered_map<std::string, AssetRef> m_assets;
 	
 		std::vector<Texture2D*> m_textures;
-		/*std::vector<std::unique_ptr<Material>> m_materials;
-		std::vector<std::unique_ptr<StaticMesh>> m_meshes;*/
 	};
 }

@@ -272,6 +272,10 @@ namespace Phoenix
 			return GL_RG8; 
 		case EPixelFormat::R8:
 			return GL_R8;
+		case EPixelFormat::SRGB8:
+			return GL_SRGB8;
+		case EPixelFormat::SRGBA8:
+			return GL_SRGB8_ALPHA8;
 		case EPixelFormat::RGB16F:
 			return GL_RGB16F;
 		case EPixelFormat::RGBA16F:
@@ -300,10 +304,12 @@ namespace Phoenix
 		case EPixelFormat::R8G8B8A8:
 		case EPixelFormat::RGBA16F:
 		case EPixelFormat::RGBA32F:
+		case EPixelFormat::SRGBA8:
 			return GL_RGBA;
 		case EPixelFormat::R8G8B8:
 		case EPixelFormat::RGB16F:
 		case EPixelFormat::RGB32F:
+		case EPixelFormat::SRGB8:
 			return GL_RGB;
 		case EPixelFormat::RG8:
 			return GL_RG;
@@ -326,7 +332,9 @@ namespace Phoenix
 		switch (format)
 		{
 		case EPixelFormat::R8G8B8A8:
+		case EPixelFormat::SRGBA8:
 		case EPixelFormat::R8G8B8:
+		case EPixelFormat::SRGB8:
 		case EPixelFormat::RG8:
 		case EPixelFormat::R8:
 			return GL_UNSIGNED_BYTE;

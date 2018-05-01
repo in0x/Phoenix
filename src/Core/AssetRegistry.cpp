@@ -31,7 +31,7 @@ namespace Phoenix
 		}
 	}
 	
-	Texture2D* AssetRegistry::getTexture(const char* path)
+	Texture2D* AssetRegistry::getTexture(const char* path, const TextureCreationHints* hints)
 	{
 		int64_t location = isAssetLoaded(path, EAssetType::Texture);
 
@@ -41,7 +41,7 @@ namespace Phoenix
 		}
 
 		Texture2D* tex = new Texture2D();
-		Texture2D other = initTextureAsset(path, m_renderDevice, m_renderContext);
+		Texture2D other = initTextureAsset(path, hints, m_renderDevice, m_renderContext);
 		*tex = other;
 		
 		m_textures.push_back(tex);
@@ -49,12 +49,4 @@ namespace Phoenix
 		
 		return tex;
 	}
-	
-	/*Material* AssetRegistry::getMaterial(const char* path)
-	{
-	}
-
-	StaticMesh* AssetRegistry::getMesh(const char* path)
-	{
-	}*/
 }
