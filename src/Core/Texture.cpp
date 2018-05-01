@@ -72,7 +72,8 @@ namespace Phoenix
 			for (size_t column = 0; column < widthBytes; ++column)
 			{
 				temp = *bottom;
-				*top = *bottom;
+				*bottom = *top;
+				*top = temp;
 				top++;
 				bottom++;
 			}
@@ -175,6 +176,8 @@ namespace Phoenix
 			Logger::warningf("Failed to load data for texture %s. Cannot initialize texture further", path);
 			return texture;
 		}
+
+		flipTextureHorizontal(data);
 
 		TextureDesc desc = createDesc(data, ETextureFilter::Linear, ETextureFilter::Linear);
 
