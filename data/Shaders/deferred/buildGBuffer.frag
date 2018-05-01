@@ -27,5 +27,5 @@ void main()
 	
 	kDiffuseRGBDepthA.w = positionEye.z;
 	
-	kSpecularRGB = vec3(1.0, 1.0, 1.0);
+	kSpecularRGB = vec3(0.0, 0.0, 0.0);
 }

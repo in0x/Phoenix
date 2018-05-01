@@ -33,5 +33,5 @@ void main()
 	float cosTh = max(dot(N, H), 0.0);
 	float cosTi = max(dot(N, L), 0.0);
 	
-	color = vec4(((kDiffuse + kSpecular * pow(cosTh, specExp)) * lightColor * cosTi) * 0.000001 + kDiffuse, 1.0);
+	color = vec4(((kDiffuse + kSpecular * pow(cosTh, specExp)) * lightColor * cosTi), 1.0);
 }

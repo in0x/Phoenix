@@ -10,9 +10,13 @@ const float gamma = 2.2;
 
 void main()
 {
-	vec4 finalColor = texture(kfinalRGBA_tex, texCoord);
+	vec3 hdrColor = texture(kfinalRGBA_tex, texCoord).xyz;
 	
-    finalColor.rgb = pow(finalColor.rgb, vec3(1.0/gamma));
+	// Reinhard tone mapping
+    hdrColor = hdrColor / (hdrColor + vec3(1.0));
 	
-	correctedColor = finalColor;
+	// Gamma correction
+    hdrColor = pow(hdrColor, vec3(1.0/gamma));
+	
+	correctedColor = vec4(hdrColor, 1.0);
 }
