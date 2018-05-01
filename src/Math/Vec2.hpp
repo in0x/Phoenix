@@ -17,6 +17,11 @@ namespace Phoenix
 			, y(_y)
 		{}
 
+		constexpr Vec2(float val)
+			: x(val)
+			, y(val)
+		{}
+
 		float& operator()(int i)
 		{
 			return *(&x + i);

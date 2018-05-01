@@ -21,6 +21,12 @@ namespace Phoenix
 			, z(_z)
 		{}
 
+		constexpr Vec3(float val)
+			: x(val)
+			, y(val)
+			, z(val)
+		{}
+
 		float& operator()(int i)
 		{
 			return *(&x + i);
