@@ -51,6 +51,15 @@ namespace Phoenix
 		return getNonDiffuseHints();
 	}
 
+	void MeshData::setSize(size_t numVertices)
+	{
+		m_numVertices = numVertices;
+		m_vertices.reserve(numVertices);
+		m_normals.reserve(numVertices);
+		m_tangents.reserve(numVertices);
+		m_texCoords.reserve(numVertices);
+	}
+
 	struct MaterialImport
 	{
 		std::string m_diffuseTex;
@@ -76,29 +85,22 @@ namespace Phoenix
 		MeshImport mesh;
 	
 		size_t numIndices = shape.mesh.indices.size();
-		mesh.m_meshData.m_numVertices = numIndices;
-
-		mesh.m_meshData.m_vertices.reserve(numIndices);
-		mesh.m_meshData.m_normals.reserve(numIndices);
-		mesh.m_meshData.m_uvs.reserve(numIndices);
-
+	
+		mesh.m_meshData.setSize(numIndices);
 		mesh.m_name = shape.name;
 
-		assert(shape.mesh.num_face_vertices[0] == 3);
-		size_t vertsInFace = 3;
-
-		int lastMaterialIdx = -1;
-
-		if (shape.mesh.material_ids[0] == -1)
-		{
-			Logger::warningf("Shape %s does not have a material, this needs to be assigned a default material!", shape.name.c_str());
-			Logger::warning("This shape will be skipped when drawing.");
-		}
-
 		assert((numIndices % 3) == 0);
+		assert(shape.mesh.num_face_vertices[0] == 3);
 
+		size_t vertsInFace = 3;
+		size_t lastMaterialIdx = -1;
+
+		MeshData& data = mesh.m_meshData;
+
+		// Convert imported data to engine format.
 		for (size_t indexOffset = 0; indexOffset < numIndices; indexOffset += vertsInFace)
 		{
+			// One shape may have multiple materials. 
 			if (shape.mesh.material_ids[indexOffset / 3] != lastMaterialIdx)
 			{
 				lastMaterialIdx = shape.mesh.material_ids[indexOffset / 3];
@@ -113,10 +115,11 @@ namespace Phoenix
 				matImport.m_metallicTex = mtl.ambient_texname;
 				matImport.m_normalTex = mtl.bump_texname;
 				matImport.m_vertexFrom = indexOffset;
-				
+
 				matImport.m_name = mtl.name.c_str();
 			}
 
+			// Read in vertex, normal and uv pair.
 			for (size_t vertex = 0; vertex < vertsInFace; vertex++)
 			{
 				assert((indexOffset + vertex) < numIndices);
@@ -127,9 +130,59 @@ namespace Phoenix
 				size_t normalIdx = 3 * idx.normal_index;
 				size_t uvIdx = 2 * idx.texcoord_index;
 
-				mesh.m_meshData.m_vertices.emplace_back(vertices[vertexIdx + 0], vertices[vertexIdx + 1], vertices[vertexIdx + 2]);
-				mesh.m_meshData.m_normals.emplace_back(normals[normalIdx + 0], normals[normalIdx + 1], normals[normalIdx + 2]);
-				mesh.m_meshData.m_uvs.emplace_back(uvs[uvIdx + 0], uvs[uvIdx + 1]);
+				data.m_vertices.emplace_back(vertices[vertexIdx + 0], vertices[vertexIdx + 1], vertices[vertexIdx + 2]);
+				data.m_normals.emplace_back(normals[normalIdx + 0], normals[normalIdx + 1], normals[normalIdx + 2]);
+				data.m_texCoords.emplace_back(uvs[uvIdx + 0], uvs[uvIdx + 1]);
+			}
+
+			// Generate (bi)tangent
+			// See: Lengyel, Eric. “Computing Tangent Space Basis Vectors for an Arbitrary Mesh”. Terathon Software, 2001. http://terathon.com/code/tangent.html
+			{
+				size_t lastVertex = data.m_vertices.size() - 1;
+
+				const Vec3& v3 = data.m_vertices[lastVertex - 2];
+				const Vec3& v2 = data.m_vertices[lastVertex - 1];
+				const Vec3& v1 = data.m_vertices[lastVertex];
+
+				const Vec2& w3 = data.m_texCoords[lastVertex - 2];
+				const Vec2& w2 = data.m_texCoords[lastVertex - 1];
+				const Vec2& w1 = data.m_texCoords[lastVertex];
+			
+				float x1 = v2.x - v1.x;
+				float x2 = v3.x - v1.x;
+				float y1 = v2.y - v1.y;
+				float y2 = v3.y - v1.y;
+				float z1 = v2.z - v1.z;
+				float z2 = v3.z - v1.z;
+
+				float s1 = w2.x - w1.x;
+				float s2 = w3.x - w1.x;
+				float t1 = w2.y - w1.y;
+				float t2 = w3.y - w1.y;
+
+				float r = 1.0f / (s1 * t2 - s2 * t1);
+				
+				Vec3 sdir((t2 * x1 - t1 * x2) * r, (t2 * y1 - t1 * y2) * r, (t2 * z1 - t1 * z2) * r);
+				
+				Vec3 tdir((s1 * x2 - s2 * x1) * r, (s1 * y2 - s2 * y1) * r, (s1 * z2 - s2 * z1) * r);
+
+				for (size_t i = 0; i < vertsInFace; ++i)
+				{
+					const Vec3& tan1 = sdir;
+					const Vec3& tan2 = tdir;
+					const Vec3& n = data.m_normals[lastVertex - (vertsInFace - i - 1)];
+					
+					Vec3 t;
+
+					// Gram-Schmidt orthogonalize
+					t = (tan1 - n * n.dot(tan1));
+					t.normalize();
+
+					// Calculate handedness
+					float w = n.cross(tan1).dot(tan2) < 0.0f ? -1.0f : 1.0f;
+
+					data.m_tangents.emplace_back(t, w);
+				}
 			}
 		}
 
@@ -137,14 +190,14 @@ namespace Phoenix
 	}
 
 	// Loads the.obj file and its mtl(s) and converts the mesh into a format drawable by our renderer.
-	std::vector<MeshImport> loadObj(const char* filename, const char* mtlDir = nullptr, bool triangulate = true)
+	std::vector<MeshImport> loadObj(const char* filename, const char* mtlDir)
 	{
 		tinyobj::attrib_t attrib;
 		std::vector<tinyobj::shape_t> shapes;
 		std::vector<tinyobj::material_t> materials;
 
 		std::string err;
-		bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, filename, mtlDir, triangulate);
+		bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, filename, mtlDir, true);
 
 		assert(ret);
 
@@ -180,7 +233,10 @@ namespace Phoenix
 		{ sizeof(Vec3), numVertices, outMesh->m_data.m_normals.data() });
 
 		layout.add({ EAttributeProperty::TexCoord, EAttributeType::Float, 2 },
-		{ sizeof(Vec2), numVertices, outMesh->m_data.m_uvs.data() });
+		{ sizeof(Vec2), numVertices, outMesh->m_data.m_texCoords.data() });
+
+		layout.add({ EAttributeProperty::Bitangent, EAttributeType::Float, 4 },
+		{ sizeof(Vec4), numVertices, outMesh->m_data.m_tangents.data() });
 
 		outMesh->m_vertexbuffer = renderDevice->createVertexBuffer(layout);
 
@@ -310,7 +366,8 @@ namespace Phoenix
 		serialize(ar, data.m_numVertices);
 		serialize(ar, data.m_vertices);
 		serialize(ar, data.m_normals);
-		serialize(ar, data.m_uvs);
+		serialize(ar, data.m_tangents);
+		serialize(ar, data.m_texCoords);
 	}
 
 	void serialize(Archive& ar, Material& material)

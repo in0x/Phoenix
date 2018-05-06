@@ -51,6 +51,8 @@ namespace Phoenix
 	template <class T>
 	static void serialize(Archive& ar, std::vector<T>& vector)
 	{
+		static_assert(std::is_standard_layout<T>::value, "T should be standard layout.");
+
 		if (ar.isWriting())
 		{
 			size_t size = vector.size();

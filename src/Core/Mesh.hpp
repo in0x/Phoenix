@@ -2,6 +2,7 @@
 
 #include <Render/RIResourceHandles.hpp>
 
+#include <Math/Vec4.hpp>
 #include <Math/Vec3.hpp>
 #include <Math/Vec2.hpp>
 
@@ -31,11 +32,19 @@ namespace Phoenix
 			: m_numVertices(0)
 		{}
 
+		void setSize(size_t numVertices);
+
 		size_t m_numVertices;
 
 		std::vector<Vec3> m_vertices;
+		
 		std::vector<Vec3> m_normals;
-		std::vector<Vec2> m_uvs;
+		
+		// Surface-local coordinate handedness is stored in w.
+		// Allows to calculate bitangent as B = (N x T) * Tw.
+		std::vector<Vec4> m_tangents;
+
+		std::vector<Vec2> m_texCoords;
 	};
 
 	struct StaticMesh

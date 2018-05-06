@@ -105,7 +105,7 @@ void run()
 
 #if PHI_WRITE
 	{
-		std::vector<EntityHandle> sponza = meshEntitiesFromObj(&world, renderDevice, renderContext, "Models/sponza/sponza.obj", &assets);
+		std::vector<EntityHandle> sponza = meshEntitiesFromObj(&world, renderDevice, "Models/sponza/sponza.obj", &assets);
 
 		for (CStaticMesh& mesh : ComponentIterator<CStaticMesh>(&world))
 		{
@@ -133,7 +133,8 @@ void run()
 #endif // PHI_LOAD
 
 	EntityHandle light = world.createEntity();
-	world.addComponent<CDirectionalLight>(light, Vec3(-0.5f, -0.5f, -0.5f), Vec3(5.0f, 5.0f, 5.0f));
+	//world.addComponent<CDirectionalLight>(light, Vec3(-0.5f, -0.5f, -0.5f), Vec3(5.0f, 5.0f, 5.0f));
+	world.addComponent<CDirectionalLight>(light, Vec3(0.0f, -1.0f, 0.0f), Vec3(5.0f, 5.0f, 5.0f));
 
 	using Clock = std::chrono::high_resolution_clock;
 	using pointInTime = std::chrono::time_point<std::chrono::high_resolution_clock>;
