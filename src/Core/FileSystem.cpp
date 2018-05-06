@@ -47,4 +47,24 @@ namespace Phoenix
 
 		return true;
 	}
+
+	int32_t fileNameFromPath(const char* path)
+	{
+		const char* seperators[] = { "/", "\\" };
+		
+		int32_t location = 0;
+		int32_t len = strlen(path);
+
+		for (const char* seperator : seperators)
+		{
+			location = findLast(path, seperator);
+			if ((location != -1) && (location + 1 < len))
+			{
+				return location + 1;
+			}
+		}
+
+		return 0;
+	}
+
 }
