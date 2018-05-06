@@ -23,6 +23,8 @@ namespace Phoenix
 		hints.wrapU = ETextureWrap::Repeat;
 		hints.wrapV = ETextureWrap::Repeat;
 		hints.wrapW = ETextureWrap::Repeat;
+		hints.bGenMipMaps = true;
+		hints.mipFilter = ETextureFilter::Linear;
 		return &hints;
 	}
 
@@ -33,6 +35,8 @@ namespace Phoenix
 		hints.wrapU = ETextureWrap::Repeat;
 		hints.wrapV = ETextureWrap::Repeat;
 		hints.wrapW = ETextureWrap::Repeat;
+		hints.bGenMipMaps = true;
+		hints.mipFilter = ETextureFilter::Linear;
 		return &hints;
 	}
 

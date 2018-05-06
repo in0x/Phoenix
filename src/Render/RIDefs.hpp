@@ -293,6 +293,7 @@ namespace Phoenix
 			, pixelFormat(EPixelFormat::None)
 			, minFilter(ETextureFilter::Linear)
 			, magFilter(ETextureFilter::Linear)
+			, mipFilter(ETextureFilter::Linear)
 			, wrapU(ETextureWrap::ClampToEdge)
 			, wrapV(ETextureWrap::ClampToEdge)
 			, wrapW(ETextureWrap::ClampToEdge)
@@ -304,6 +305,7 @@ namespace Phoenix
 		EPixelFormat pixelFormat;
 		ETextureFilter minFilter;
 		ETextureFilter magFilter;
+		ETextureFilter mipFilter;
 		ETextureWrap wrapU;
 		ETextureWrap wrapV;
 		ETextureWrap wrapW;

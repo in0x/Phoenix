@@ -147,6 +147,16 @@ namespace Phoenix
 		}
 	}
 
+	bool isPow2(uint32_t value)
+	{
+		return ((value & (value - 1)) == 0);
+	}
+
+	uint32_t getMaxMipLevels(uint32_t res)
+	{
+		return std::log2(res);
+	}
+
 	void setDescFromHints(TextureDesc* desc, const TextureCreationHints* hints)
 	{
 		if (isLinearSpace(desc->pixelFormat) && hints->colorSpace == ETextrueColorSpace::SRGB)
@@ -163,6 +173,14 @@ namespace Phoenix
 		desc->wrapU = hints->wrapU;
 		desc->wrapV = hints->wrapV;
 		desc->wrapW = hints->wrapW;
+
+		if (hints->bGenMipMaps 
+			&& desc->width > 1 
+			&& desc->height > 1)
+		{
+			desc->numMips = getMaxMipLevels(std::min(desc->width, desc->height));
+			desc->mipFilter = hints->mipFilter;
+		}
 	}
 
 	Texture2D initTextureAsset(const char* path, const TextureCreationHints* hints, IRIDevice* renderDevice, IRIContext* renderContext)

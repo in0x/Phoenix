@@ -275,6 +275,11 @@ namespace Phoenix
 			texture->m_glTex.m_dataType,
 			data);
 
+		if (texture->m_numMips > 0)
+		{
+			glGenerateMipmap(GL_TEXTURE_2D);
+		}
+
 		assert(!checkGlErrorOccured());
 	}
 
@@ -292,6 +297,11 @@ namespace Phoenix
 			texture->m_glTex.m_components,
 			texture->m_glTex.m_dataType,
 			data);
+		
+		if (texture->m_numMips > 0)
+		{
+			glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+		}
 
 		assert(!checkGlErrorOccured());
 	}

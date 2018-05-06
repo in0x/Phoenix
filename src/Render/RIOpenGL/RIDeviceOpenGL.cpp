@@ -367,6 +367,30 @@ namespace Phoenix
 		}
 	}
 
+	GLenum toGlMipFilter(ETextureFilter minFilter, ETextureFilter mipFilter)
+	{
+		if (minFilter == ETextureFilter::Nearest && mipFilter == ETextureFilter::Nearest)
+		{
+			return GL_NEAREST_MIPMAP_NEAREST;
+		}
+		else if (minFilter == ETextureFilter::Linear && mipFilter == ETextureFilter::Nearest)
+		{
+			return GL_LINEAR_MIPMAP_NEAREST;
+		}
+		else if (minFilter == ETextureFilter::Nearest && mipFilter == ETextureFilter::Linear)
+		{
+			return GL_NEAREST_MIPMAP_LINEAR;
+		}
+		else if (minFilter == ETextureFilter::Linear && mipFilter == ETextureFilter::Linear)
+		{ 
+			return GL_LINEAR_MIPMAP_LINEAR;
+		}
+		else
+		{
+			return GL_NEAREST;
+		}
+	}
+
 	GLenum toGlWrap(ETextureWrap wrap)
 	{
 		switch (wrap)
@@ -389,6 +413,7 @@ namespace Phoenix
 		glTex.m_dataType = toGlTexDatatype(desc.pixelFormat);
 		glTex.m_pixelFormat = toGlFormat(desc.pixelFormat);
 		texture.m_numMips = desc.numMips;
+		texture.m_numMips = desc.numMips;
 
 		glGenTextures(1, &glTex.m_id);
 		glActiveTexture(GL_TEXTURE0);
@@ -403,8 +428,20 @@ namespace Phoenix
 			glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 		}
 
-		glTexParameteri(textureType, GL_TEXTURE_MAG_FILTER, toGlFilter(desc.magFilter));
-		glTexParameteri(textureType, GL_TEXTURE_MIN_FILTER, toGlFilter(desc.minFilter));
+		GLenum magFilter = toGlFilter(desc.magFilter);
+
+		GLenum minFilter = 0;
+		if (desc.numMips > 0)
+		{
+			minFilter = toGlMipFilter(desc.minFilter, desc.mipFilter);
+		}
+		else
+		{
+			minFilter = toGlFilter(desc.minFilter);
+		}
+
+		glTexParameteri(textureType, GL_TEXTURE_MAG_FILTER, magFilter);
+		glTexParameteri(textureType, GL_TEXTURE_MIN_FILTER, minFilter);
 
 		glTexParameteri(textureType, GL_TEXTURE_WRAP_S, toGlWrap(desc.wrapU));
 		glTexParameteri(textureType, GL_TEXTURE_WRAP_T, toGlWrap(desc.wrapV));
