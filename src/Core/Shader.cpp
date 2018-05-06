@@ -33,12 +33,22 @@ namespace Phoenix
 	ProgramHandle loadShaderProgram(IRIDevice* renderDevice, char* vsPath, const char* fsPath)
 	{
 		std::string vsSource = loadText(vsPath);
-		VertexShaderHandle vs= renderDevice->createVertexShader(vsSource.c_str());
-		assert(vs.isValid());
+		VertexShaderHandle vs = renderDevice->createVertexShader(vsSource.c_str());
+
+		if (!vs.isValid())
+		{
+			Logger::errorf("While compiling: %s", vsPath);
+			assert(vs.isValid());
+		}
 
 		std::string fsSource = loadText(fsPath);
 		FragmentShaderHandle fs = renderDevice->createFragmentShader(fsSource.c_str());
-		assert(fs.isValid());
+
+		if (!fs.isValid())
+		{
+			Logger::errorf("While compiling: %s", fsPath);
+			assert(fs.isValid());
+		}
 		
 		ProgramHandle program = renderDevice->createProgram(vs, fs);
 		assert(program.isValid());
