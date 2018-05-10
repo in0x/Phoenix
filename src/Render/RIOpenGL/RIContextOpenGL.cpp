@@ -11,7 +11,9 @@ namespace Phoenix
 {
 	RIContextOpenGL::RIContextOpenGL(const RIOpenGLResourceStore* resources)
 		: m_resources(resources)
+		, m_maxTextureUnits(0)
 	{
+		m_maxTextureUnits = getMaxTextureUnits();
 	}
 
 	GLenum toGlPrimitive(EPrimitive primitive)
@@ -205,7 +207,7 @@ namespace Phoenix
 		}
 
 		assert(glUniform.m_glType == getSamplerType(binding.texturetype));
-		assert(m_boundState.activeTextureCount < getMaxTextureUnits());
+		assert(m_boundState.activeTextureCount < m_maxTextureUnits);
 
 		glActiveTexture(GL_TEXTURE0 + m_boundState.activeTextureCount);
 		glBindTexture(binding.texturetype, binding.texID);

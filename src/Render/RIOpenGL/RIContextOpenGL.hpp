@@ -73,5 +73,7 @@ namespace Phoenix
 			const GlProgram*	program = nullptr;
 			uint8_t activeTextureCount = 0;
 		} m_boundState;
+
+		uint32_t m_maxTextureUnits;
 	};
 }

@@ -55,7 +55,7 @@ const char* getGlErrorString(bool& bErrorOccured)
 	}
 }
 
-#define PHI_SLOW_GL_ERROR_CHECK 1
+#define PHI_SLOW_GL_ERROR_CHECK 0
 
 bool checkGlErrorOccured()
 {
