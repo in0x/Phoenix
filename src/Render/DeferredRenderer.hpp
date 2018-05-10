@@ -62,7 +62,8 @@ namespace Phoenix
 			UniformHandle modelTf;
 			UniformHandle viewTf;
 			UniformHandle projTf;
-
+			UniformHandle modelViewTf;
+			UniformHandle normalTf;
 			UniformHandle lightDirEye;
 			UniformHandle lightColor;
 

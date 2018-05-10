@@ -14,9 +14,7 @@ namespace Phoenix
 	public:
 		MatrixData<3> m_data;
 
-		constexpr Matrix3()
-			: m_data(MatrixData<3>())
-		{}
+		Matrix3() = default;
 
 		Matrix3(float m00, float m01, float m02,
 			float m10, float m11, float m12,

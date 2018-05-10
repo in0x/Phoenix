@@ -4,6 +4,8 @@
 #include <Core/Mesh.hpp>
 #include <Core/Logger.hpp>
 
+#include <Math/Matrix3.hpp>
+
 #include <Render/RIDevice.hpp>
 #include <Render/RIContext.hpp>
 
@@ -55,6 +57,9 @@ namespace Phoenix
 		m_uniforms.viewTf = renderDevice->createUniform("viewTf", EUniformType::Mat4);
 		m_uniforms.projTf = renderDevice->createUniform("projectionTf", EUniformType::Mat4);
  
+		m_uniforms.modelViewTf = renderDevice->createUniform("modelViewTf", EUniformType::Mat4);
+		m_uniforms.normalTf = renderDevice->createUniform("normalTf", EUniformType::Mat3);
+
 		m_uniforms.lightDirEye = renderDevice->createUniform("lightDirectionEye", EUniformType::Vec3);
 		m_uniforms.lightColor = renderDevice->createUniform("lightColor", EUniformType::Vec3);
 
@@ -93,7 +98,6 @@ namespace Phoenix
 		m_context->setDepthWrite(EDepth::Enable);
 		m_context->setBlendState(BlendState(EBlend::Disable));
 		m_context->bindShaderProgram(m_gBufferProgram);
-		m_context->bindUniform(m_uniforms.viewTf, &m_viewMat);
 		m_context->bindUniform(m_uniforms.projTf, &m_projMat);
 	}
 
@@ -109,7 +113,12 @@ namespace Phoenix
 
 	void DeferredRenderer::drawStaticMesh(const StaticMesh& mesh, const Matrix4& transform)
 	{
-		m_context->bindUniform(m_uniforms.modelTf, &transform);
+		Matrix4 modelViewTf = m_viewMat * transform;
+		m_context->bindUniform(m_uniforms.modelViewTf, &modelViewTf);
+
+		Matrix3 normalTf(modelViewTf.asMatrix3());
+		normalTf.transposeSelf().inverseSelf();
+		m_context->bindUniform(m_uniforms.normalTf, &normalTf);
 
 		size_t materialIdx = 0;
 

@@ -5,8 +5,8 @@ layout (location = 1) in vec3 normal;
 layout (location = 2) in vec2 texcoord;
 layout (location = 3) in vec4 tangent; // Handedness in w, used to calc bitangent
 
-uniform mat4 modelTf;
-uniform mat4 viewTf;
+uniform mat4 modelViewTf;
+uniform mat3 normalTf;
 uniform mat4 projectionTf;
 
 out VS_OUT
@@ -19,9 +19,6 @@ out VS_OUT
 
 void main()
 {
-	mat4 modelViewTf = viewTf * modelTf;
-	mat3 normalTf = inverse(transpose(mat3(modelViewTf)));
-
 	vs_out.viewNormal = vec4(normalTf * normal, 0.0);
 	vs_out.viewPosition = modelViewTf * vec4(position, 1.0);
 	vs_out.uv = texcoord;
