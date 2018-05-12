@@ -49,8 +49,8 @@ namespace Phoenix
 
 		RenderTargetHandle m_gBuffer;
 		Texture2DHandle m_kDiffuseDepthTex;
-		Texture2DHandle m_kSpecularTex;
-		Texture2DHandle m_normalSpecExpTex;
+		Texture2DHandle m_MetallicTex;
+		Texture2DHandle m_normalRoughnessTex;
 		Texture2DHandle m_depthTex;
 
 		RenderTargetHandle m_backBuffer;
@@ -68,8 +68,8 @@ namespace Phoenix
 			UniformHandle lightColor;
 
 			UniformHandle diffuseDepthTexSampler;
-			UniformHandle specularTexSampler;
-			UniformHandle normalSpecExpTexSampler;
+			UniformHandle metallicTexSampler;
+			UniformHandle normalRoughnessSampler;
 			UniformHandle depthTexSampler;
 
 			UniformHandle finalTexSampler;

@@ -16,30 +16,30 @@ namespace Phoenix
 		, m_context(renderContext)
 	{
 		TextureDesc desc;
-		desc.pixelFormat = EPixelFormat::RGBA16F;
 		desc.width = gBufferWidth;
 		desc.height = gBufferHeight;
 
-		m_normalSpecExpTex = renderDevice->createTexture2D(desc);
+		desc.pixelFormat = EPixelFormat::RGBA16F;
+		m_normalRoughnessTex = renderDevice->createTexture2D(desc);
 
 		desc.pixelFormat = EPixelFormat::RGBA16F;
 		m_kDiffuseDepthTex = renderDevice->createTexture2D(desc);
 
 		desc.pixelFormat = EPixelFormat::RGB16F;
-		m_kSpecularTex = renderDevice->createTexture2D(desc);
+		m_MetallicTex = renderDevice->createTexture2D(desc);
 
 		desc.pixelFormat = EPixelFormat::Depth32F;
 		m_depthTex = renderDevice->createTexture2D(desc);
 
-		m_uniforms.normalSpecExpTexSampler = renderDevice->createUniform("normalRGBSpecExpA_tex", EUniformType::Sampler2D);
+		m_uniforms.normalRoughnessSampler = renderDevice->createUniform("normalRGBRoughnessA_tex", EUniformType::Sampler2D);
 		m_uniforms.diffuseDepthTexSampler = renderDevice->createUniform("kDiffuseRGBDepthA_tex", EUniformType::Sampler2D);
-		m_uniforms.specularTexSampler = renderDevice->createUniform("kSpecularRGB_tex", EUniformType::Sampler2D);
+		m_uniforms.metallicTexSampler = renderDevice->createUniform("metallicR_tex", EUniformType::Sampler2D);
 		m_uniforms.depthTexSampler = renderDevice->createUniform("depth_tex", EUniformType::Sampler2D);
 
 		RenderTargetDesc gBufferDesc;
-		gBufferDesc.colorAttachs[RenderTargetDesc::Color0] = m_normalSpecExpTex;
+		gBufferDesc.colorAttachs[RenderTargetDesc::Color0] = m_normalRoughnessTex;
 		gBufferDesc.colorAttachs[RenderTargetDesc::Color1] = m_kDiffuseDepthTex;
-		gBufferDesc.colorAttachs[RenderTargetDesc::Color2] = m_kSpecularTex;
+		gBufferDesc.colorAttachs[RenderTargetDesc::Color2] = m_MetallicTex;
 		gBufferDesc.depthAttach = m_depthTex;
 
 		m_gBuffer = renderDevice->createRenderTarget(gBufferDesc);
@@ -165,9 +165,9 @@ namespace Phoenix
 
 		m_context->bindUniform(m_uniforms.projTf, &m_projMat);
 
-		m_context->bindTexture(m_uniforms.normalSpecExpTexSampler, m_normalSpecExpTex);
+		m_context->bindTexture(m_uniforms.normalRoughnessSampler, m_normalRoughnessTex);
 		m_context->bindTexture(m_uniforms.diffuseDepthTexSampler, m_kDiffuseDepthTex);
-		m_context->bindTexture(m_uniforms.specularTexSampler, m_kSpecularTex);
+		m_context->bindTexture(m_uniforms.metallicTexSampler, m_MetallicTex);
 	}
 
 	void DeferredRenderer::drawDirectionalLight(Vec3 direction, Vec3 color)

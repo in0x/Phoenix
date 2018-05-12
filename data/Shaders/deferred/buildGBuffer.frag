@@ -13,26 +13,22 @@ in VS_OUT
 	vec2 uv;
 } fs_in;
 
-layout (location = 0) out vec4 normalRGBSpecExpA;
+layout (location = 0) out vec4 normalRGBRoughnessA;
 layout (location = 1) out vec4 kDiffuseRGBDepthA;
-layout (location = 2) out vec3 kSpecularRGB;
+layout (location = 2) out vec3 metallicR;
 
 void main()
 {
-	//normalRGBSpecExpA.xyz = normalize(fs_in.viewNormal.xyz);
-	
 	vec3 normal = texture(matNormalTex, fs_in.uv).xyz;
 	normal = normalize(normal * 2.0 - 1.0);
-	normalRGBSpecExpA.xyz = normalize(fs_in.tangentToViewTf * normal);
+	normal = fs_in.tangentToViewTf * normal;
+	normal = normalize(normal + fs_in.viewNormal.xyz);
 	
-	normalRGBSpecExpA.w = 1.0;
+	normalRGBRoughnessA.xyz = normal;
+	normalRGBRoughnessA.w = texture(matRoughnessTex, fs_in.uv).x;
 	
 	kDiffuseRGBDepthA.xyz = texture(matDiffuseTex, fs_in.uv).xyz;
 	kDiffuseRGBDepthA.w = fs_in.viewPosition.z;
 	
-	kDiffuseRGBDepthA.xyz += texture(matRoughnessTex, fs_in.uv).xyz * 0.000001;
-	kDiffuseRGBDepthA.xyz += texture(matMetallicTex, fs_in.uv).xyz * 0.000001;
-	kDiffuseRGBDepthA.xyz += texture(matNormalTex, fs_in.uv).xyz * 0.000001;
-	
-	kSpecularRGB = vec3(0.0, 0.0, 0.0);
+	metallicR = texture(matMetallicTex, fs_in.uv).xyz;
 }
