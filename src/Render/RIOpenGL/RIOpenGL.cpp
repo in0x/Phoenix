@@ -28,7 +28,11 @@ namespace Phoenix
 		
 		bool init(const WindowConfig& config)
 		{
-			m_glfwWindow = glfwCreateWindow(config.width, config.height, config.title, nullptr, nullptr);
+			m_glfwWindow = glfwCreateWindow(config.width, 
+											config.height, 
+											config.title,	
+											config.bFullscreen ? glfwGetPrimaryMonitor() : nullptr,
+											nullptr);
 
 			if (m_glfwWindow)
 			{
@@ -214,7 +218,7 @@ namespace Phoenix
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
+		
 		g_impl = new RIOpenGLImpl;
 		return true;
 	}

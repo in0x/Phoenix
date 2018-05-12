@@ -52,6 +52,12 @@ namespace Phoenix
 	{
 		return v < lo ? lo : hi < v ? hi : v;
 	}
+
+	template <typename T>
+	T lerp(T a, T b, float f)
+	{
+		return (1.0f - f) * a + f * b;
+	}
 	
 	Matrix4 lookAtRH(Vec3& cameraPos, Vec3& target, Vec3& up);
 	Matrix4 perspectiveRH(float yFOV, float aspect, float near, float far);		

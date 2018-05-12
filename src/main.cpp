@@ -44,7 +44,9 @@ namespace Phoenix
 	{
 		EntityHandle entity = world->createEntity();
 		world->addComponent<CStaticMesh>(entity, std::move(mesh));
-		world->addComponent<CTransform>(entity);
+		CTransform* tf = world->addComponent<CTransform>(entity);
+		tf->m_scale = 0.1f;
+		tf->recalculate();
 		return entity;
 	}
 }
@@ -133,8 +135,8 @@ void run()
 #endif // PHI_LOAD
 
 	EntityHandle light = world.createEntity();
-	//world.addComponent<CDirectionalLight>(light, Vec3(-0.5f, -0.5f, -0.5f), Vec3(5.0f, 5.0f, 5.0f));
-	world.addComponent<CDirectionalLight>(light, Vec3(0.0f, -1.0f, 0.0f), Vec3(5.0f, 5.0f, 5.0f));
+	world.addComponent<CDirectionalLight>(light, Vec3(-0.5f, -0.5f, -0.5f), Vec3(5.0f, 5.0f, 5.0f));
+	//world.addComponent<CDirectionalLight>(light, Vec3(0.0f, -1.0f, 0.0f), Vec3(5.0f, 5.0f, 5.0f));
 
 	using Clock = std::chrono::high_resolution_clock;
 	using pointInTime = std::chrono::time_point<std::chrono::high_resolution_clock>;
@@ -149,9 +151,9 @@ void run()
 	Camera camera;
 
 	Vec2 cameraVelocity;
-	float cameraAccel = 30.0f;
+	float cameraAccel = 15.0f;
 	float cameraDrag = 0.9f;
-	float cameraVelMax = 200.0f;
+	float cameraVelMax = 50.0f;
 
 	while (!gameWindow->wantsToClose())
 	{
