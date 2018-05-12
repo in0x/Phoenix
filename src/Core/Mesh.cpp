@@ -252,21 +252,23 @@ namespace Phoenix
 	{
 		size_t matIdx = 0;
 		const char* defaultWhiteTexPath = "Textures/Default1x1White.tga";
+		const char* defaultBlackTexPath = "Textures/Default1x1Black.tga";
 
-		Texture2D* defaultTex = assets->getTexture(defaultWhiteTexPath);
+		Texture2D* defaultTexWhite = assets->getTexture(defaultWhiteTexPath);
+		Texture2D* defaultTexBlack = assets->getTexture(defaultBlackTexPath);
 
 		for (const MaterialImport& matImport : import.m_matImports)
 		{
 			outMesh->m_vertexFrom[matIdx] = matImport.m_vertexFrom;
 			Material* material = &outMesh->m_materials[matIdx];
 
-			material->m_diffuseTex = !matImport.m_diffuseTex.empty() ? assets->getTexture((mtlPath + matImport.m_diffuseTex).c_str(), getDiffuseHints()) : defaultTex;
+			material->m_diffuseTex = !matImport.m_diffuseTex.empty() ? assets->getTexture((mtlPath + matImport.m_diffuseTex).c_str(), getDiffuseHints()) : defaultTexWhite;
 			
-			material->m_roughnessTex = !matImport.m_roughnessTex.empty() ? assets->getTexture((mtlPath + matImport.m_roughnessTex).c_str(), getRoughnessHints()) : defaultTex;
+			material->m_roughnessTex = !matImport.m_roughnessTex.empty() ? assets->getTexture((mtlPath + matImport.m_roughnessTex).c_str(), getRoughnessHints()) : defaultTexWhite;
 
-			material->m_metallicTex = !matImport.m_metallicTex.empty() ? assets->getTexture((mtlPath + matImport.m_metallicTex).c_str(), getMetallicHints()) : defaultTex;
+			material->m_metallicTex = !matImport.m_metallicTex.empty() ? assets->getTexture((mtlPath + matImport.m_metallicTex).c_str(), getMetallicHints()) : defaultTexBlack;
 			
-			material->m_normalTex = !matImport.m_normalTex.empty() ? assets->getTexture((mtlPath + matImport.m_normalTex).c_str(), getNormalsHints()) : defaultTex;
+			material->m_normalTex = !matImport.m_normalTex.empty() ? assets->getTexture((mtlPath + matImport.m_normalTex).c_str(), getNormalsHints()) : defaultTexBlack;
 			
 			material->m_name = matImport.m_name;
 
@@ -284,10 +286,10 @@ namespace Phoenix
 			outMesh->m_vertexFrom[matIdx] = 0;
 			Material* material = &outMesh->m_materials[matIdx];
 
-			material->m_diffuseTex = defaultTex;			
-			material->m_roughnessTex = defaultTex;
-			material->m_metallicTex = defaultTex;
-			material->m_normalTex = defaultTex;
+			material->m_diffuseTex = defaultTexWhite;			
+			material->m_roughnessTex = defaultTexWhite;
+			material->m_metallicTex = defaultTexBlack;
+			material->m_normalTex = defaultTexBlack;
 		
 			material->m_name = "defaultMaterial";
 
