@@ -15,11 +15,11 @@ in VS_OUT
 
 layout (location = 0) out vec4 normalRGBRoughnessA;
 layout (location = 1) out vec4 kDiffuseRGBDepthA;
-layout (location = 2) out vec3 metallicR;
+layout (location = 2) out vec3 metallicRGB;
 
 void main()
 {
-	vec3 normal = texture(matNormalTex, fs_in.uv).xyz;
+	vec3 normal = normalize(texture(matNormalTex, fs_in.uv).xyz);
 	normal = normalize(normal * 2.0 - 1.0);
 	normal = fs_in.tangentToViewTf * normal;
 	normal = normalize(normal + fs_in.viewNormal.xyz);
@@ -30,5 +30,5 @@ void main()
 	kDiffuseRGBDepthA.xyz = texture(matDiffuseTex, fs_in.uv).xyz;
 	kDiffuseRGBDepthA.w = fs_in.viewPosition.z;
 	
-	metallicR = texture(matMetallicTex, fs_in.uv).xyz;
+	metallicRGB = texture(matMetallicTex, fs_in.uv).xyz;
 }

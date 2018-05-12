@@ -135,7 +135,7 @@ void run()
 #endif // PHI_LOAD
 
 	EntityHandle light = world.createEntity();
-	world.addComponent<CDirectionalLight>(light, Vec3(-0.5f, -0.5f, -0.5f), Vec3(5.0f, 5.0f, 5.0f));
+	world.addComponent<CDirectionalLight>(light, Vec3(-0.5f, -0.5f, -0.5f), Vec3(253.0 / 255.0, 230.0 / 255.0, 155.0 / 255.0) * 5.0);
 	//world.addComponent<CDirectionalLight>(light, Vec3(0.0f, -1.0f, 0.0f), Vec3(5.0f, 5.0f, 5.0f));
 
 	using Clock = std::chrono::high_resolution_clock;
@@ -152,7 +152,7 @@ void run()
 
 	Vec2 cameraVelocity;
 	float cameraAccel = 15.0f;
-	float cameraDrag = 0.9f;
+	float cameraDrag = 0.85f;
 	float cameraVelMax = 50.0f;
 
 	while (!gameWindow->wantsToClose())

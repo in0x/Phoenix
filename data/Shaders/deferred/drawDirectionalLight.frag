@@ -2,7 +2,7 @@
 
 uniform sampler2D normalRGBRoughnessA_tex;
 uniform sampler2D kDiffuseRGBDepthA_tex;
-uniform sampler2D metallicR_tex;
+uniform sampler2D metallicRGB_tex;
 
 uniform vec3 lightDirectionEye;
 uniform vec3 lightColor;
@@ -12,26 +12,88 @@ in vec4 rayEye;
 
 out vec4 color;
 
+const float PI = 3.14159265359;
+
+vec3 fresnelSchlick(float cosTheta, vec3 f0)
+{
+	return f0 + (1.0 - f0) * pow(1.0 - cosTheta, 5.0);
+}
+
+float normalDistGGX(vec3 N, vec3 H, float roughness)
+{
+	float alpha2 = roughness * roughness;
+	alpha2 = alpha2 * alpha2;
+	
+	float n_dot_h2 = max(dot(N, H), 0.0);
+	n_dot_h2 = n_dot_h2 * n_dot_h2;
+	
+	float denom = (n_dot_h2 * (alpha2 - 1.0) + 1.0);
+	denom = PI * denom * denom;
+	
+	return alpha2 / denom;
+}
+
+float geometrySchlickGGX(float n_dot_v, float roughness)
+{
+	float r = (roughness + 1.0);
+	float k = (r * r) / 8.0;
+	
+	float denom = n_dot_v * (1.0 - k) + k;
+	
+	return n_dot_v / denom;
+}
+
+float geometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
+{
+	float n_dot_v = max(dot(N, V), 0.0);
+	float n_dot_l = max(dot(N, L), 0.0);
+	
+	float ggx1 = geometrySchlickGGX(n_dot_l, roughness);
+	float ggx2 = geometrySchlickGGX(n_dot_v, roughness);
+	
+	return ggx1 * ggx2;
+}
+
 void main()
 {
 	vec4 diffsuseDepth = texture(kDiffuseRGBDepthA_tex, texCoord);
 	vec4 normalRoughness = texture(normalRGBRoughnessA_tex, texCoord);
 	
 	float zEye = diffsuseDepth.w;
-	float specExp = normalRoughness.w;
-	
 	vec4 positionEye = rayEye * zEye;
 	vec3 normalEye = normalRoughness.xyz;
-	vec3 kDiffuse = diffsuseDepth.xyz;
-	vec3 kSpecular = texture(metallicR_tex, texCoord).xyz;
-
+	
 	vec3 N = normalize(normalEye);
 	vec3 V = normalize(-positionEye.xyz);
 	vec3 L = normalize(-lightDirectionEye);
 	vec3 H = normalize(V + L);
 	
-	float cosTh = max(dot(N, H), 0.0);
-	float cosTi = max(dot(N, L), 0.0);
+	float cosTheta = max(dot(H, V), 0.0);
 	
-	color = vec4(((kDiffuse + kSpecular * pow(cosTh, specExp)) * lightColor * cosTi), 1.0);
+	vec3 radiance = lightColor * cosTheta;
+	
+	vec3 kDiffuse = diffsuseDepth.xyz;
+	float roughness = normalRoughness.w;
+	vec3 metallic = texture(metallicRGB_tex, texCoord).xyz;
+
+	vec3 f0 = vec3(0.04);	
+	f0 = mix(f0, kDiffuse, metallic);
+	vec3 fresnel = fresnelSchlick(cosTheta, f0);
+	
+	float normalDist = normalDistGGX(N, H, roughness);
+	float geometry = geometrySmith(N, V, L, roughness);
+	
+	vec3 numerator = normalDist * geometry * fresnel;
+	float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0);
+	vec3 specularBRDF = numerator / max(denominator, 0.001);
+	
+	vec3 ks = fresnel;
+	vec3 kd = vec3(1.0) - ks;
+	
+	kd *= 1.0 - metallic;
+	
+	float n_dot_l = max(dot(N, L), 0.0);
+	
+	vec3 lightOut = (kd * kDiffuse / PI + specularBRDF) * radiance * n_dot_l;
+	color = vec4(lightOut, 1.0);
 }
