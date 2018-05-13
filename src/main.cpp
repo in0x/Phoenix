@@ -205,20 +205,20 @@ void run()
 
 		MouseState mouse = gameWindow->m_mouseState;
 
-		if (mouse.m_x != prevMouseX || mouse.m_y != prevMouseY)
+		if (mouse.m_buttonStates[MouseState::Left] == Input::Press)
 		{
-			if (mouse.m_buttonStates[MouseState::Left] == Input::Press)
-			{
-				float dx = -radians(4.0f * config.width * ((mouse.m_x - prevMouseX) / config.width) * dt);
-				float dy = -radians(4.0f * config.height * ((mouse.m_y - prevMouseY) / config.height) * dt);
+			float dx = mouse.m_x - prevMouseX;
+			float dy = mouse.m_y - prevMouseY;
 
-				camera.yaw(dx);
-				camera.pitch(dy);
-			}
+			dx = -radians(dx / 10.0f);
+			dy = -radians(dy / 10.0f);
 
-			prevMouseX = mouse.m_x;
-			prevMouseY = mouse.m_y;
+			camera.yaw(dx);
+			camera.pitch(dy);
 		}
+
+		prevMouseX = mouse.m_x;
+		prevMouseY = mouse.m_y;
 
 		renderer.setViewMatrix(camera.updateViewMatrix());
 
