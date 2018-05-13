@@ -34,6 +34,8 @@ namespace Phoenix
 		virtual RenderTargetHandle	 createRenderTarget(const RenderTargetDesc& desc) override;
 		
 		virtual UniformHandle		 createUniform(const char* name, EUniformType type) override;
+
+		virtual ConstantBufferHandle createConstantBuffer(const ConstantBufferDesc& desc) override;
 		
 	private:
 		RIOpenGLResourceStore* m_resources;

@@ -1,8 +1,6 @@
 #pragma once
 
 #include <stdint.h>
-#include <array>
-
 #include "RIResourceHandles.hpp"
 
 namespace Phoenix
@@ -33,7 +31,7 @@ namespace Phoenix
 
 	// Begin VertexBuffer.h
 
-	enum class EAttributeProperty
+	enum EAttributeProperty
 	{
 		Position,
 		Normal,
@@ -146,7 +144,7 @@ namespace Phoenix
 		}
 
 	private:
-		std::array<VertexAttrib, static_cast<size_t>(EAttributeProperty::Count)> m_attribs;
+		VertexAttrib m_attribs[EAttributeProperty::Count];
 		size_t m_index;
 
 		VertexAttrib* has(EAttributeProperty attribType)
@@ -363,55 +361,49 @@ namespace Phoenix
 		}
 	};
 
-	struct UniformInfo;
-
-	class PipelineState
+	enum class ECBType
 	{
-
+		Int,
+		Float,
+		Vec3,
+		Vec4,
+		Mat3,
+		Mat4,
+		Sampler1D,
+		Sampler2D,
+		SamplerCube
 	};
 
-	//struct StateGroup
-	//{
-	//	EBlend::Type blend;
-	//	ERaster::Type raster;
-	//	EDepth::Type depth;
-	//	EStencil::Type stencil;
-	//	TextureHandle* textures;
-	//	size_t textureCount;
-	//	UniformHandle* uniforms;
-	//	size_t uniformCount;
-	//	ProgramHandle program;
-	//};
+	struct CBMember
+	{
+		const char* name;
+		ECBType type;
+		uint32_t arrayLen;
+	};
 
-	//struct CStateGroup
-	//{
-	//	EBlend::Type blend;
-	//	ERaster::Type raster;
-	//	EDepth::Type depth;
-	//	EStencil::Type stencil;
-	//	ProgramHandle program;
-	//	UniformInfo* uniforms;
-	//	size_t uniformCount;
-	//	UniformInfo* textureLocations;
-	//	TextureHandle* textures;
-	//	size_t textureCount;
-	//};
+	struct ConstantBufferDesc
+	{
+		enum { MAX_MEMBERS = 32 };
+		
+		ConstantBufferDesc()
+			: numMembers(0)
+			, arrayLen(1)
+		{}
+		
+		ConstantBufferDesc& add(const CBMember& next)
+		{
+			if (numMembers < MAX_MEMBERS)
+			{
+				members[numMembers] = next;
+				numMembers++;
+			}			
 
-	//typedef StateGroup* StateGroupStack;
-	//// Somehow make sure that when the user gets a stategroup stack one default is there per default
+			return *this;
+		}
 
-	//// Compiles all StateGroups into one complete StateGroup. Interpretation
-	//// walks from left to right -> A setting at the front overrides a setting at the back.
-	//inline StateGroup compile(StateGroupStack states, uint32_t stateCount)
-	//{
-	//	StateGroup state;
-
-	//	for (size_t i = 0; i < stateCount; ++i)
-	//	{
-	//		const StateGroup& current = states[i];
-	//		// Set each setting if not set already;
-	//	}
-
-	//	return state;
-	//}
+		const char* name;
+		uint32_t numMembers;
+		CBMember members[MAX_MEMBERS];
+		uint32_t arrayLen;
+	};
 }

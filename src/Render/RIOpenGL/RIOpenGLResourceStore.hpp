@@ -19,5 +19,6 @@ namespace Phoenix
 		RIResourceContainer<GlFramebuffer,	  RenderTargetHandle,   256 > m_framebuffers;
 		RIResourceContainer<RIUniform,		  UniformHandle,		2048> m_uniforms;
 		RIResourceContainer<GlTextureCube,	  TextureCubeHandle,	256>  m_textureCubes;
+		RIResourceContainer<GlConstantBuffer, ConstantBufferHandle, 1024> m_constantBuffers;
 	};
 }

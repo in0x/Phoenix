@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "RIOpenGLResourceStore.hpp"
 #include "RIDeviceOpenGL.hpp"
@@ -200,20 +200,15 @@ namespace Phoenix
 
 	void registerActiveUniforms(GlProgram& program)
 	{
-		GLint count;
-		GLint size;
+		GLint count = 0;
+		GLint size = 0;
 		GLenum type;
 
 		GLint bufSize = 0;
 		glGetProgramiv(program.m_id, GL_ACTIVE_UNIFORM_MAX_LENGTH, &bufSize);
 
-		if (0 == bufSize)
-		{
-			return;
-		}
-
 		std::vector<GLchar> name(bufSize);
-		GLsizei length;
+		GLsizei length = 0;
 
 		glGetProgramiv(program.m_id, GL_ACTIVE_UNIFORMS, &count);
 
@@ -222,6 +217,22 @@ namespace Phoenix
 			glGetActiveUniform(program.m_id, (GLuint)i, bufSize, &length, &size, &type, name.data());
 			GLint location = glGetUniformLocation(program.m_id, name.data());
 			program.m_activeUniforms.registerUniform(name.data(), program.m_id, location, size, type);
+		}
+
+		glGetProgramiv(program.m_id, GL_ACTIVE_UNIFORM_BLOCKS, &count);
+	
+		glGetProgramiv(program.m_id, GL_ACTIVE_UNIFORM_BLOCK_MAX_NAME_LENGTH, &bufSize);
+		name.clear();
+		name.resize(bufSize);
+		
+		GLint blockSize = 0;
+
+		for (GLint i = 0; i < count; ++i)
+		{
+			glGetActiveUniformBlockName(program.m_id, i, bufSize, &length, name.data());
+			glGetActiveUniformBlockiv(program.m_id, i, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
+
+			program.m_activeUniforms.registerUniform(name.data(), program.m_id, i, blockSize, GL_UNIFORM_BUFFER); 
 		}
 	}
 
@@ -601,4 +612,59 @@ namespace Phoenix
 		return true;
 	}
 
+	size_t cbTypeToSize(ECBType type)
+	{
+		// These sizes probably dont work by themselves since we need to factor in padding
+		switch (type)
+		{
+		case ECBType::Vec4:
+			return 32 * 4;
+		case ECBType::Mat4:
+			return 32 * 4 * 4;
+		case ECBType::Int:
+			return 32;
+		case ECBType::Vec3:
+			return 32 * 3;
+		case ECBType::Mat3:
+			return 32 * 3 * 3;
+		case ECBType::Float:
+			return 32;
+		default:
+			assert(false);
+			return 0;
+		}
+	}
+	
+	ConstantBufferHandle RIDeviceOpenGL::createConstantBuffer(const ConstantBufferDesc& desc)
+	{
+		ConstantBufferHandle handle = m_resources->m_constantBuffers.allocateResource();
+		GlConstantBuffer* cb = m_resources->m_constantBuffers.getResource(handle);
+
+		cb->m_desc = desc;
+
+		size_t bufferSizeBytes = 0;
+
+		for (size_t i = 0; i < desc.numMembers; ++i)
+		{
+			const CBMember& member = desc.members[i];
+
+			bufferSizeBytes += cbTypeToSize(member.type) * member.arrayLen;
+		}
+
+		bufferSizeBytes *= desc.arrayLen;	
+		
+		glGenBuffers(1, &cb->m_id);
+		glBindBuffer(GL_UNIFORM_BUFFER, cb->m_id);
+		glBufferData(GL_UNIFORM_BUFFER,	bufferSizeBytes, nullptr, GL_STATIC_DRAW);
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+		if (checkGlErrorOccured())
+		{
+			Logger::error("An error occured during ConstantBuffer creation.");
+			m_resources->m_constantBuffers.destroyResource(handle);
+			handle.invalidate();
+		}
+
+		return handle;
+	}
 }

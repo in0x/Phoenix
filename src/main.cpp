@@ -111,8 +111,8 @@ void run()
 	renderContext->setDepthTest(EDepth::Enable);
 
 	WindowConfig config;
-	config.width = 1280;
-	config.height = 720;
+	config.width = 1600;
+	config.height = 900;
 	config.title = "Phoenix";
 	config.bFullscreen = false;
 
@@ -172,6 +172,7 @@ void run()
 
 	EntityHandle light = world.createEntity();
 	world.addComponent<CDirectionalLight>(light, Vec3(-0.5f, 0.5f, -0.5f), Vec3(253.0 / 255.0, 230.0 / 255.0, 155.0 / 255.0) * 5.0);
+	//world.addComponent<CDirectionalLight>(light, Vec3(0, 0, -1.0f), Vec3(253.0 / 255.0, 230.0 / 255.0, 155.0 / 255.0) * 5.0);
 	//world.addComponent<CDirectionalLight>(light, Vec3(0.0f, -1.0f, 0.0f), Vec3(5.0f, 5.0f, 5.0f));
 
 	//EntityHandle light1 = world.createEntity();
@@ -204,6 +205,24 @@ void run()
 
 	DirLightBuffer dlBuffer(MAX_DIR_LIGHTS);
 
+	ConstantBufferDesc cbDesc;
+	cbDesc.name = "LightData";
+
+	const uint32_t maxNumDirLights = 32;
+
+	cbDesc.add({
+		"directionEye",
+		ECBType::Vec3,
+		maxNumDirLights
+	}).add({
+		"color",
+		ECBType::Vec3,
+		maxNumDirLights
+	}).add({
+		"numLights",
+		ECBType::Int,
+		1
+	});
 	while (!gameWindow->wantsToClose())
 	{
 		Platform::pollEvents();

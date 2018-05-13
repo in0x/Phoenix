@@ -83,4 +83,14 @@ namespace Phoenix
 		GLuint m_id;
 		uint8_t m_colorAttachCount;
 	};
+
+	class GlConstantBuffer : public RIConstantBuffer
+	{
+	public:
+		GlConstantBuffer()
+			: m_id(0)
+		{}
+	
+		GLuint m_id;
+	};
 }

@@ -31,5 +31,7 @@ namespace Phoenix
 		virtual RenderTargetHandle	 createRenderTarget(const RenderTargetDesc& desc) = 0;
 		
 		virtual UniformHandle		 createUniform(const char* name, EUniformType type) = 0;
+
+		virtual ConstantBufferHandle createConstantBuffer(const ConstantBufferDesc& desc) = 0;
 	};
 }

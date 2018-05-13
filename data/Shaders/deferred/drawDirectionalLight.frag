@@ -10,6 +10,12 @@ uniform vec3 dl_directionEye[MAX_DIR_LIGHTS];
 uniform vec3 dl_color[MAX_DIR_LIGHTS];
 uniform int  dl_numLights;
 
+const int MAX_DIR_LIGHTS = 32;
+
+uniform vec3 dl_directionEye[MAX_DIR_LIGHTS];
+uniform vec3 dl_color[MAX_DIR_LIGHTS];
+uniform int  dl_numLights;
+
 in vec2 texCoord;
 in vec4 rayEye;
 

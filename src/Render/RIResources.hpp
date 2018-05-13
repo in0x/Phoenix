@@ -81,7 +81,7 @@ namespace Phoenix
 	class RIRenderTarget : public RIResource
 	{
 	};
-	
+
 	class RIUniform : public RIResource
 	{
 	public:
@@ -90,5 +90,11 @@ namespace Phoenix
 		char m_debugName[MAX_NAME_LENGTH];
 		EUniformType m_type;
 		FNVHash m_nameHash;
+	};
+
+	class RIConstantBuffer : public RIResource
+	{
+	public:
+		ConstantBufferDesc m_desc;
 	};
 }
