@@ -74,6 +74,10 @@ namespace Phoenix
 		m_uniforms.matRoughnessSampler = renderDevice->createUniform("matRoughnessTex", EUniformType::Sampler2D);
 		m_uniforms.matMetallicSampler = renderDevice->createUniform("matMetallicTex", EUniformType::Sampler2D);
 		m_uniforms.matNormalSampler = renderDevice->createUniform("matNormalTex", EUniformType::Sampler2D);
+
+		m_dirLights.directions = renderDevice->createUniform("dl_directionEye[0]", EUniformType::Vec3);
+		m_dirLights.colors = renderDevice->createUniform("dl_color[0]", EUniformType::Vec3);
+		m_dirLights.numLights = renderDevice->createUniform("dl_numLights", EUniformType::Int);
 	}
 
 	void DeferredRenderer::setViewMatrix(const Matrix4& view)
@@ -170,12 +174,16 @@ namespace Phoenix
 		m_context->bindTexture(m_uniforms.metallicTexSampler, m_MetallicTex);
 	}
 
-	void DeferredRenderer::drawDirectionalLight(Vec3 direction, Vec3 color)
+	void DeferredRenderer::runDirectionalLightPass(Vec3* directions, Vec3* colors, size_t numLights)
 	{
-		Vec3 lightDirEye = m_viewMat * direction;
+		for (size_t i = 0; i < numLights; ++i)
+		{
+			directions[i] *= m_viewMat;
+		}
 
-		m_context->bindUniform(m_uniforms.lightDirEye, &lightDirEye);
-		m_context->bindUniform(m_uniforms.lightColor, &color);
+		m_context->bindUniform(m_dirLights.directions, directions);
+		m_context->bindUniform(m_dirLights.colors, colors);
+		m_context->bindUniform(m_dirLights.numLights, &numLights);
 		m_context->drawLinear(EPrimitive::TriangleStrips, 4, 0);
 	}
 

@@ -13,7 +13,7 @@ namespace Phoenix
 	
 	struct StaticMesh;
 	struct Material;
-
+	
 	class DeferredRenderer
 	{
 	public:
@@ -37,8 +37,8 @@ namespace Phoenix
 		// the first light.
 		void setupDirectionalLightPass();
 
-		// Evaluates the shading equation for this light using the values written into the GBuffer.
-		void drawDirectionalLight(Vec3 direction, Vec3 color);
+		// Evaluates the shading equation for these lights using the values written into the GBuffer.
+		void runDirectionalLightPass(Vec3* directions, Vec3* colors, size_t numLights);
 
 		// Applies gamma correction to the final color values and copies them into the default framebuffer. 
 		void copyFinalColorToBackBuffer();
@@ -56,7 +56,6 @@ namespace Phoenix
 		RenderTargetHandle m_backBuffer;
 		Texture2DHandle m_kFinalTex;
 
-		// NOTE(Phil): I want to replace these groups of uniforms with constant buffers eventually.
 		struct Uniforms
 		{
 			UniformHandle modelTf;
@@ -79,6 +78,13 @@ namespace Phoenix
 			UniformHandle matMetallicSampler;
 			UniformHandle matNormalSampler;
 		} m_uniforms;
+
+		struct DirectionalLightUniforms
+		{
+			UniformHandle directions;
+			UniformHandle colors;
+			UniformHandle numLights;
+		} m_dirLights;
 
 		ProgramHandle m_gBufferProgram;
 		ProgramHandle m_ambientLightProgram;

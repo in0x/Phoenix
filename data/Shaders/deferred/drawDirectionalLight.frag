@@ -4,8 +4,11 @@ uniform sampler2D normalRGBRoughnessA_tex;
 uniform sampler2D kDiffuseRGBDepthA_tex;
 uniform sampler2D metallicR_tex;
 
-uniform vec3 lightDirectionEye;
-uniform vec3 lightColor;
+const int MAX_DIR_LIGHTS = 32;
+
+uniform vec3 dl_directionEye[MAX_DIR_LIGHTS];
+uniform vec3 dl_color[MAX_DIR_LIGHTS];
+uniform int  dl_numLights;
 
 in vec2 texCoord;
 in vec4 rayEye;
@@ -65,35 +68,42 @@ void main()
 	
 	vec3 N = normalize(normalEye);
 	vec3 V = normalize(-positionEye.xyz);
-	vec3 L = normalize(lightDirectionEye);
-	vec3 H = normalize(V + L);
 	
-	float cosTheta = max(dot(H, V), 0.0);
+	vec3 lightOut = vec3(0.0);
 	
-	vec3 radiance = lightColor * cosTheta;
+	for (int i = 0; i < dl_numLights; i++)
+	{
+		vec3 L = normalize(-dl_directionEye[i]);
+		vec3 H = normalize(V + L);
 	
-	vec3 kDiffuse = diffsuseDepth.xyz;
-	float roughness = normalRoughness.w;
-	float metallic = texture(metallicR_tex, texCoord).x;
+		float cosTheta = max(dot(H, V), 0.0);
+		
+		vec3 radiance = dl_color[i] * cosTheta;
+		
+		vec3 kDiffuse = diffsuseDepth.xyz;
+		float roughness = normalRoughness.w;
+		float metallic = texture(metallicR_tex, texCoord).x;
+		
+		vec3 f0 = vec3(0.04);	
+		f0 = mix(f0, kDiffuse, metallic);
+		vec3 fresnel = fresnelSchlick(cosTheta, f0);
+		
+		float normalDist = normalDistGGX(N, H, roughness);
+		float geometry = geometrySmith(N, V, L, roughness);
+		
+		vec3 numerator = normalDist * geometry * fresnel;
+		float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0);
+		vec3 specularBRDF = numerator / max(denominator, 0.001);
+		
+		vec3 ks = fresnel;
+		vec3 kd = vec3(1.0) - ks;
+		
+		kd *= 1.0 - metallic;
+		
+		float n_dot_l = max(dot(N, L), 0.0);
+		
+		lightOut += (kd * kDiffuse / PI + specularBRDF) * radiance * n_dot_l;
+	}
 	
-	vec3 f0 = vec3(0.04);	
-	f0 = mix(f0, kDiffuse, metallic);
-	vec3 fresnel = fresnelSchlick(cosTheta, f0);
-	
-	float normalDist = normalDistGGX(N, H, roughness);
-	float geometry = geometrySmith(N, V, L, roughness);
-	
-	vec3 numerator = normalDist * geometry * fresnel;
-	float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0);
-	vec3 specularBRDF = numerator / max(denominator, 0.001);
-	
-	vec3 ks = fresnel;
-	vec3 kd = vec3(1.0) - ks;
-	
-	kd *= 1.0 - metallic;
-	
-	float n_dot_l = max(dot(N, L), 0.0);
-	
-	vec3 lightOut = (kd * kDiffuse / PI + specularBRDF) * radiance * n_dot_l;
 	color = vec4(lightOut, 1.0);
 }
