@@ -65,7 +65,7 @@ void main()
 	
 	vec3 N = normalize(normalEye);
 	vec3 V = normalize(-positionEye.xyz);
-	vec3 L = normalize(-lightDirectionEye);
+	vec3 L = normalize(lightDirectionEye);
 	vec3 H = normalize(V + L);
 	
 	float cosTheta = max(dot(H, V), 0.0);
