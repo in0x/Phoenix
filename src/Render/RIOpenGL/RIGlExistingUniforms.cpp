@@ -38,7 +38,7 @@ namespace Phoenix
 			return false;
 		}
 
-		outUniform = m_existingUniforms.at(hashWithProgram);
+		outUniform = uniformIt->second;
 		return true;
 	}
 }
