@@ -21,6 +21,8 @@ namespace Phoenix
 	{
 		static TextureCreationHints hints;
 		hints.colorSpace = ETextrueColorSpace::SRGB;
+		hints.minFilter = ETextureFilter::Linear;
+		hints.magFilter = ETextureFilter::Linear;
 		hints.wrapU = ETextureWrap::Repeat;
 		hints.wrapV = ETextureWrap::Repeat;
 		hints.wrapW = ETextureWrap::Repeat;
