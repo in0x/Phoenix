@@ -152,7 +152,7 @@ namespace Phoenix
 		assert(nullptr != program);
 
 		GlUniform glUniform;
-		bool bIsActive = m_resources->m_actualUniforms.getUniformIfExisting(uniform->m_nameHash, program->m_id, glUniform);
+		bool bIsActive = program->m_activeUniforms.getUniformIfExisting(uniform->m_nameHash, program->m_id, glUniform);
 
 		if (bIsActive)
 		{
@@ -198,7 +198,7 @@ namespace Phoenix
 		const RIUniform* uniform = m_resources->m_uniforms.getResource(samplerHandle);
 
 		GlUniform glUniform;
-		bool bIsActive = m_resources->m_actualUniforms.getUniformIfExisting(uniform->m_nameHash, program->m_id, glUniform);
+		bool bIsActive = program->m_activeUniforms.getUniformIfExisting(uniform->m_nameHash, program->m_id, glUniform);
 
 		if (!bIsActive)
 		{

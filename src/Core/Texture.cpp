@@ -8,6 +8,8 @@
 #include <Render/RIDevice.hpp>
 #include <Render/RIContext.hpp>
 
+#include <algorithm>
+
 #define STB_IMAGE_IMPLEMENTATION
 #include <ThirdParty/STB/stb_image.h>
 

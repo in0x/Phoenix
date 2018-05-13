@@ -2,6 +2,7 @@
 
 #include <assert.h>
 #include <fstream>
+#include <algorithm>
 
 #include <Core/Logger.hpp>
 #include <Render/RIDevice.hpp>

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Render/RIResources.hpp>
+#include "RIGlExistingUniforms.hpp"
 #include "OpenGL.hpp"
 
 namespace Phoenix
@@ -39,6 +40,7 @@ namespace Phoenix
 	{
 	public:
 		GLuint m_id;
+		GlExisitingUniforms m_activeUniforms;
 	};
 
 	struct GlUniform

@@ -11,6 +11,7 @@
 #include <Core/Logger.hpp>
 
 #include <vector>
+#include <algorithm>
 
 namespace Phoenix
 {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <string>
 
 #include <Render/RIDefs.hpp>
 #include <Render/RIResourceHandles.hpp>

@@ -198,7 +198,7 @@ namespace Phoenix
 			|| typeVal == GL_TEXTURE_1D);
 	}
 
-	void registerActiveUniforms(const GlProgram& program, GlExisitingUniforms& uniformstore)
+	void registerActiveUniforms(GlProgram& program)
 	{
 		GLint count;
 		GLint size;
@@ -220,7 +220,7 @@ namespace Phoenix
 		for (GLint i = 0; i < count; ++i)
 		{
 			glGetActiveUniform(program.m_id, (GLuint)i, bufSize, &length, &size, &type, name.data());
-			uniformstore.registerUniform(name.data(), program.m_id, i, size, type);
+			program.m_activeUniforms.registerUniform(name.data(), program.m_id, i, size, type);
 		}
 	}
 
@@ -248,7 +248,7 @@ namespace Phoenix
 		}
 
 		program->m_id = programId;
-		registerActiveUniforms(*program, m_resources->m_actualUniforms);
+		registerActiveUniforms(*program);
 
 		if (checkGlErrorOccured())
 		{

@@ -10,6 +10,7 @@
 #include <Render/RIContext.hpp>
 
 #include <assert.h>
+#include <algorithm>
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <ThirdParty/tinyobj/tiny_obj_loader.h>
