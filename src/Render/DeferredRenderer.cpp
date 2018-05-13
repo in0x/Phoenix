@@ -60,9 +60,6 @@ namespace Phoenix
 		m_uniforms.modelViewTf = renderDevice->createUniform("modelViewTf", EUniformType::Mat4);
 		m_uniforms.normalTf = renderDevice->createUniform("normalTf", EUniformType::Mat3);
 
-		m_uniforms.lightDirEye = renderDevice->createUniform("lightDirectionEye", EUniformType::Vec3);
-		m_uniforms.lightColor = renderDevice->createUniform("lightColor", EUniformType::Vec3);
-
 		m_gBufferProgram = loadShaderProgram(renderDevice, "Shaders/deferred/buildGBuffer.vert", "Shaders/deferred/buildGBuffer.frag");
 		m_ambientLightProgram = loadShaderProgram(renderDevice, "Shaders/deferred/drawAmbientLight.vert", "Shaders/deferred/drawAmbientLight.frag");
 		m_directionaLightProgram = loadShaderProgram(renderDevice, "Shaders/deferred/drawDirectionalLight.vert", "Shaders/deferred/drawDirectionalLight.frag");
