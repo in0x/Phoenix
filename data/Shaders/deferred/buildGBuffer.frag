@@ -15,7 +15,7 @@ in VS_OUT
 
 layout (location = 0) out vec4 normalRGBRoughnessA;
 layout (location = 1) out vec4 kDiffuseRGBDepthA;
-layout (location = 2) out vec3 metallicRGB;
+layout (location = 2) out vec3 metallicR;
 
 void main()
 {
@@ -30,5 +30,5 @@ void main()
 	kDiffuseRGBDepthA.xyz = texture(matDiffuseTex, fs_in.uv).xyz;
 	kDiffuseRGBDepthA.w = fs_in.viewPosition.z;
 	
-	metallicRGB = texture(matMetallicTex, fs_in.uv).xyz;
+	metallicR = texture(matMetallicTex, fs_in.uv).xyz;
 }

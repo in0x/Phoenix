@@ -33,7 +33,7 @@ namespace Phoenix
 
 		m_uniforms.normalRoughnessSampler = renderDevice->createUniform("normalRGBRoughnessA_tex", EUniformType::Sampler2D);
 		m_uniforms.diffuseDepthTexSampler = renderDevice->createUniform("kDiffuseRGBDepthA_tex", EUniformType::Sampler2D);
-		m_uniforms.metallicTexSampler = renderDevice->createUniform("metallicRGB_tex", EUniformType::Sampler2D);
+		m_uniforms.metallicTexSampler = renderDevice->createUniform("metallicR_tex", EUniformType::Sampler2D);
 		m_uniforms.depthTexSampler = renderDevice->createUniform("depth_tex", EUniformType::Sampler2D);
 
 		RenderTargetDesc gBufferDesc;

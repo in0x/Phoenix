@@ -2,7 +2,7 @@
 
 uniform sampler2D normalRGBRoughnessA_tex;
 uniform sampler2D kDiffuseRGBDepthA_tex;
-uniform sampler2D metallicRGB_tex;
+uniform sampler2D metallicR_tex;
 
 uniform vec3 lightDirectionEye;
 uniform vec3 lightColor;
@@ -74,8 +74,8 @@ void main()
 	
 	vec3 kDiffuse = diffsuseDepth.xyz;
 	float roughness = normalRoughness.w;
-	vec3 metallic = texture(metallicRGB_tex, texCoord).xyz;
-
+	float metallic = texture(metallicR_tex, texCoord).x;
+	
 	vec3 f0 = vec3(0.04);	
 	f0 = mix(f0, kDiffuse, metallic);
 	vec3 fresnel = fresnelSchlick(cosTheta, f0);
