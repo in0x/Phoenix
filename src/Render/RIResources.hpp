@@ -85,7 +85,7 @@ namespace Phoenix
 	class RIUniform : public RIResource
 	{
 	public:
-		enum { MAX_NAME_LENGTH = 32 };
+		enum { MAX_NAME_LENGTH = 64 };
 
 		char m_debugName[MAX_NAME_LENGTH];
 		EUniformType m_type;

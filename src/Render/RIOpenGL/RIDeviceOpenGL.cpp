@@ -220,7 +220,8 @@ namespace Phoenix
 		for (GLint i = 0; i < count; ++i)
 		{
 			glGetActiveUniform(program.m_id, (GLuint)i, bufSize, &length, &size, &type, name.data());
-			program.m_activeUniforms.registerUniform(name.data(), program.m_id, i, size, type);
+			GLint location = glGetUniformLocation(program.m_id, name.data());
+			program.m_activeUniforms.registerUniform(name.data(), program.m_id, location, size, type);
 		}
 	}
 
