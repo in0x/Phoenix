@@ -25,12 +25,12 @@ namespace Phoenix
 			return m_bEmpty;
 		}
 
-		uint32_t size() const
+		size_t size() const
 		{
 			return (m_head > m_tail) ? (m_head - m_tail) : (bufferSize - m_tail) + m_head;
 		}
 
-		uint32_t capacity() const
+		size_t capacity() const
 		{
 			return bufferSize;
 		}
