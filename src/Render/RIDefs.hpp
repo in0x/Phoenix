@@ -382,7 +382,6 @@ namespace Phoenix
 
 	struct CBMember
 	{
-		const char* name;
 		ECBType type;
 		uint32_t arrayLen;
 	};
@@ -395,12 +394,12 @@ namespace Phoenix
 			: numMembers(0)
 			, arrayLen(1)
 		{}
-		
-		ConstantBufferDesc& add(const CBMember& next)
+		ConstantBufferDesc& add(ECBType type, uint32_t arraylen = 1)
 		{
 			if (numMembers < MAX_MEMBERS)
 			{
-				members[numMembers] = next;
+				members[numMembers].type = type;
+				members[numMembers].arrayLen = arraylen;
 				numMembers++;
 			}			
 

@@ -205,24 +205,6 @@ void run()
 
 	DirLightBuffer dlBuffer(MAX_DIR_LIGHTS);
 
-	ConstantBufferDesc cbDesc;
-	cbDesc.name = "LightData";
-
-	const uint32_t maxNumDirLights = 32;
-
-	cbDesc.add({
-		"directionEye",
-		ECBType::Vec3,
-		maxNumDirLights
-	}).add({
-		"color",
-		ECBType::Vec3,
-		maxNumDirLights
-	}).add({
-		"numLights",
-		ECBType::Int,
-		1
-	});
 	while (!gameWindow->wantsToClose())
 	{
 		Platform::pollEvents();
