@@ -85,9 +85,9 @@ namespace Phoenix
 	class RIUniform : public RIResource
 	{
 	public:
-		enum { MAX_NAME_LENGTH = 64 };
+		enum { DBG_MAX_NAME_LEN = 64 };
 
-		char m_debugName[MAX_NAME_LENGTH];
+		char m_debugName[DBG_MAX_NAME_LEN];
 		EUniformType m_type;
 		FNVHash m_nameHash;
 	};

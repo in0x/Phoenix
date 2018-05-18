@@ -72,8 +72,8 @@ namespace Phoenix
 		m_uniforms.matMetallicSampler = renderDevice->createUniform("matMetallicTex", EUniformType::Sampler2D);
 		m_uniforms.matNormalSampler = renderDevice->createUniform("matNormalTex", EUniformType::Sampler2D);
 
-		m_dirLights.directions = renderDevice->createUniform("dl_directionEye[0]", EUniformType::Vec3);
-		m_dirLights.colors = renderDevice->createUniform("dl_color[0]", EUniformType::Vec3);
+		m_dirLights.directions = renderDevice->createUniform("dl_directionEye", EUniformType::Vec3, EUniformIsArray::True);
+		m_dirLights.colors = renderDevice->createUniform("dl_color", EUniformType::Vec3, EUniformIsArray::True);
 		m_dirLights.numLights = renderDevice->createUniform("dl_numLights", EUniformType::Int);
 	}
 

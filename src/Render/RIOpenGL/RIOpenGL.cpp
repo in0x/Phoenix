@@ -211,6 +211,8 @@ namespace Phoenix
 			return false;
 		}
 
+		g_impl = new RIOpenGLImpl;
+
 		glfwMakeContextCurrent(nullptr);
 		glfwDestroyWindow(window);
 		glfwDefaultWindowHints();
@@ -220,7 +222,6 @@ namespace Phoenix
 		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 		
-		g_impl = new RIOpenGLImpl;
 		return true;
 	}
 

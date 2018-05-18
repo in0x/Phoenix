@@ -506,13 +506,21 @@ namespace Phoenix
 		return handle;
 	}
 
-	UniformHandle RIDeviceOpenGL::createUniform(const char* name, EUniformType type)
+	UniformHandle RIDeviceOpenGL::createUniform(const char* name, EUniformType type, EUniformIsArray isArray)
 	{
 		UniformHandle handle = m_resources->m_uniforms.allocateResource();
+
+		std::string	fullName(name);
+
+		if (isArray == EUniformIsArray::True)
+		{
+			fullName += "[0]";
+		}
+
 		RIUniform* uniform = m_resources->m_uniforms.getResource(handle);
 		uniform->m_type = type;
-		uniform->m_nameHash = HashFNV<const char*>()(name);
-		strncpy(uniform->m_debugName, name, RIUniform::MAX_NAME_LENGTH);
+		uniform->m_nameHash = HashFNV<const char*>()(fullName.c_str());
+		strncpy(uniform->m_debugName, fullName.c_str(), RIUniform::DBG_MAX_NAME_LEN);
 		return handle;
 	}
 

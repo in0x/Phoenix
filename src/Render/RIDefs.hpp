@@ -63,6 +63,12 @@ namespace Phoenix
 		SamplerCube
 	};
 
+	enum class EUniformIsArray
+	{
+		False,
+		True
+	};
+
 	// NOTE(Phil): Decl and data should likely be seperated into
 	// two types, as multiple vertexbuffers may share the same
 	// layout (this seems very likely), however I haven't thought
