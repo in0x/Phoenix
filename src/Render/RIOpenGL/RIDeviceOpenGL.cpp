@@ -203,8 +203,9 @@ namespace Phoenix
 		GLint count = 0;
 		GLint size = 0;
 		GLenum type;
-
+		GLint location = 0;
 		GLint bufSize = 0;
+
 		glGetProgramiv(program.m_id, GL_ACTIVE_UNIFORM_MAX_LENGTH, &bufSize);
 
 		std::vector<GLchar> name(bufSize);
@@ -215,7 +216,7 @@ namespace Phoenix
 		for (GLint i = 0; i < count; ++i)
 		{
 			glGetActiveUniform(program.m_id, (GLuint)i, bufSize, &length, &size, &type, name.data());
-			GLint location = glGetUniformLocation(program.m_id, name.data());
+			location = glGetUniformLocation(program.m_id, name.data());
 			program.m_activeUniforms.registerUniform(name.data(), program.m_id, location, size, type);
 		}
 
@@ -231,8 +232,9 @@ namespace Phoenix
 		{
 			glGetActiveUniformBlockName(program.m_id, i, bufSize, &length, name.data());
 			glGetActiveUniformBlockiv(program.m_id, i, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
+			location = glGetUniformBlockIndex(program.m_id, name.data());
 
-			program.m_activeUniforms.registerUniform(name.data(), program.m_id, i, blockSize, GL_UNIFORM_BUFFER); 
+			program.m_activeUniforms.registerUniform(name.data(), program.m_id, location, blockSize, GL_UNIFORM_BUFFER);
 		}
 	}
 
