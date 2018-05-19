@@ -86,7 +86,6 @@ namespace Phoenix
 	{
 	public:
 		enum { DBG_MAX_NAME_LEN = 64 };
-
 		char m_debugName[DBG_MAX_NAME_LEN];
 		EUniformType m_type;
 		FNVHash m_nameHash;
@@ -95,6 +94,9 @@ namespace Phoenix
 	class RIConstantBuffer : public RIResource
 	{
 	public:
-		ConstantBufferDesc m_desc;
+		enum {MAX_NAME_LEN = 128};
+		char m_name[128];
+		FNVHash m_nameHash;
+		size_t m_bufferSizeBytes;
 	};
 }

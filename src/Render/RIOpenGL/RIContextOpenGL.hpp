@@ -61,6 +61,10 @@ namespace Phoenix
 
 		virtual uint32_t getMaxTextureUnits() const override;
 
+		virtual void bindConstantBufferToLocation(ConstantBufferHandle cbHandle, uint32_t location) override;
+
+		virtual void updateConstantBuffer(ConstantBufferHandle cbHandle, const void* data, size_t numBytes, size_t offsetBytes = 0) override;
+
 	private:
 		void bindTextureBase(UniformHandle samplerHandle, const TextureBind& binding);
 
@@ -70,8 +74,13 @@ namespace Phoenix
 		{
 			const GlVertexBuffer* vertexbuffer = nullptr;
 			const GlIndexBuffer* indexbuffer = nullptr ;
-			const GlProgram*	program = nullptr;
-			uint8_t activeTextureCount = 0;
+			const GlProgram* program = nullptr;
+			uint8_t activeTextures = 0;
+
+			enum { MAX_ACTIVE_CONSTANT_BUFFERS = 64 };
+
+			ConstantBufferHandle cbBindings[MAX_ACTIVE_CONSTANT_BUFFERS];
+
 		} m_boundState;
 
 		uint32_t m_maxTextureUnits;

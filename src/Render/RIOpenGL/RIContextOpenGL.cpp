@@ -14,6 +14,10 @@ namespace Phoenix
 		, m_maxTextureUnits(0)
 	{
 		m_maxTextureUnits = getMaxTextureUnits();
+
+		GLint maxUboBindings = 0;
+		glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &maxUboBindings);
+		assert(m_boundState.MAX_ACTIVE_CONSTANT_BUFFERS < maxUboBindings);
 	}
 
 	GLenum toGlPrimitive(EPrimitive primitive)
@@ -36,9 +40,9 @@ namespace Phoenix
 
 	uint32_t RIContextOpenGL::getMaxTextureUnits() const
 	{
-		GLint maxTextureUnits;
+		GLint maxTextureUnits = 0;
 		glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxTextureUnits);
-		return static_cast<uint32_t>(maxTextureUnits) - 1;
+		return static_cast<uint32_t>(maxTextureUnits);
 	}
 
 	void RIContextOpenGL::drawLinear(EPrimitive primitives, uint32_t count, uint32_t start)
@@ -207,14 +211,14 @@ namespace Phoenix
 		}
 
 		assert(glUniform.m_glType == getSamplerType(binding.texturetype));
-		assert(m_boundState.activeTextureCount < m_maxTextureUnits);
+		assert(m_boundState.activeTextures < m_maxTextureUnits);
 
-		glActiveTexture(GL_TEXTURE0 + m_boundState.activeTextureCount);
+		glActiveTexture(GL_TEXTURE0 + m_boundState.activeTextures);
 		glBindTexture(binding.texturetype, binding.texID);
 		
-		glUniform1iv(glUniform.m_location, glUniform.m_numElements, reinterpret_cast<const GLint*>(&m_boundState.activeTextureCount));
+		glUniform1iv(glUniform.m_location, glUniform.m_numElements, reinterpret_cast<const GLint*>(&m_boundState.activeTextures));
 	
-		m_boundState.activeTextureCount++;
+		m_boundState.activeTextures++;
 
 		assert(!checkGlErrorOccured());
 	}
@@ -233,13 +237,13 @@ namespace Phoenix
 
 	void RIContextOpenGL::unbindTextures()
 	{
-		for (uint8_t activeTexture = 0; activeTexture < m_boundState.activeTextureCount; ++activeTexture)
+		for (uint8_t activeTexture = 0; activeTexture < m_boundState.activeTextures; ++activeTexture)
 		{
 			glActiveTexture(GL_TEXTURE0 + activeTexture);
 			glBindTexture(GL_TEXTURE_2D, 0); 
 		}
 
-		m_boundState.activeTextureCount = 0;
+		m_boundState.activeTextures = 0;
 	}
 
 	void RIContextOpenGL::clearRenderTargetColor(RenderTargetHandle rtHandle, const RGBA& clearColor)
@@ -310,7 +314,7 @@ namespace Phoenix
 
 	void RIContextOpenGL::endPass()
 	{
-		m_boundState.activeTextureCount = 0;
+		m_boundState.activeTextures = 0;
 		assert(!checkGlErrorOccured());
 	}
 
@@ -425,5 +429,25 @@ namespace Phoenix
 			, toGlBlendFactor(state.m_factorDstRGB)
 			, toGlBlendFactor(state.m_factorSrcA)
 			, toGlBlendFactor(state.m_factorDstA));
+	}
+
+	void RIContextOpenGL::bindConstantBufferToLocation(ConstantBufferHandle cbHandle, uint32_t location)
+	{
+		const GlConstantBuffer* cb = m_resources->m_constantBuffers.getResource(cbHandle);
+
+		GlUniform glUniform;
+		bool bIsActive = m_boundState.program->m_activeUniforms.getUniformIfExisting(cb->m_nameHash, m_boundState.program->m_id, glUniform);
+		assert(cb->m_bufferSizeBytes == glUniform.m_numElements);
+	
+		glBindBufferBase(GL_UNIFORM_BUFFER, location, cb->m_id);
+	}
+
+	void RIContextOpenGL::updateConstantBuffer(ConstantBufferHandle cbHandle, const void* data, size_t numBytes, size_t offsetBytes)
+	{
+		const GlConstantBuffer* cb = m_resources->m_constantBuffers.getResource(cbHandle);
+
+		glBindBuffer(GL_UNIFORM_BUFFER, cb->m_id);
+		glBufferSubData(GL_UNIFORM_BUFFER, offsetBytes, cb->m_bufferSizeBytes, data);
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	}
 }

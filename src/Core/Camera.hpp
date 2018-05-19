@@ -20,6 +20,6 @@ namespace Phoenix
 		void pitch(float angle);
 		void yaw(float angle);
 
-		Matrix4 updateViewMatrix();
+		Matrix4 getUpdatedViewMatrix();
 	};
 }

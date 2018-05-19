@@ -6,15 +6,17 @@ uniform sampler2D metallicR_tex;
 
 const int MAX_DIR_LIGHTS = 32;
 
-uniform vec3 dl_directionEye[MAX_DIR_LIGHTS];
-uniform vec3 dl_color[MAX_DIR_LIGHTS];
-uniform int  dl_numLights;
+struct Directional
+{
+	vec3 directionEye[MAX_DIR_LIGHTS];
+	vec3 color[MAX_DIR_LIGHTS];
+	int  numLights;
+};
 
-const int MAX_DIR_LIGHTS = 32;
-
-uniform vec3 dl_directionEye[MAX_DIR_LIGHTS];
-uniform vec3 dl_color[MAX_DIR_LIGHTS];
-uniform int  dl_numLights;
+layout(std140, binding = 1) uniform LightDataBuffer
+{
+	Directional dir;
+} lights;
 
 in vec2 texCoord;
 in vec4 rayEye;
@@ -81,14 +83,14 @@ void main()
 	
 	vec3 lightOut = vec3(0.0);
 	
-	for (int i = 0; i < dl_numLights; i++)
+	for (int i = 0; i < lights.dir.numLights; i++)
 	{
-		vec3 L = normalize(-dl_directionEye[i]);
+		vec3 L = normalize(-lights.dir.directionEye[i]);
 		vec3 H = normalize(V + L);
 	
 		float cosTheta = max(dot(H, V), 0.0);
 		
-		vec3 radiance = dl_color[i] * cosTheta;
+		vec3 radiance = lights.dir.color[i] * cosTheta;
 
 		vec3 f0 = vec3(0.04);	
 		f0 = mix(f0, kDiffuse, metallic);

@@ -33,7 +33,7 @@ namespace Phoenix
 		m_zAxis = r * m_zAxis;
 	}
 
-	Matrix4 Camera::updateViewMatrix()
+	Matrix4 Camera::getUpdatedViewMatrix()
 	{
 		m_zAxis = m_zAxis.normalize();
 		m_yAxis = m_zAxis.cross(m_xAxis).normalized();

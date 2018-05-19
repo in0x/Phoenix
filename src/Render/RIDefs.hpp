@@ -366,49 +366,4 @@ namespace Phoenix
 			depthStencilAttach.invalidate();
 		}
 	};
-
-	enum class ECBType
-	{
-		Int,
-		Float,
-		Vec3,
-		Vec4,
-		Mat3,
-		Mat4,
-		Sampler1D,
-		Sampler2D,
-		SamplerCube
-	};
-
-	struct CBMember
-	{
-		ECBType type;
-		uint32_t arrayLen;
-	};
-
-	struct ConstantBufferDesc
-	{
-		enum { MAX_MEMBERS = 32 };
-		
-		ConstantBufferDesc()
-			: numMembers(0)
-			, arrayLen(1)
-		{}
-		ConstantBufferDesc& add(ECBType type, uint32_t arraylen = 1)
-		{
-			if (numMembers < MAX_MEMBERS)
-			{
-				members[numMembers].type = type;
-				members[numMembers].arrayLen = arraylen;
-				numMembers++;
-			}			
-
-			return *this;
-		}
-
-		const char* name;
-		uint32_t numMembers;
-		CBMember members[MAX_MEMBERS];
-		uint32_t arrayLen;
-	};
 }

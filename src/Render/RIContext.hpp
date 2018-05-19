@@ -52,6 +52,10 @@ namespace Phoenix
 		virtual void endPass() = 0;
 
 		virtual uint32_t getMaxTextureUnits() const = 0;
+
+		virtual void bindConstantBufferToLocation(ConstantBufferHandle cbHandle, uint32_t location) = 0;
+
+		virtual void updateConstantBuffer(ConstantBufferHandle cbHandle, const void* data, size_t numBytes, size_t offsetBytes = 0) = 0;
 	};
 }
 

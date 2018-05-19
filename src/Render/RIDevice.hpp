@@ -32,6 +32,6 @@ namespace Phoenix
 		
 		virtual UniformHandle		 createUniform(const char* name, EUniformType type, EUniformIsArray isArray = EUniformIsArray::False) = 0;
 
-		virtual ConstantBufferHandle createConstantBuffer(const ConstantBufferDesc& desc) = 0;
+		virtual ConstantBufferHandle createConstantBuffer(const char* name, size_t bufferSizeBytes) = 0;
 	};
 }

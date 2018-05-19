@@ -17,6 +17,7 @@
 
 #include "Render/RIOpenGL/RIOpenGL.hpp"
 #include "Render/DeferredRenderer.hpp"
+#include "Render/LightBuffer.hpp"
 
 #include "Core/Components/CDirectionalLight.hpp"
 #include "Core/Components/CStaticMesh.hpp"
@@ -49,42 +50,6 @@ namespace Phoenix
 		tf->recalculate();
 		return entity;
 	}
-
-
-	struct DirLightBuffer
-	{
-		DirLightBuffer(size_t maxNumLights)
-			: m_directions(maxNumLights)
-			, m_colors(maxNumLights)
-			, m_maxNumLights(maxNumLights)
-			, m_numCurrentLights(0)
-		{}
-
-		void add(const Vec3& direction, const Vec3& color)
-		{
-			if (m_numCurrentLights >= m_maxNumLights)
-			{
-				return;
-			}
-			
-			m_directions[m_numCurrentLights] = direction;
-			m_colors[m_numCurrentLights] = color;
-
-			m_numCurrentLights++;
-		}
-
-		void clear()
-		{
-			m_numCurrentLights = 0;
-		}
-
-		std::vector<Vec3> m_directions;
-		std::vector<Vec3> m_colors;
-		size_t m_maxNumLights;
-		size_t m_numCurrentLights;
-	};
-
-
 }
 
 void run()
@@ -170,19 +135,19 @@ void run()
 	}
 #endif // PHI_LOAD
 
-	EntityHandle light = world.createEntity();
-	world.addComponent<CDirectionalLight>(light, Vec3(-0.5f, 0.5f, -0.5f), Vec3(253.0 / 255.0, 230.0 / 255.0, 155.0 / 255.0) * 5.0);
+	//EntityHandle light = world.createEntity();
+	//world.addComponent<CDirectionalLight>(light, Vec3(-0.5f, 0.5f, -0.5f), Vec3(253.0 / 255.0, 230.0 / 255.0, 155.0 / 255.0) * 5.0);
 	//world.addComponent<CDirectionalLight>(light, Vec3(0, 0, -1.0f), Vec3(253.0 / 255.0, 230.0 / 255.0, 155.0 / 255.0) * 5.0);
 	//world.addComponent<CDirectionalLight>(light, Vec3(0.0f, -1.0f, 0.0f), Vec3(5.0f, 5.0f, 5.0f));
 
-	//EntityHandle light1 = world.createEntity();
-	//world.addComponent<CDirectionalLight>(light1, Vec3(0.0f, 0.0f, -0.5f), Vec3(5.0f, 0.0f, 0.0f));
+	EntityHandle light1 = world.createEntity();
+	world.addComponent<CDirectionalLight>(light1, Vec3(0.0f, 0.0f, -0.5f), Vec3(5.0f, 0.0f, 0.0f));
 
-	//EntityHandle light2 = world.createEntity();
-	//world.addComponent<CDirectionalLight>(light2, Vec3(0.0f, 0.0f, 0.5f), Vec3(0.0f, 5.0f, 0.0f));
+	EntityHandle light2 = world.createEntity();
+	world.addComponent<CDirectionalLight>(light2, Vec3(0.0f, 0.0f, 0.5f), Vec3(0.0f, 5.0f, 0.0f));
 
-	//EntityHandle light3 = world.createEntity();
-	//world.addComponent<CDirectionalLight>(light3, Vec3(0.0f, -1.0f, 0.0f), Vec3(0.0f, 0.0f, 5.0f));
+	EntityHandle light3 = world.createEntity();
+	world.addComponent<CDirectionalLight>(light3, Vec3(0.0f, -1.0f, 0.0f), Vec3(0.0f, 0.0f, 5.0f));
 
 	using Clock = std::chrono::high_resolution_clock;
 	using pointInTime = std::chrono::time_point<std::chrono::high_resolution_clock>;
@@ -201,9 +166,9 @@ void run()
 	float cameraDrag = 0.85f;
 	float cameraVelMax = 50.0f;
 
-	const int MAX_DIR_LIGHTS = 32;
+	Matrix4 viewMatrix = camera.getUpdatedViewMatrix();
 
-	DirLightBuffer dlBuffer(MAX_DIR_LIGHTS);
+	LightBuffer lightBuffer;
 
 	while (!gameWindow->wantsToClose())
 	{
@@ -270,7 +235,8 @@ void run()
 		prevMouseX = mouse.m_x;
 		prevMouseY = mouse.m_y;
 
-		renderer.setViewMatrix(camera.updateViewMatrix());
+		viewMatrix = camera.getUpdatedViewMatrix();
+		renderer.setViewMatrix(viewMatrix);
 
 		renderer.setupGBufferPass();
 
@@ -286,13 +252,14 @@ void run()
 
 		renderer.setupDirectionalLightPass();
 
-		dlBuffer.clear();
+		lightBuffer.clear();
+
 		for (CDirectionalLight& dirLight : ComponentIterator<CDirectionalLight>(&world))
 		{
-			dlBuffer.add(dirLight.m_direction, dirLight.m_color);
+			lightBuffer.addDirectional(viewMatrix * dirLight.m_direction, dirLight.m_color);
 		}
 
-		renderer.runDirectionalLightPass(dlBuffer.m_directions.data(), dlBuffer.m_colors.data(), dlBuffer.m_numCurrentLights);
+		renderer.runLightsPass(lightBuffer);
 
 		renderer.copyFinalColorToBackBuffer();
 

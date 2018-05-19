@@ -10,7 +10,8 @@ namespace Phoenix
 {
 	class IRIDevice;
 	class IRIContext;
-	
+	class LightBuffer;
+
 	struct StaticMesh;
 	struct Material;
 	
@@ -33,12 +34,9 @@ namespace Phoenix
 
 		void drawAmbientLight();
 
-		// Sets up the state needed to evaluate the shading equation. Needs to be called after filling the Gbuffer and before submitting
-		// the first light.
 		void setupDirectionalLightPass();
 
-		// Evaluates the shading equation for these lights using the values written into the GBuffer.
-		void runDirectionalLightPass(Vec3* directions, Vec3* colors, size_t numLights);
+		void runLightsPass(const LightBuffer& lightBuffer);
 
 		// Applies gamma correction to the final color values and copies them into the default framebuffer. 
 		void copyFinalColorToBackBuffer();
@@ -77,17 +75,12 @@ namespace Phoenix
 			UniformHandle matNormalSampler;
 		} m_uniforms;
 
-		struct DirectionalLightUniforms
-		{
-			UniformHandle directions;
-			UniformHandle colors;
-			UniformHandle numLights;
-		} m_dirLights;
-
 		ProgramHandle m_gBufferProgram;
 		ProgramHandle m_ambientLightProgram;
 		ProgramHandle m_directionaLightProgram;
 		ProgramHandle m_copyToBackBufferProgram;
+
+		ConstantBufferHandle m_cbLights;
 
 		BlendState m_lightBlendState;
 

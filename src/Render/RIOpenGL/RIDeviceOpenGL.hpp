@@ -35,8 +35,8 @@ namespace Phoenix
 		
 		virtual UniformHandle		 createUniform(const char* name, EUniformType type, EUniformIsArray isArray) override;
 
-		virtual ConstantBufferHandle createConstantBuffer(const ConstantBufferDesc& desc) override;
-		
+		virtual ConstantBufferHandle createConstantBuffer(const char* name, size_t bufferSizeBytes) override;
+
 	private:
 		RIOpenGLResourceStore* m_resources;
 

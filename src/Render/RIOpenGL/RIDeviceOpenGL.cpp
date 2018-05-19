@@ -523,6 +523,7 @@ namespace Phoenix
 		uniform->m_type = type;
 		uniform->m_nameHash = HashFNV<const char*>()(fullName.c_str());
 		strncpy(uniform->m_debugName, fullName.c_str(), RIUniform::DBG_MAX_NAME_LEN);
+		uniform->m_debugName[RIUniform::DBG_MAX_NAME_LEN - 1] = '\0';
 		return handle;
 	}
 
@@ -621,48 +622,12 @@ namespace Phoenix
 		glFramebufferTexture(GL_FRAMEBUFFER, toGlAttachment(attachment), texture->m_glTex.m_id, 0);
 		return true;
 	}
-
-	size_t cbTypeToSize(ECBType type)
-	{
-		// These sizes probably dont work by themselves since we need to factor in padding
-		switch (type)
-		{
-		case ECBType::Vec4:
-			return 32 * 4;
-		case ECBType::Mat4:
-			return 32 * 4 * 4;
-		case ECBType::Int:
-			return 32;
-		case ECBType::Vec3:
-			return 32 * 3;
-		case ECBType::Mat3:
-			return 32 * 3 * 3;
-		case ECBType::Float:
-			return 32;
-		default:
-			assert(false);
-			return 0;
-		}
-	}
 	
-	ConstantBufferHandle RIDeviceOpenGL::createConstantBuffer(const ConstantBufferDesc& desc)
+	ConstantBufferHandle RIDeviceOpenGL::createConstantBuffer(const char* name, size_t bufferSizeBytes)
 	{
 		ConstantBufferHandle handle = m_resources->m_constantBuffers.allocateResource();
 		GlConstantBuffer* cb = m_resources->m_constantBuffers.getResource(handle);
 
-		cb->m_desc = desc;
-
-		size_t bufferSizeBytes = 0;
-
-		for (size_t i = 0; i < desc.numMembers; ++i)
-		{
-			const CBMember& member = desc.members[i];
-
-			bufferSizeBytes += cbTypeToSize(member.type) * member.arrayLen;
-		}
-
-		bufferSizeBytes *= desc.arrayLen;	
-		
 		glGenBuffers(1, &cb->m_id);
 		glBindBuffer(GL_UNIFORM_BUFFER, cb->m_id);
 		glBufferData(GL_UNIFORM_BUFFER,	bufferSizeBytes, nullptr, GL_STATIC_DRAW);
@@ -670,10 +635,16 @@ namespace Phoenix
 
 		if (checkGlErrorOccured())
 		{
-			Logger::error("An error occured during ConstantBuffer creation.");
+			Logger::errorf("An error occured during creation of ConstantBuffer %s.", name);
 			m_resources->m_constantBuffers.destroyResource(handle);
 			handle.invalidate();
 		}
+
+		strncpy(cb->m_name, name, RIConstantBuffer::MAX_NAME_LEN);
+		cb->m_name[RIConstantBuffer::MAX_NAME_LEN - 1] = '\0';
+		cb->m_bufferSizeBytes = bufferSizeBytes;
+
+		cb->m_nameHash = HashFNV<const char*>()(name);
 
 		return handle;
 	}

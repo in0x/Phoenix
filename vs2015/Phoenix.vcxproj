@@ -226,6 +226,7 @@
     <ClInclude Include="..\src\Render\CommandPacket.hpp" />
     <ClInclude Include="..\src\Render\Commands.hpp" />
     <ClInclude Include="..\src\Render\DeferredRenderer.hpp" />
+    <ClInclude Include="..\src\Render\LightBuffer.hpp" />
     <ClInclude Include="..\src\Render\RenderWindow.hpp" />
     <ClInclude Include="..\src\Render\RIContext.hpp" />
     <ClInclude Include="..\src\Render\RIDefs.hpp" />

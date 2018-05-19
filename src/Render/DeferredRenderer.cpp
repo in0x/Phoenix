@@ -8,7 +8,7 @@
 
 #include <Render/RIDevice.hpp>
 #include <Render/RIContext.hpp>
-
+#include <Render/LightBuffer.hpp>
 namespace Phoenix
 {
 	DeferredRenderer::DeferredRenderer(IRIDevice* renderDevice, IRIContext* renderContext, uint32_t gBufferWidth, uint32_t gBufferHeight)
@@ -72,9 +72,7 @@ namespace Phoenix
 		m_uniforms.matMetallicSampler = renderDevice->createUniform("matMetallicTex", EUniformType::Sampler2D);
 		m_uniforms.matNormalSampler = renderDevice->createUniform("matNormalTex", EUniformType::Sampler2D);
 
-		m_dirLights.directions = renderDevice->createUniform("dl_directionEye", EUniformType::Vec3, EUniformIsArray::True);
-		m_dirLights.colors = renderDevice->createUniform("dl_color", EUniformType::Vec3, EUniformIsArray::True);
-		m_dirLights.numLights = renderDevice->createUniform("dl_numLights", EUniformType::Int);
+		m_cbLights =  renderDevice->createConstantBuffer("LightDataBuffer", sizeof(LightBuffer));
 	}
 
 	void DeferredRenderer::setViewMatrix(const Matrix4& view)
@@ -137,7 +135,6 @@ namespace Phoenix
 		m_context->unbindTextures();
 	}
 
-
 	void DeferredRenderer::setupAmbientLightPass()
 	{
 		m_context->bindRenderTarget(m_backBuffer);
@@ -171,16 +168,10 @@ namespace Phoenix
 		m_context->bindTexture(m_uniforms.metallicTexSampler, m_MetallicTex);
 	}
 
-	void DeferredRenderer::runDirectionalLightPass(Vec3* directions, Vec3* colors, size_t numLights)
+	void DeferredRenderer::runLightsPass(const LightBuffer& lightBuffer)
 	{
-		for (size_t i = 0; i < numLights; ++i)
-		{
-			directions[i] *= m_viewMat;
-		}
-
-		m_context->bindUniform(m_dirLights.directions, directions);
-		m_context->bindUniform(m_dirLights.colors, colors);
-		m_context->bindUniform(m_dirLights.numLights, &numLights);
+		m_context->updateConstantBuffer(m_cbLights, &lightBuffer, sizeof(LightBuffer));
+		m_context->bindConstantBufferToLocation(m_cbLights, 1);
 		m_context->drawLinear(EPrimitive::TriangleStrips, 4, 0);
 	}
 
