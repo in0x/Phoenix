@@ -247,9 +247,6 @@ void run()
 			renderer.drawStaticMesh(mesh.m_mesh, transform->m_cached);
 		}
 
-		renderer.setupAmbientLightPass();
-		renderer.drawAmbientLight();
-
 		renderer.setupDirectionalLightPass();
 
 		lightBuffer.clear();

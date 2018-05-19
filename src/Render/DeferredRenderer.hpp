@@ -30,10 +30,6 @@ namespace Phoenix
 		// Draws the material values needed for shading from this StaticMesh into the GBuffer.
 		void drawStaticMesh(const StaticMesh& mesh, const Matrix4& transform);
 
-		void setupAmbientLightPass();
-
-		void drawAmbientLight();
-
 		void setupDirectionalLightPass();
 
 		void runLightsPass(const LightBuffer& lightBuffer);
@@ -76,8 +72,7 @@ namespace Phoenix
 		} m_uniforms;
 
 		ProgramHandle m_gBufferProgram;
-		ProgramHandle m_ambientLightProgram;
-		ProgramHandle m_directionaLightProgram;
+		ProgramHandle m_lightsPassProgram;
 		ProgramHandle m_copyToBackBufferProgram;
 
 		ConstantBufferHandle m_cbLights;

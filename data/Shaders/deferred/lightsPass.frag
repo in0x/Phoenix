@@ -25,6 +25,8 @@ out vec4 color;
 
 const float PI = 3.14159265359;
 
+const float ambientFactor = 0.1;
+
 vec3 fresnelSchlick(float cosTheta, vec3 f0)
 {
 	return f0 + (1.0 - f0) * pow(1.0 - cosTheta, 5.0);
@@ -82,6 +84,8 @@ void main()
 	vec3 V = normalize(-positionEye.xyz);
 	
 	vec3 lightOut = vec3(0.0);
+	
+	lightOut += kDiffuse * ambientFactor;
 	
 	for (int i = 0; i < lights.dir.numLights; i++)
 	{

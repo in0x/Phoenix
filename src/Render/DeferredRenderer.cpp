@@ -61,8 +61,7 @@ namespace Phoenix
 		m_uniforms.normalTf = renderDevice->createUniform("normalTf", EUniformType::Mat3);
 
 		m_gBufferProgram = loadShaderProgram(renderDevice, "Shaders/deferred/buildGBuffer.vert", "Shaders/deferred/buildGBuffer.frag");
-		m_ambientLightProgram = loadShaderProgram(renderDevice, "Shaders/deferred/drawAmbientLight.vert", "Shaders/deferred/drawAmbientLight.frag");
-		m_directionaLightProgram = loadShaderProgram(renderDevice, "Shaders/deferred/drawDirectionalLight.vert", "Shaders/deferred/drawDirectionalLight.frag");
+		m_lightsPassProgram = loadShaderProgram(renderDevice, "Shaders/deferred/lightsPass.vert", "Shaders/deferred/lightsPass.frag");
 		m_copyToBackBufferProgram = loadShaderProgram(renderDevice, "Shaders/deferred/copyToBackBuffer.vert", "Shaders/deferred/copyToBackBuffer.frag");
 
 		m_lightBlendState = BlendState(EBlendOp::Add, EBlendFactor::One, EBlendFactor::One);
@@ -135,23 +134,6 @@ namespace Phoenix
 		m_context->unbindTextures();
 	}
 
-	void DeferredRenderer::setupAmbientLightPass()
-	{
-		m_context->bindRenderTarget(m_backBuffer);
-
-		m_context->setBlendState(m_lightBlendState);
-		m_context->setDepthTest(EDepth::Disable);
-
-		m_context->bindShaderProgram(m_ambientLightProgram);
-	
-		m_context->bindTexture(m_uniforms.diffuseDepthTexSampler, m_kDiffuseDepthTex);
-	}
-
-	void DeferredRenderer::drawAmbientLight()
-	{
-		m_context->drawLinear(EPrimitive::TriangleStrips, 4, 0);
-	}
-
 	void DeferredRenderer::setupDirectionalLightPass()
 	{
 		m_context->bindRenderTarget(m_backBuffer);
@@ -159,7 +141,7 @@ namespace Phoenix
 		m_context->setBlendState(m_lightBlendState);
 		m_context->setDepthTest(EDepth::Disable);
 
-		m_context->bindShaderProgram(m_directionaLightProgram);
+		m_context->bindShaderProgram(m_lightsPassProgram);
 
 		m_context->bindUniform(m_uniforms.projTf, &m_projMat);
 
