@@ -187,6 +187,7 @@
     <ClInclude Include="..\src\Core\Component.hpp" />
     <ClInclude Include="..\src\Core\Components\CCamera.hpp" />
     <ClInclude Include="..\src\Core\Components\CDirectionalLight.hpp" />
+    <ClInclude Include="..\src\Core\Components\CPointLight.hpp" />
     <ClInclude Include="..\src\Core\Components\CStaticMesh.hpp" />
     <ClInclude Include="..\src\Core\Components\CTransform.hpp" />
     <ClInclude Include="..\src\Core\EcsTypes.hpp" />

@@ -3,6 +3,7 @@
 namespace Phoenix
 {
 	class Matrix4;
+	class Vec4;
 
 	class Vec3
 	{
@@ -26,6 +27,8 @@ namespace Phoenix
 			, y(val)
 			, z(val)
 		{}
+
+		Vec3(const Vec4& xyzw);
 
 		float& operator()(int i)
 		{

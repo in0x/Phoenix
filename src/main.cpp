@@ -6,7 +6,6 @@
 
 #include "Core/Logger.hpp"
 #include "Core/FileSystem.hpp"
-#include "Core/StringTokenizer.hpp"
 #include "Core/Serialize.hpp"
 #include "Core/Camera.hpp"
 #include "Core/AssetRegistry.hpp"
@@ -22,6 +21,7 @@
 #include "Core/Components/CDirectionalLight.hpp"
 #include "Core/Components/CStaticMesh.hpp"
 #include "Core/Components/CTransform.hpp"
+#include "Core/Components/CPointLight.hpp"
 
 namespace Phoenix
 {
@@ -44,10 +44,24 @@ namespace Phoenix
 	EntityHandle createMeshEntity(World* world, StaticMesh&& mesh)
 	{
 		EntityHandle entity = world->createEntity();
+		
 		world->addComponent<CStaticMesh>(entity, std::move(mesh));
+		
 		CTransform* tf = world->addComponent<CTransform>(entity);
 		tf->m_scale = 0.1f;
 		tf->recalculate();
+
+		return entity;
+	}
+
+	EntityHandle createPointLightEntity(World* world, const Vec3& position, const Vec3& color, float radius)
+	{
+		EntityHandle entity = world->createEntity();
+
+		CTransform* tf = world->addComponent<CTransform>(entity);
+		tf->m_translation = position;
+		world->addComponent<CPointLight>(entity, color, radius);
+
 		return entity;
 	}
 }
@@ -100,6 +114,7 @@ void run()
 	world.registerComponentType<CDirectionalLight>();
 	world.registerComponentType<CStaticMesh>();
 	world.registerComponentType<CTransform>();
+	world.registerComponentType<CPointLight>();
 
 	AssetRegistry assets(renderDevice, renderContext);
 
@@ -136,18 +151,11 @@ void run()
 #endif // PHI_LOAD
 
 	//EntityHandle light = world.createEntity();
-	//world.addComponent<CDirectionalLight>(light, Vec3(-0.5f, 0.5f, -0.5f), Vec3(253.0 / 255.0, 230.0 / 255.0, 155.0 / 255.0) * 5.0);
-	//world.addComponent<CDirectionalLight>(light, Vec3(0, 0, -1.0f), Vec3(253.0 / 255.0, 230.0 / 255.0, 155.0 / 255.0) * 5.0);
-	//world.addComponent<CDirectionalLight>(light, Vec3(0.0f, -1.0f, 0.0f), Vec3(5.0f, 5.0f, 5.0f));
-
-	EntityHandle light1 = world.createEntity();
-	world.addComponent<CDirectionalLight>(light1, Vec3(0.0f, 0.0f, -0.5f), Vec3(5.0f, 0.0f, 0.0f));
-
-	EntityHandle light2 = world.createEntity();
-	world.addComponent<CDirectionalLight>(light2, Vec3(0.0f, 0.0f, 0.5f), Vec3(0.0f, 5.0f, 0.0f));
-
-	EntityHandle light3 = world.createEntity();
-	world.addComponent<CDirectionalLight>(light3, Vec3(0.0f, -1.0f, 0.0f), Vec3(0.0f, 0.0f, 5.0f));
+	//world.addComponent<CDirectionalLight>(light, Vec3(-0.5f, -0.5f, -0.5f), Vec3(253.0 / 255.0, 230.0 / 255.0, 155.0 / 255.0) * 5.0);
+	
+	createPointLightEntity(&world, Vec3(50.0, 5.0, -5.0), Vec3(1000.0, 0.0, 0.0), 100);
+	createPointLightEntity(&world, Vec3(0.0, 5.0, -5.0), Vec3(0.0, 1000.0, 0.0), 100);
+	createPointLightEntity(&world, Vec3(-50.0, 5.0, -5.0), Vec3(0.0, 0.0, 1000.0), 100);
 
 	using Clock = std::chrono::high_resolution_clock;
 	using pointInTime = std::chrono::time_point<std::chrono::high_resolution_clock>;
@@ -165,8 +173,6 @@ void run()
 	float cameraAccel = 15.0f;
 	float cameraDrag = 0.85f;
 	float cameraVelMax = 50.0f;
-
-	Matrix4 viewMatrix = camera.getUpdatedViewMatrix();
 
 	LightBuffer lightBuffer;
 
@@ -235,8 +241,8 @@ void run()
 		prevMouseX = mouse.m_x;
 		prevMouseY = mouse.m_y;
 
-		viewMatrix = camera.getUpdatedViewMatrix();
-		renderer.setViewMatrix(viewMatrix);
+		viewTf = camera.getUpdatedViewMatrix();
+		renderer.setViewMatrix(viewTf);
 
 		renderer.setupGBufferPass();
 
@@ -253,7 +259,17 @@ void run()
 
 		for (CDirectionalLight& dirLight : ComponentIterator<CDirectionalLight>(&world))
 		{
-			lightBuffer.addDirectional(viewMatrix * dirLight.m_direction, dirLight.m_color);
+			lightBuffer.addDirectional(viewTf * dirLight.m_direction, dirLight.m_color);
+		}
+
+		for (CPointLight& pointLight : ComponentIterator<CPointLight>(&world))
+		{
+			CTransform* transform = pointLight.sibling<CTransform>();
+
+			Vec4 eyePos(transform->m_translation, 1.0);
+			eyePos *= viewTf;
+
+			lightBuffer.addPointLight(Vec3(eyePos), pointLight.m_color, pointLight.m_radius);
 		}
 
 		renderer.runLightsPass(lightBuffer);

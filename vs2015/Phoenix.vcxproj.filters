@@ -214,6 +214,9 @@
     <ClInclude Include="..\src\Render\LightBuffer.hpp">
       <Filter>Render</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Core\Components\CPointLight.hpp">
+      <Filter>Core\Components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Core\Clock.cpp">

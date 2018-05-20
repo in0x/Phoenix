@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Math/Vec3.hpp>
+#include <Math/Vec4.hpp>
 
 namespace Phoenix
 {
@@ -17,16 +18,28 @@ namespace Phoenix
 		float z;
 	};
 
+	struct alignas(16) GpuVec4
+	{
+		GpuVec4()
+			: x(0.0f), y(0.0f), z(0.0f) {}
+
+		GpuVec4(const Vec3& v)
+			: x(v.x), y(v.y), z(v.z) {}
+
+		float x;
+		float y;
+		float z;
+		float w;
+	};
+
 	class LightBuffer
 	{
 	public:
 		enum 
 		{
-			MAX_DIR = 32
+			MAX_DIR = 32,
+			MAX_POINT = 64
 		};
-		
-		LightBuffer()
-			: m_dir_numLights(0) {}
 
 		void addDirectional(const Vec3& direction, const Vec3& color)
 		{
@@ -40,15 +53,37 @@ namespace Phoenix
 			m_dir_numLights++;
 		}
 
+		void addPointLight(const Vec3& position, const Vec3& color, float radius)
+		{
+			if (m_pl_numLights >= MAX_POINT)
+			{
+				return;
+			}
+
+			m_pl_positionRadius[m_pl_numLights] = position;
+			m_pl_positionRadius[m_pl_numLights].w = radius;
+			m_pl_colors[m_pl_numLights] = color;
+			m_pl_numLights++;
+		}
+
 		void clear()
 		{
 			memset(m_dir_directions, 0, sizeof(GpuVec3) * MAX_DIR);
 			memset(m_dir_colors, 0, sizeof(GpuVec3) * MAX_DIR);
+
+			memset(m_pl_positionRadius, 0, sizeof(GpuVec4) * MAX_POINT);
+			memset(m_pl_colors, 0, sizeof(GpuVec3) * MAX_POINT);
+
 			m_dir_numLights = 0;
+			m_pl_numLights = 0;
 		}
 
 		GpuVec3 m_dir_directions[MAX_DIR];
 		GpuVec3 m_dir_colors[MAX_DIR];
 		uint32_t m_dir_numLights;
+
+		GpuVec4 m_pl_positionRadius[MAX_POINT];
+		GpuVec3 m_pl_colors[MAX_POINT];
+		uint32_t m_pl_numLights;
 	};
 }

@@ -1,10 +1,17 @@
 #include "Vec3.hpp"
+#include "Vec4.hpp"
 #include "Matrix4.hpp"
 #include "PhiMath.hpp"
 #include <cassert>
 
 namespace Phoenix
 {
+	Vec3::Vec3(const Vec4& xyzw)
+		: x(xyzw.x)
+		, y(xyzw.y)
+		, z(xyzw.z)
+	{}
+
 	Vec3& Vec3::operator+=(const Vec3& rhv)
 	{
 		x += rhv.x;
