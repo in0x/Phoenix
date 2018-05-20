@@ -31,6 +31,10 @@ namespace Phoenix
 			D,
 			S,
 			W,
+			UpArrow,
+			DownArrow,
+			LeftArrow,
+			RightArrow,
 			NumValues,
 		};
 		

@@ -54,13 +54,13 @@ namespace Phoenix
 		return entity;
 	}
 
-	EntityHandle createPointLightEntity(World* world, const Vec3& position, const Vec3& color, float radius)
+	EntityHandle createPointLightEntity(World* world, const Vec3& position, float radius, const Vec3& color, float intensity)
 	{
 		EntityHandle entity = world->createEntity();
 
 		CTransform* tf = world->addComponent<CTransform>(entity);
 		tf->m_translation = position;
-		world->addComponent<CPointLight>(entity, color, radius);
+		world->addComponent<CPointLight>(entity, color, radius, intensity);
 
 		return entity;
 	}
@@ -151,11 +151,9 @@ void run()
 #endif // PHI_LOAD
 
 	//EntityHandle light = world.createEntity();
-	//world.addComponent<CDirectionalLight>(light, Vec3(-0.5f, -0.5f, -0.5f), Vec3(253.0 / 255.0, 230.0 / 255.0, 155.0 / 255.0) * 5.0);
+	//world.addComponent<CDirectionalLight>(light, Vec3(-0.5f, -0.5f, -0.5f), Vec3(253.0 / 255.0, 230.0 / 255.0, 155.0 / 255.0) * 2.0f);
 	
-	createPointLightEntity(&world, Vec3(50.0, 5.0, -5.0), Vec3(1000.0, 0.0, 0.0), 100);
-	createPointLightEntity(&world, Vec3(0.0, 5.0, -5.0), Vec3(0.0, 1000.0, 0.0), 100);
-	createPointLightEntity(&world, Vec3(-50.0, 5.0, -5.0), Vec3(0.0, 0.0, 1000.0), 100);
+	createPointLightEntity(&world, Vec3(0.0, 25.0, -5.0), 1000.0f, Vec3(1.0, 0.0, 0.0), 1000.0f);
 
 	using Clock = std::chrono::high_resolution_clock;
 	using pointInTime = std::chrono::time_point<std::chrono::high_resolution_clock>;
@@ -269,7 +267,7 @@ void run()
 			Vec4 eyePos(transform->m_translation, 1.0);
 			eyePos *= viewTf;
 
-			lightBuffer.addPointLight(Vec3(eyePos), pointLight.m_color, pointLight.m_radius);
+			lightBuffer.addPointLight(Vec3(eyePos), pointLight.m_radius, pointLight.m_color, pointLight.m_intensity);
 		}
 
 		renderer.runLightsPass(lightBuffer);

@@ -4,20 +4,21 @@ uniform sampler2D normalRGBRoughnessA_tex;
 uniform sampler2D kDiffuseRGBDepthA_tex;
 uniform sampler2D metallicR_tex;
 
-const int MAX_DIR_LIGHTS = 32;
+const int MAX_DIR = 32;
 
-const int MAX_POINT_LIGHTS = 64;
+const int MAX_POINT = 64;
+
+const int MAX_SPOT = 64;
 
 layout(std140, binding = 1) uniform LightDataBuffer
 {
-	vec3 dl_directionEye[MAX_DIR_LIGHTS];
-	vec3 dl_color[MAX_DIR_LIGHTS];
+	vec3 dl_directionEye[MAX_DIR];
+	vec3 dl_color[MAX_DIR];
 	int  dl_numLights;
 	
-	vec4 pl_positionEyeXyzRadiusW[MAX_POINT_LIGHTS];
-	vec3 pl_color[MAX_POINT_LIGHTS];
-	int pl_numLights;
-
+	vec4 pl_positionEyeRadius[MAX_POINT];
+	vec4 pl_colorIntensity[MAX_POINT];
+	int  pl_numLights;
 } lights;
 
 in vec2 texCoord;
@@ -69,11 +70,10 @@ float geometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
 	return ggx1 * ggx2;
 }
 
-vec3 shade(vec3 N, vec3 V, vec3 L, float metallic, float roughness, vec3 kDiffuse, vec3 lightColor)
+vec3 shade(vec3 N, vec3 V, vec3 L, float metallic, float roughness, vec3 kDiffuse)
 {
 		vec3 H = normalize(V + L);
 		float cosTheta = max(dot(H, V), 0.0);	
-		vec3 radiance = lightColor;	
 			
 		vec3 f0 = vec3(0.04);	
 		f0 = mix(f0, kDiffuse, metallic);
@@ -82,7 +82,7 @@ vec3 shade(vec3 N, vec3 V, vec3 L, float metallic, float roughness, vec3 kDiffus
 		float normalDist = normalDistGGX(N, H, roughness);
 		float geometry = geometrySmith(N, V, L, roughness);
 		
-		float n_dot_l = max(dot(N, L), 0.0);
+		float n_dot_l = clamp(max(dot(N, L), 0.0), 0.0, 1.0);
 		
 		vec3 numerator = normalDist * geometry * fresnel;
 		float denominator = 4.0 * max(dot(N, V), 0.0) * n_dot_l;
@@ -93,14 +93,18 @@ vec3 shade(vec3 N, vec3 V, vec3 L, float metallic, float roughness, vec3 kDiffus
 		
 		kd *= 1.0 - metallic;
 		
-		return (kd * kDiffuse / PI + specularBRDF) * radiance * n_dot_l;
+		return (kd * kDiffuse / PI + specularBRDF) * n_dot_l;
 }
 
 vec3 shadeDirectionalLight(int lightIdx, vec3 N, vec3 V, float metallic, float roughness, vec3 kDiffuse)
 {
 	vec3 L = normalize(-lights.dl_directionEye[lightIdx]);
+	
 	vec3 lightColor = lights.dl_color[lightIdx];
-	return shade(N, V, L, metallic, roughness, kDiffuse, lightColor);	
+	float intensity = length(lightColor);
+	lightColor = normalize(lightColor);
+	
+	return shade(N, V, L, metallic, roughness, kDiffuse) * intensity * lightColor;	
 }
 
 float smoothDistanceAtten(float distSqr, float invSqrRadius)
@@ -123,15 +127,17 @@ float distanceAtten(vec3 lightVector, float radius)
 
 vec3 shadePointLight(int lightIdx, vec3 N, vec3 V, vec3 positionEye, float metallic, float roughness, vec3 kDiffuse)
 {
-	vec3 lightPosEye = lights.pl_positionEyeXyzRadiusW[lightIdx].xyz;
-	float radius = lights.pl_positionEyeXyzRadiusW[lightIdx].w;
+	vec3 lightPosEye = lights.pl_positionEyeRadius[lightIdx].xyz;
+	float radius = lights.pl_positionEyeRadius[lightIdx].w;
 
 	vec3 L = lightPosEye - positionEye;
-	float atten = distanceAtten(L, radius);
+	float attenuation = distanceAtten(L, radius);
 	L = normalize(L);
-	vec3 lightColor = lights.pl_color[lightIdx];
 	
-	return shade(N, V, L, metallic, roughness, kDiffuse, lightColor) * atten;
+	vec3 lightColor = lights.pl_colorIntensity[lightIdx].xyz;
+	float intensity = lights.pl_colorIntensity[lightIdx].w;
+	
+	return shade(N, V, L, metallic, roughness, kDiffuse) * ((intensity * normalize(lightColor)) / (4 * PI)) * attenuation;
 }
 
 void main()
@@ -152,7 +158,7 @@ void main()
 	
 	vec3 lightOut = vec3(0.0);
 	
-	lightOut += kDiffuse * ambientFactor;
+	//lightOut += kDiffuse * ambientFactor;
 	
 	for (int i = 0; i < lights.dl_numLights; i++)
 	{	

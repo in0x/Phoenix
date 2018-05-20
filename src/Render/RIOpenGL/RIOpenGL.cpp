@@ -252,10 +252,14 @@ namespace Phoenix
 
 		switch (key)
 		{
-			IMPL_KEY_SWITCH(GLFW_KEY_A, Key::A)
-			IMPL_KEY_SWITCH(GLFW_KEY_D, Key::D)
-			IMPL_KEY_SWITCH(GLFW_KEY_S, Key::S)
-			IMPL_KEY_SWITCH(GLFW_KEY_W, Key::W)
+			IMPL_KEY_SWITCH(GLFW_KEY_A,		Key::A)
+			IMPL_KEY_SWITCH(GLFW_KEY_D,		Key::D)
+			IMPL_KEY_SWITCH(GLFW_KEY_S,		Key::S)
+			IMPL_KEY_SWITCH(GLFW_KEY_W,		Key::W)
+			IMPL_KEY_SWITCH(GLFW_KEY_UP,	Key::UpArrow)
+			IMPL_KEY_SWITCH(GLFW_KEY_DOWN,  Key::DownArrow)
+			IMPL_KEY_SWITCH(GLFW_KEY_LEFT,  Key::LeftArrow)
+			IMPL_KEY_SWITCH(GLFW_KEY_RIGHT, Key::RightArrow)
 			default:
 			{
 				Logger::warningf("Attempted to convert unhandled key value: %s", glfwGetKeyName(key, scancode));

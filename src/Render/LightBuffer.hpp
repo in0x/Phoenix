@@ -53,7 +53,7 @@ namespace Phoenix
 			m_dir_numLights++;
 		}
 
-		void addPointLight(const Vec3& position, const Vec3& color, float radius)
+		void addPointLight(const Vec3& position, float radius, const Vec3& color, float intensity)
 		{
 			if (m_pl_numLights >= MAX_POINT)
 			{
@@ -62,7 +62,8 @@ namespace Phoenix
 
 			m_pl_positionRadius[m_pl_numLights] = position;
 			m_pl_positionRadius[m_pl_numLights].w = radius;
-			m_pl_colors[m_pl_numLights] = color;
+			m_pl_colorsIntensity[m_pl_numLights] = color;
+			m_pl_colorsIntensity[m_pl_numLights].w = intensity;
 			m_pl_numLights++;
 		}
 
@@ -72,7 +73,7 @@ namespace Phoenix
 			memset(m_dir_colors, 0, sizeof(GpuVec3) * MAX_DIR);
 
 			memset(m_pl_positionRadius, 0, sizeof(GpuVec4) * MAX_POINT);
-			memset(m_pl_colors, 0, sizeof(GpuVec3) * MAX_POINT);
+			memset(m_pl_colorsIntensity, 0, sizeof(GpuVec3) * MAX_POINT);
 
 			m_dir_numLights = 0;
 			m_pl_numLights = 0;
@@ -83,7 +84,7 @@ namespace Phoenix
 		uint32_t m_dir_numLights;
 
 		GpuVec4 m_pl_positionRadius[MAX_POINT];
-		GpuVec3 m_pl_colors[MAX_POINT];
+		GpuVec4 m_pl_colorsIntensity[MAX_POINT];
 		uint32_t m_pl_numLights;
 	};
 }
