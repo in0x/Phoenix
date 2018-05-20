@@ -6,4 +6,4 @@ In the long run, I'm working towards implementing a small game idea I have, so b
 Unless I deem it to be too much work, or not interesting, I try to build as much as possible from scratch.
 
 As I'm constantly working on and fiddling with the project, this screenshot may be out of date.  
-![](doc/screen.PNG)
+![](doc/points.png)
