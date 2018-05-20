@@ -48,7 +48,7 @@ namespace Phoenix
 		void* at(size_t idx)
 		{
 			assert(idx <= m_nextAllocIdx);
-			return m_chunks[idx / m_elemsPerChunk] + (idx % m_elemsPerChunk) * m_sizePerAllocBytes;
+			return m_chunks[floor(idx / m_elemsPerChunk)] + (idx % m_elemsPerChunk) * m_sizePerAllocBytes;
 		}
 
 		void* alloc()

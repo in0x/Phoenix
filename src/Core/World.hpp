@@ -49,7 +49,7 @@ namespace Phoenix
 			comp->m_world = this;
 			comp->m_entity = handle;
 
-			entity.m_components.emplace(type, handle);
+			entity.m_components.emplace(type, pool->size() - 1 /*handle*/);
 
 			return comp;
 		}
