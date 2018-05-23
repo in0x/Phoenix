@@ -45,6 +45,11 @@ namespace Phoenix
 			return (nullptr != m_glfwWindow);
 		}
 
+		virtual void* getApiHandle()
+		{
+			return static_cast<void*>(m_glfwWindow);
+		}
+
 		~GlRenderWindow()
 		{
 			// TODO(phil.welsch): Do we need to unsub from key cb when window is destroyed?

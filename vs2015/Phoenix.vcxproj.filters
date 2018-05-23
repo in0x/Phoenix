@@ -217,6 +217,30 @@
     <ClInclude Include="..\src\Core\Components\CPointLight.hpp">
       <Filter>Core\Components</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Core\SimpleWorld.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ThirdParty\imgui\imconfig.h">
+      <Filter>ThirdParty\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ThirdParty\imgui\imgui.h">
+      <Filter>ThirdParty\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ThirdParty\imgui\imgui_internal.h">
+      <Filter>ThirdParty\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ThirdParty\imgui\stb_rect_pack.h">
+      <Filter>ThirdParty\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ThirdParty\imgui\stb_textedit.h">
+      <Filter>ThirdParty\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ThirdParty\imgui\stb_truetype.h">
+      <Filter>ThirdParty\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ThirdParty\imgui\glfwExample\imgui_impl_glfw_gl3.h">
+      <Filter>ThirdParty\imgui\glfwExample</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Core\Clock.cpp">
@@ -322,6 +346,18 @@
     <ClCompile Include="..\src\Core\AssetRegistry.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\ThirdParty\imgui\imgui_draw.cpp">
+      <Filter>ThirdParty\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ThirdParty\imgui\imgui.cpp">
+      <Filter>ThirdParty\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ThirdParty\imgui\imgui_demo.cpp">
+      <Filter>ThirdParty\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ThirdParty\imgui\glfwExample\imgui_impl_glfw_gl3.cpp">
+      <Filter>ThirdParty\imgui\glfwExample</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Math">
@@ -368,6 +404,12 @@
     </Filter>
     <Filter Include="ThirdParty\dirent">
       <UniqueIdentifier>{c4c4a003-9465-4141-9a8f-fe7565fb833b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty\imgui">
+      <UniqueIdentifier>{ba007322-657e-415d-a9a3-19877c01cf4f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty\imgui\glfwExample">
+      <UniqueIdentifier>{04b6cb21-4080-4503-b648-1e1f7a101a0a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

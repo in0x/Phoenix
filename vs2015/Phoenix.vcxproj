@@ -198,6 +198,7 @@
     <ClInclude Include="..\src\Core\SerialUtil.hpp" />
     <ClInclude Include="..\src\Core\Shader.hpp" />
     <ClInclude Include="..\src\Core\FNVHash.hpp" />
+    <ClInclude Include="..\src\Core\SimpleWorld.hpp" />
     <ClInclude Include="..\src\Core\StringTokenizer.hpp" />
     <ClInclude Include="..\src\Core\Texture.hpp" />
     <ClInclude Include="..\src\Core\Clock.hpp" />
@@ -251,6 +252,13 @@
     <ClInclude Include="..\src\ThirdParty\glew\wglew.h" />
     <ClInclude Include="..\src\ThirdParty\glfw\glfw3.h" />
     <ClInclude Include="..\src\ThirdParty\glfw\glfw3native.h" />
+    <ClInclude Include="..\src\ThirdParty\imgui\glfwExample\imgui_impl_glfw_gl3.h" />
+    <ClInclude Include="..\src\ThirdParty\imgui\imconfig.h" />
+    <ClInclude Include="..\src\ThirdParty\imgui\imgui.h" />
+    <ClInclude Include="..\src\ThirdParty\imgui\imgui_internal.h" />
+    <ClInclude Include="..\src\ThirdParty\imgui\stb_rect_pack.h" />
+    <ClInclude Include="..\src\ThirdParty\imgui\stb_textedit.h" />
+    <ClInclude Include="..\src\ThirdParty\imgui\stb_truetype.h" />
     <ClInclude Include="..\src\ThirdParty\STB\stb_easy_font.h" />
     <ClInclude Include="..\src\ThirdParty\STB\stb_image.h" />
     <ClInclude Include="..\src\ThirdParty\tinyobj\tiny_obj_loader.h" />
@@ -294,6 +302,10 @@
     <ClCompile Include="..\src\Render\RIOpenGL\RIOpenGL.cpp" />
     <ClCompile Include="..\src\Tests\MathTests.cpp" />
     <ClCompile Include="..\src\Tests\MemoryTests.cpp" />
+    <ClCompile Include="..\src\ThirdParty\imgui\glfwExample\imgui_impl_glfw_gl3.cpp" />
+    <ClCompile Include="..\src\ThirdParty\imgui\imgui.cpp" />
+    <ClCompile Include="..\src\ThirdParty\imgui\imgui_demo.cpp" />
+    <ClCompile Include="..\src\ThirdParty\imgui\imgui_draw.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

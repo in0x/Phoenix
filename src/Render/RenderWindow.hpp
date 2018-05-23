@@ -77,7 +77,9 @@ namespace Phoenix
 		RenderWindow() {}
 		virtual ~RenderWindow() {}
 
-		virtual bool wantsToClose() { return false; }
+		virtual void* getApiHandle() { return nullptr; };
+
+		virtual bool wantsToClose() { return true; }
 
 		Key::State m_keyStates[Key::Value::NumValues];
 		MouseState m_mouseState;

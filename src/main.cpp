@@ -23,6 +23,9 @@
 #include "Core/Components/CTransform.hpp"
 #include "Core/Components/CPointLight.hpp"
 
+#include "ThirdParty/imgui/imgui.h"
+#include "ThirdParty/imgui/glfwExample/imgui_impl_glfw_gl3.h"
+
 namespace Phoenix
 {
 	std::vector<EntityHandle> meshEntitiesFromObj(World* world, IRIDevice* renderDevice, const char* meshPath, AssetRegistry* assets)
@@ -64,6 +67,26 @@ namespace Phoenix
 
 		return entity;
 	}
+
+	void initImGui(RenderWindow* window)
+	{
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
+		ImGuiIO& io = ImGui::GetIO(); (void)io;
+		ImGui_ImplGlfwGL3_Init(window->getApiHandle(), false);
+		ImGui::StyleColorsDark();
+	}
+
+	void renderImGui()
+	{
+		ImGui_ImplGlfwGL3_RenderDrawData();
+	}
+
+	void exitImGui()
+	{
+		ImGui_ImplGlfwGL3_Shutdown();
+		ImGui::DestroyContext();
+	}
 }
 
 void run()
@@ -98,6 +121,8 @@ void run()
 	RenderWindow* gameWindow = RI::createWindow(config);
 
 	RI::setWindowToRenderTo(gameWindow);
+
+	initImGui(gameWindow);
 
 	DeferredRenderer renderer(renderDevice, renderContext, config.width, config.height);
 
@@ -150,10 +175,7 @@ void run()
 	}
 #endif // PHI_LOAD
 
-	//EntityHandle light = world.createEntity();
-	//world.addComponent<CDirectionalLight>(light, Vec3(-0.5f, -0.5f, -0.5f), Vec3(253.0 / 255.0, 230.0 / 255.0, 155.0 / 255.0) * 2.0f);
-	
-	createPointLightEntity(&world, Vec3(0.0, 25.0, -5.0), 1000.0f, Vec3(1.0, 0.0, 0.0), 1000.0f);
+	createPointLightEntity(&world, Vec3(0.0, 2.0, -5.0), 1000.0f, Vec3(1.0, 1.0, 1.0), 1000.0f);
 
 	using Clock = std::chrono::high_resolution_clock;
 	using pointInTime = std::chrono::time_point<std::chrono::high_resolution_clock>;
@@ -177,6 +199,8 @@ void run()
 	while (!gameWindow->wantsToClose())
 	{
 		Platform::pollEvents();
+
+		ImGui_ImplGlfwGL3_NewFrame();
 
 		pointInTime currentTime = Clock::now();
 		std::chrono::duration<float> timeSpan = currentTime - lastTime;
@@ -274,13 +298,42 @@ void run()
 
 		renderer.copyFinalColorToBackBuffer();
 
+		Vec3 editColor;
+		static bool checkBox = false;
+
+		static float f = 0.0f;
+		static int counter = 0;
+		ImGui::Text("Hello, world!");                           
+		ImGui::SliderFloat("float", &f, 0.0f, 1.0f);                
+		ImGui::ColorEdit3("clear color", (float*)&editColor);	
+
+		ImGui::Checkbox("Demo Window", &checkBox);				
+		
+		if (ImGui::Button("Button"))							
+		{
+			counter++;
+		}
+		
+		ImGui::SameLine();
+		ImGui::Text("counter = %d", counter);
+
+		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+
+		if (checkBox)
+		{
+			ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiCond_FirstUseEver); // Normally user code doesn't need/want to call this because positions are saved in .ini file anyway. Here we just want to make the demo initial state a bit more friendly!
+			ImGui::ShowDemoWindow(&checkBox);
+		}
+
+		renderImGui();
+
 		RI::swapBufferToWindow(gameWindow);
 	}
 
+	exitImGui();
 	RI::destroyWindow(gameWindow);
 	RI::exit();
 	Logger::exit();
-
 }
 
 int main(int argc, char** argv)
