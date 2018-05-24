@@ -312,7 +312,7 @@ namespace Phoenix
 		return totalMods;
 	}
 
-	MouseState::Button mouseButtonFromGlfw(int button)
+	MouseButton mouseButtonFromGlfw(int button)
 	{
 
 #define IMPL_BT_SWITCH(glfw, value) \
@@ -323,15 +323,15 @@ namespace Phoenix
 
 		switch (button)
 		{
-			IMPL_BT_SWITCH(GLFW_MOUSE_BUTTON_LEFT, MouseState::Left)
-			IMPL_BT_SWITCH(GLFW_MOUSE_BUTTON_RIGHT, MouseState::Right)
-			IMPL_BT_SWITCH(GLFW_MOUSE_BUTTON_MIDDLE, MouseState::Middle)
-			IMPL_BT_SWITCH(GLFW_MOUSE_BUTTON_4, MouseState::Mouse4)
-			IMPL_BT_SWITCH(GLFW_MOUSE_BUTTON_5, MouseState::Mouse5)
+			IMPL_BT_SWITCH(GLFW_MOUSE_BUTTON_LEFT, MouseButton::Left)
+			IMPL_BT_SWITCH(GLFW_MOUSE_BUTTON_RIGHT, MouseButton::Right)
+			IMPL_BT_SWITCH(GLFW_MOUSE_BUTTON_MIDDLE, MouseButton::Middle)
+			IMPL_BT_SWITCH(GLFW_MOUSE_BUTTON_4, MouseButton::Mouse4)
+			IMPL_BT_SWITCH(GLFW_MOUSE_BUTTON_5, MouseButton::Mouse5)
 		default:
 			{
 				Logger::warningf("Attempted to convert unhandled button value: %d", button);
-				return MouseState::NumButtons;
+				return MouseButton::NumButtons;
 			}
 		}
 	}

@@ -72,14 +72,30 @@ namespace Phoenix
 	{
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
-		ImGuiIO& io = ImGui::GetIO(); (void)io;
-		ImGui_ImplGlfwGL3_Init(window->getApiHandle(), false);
+		ImGui_ImplGlfwGL3_Init(window->getApiHandle(), true); // Need to use io.WantX properties to filter which input should be passed on to Phoenix
 		ImGui::StyleColorsDark();
 	}
 
 	void renderImGui()
 	{
 		ImGui_ImplGlfwGL3_RenderDrawData();
+	}
+
+	void filterUiConsumeInput(KbState* kbstate, MouseState* mousestate, float mousePrevX, float mousePrevY)
+	{
+		ImGuiIO& io = ImGui::GetIO(); 
+		
+		if (io.WantCaptureKeyboard)
+		{
+			memset(kbstate, 0, sizeof(KbState));
+		}
+
+		if (io.WantCaptureMouse)
+		{
+			memset(mousestate, 0, sizeof(MouseState));
+			mousestate->m_x = mousePrevX;
+			mousestate->m_y = mousePrevY;
+		}
 	}
 
 	void exitImGui()
@@ -199,8 +215,10 @@ void run()
 	while (!gameWindow->wantsToClose())
 	{
 		Platform::pollEvents();
-
+		
 		ImGui_ImplGlfwGL3_NewFrame();
+
+		filterUiConsumeInput(&gameWindow->m_keyStates, &gameWindow->m_mouseState, prevMouseX, prevMouseY);;
 
 		pointInTime currentTime = Clock::now();
 		std::chrono::duration<float> timeSpan = currentTime - lastTime;
@@ -248,7 +266,7 @@ void run()
 
 		MouseState mouse = gameWindow->m_mouseState;
 
-		if (mouse.m_buttonStates[MouseState::Left] == Input::Press)
+		if (mouse.m_buttonStates[MouseButton::Left] == Input::Press)
 		{
 			float dx = mouse.m_x - prevMouseX;
 			float dy = mouse.m_y - prevMouseY;

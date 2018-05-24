@@ -45,13 +45,6 @@
 #include <ThirdParty/glfw/glfw3.h>
 #include <Render/RIOpenGL/OpenGL.hpp>
 
-//#ifdef _WIN32
-//#undef APIENTRY
-//#define GLFW_EXPOSE_NATIVE_WIN32
-//#define GLFW_EXPOSE_NATIVE_WGL
-//#include <GLFW/glfw3native.h>
-//#endif
-
 // GLFW data
 static GLFWwindow*  g_Window = NULL;
 static double       g_Time = 0.0;
@@ -359,9 +352,9 @@ void    ImGui_ImplGlfwGL3_InvalidateDeviceObjects()
 
 static void ImGui_ImplGlfw_InstallCallbacks(GLFWwindow* window)
 {
-    glfwSetMouseButtonCallback(window, ImGui_ImplGlfw_MouseButtonCallback);
-    glfwSetScrollCallback(window, ImGui_ImplGlfw_ScrollCallback);
-    glfwSetKeyCallback(window, ImGui_ImplGlfw_KeyCallback);
+    //glfwSetMouseButtonCallback(window, ImGui_ImplGlfw_MouseButtonCallback);
+    //glfwSetScrollCallback(window, ImGui_ImplGlfw_ScrollCallback);
+    //glfwSetKeyCallback(window, ImGui_ImplGlfw_KeyCallback);
     glfwSetCharCallback(window, ImGui_ImplGlfw_CharCallback);
 }
 
@@ -408,12 +401,8 @@ bool    ImGui_ImplGlfwGL3_Init(void* windowHandle, bool install_callbacks, const
 
     io.SetClipboardTextFn = ImGui_ImplGlfwGL3_SetClipboardText;
     io.GetClipboardTextFn = ImGui_ImplGlfwGL3_GetClipboardText;
-    io.ClipboardUserData = g_Window;
+    io.ClipboardUserData = g_Window; 
 
-//#ifdef _WIN32
-//    io.ImeWindowHandle = glfwGetWin32Window(g_Window);
-//#endif
-//
     // Load cursors
     // FIXME: GLFW doesn't expose suitable cursors for ResizeAll, ResizeNESW, ResizeNWSE. We revert to arrow cursor for those.
     g_MouseCursors[ImGuiMouseCursor_Arrow] = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
@@ -504,39 +493,7 @@ void ImGui_ImplGlfwGL3_NewFrame()
         }
     }
 
-    // Gamepad navigation mapping [BETA]
     memset(io.NavInputs, 0, sizeof(io.NavInputs));
-    if (io.ConfigFlags & ImGuiConfigFlags_NavEnableGamepad)
-    {
-        // Update gamepad inputs
-        #define MAP_BUTTON(NAV_NO, BUTTON_NO)       { if (buttons_count > BUTTON_NO && buttons[BUTTON_NO] == GLFW_PRESS) io.NavInputs[NAV_NO] = 1.0f; }
-        #define MAP_ANALOG(NAV_NO, AXIS_NO, V0, V1) { float v = (axes_count > AXIS_NO) ? axes[AXIS_NO] : V0; v = (v - V0) / (V1 - V0); if (v > 1.0f) v = 1.0f; if (io.NavInputs[NAV_NO] < v) io.NavInputs[NAV_NO] = v; }
-        int axes_count = 0, buttons_count = 0;
-        const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &axes_count);
-        const unsigned char* buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &buttons_count);
-        MAP_BUTTON(ImGuiNavInput_Activate,   0);     // Cross / A
-        MAP_BUTTON(ImGuiNavInput_Cancel,     1);     // Circle / B
-        MAP_BUTTON(ImGuiNavInput_Menu,       2);     // Square / X
-        MAP_BUTTON(ImGuiNavInput_Input,      3);     // Triangle / Y
-        MAP_BUTTON(ImGuiNavInput_DpadLeft,   13);    // D-Pad Left
-        MAP_BUTTON(ImGuiNavInput_DpadRight,  11);    // D-Pad Right
-        MAP_BUTTON(ImGuiNavInput_DpadUp,     10);    // D-Pad Up
-        MAP_BUTTON(ImGuiNavInput_DpadDown,   12);    // D-Pad Down
-        MAP_BUTTON(ImGuiNavInput_FocusPrev,  4);     // L1 / LB
-        MAP_BUTTON(ImGuiNavInput_FocusNext,  5);     // R1 / RB
-        MAP_BUTTON(ImGuiNavInput_TweakSlow,  4);     // L1 / LB
-        MAP_BUTTON(ImGuiNavInput_TweakFast,  5);     // R1 / RB
-        MAP_ANALOG(ImGuiNavInput_LStickLeft, 0,  -0.3f,  -0.9f);
-        MAP_ANALOG(ImGuiNavInput_LStickRight,0,  +0.3f,  +0.9f);
-        MAP_ANALOG(ImGuiNavInput_LStickUp,   1,  +0.3f,  +0.9f);
-        MAP_ANALOG(ImGuiNavInput_LStickDown, 1,  -0.3f,  -0.9f);
-        #undef MAP_BUTTON
-        #undef MAP_ANALOG
-        if (axes_count > 0 && buttons_count > 0) 
-            io.BackendFlags |= ImGuiBackendFlags_HasGamepad; 
-        else 
-            io.BackendFlags &= ~ImGuiBackendFlags_HasGamepad;
-    }
 
     // Start the frame. This call will update the io.WantCaptureMouse, io.WantCaptureKeyboard flag that you can use to dispatch inputs (or not) to your application.
     ImGui::NewFrame();

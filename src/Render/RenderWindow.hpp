@@ -16,7 +16,7 @@ namespace Phoenix
 	{
 		enum Action
 		{
-			Release,
+			Release = 0,
 			Press,
 			Repeat,
 			NumActions
@@ -52,25 +52,27 @@ namespace Phoenix
 			int m_modifiers;
 		};
 	};
+	
+	enum MouseButton
+	{
+		Left,
+		Right,
+		Middle,
+		Mouse4,
+		Mouse5,
+		NumButtons
+	};
 
 	struct MouseState
 	{		
-		enum Button
-		{
-			Left,
-			Right,
-			Middle,
-			Mouse4,
-			Mouse5,
-			NumButtons
-		};
-
 		float m_x;
 		float m_y;
 
 		Input::Action m_buttonStates[NumButtons];
 	};
 
+	using KbState = Key::State[Key::Value::NumValues];
+	
 	class RenderWindow
 	{
 	public:
@@ -81,7 +83,7 @@ namespace Phoenix
 
 		virtual bool wantsToClose() { return true; }
 
-		Key::State m_keyStates[Key::Value::NumValues];
+		KbState m_keyStates;
 		MouseState m_mouseState;
 	};
 }
