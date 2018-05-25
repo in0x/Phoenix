@@ -16,7 +16,6 @@
 namespace Phoenix
 {
 	void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
-	void mouseMoveCallback(GLFWwindow* window, double x, double y);
 	void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 
 	class GlRenderWindow : public RenderWindow
@@ -38,7 +37,6 @@ namespace Phoenix
 			if (m_glfwWindow)
 			{
 				glfwSetKeyCallback(m_glfwWindow, &keyCallback);
-				glfwSetCursorPosCallback(m_glfwWindow, &mouseMoveCallback);
 				glfwSetMouseButtonCallback(m_glfwWindow, &mouseButtonCallback);
 			}
 
@@ -336,11 +334,18 @@ namespace Phoenix
 		}
 	}
 
+	void updateMousePos(GlRenderWindow* renderWindow);
+
 	namespace Platform
 	{
 		void pollEvents()
 		{
 			glfwPollEvents(); 
+			
+			for (GlRenderWindow* window : g_impl->m_pWindows)
+			{
+				updateMousePos(window);
+			}
 		}
 	}
 
@@ -358,20 +363,23 @@ namespace Phoenix
 		renderWindow->m_keyStates[value].m_action = actionFromGlfw(action);
 		renderWindow->m_keyStates[value].m_modifiers = modifierFromGlfw(mods);
 	}
-
-	void mouseMoveCallback(GLFWwindow* window, double x, double y)
+	
+	void updateMousePos(GlRenderWindow* renderWindow)
 	{
-		GlRenderWindow* renderWindow = windowFromGlfw(window);
+		double x, y;
+		glfwGetCursorPos(renderWindow->m_glfwWindow, &x, &y);
+
+		renderWindow->m_mouseState.m_prev_x = renderWindow->m_mouseState.m_x;
+		renderWindow->m_mouseState.m_prev_y = renderWindow->m_mouseState.m_y;
 		renderWindow->m_mouseState.m_x = static_cast<float>(x);
 		renderWindow->m_mouseState.m_y = static_cast<float>(y);
 	}
 
 	void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 	{
-		(void)mods;
+		(void)mods; 
 		GlRenderWindow* renderWindow = windowFromGlfw(window);
 		MouseState& state = renderWindow->m_mouseState;
-
 		state.m_buttonStates[mouseButtonFromGlfw(button)] = actionFromGlfw(action);
 	}
 }

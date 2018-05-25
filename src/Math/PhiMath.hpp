@@ -58,7 +58,19 @@ namespace Phoenix
 	{
 		return (1.0f - f) * a + f * b;
 	}
+
+	template <typename T>
+	T max(T a, T b)
+	{
+		return a > b ? a : b;
+	}
 	
+	template <typename T>
+	T min(T a, T b)
+	{
+		return a < b ? a : b;
+	}
+
 	Matrix4 lookAtRH(Vec3& cameraPos, Vec3& target, Vec3& up);
 	Matrix4 perspectiveRH(float yFOV, float aspect, float near, float far);		
 	Matrix4 orthographicRH(float yFOV, float aspect, float near, float far);

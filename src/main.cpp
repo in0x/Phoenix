@@ -67,7 +67,67 @@ namespace Phoenix
 		return entity;
 	}
 
+	void moveCamera(Camera* camera, const KbState& kbstate, float dt)
+	{
+		static Vec2 cameraVelocity;
+		const float cameraAccel = 15.0f;
+		const float cameraDrag = 0.85f;
+		const float cameraVelMax = 50.0f;
 
+		cameraVelocity *= cameraDrag;
+
+		float cameraAccelThisFrame = cameraAccel;
+
+		Input::Action state_a = kbstate[Key::A].m_action;
+		if (state_a == Input::Press || state_a == Input::Repeat)
+		{
+			cameraVelocity.x -= cameraAccelThisFrame;
+		}
+
+		Input::Action state_d = kbstate[Key::D].m_action;
+		if (state_d == Input::Press || state_d == Input::Repeat)
+		{
+			cameraVelocity.x += cameraAccelThisFrame;
+		}
+
+		Input::Action state_w = kbstate[Key::W].m_action;
+		if (state_w == Input::Press || state_w == Input::Repeat)
+		{
+			cameraVelocity.y -= cameraAccelThisFrame;
+		}
+
+		Input::Action state_s = kbstate[Key::S].m_action;
+		if (state_s == Input::Press || state_s == Input::Repeat)
+		{
+			cameraVelocity.y += cameraAccelThisFrame;
+		}
+
+		float cameraVelLen = cameraVelocity.length();
+
+		if (cameraVelLen > cameraVelMax)
+		{
+			cameraVelocity.normalize();
+			cameraVelocity *= cameraVelMax;
+		}
+
+		camera->moveRight(cameraVelocity.x * dt);
+		camera->moveForward(cameraVelocity.y * dt);
+	}
+
+	void lookCamera(Camera* camera, const MouseState& mousestate, float dt)
+	{
+		if (mousestate.m_buttonStates[MouseButton::Left] == Input::Press)
+		{
+			float dx = mousestate.m_x - mousestate.m_prev_x;
+			float dy = mousestate.m_y - mousestate.m_prev_y;
+
+			dx = -radians(dx / 10.0f);
+			dy = -radians(dy / 10.0f);
+
+			camera->yaw(dx);
+			camera->pitch(dy);
+		}
+	}
 }
 
 void run()
@@ -165,16 +225,7 @@ void run()
 	
 	Platform::pollEvents();
 
-	float prevMouseX = gameWindow->m_mouseState.m_x;
-	float prevMouseY = gameWindow->m_mouseState.m_y;
-
-	Camera camera;
-
-	Vec2 cameraVelocity;
-	float cameraAccel = 15.0f;
-	float cameraDrag = 0.85f;
-	float cameraVelMax = 50.0f;
-
+	Camera camera;	
 	LightBuffer lightBuffer;
 
 	while (!gameWindow->wantsToClose())
@@ -200,78 +251,22 @@ void run()
 		float dt = timeSpan.count();
 		lastTime = currentTime;
 
-		cameraVelocity *= cameraDrag;
-
-		float cameraAccelThisFrame = cameraAccel;
-
-		Input::Action state_a = gameWindow->m_keyStates[Key::A].m_action;
-		if (state_a == Input::Press || state_a == Input::Repeat)
-		{
-			cameraVelocity.x -= cameraAccelThisFrame;
-		}
-
-		Input::Action state_d = gameWindow->m_keyStates[Key::D].m_action;
-		if (state_d == Input::Press || state_d == Input::Repeat)
-		{
-			cameraVelocity.x += cameraAccelThisFrame;
-		}
-
-		Input::Action state_w = gameWindow->m_keyStates[Key::W].m_action;
-		if (state_w == Input::Press || state_w == Input::Repeat)
-		{
-			cameraVelocity.y -= cameraAccelThisFrame;
-		}
-
-		Input::Action state_s = gameWindow->m_keyStates[Key::S].m_action;
-		if (state_s == Input::Press || state_s == Input::Repeat)
-		{
-			cameraVelocity.y += cameraAccelThisFrame;
-		}
-
-		float cameraVelLen = cameraVelocity.length();
-
-		if (cameraVelLen > cameraVelMax)
-		{
-			cameraVelocity.normalize();
-			cameraVelocity *= cameraVelMax;
-		}
-
-		camera.moveRight(cameraVelocity.x * dt);
-		camera.moveForward(cameraVelocity.y * dt);
-
-		MouseState mouse = gameWindow->m_mouseState;
-
-		if (mouse.m_buttonStates[MouseButton::Left] == Input::Press)
-		{
-			float dx = mouse.m_x - prevMouseX;
-			float dy = mouse.m_y - prevMouseY;
-
-			dx = -radians(dx / 10.0f);
-			dy = -radians(dy / 10.0f);
-
-			camera.yaw(dx);
-			camera.pitch(dy);
-		}
-
-		prevMouseX = mouse.m_x;
-		prevMouseY = mouse.m_y;
-
+		moveCamera(&camera, gameWindow->m_keyStates, dt);
+		lookCamera(&camera, gameWindow->m_mouseState, dt);
+		
 		viewTf = camera.getUpdatedViewMatrix();
 		renderer.setViewMatrix(viewTf);
-
 		renderer.setupGBufferPass();
 
 		for (CStaticMesh& mesh : ComponentIterator<CStaticMesh>(&world))
 		{
 			CTransform* transform = mesh.sibling<CTransform>();
-
 			renderer.drawStaticMesh(mesh.m_mesh, transform->m_cached);
 		}
 
-		renderer.setupDirectionalLightPass();
-
+		renderer.setupDirectLightingPass();
 		lightBuffer.clear();
-
+		
 		for (CDirectionalLight& dirLight : ComponentIterator<CDirectionalLight>(&world))
 		{
 			lightBuffer.addDirectional(viewTf * dirLight.m_direction, dirLight.m_color);
@@ -288,35 +283,9 @@ void run()
 		}
 
 		renderer.runLightsPass(lightBuffer);
-
 		renderer.copyFinalColorToBackBuffer();
 
-		static Vec3 editColor;
-		static bool checkBox = false;
-
-		static float f = 0.0f;
-		static int counter = 0;
-		ImGui::Text("Hello, world!");                           
-		ImGui::SliderFloat("float", &f, 0.0f, 1.0f);                
-		ImGui::ColorEdit3("clear color", (float*)&editColor);	
-
-		ImGui::Checkbox("Demo Window", &checkBox);				
-		
-		if (ImGui::Button("Button"))							
-		{
-			counter++;
-		}
-		
-		ImGui::SameLine();
-		ImGui::Text("counter = %d", counter);
-
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-
-		if (checkBox)
-		{
-			ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiCond_FirstUseEver); // Normally user code doesn't need/want to call this because positions are saved in .ini file anyway. Here we just want to make the demo initial state a bit more friendly!
-			ImGui::ShowDemoWindow(&checkBox);
-		}
 
 		renderImGui();
 
