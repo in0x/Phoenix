@@ -23,8 +23,7 @@
 #include "Core/Components/CTransform.hpp"
 #include "Core/Components/CPointLight.hpp"
 
-#include "ThirdParty/imgui/imgui.h"
-#include "ThirdParty/imgui/glfwExample/imgui_impl_glfw_gl3.h"
+#include "UI/PhiImGui.h"
 
 namespace Phoenix
 {
@@ -68,41 +67,7 @@ namespace Phoenix
 		return entity;
 	}
 
-	void initImGui(RenderWindow* window)
-	{
-		IMGUI_CHECKVERSION();
-		ImGui::CreateContext();
-		ImGui_ImplGlfwGL3_Init(window->getApiHandle(), true); // Need to use io.WantX properties to filter which input should be passed on to Phoenix
-		ImGui::StyleColorsDark();
-	}
 
-	void renderImGui()
-	{
-		ImGui_ImplGlfwGL3_RenderDrawData();
-	}
-
-	void filterUiConsumeInput(KbState* kbstate, MouseState* mousestate, float mousePrevX, float mousePrevY)
-	{
-		ImGuiIO& io = ImGui::GetIO(); 
-		
-		if (io.WantCaptureKeyboard)
-		{
-			memset(kbstate, 0, sizeof(KbState));
-		}
-
-		if (io.WantCaptureMouse)
-		{
-			memset(mousestate, 0, sizeof(MouseState));
-			mousestate->m_x = mousePrevX;
-			mousestate->m_y = mousePrevY;
-		}
-	}
-
-	void exitImGui()
-	{
-		ImGui_ImplGlfwGL3_Shutdown();
-		ImGui::DestroyContext();
-	}
 }
 
 void run()
@@ -216,9 +181,19 @@ void run()
 	{
 		Platform::pollEvents();
 		
-		ImGui_ImplGlfwGL3_NewFrame();
+		UiInputConsume ioConsumed = filterUiConsumedInput();
 
-		filterUiConsumeInput(&gameWindow->m_keyStates, &gameWindow->m_mouseState, prevMouseX, prevMouseY);;
+		if (ioConsumed.m_bConsumedKeyboard)
+		{
+			resetKbState(&gameWindow->m_keyStates);
+		}
+
+		if (ioConsumed.m_bConsumedMouse)
+		{
+			resetMouseState(&gameWindow->m_mouseState);
+		}
+		
+		startFrameImGui();
 
 		pointInTime currentTime = Clock::now();
 		std::chrono::duration<float> timeSpan = currentTime - lastTime;
@@ -316,7 +291,7 @@ void run()
 
 		renderer.copyFinalColorToBackBuffer();
 
-		Vec3 editColor;
+		static Vec3 editColor;
 		static bool checkBox = false;
 
 		static float f = 0.0f;

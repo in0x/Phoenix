@@ -68,11 +68,26 @@ namespace Phoenix
 		float m_x;
 		float m_y;
 
+		float m_prev_x;
+		float m_prev_y;
+
 		Input::Action m_buttonStates[NumButtons];
 	};
 
 	using KbState = Key::State[Key::Value::NumValues];
 	
+	static void resetKbState(KbState* state)
+	{
+		memset(state, 0, sizeof(KbState));
+	}
+	
+	static void resetMouseState(MouseState* state)
+	{
+		state->m_x = state->m_prev_x;
+		state->m_y = state->m_prev_y;
+		memset(state->m_buttonStates, 0, sizeof(state->m_buttonStates));
+	}
+
 	class RenderWindow
 	{
 	public:

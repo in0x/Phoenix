@@ -262,6 +262,7 @@
     <ClInclude Include="..\src\ThirdParty\STB\stb_easy_font.h" />
     <ClInclude Include="..\src\ThirdParty\STB\stb_image.h" />
     <ClInclude Include="..\src\ThirdParty\tinyobj\tiny_obj_loader.h" />
+    <ClInclude Include="..\src\UI\PhiImGui.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Core\AssetRegistry.cpp" />
@@ -306,6 +307,7 @@
     <ClCompile Include="..\src\ThirdParty\imgui\imgui.cpp" />
     <ClCompile Include="..\src\ThirdParty\imgui\imgui_demo.cpp" />
     <ClCompile Include="..\src\ThirdParty\imgui\imgui_draw.cpp" />
+    <ClCompile Include="..\src\UI\PhiImGui.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -241,6 +241,9 @@
     <ClInclude Include="..\src\ThirdParty\imgui\glfwExample\imgui_impl_glfw_gl3.h">
       <Filter>ThirdParty\imgui\glfwExample</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\UI\PhiImGui.h">
+      <Filter>UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Core\Clock.cpp">
@@ -358,6 +361,9 @@
     <ClCompile Include="..\src\ThirdParty\imgui\glfwExample\imgui_impl_glfw_gl3.cpp">
       <Filter>ThirdParty\imgui\glfwExample</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\UI\PhiImGui.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Math">
@@ -410,6 +416,9 @@
     </Filter>
     <Filter Include="ThirdParty\imgui\glfwExample">
       <UniqueIdentifier>{04b6cb21-4080-4503-b648-1e1f7a101a0a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI">
+      <UniqueIdentifier>{f40e95dd-5315-4e34-b64a-3153bbc405c4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
