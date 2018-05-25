@@ -134,7 +134,7 @@ namespace Phoenix
 		m_context->unbindTextures();
 	}
 
-	void DeferredRenderer::setupDirectionalLightPass()
+	void DeferredRenderer::setupDirectLightingPass()
 	{
 		m_context->bindRenderTarget(m_backBuffer);
 		
