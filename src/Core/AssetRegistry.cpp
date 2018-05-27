@@ -144,7 +144,7 @@ namespace Phoenix
 		saveMaterialCache(ar, &registry, registry.m_materialCache);
 		saveMeshCache(ar, &registry, registry.m_staticMeshCache);
 
-		std::string savePath = "Assets/";
+		std::string savePath = registry.getAssetsPath();
 		savePath += path;
 
 		EArchiveError err = writeArchiveToDisk(savePath.c_str(), ar);
