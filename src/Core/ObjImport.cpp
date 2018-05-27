@@ -1,12 +1,13 @@
 #include "ObjImport.hpp"
 
+#include <Render/RIDevice.hpp>
+#include <Render/RIContext.hpp>
+
 #include <Core/Logger.hpp>
+#include <Core/Mesh.hpp>
 #include <Core/Texture.hpp>
 #include <Core/Material.hpp>
 #include <Core/AssetRegistry.hpp>
-
-#include <Render/RIDevice.hpp>
-#include <Render/RIContext.hpp>
 
 #include <algorithm>
 
@@ -261,16 +262,16 @@ namespace Phoenix
 	}
 
 	// Loads the .obj file and its mtl(s), converts the mesh into a format drawable by our renderer and creates the GPU resources.
-	std::vector<StaticMesh> importObjContents(const char* assetPath, const char* mtlPath, InitResources resources)
+	std::vector<StaticMesh*> importObjContents(const char* assetPath, const char* mtlPath, InitResources resources)
 	{
 		std::vector<MeshImport> imports = loadObj(assetPath, mtlPath);
 
-		std::vector<StaticMesh> meshes;
+		std::vector<StaticMesh*> meshes;
 
 		for (const MeshImport& import : imports)
 		{
-			meshes.emplace_back();
-			StaticMesh* mesh = &meshes.back();
+			StaticMesh* mesh = resources.assets->allocStaticMesh(import.m_name.c_str());
+			meshes.push_back(mesh);
 
 			mesh->m_name = import.m_name;
 			mesh->m_data = std::move(import.m_meshData);
@@ -282,7 +283,7 @@ namespace Phoenix
 		return meshes;
 	}
 
-	std::vector<StaticMesh> importObj(const char* path, IRIDevice* renderDevice, IRIContext* renderContext, AssetRegistry* assets)
+	std::vector<StaticMesh*> importObj(const char* path, IRIDevice* renderDevice, IRIContext* renderContext, AssetRegistry* assets)
 	{
 		const char* fileDot = strrchr(path, '.');
 		size_t pathLen = strlen(path);

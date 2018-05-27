@@ -1,9 +1,9 @@
 #include "Material.hpp"
 
-#include <Core/AssetRegistry.hpp>
 #include <Core/Texture.hpp>
 #include <Core/Serialize.hpp>
 #include <Core/SerialUtil.hpp>
+#include <Core/AssetRegistry.hpp>
 
 namespace Phoenix
 {
@@ -112,7 +112,9 @@ namespace Phoenix
 		assert(err == EArchiveError::NoError);
 		destroyArchive(ar);
 	}
-	
+
+	extern Texture2D* loadTexture(const char* assetPath, class IRIDevice* renderDevice, class IRIContext* renderContext, AssetRegistry* assets);
+
 	Material* loadMaterial(const char* path, IRIDevice* renderDevice, IRIContext* renderContext, AssetRegistry* assets)
 	{
 		Material* mat = assets->getMaterial(path);

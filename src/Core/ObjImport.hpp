@@ -2,9 +2,7 @@
 
 #include <vector>
 
-#include <Core/Mesh.hpp>
-
 namespace Phoenix
 {
-	std::vector<StaticMesh> importObj(const char* path, IRIDevice* renderDevice, IRIContext* renderContext, AssetRegistry* assets);
+	std::vector<struct StaticMesh*> importObj(const char* path, class IRIDevice* renderDevice, class IRIContext* renderContext, class AssetRegistry* assets);
 }

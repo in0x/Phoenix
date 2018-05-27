@@ -139,35 +139,11 @@
     <ClInclude Include="..\src\Core\Engine.hpp">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Memory\ChunkArray.hpp">
-      <Filter>Memory</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\ThirdParty\STB\stb_image.h">
       <Filter>ThirdParty\STB</Filter>
     </ClInclude>
     <ClInclude Include="..\src\ThirdParty\STB\stb_easy_font.h">
       <Filter>ThirdParty\STB</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Core\World.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Core\Component.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Core\EcsTypes.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Core\Components\CTransform.hpp">
-      <Filter>Core\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Core\Components\CStaticMesh.hpp">
-      <Filter>Core\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Core\Components\CDirectionalLight.hpp">
-      <Filter>Core\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Core\Components\CCamera.hpp">
-      <Filter>Core\Components</Filter>
     </ClInclude>
     <ClInclude Include="..\src\ThirdParty\tinyobj\tiny_obj_loader.h">
       <Filter>ThirdParty\tinyobj</Filter>
@@ -214,9 +190,6 @@
     <ClInclude Include="..\src\Render\LightBuffer.hpp">
       <Filter>Render</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Core\Components\CPointLight.hpp">
-      <Filter>Core\Components</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Core\SimpleWorld.hpp">
       <Filter>Core</Filter>
     </ClInclude>
@@ -242,6 +215,9 @@
       <Filter>ThirdParty\imgui\glfwExample</Filter>
     </ClInclude>
     <ClInclude Include="..\src\UI\PhiImGui.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\UI\Inspector.hpp">
       <Filter>UI</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Core\Material.hpp">
@@ -352,9 +328,6 @@
     <ClCompile Include="..\src\Core\Camera.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Core\AssetRegistry.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\ThirdParty\imgui\imgui_draw.cpp">
       <Filter>ThirdParty\imgui</Filter>
     </ClCompile>
@@ -410,9 +383,6 @@
     </Filter>
     <Filter Include="ThirdParty\STB">
       <UniqueIdentifier>{982bc338-05d0-424a-a6eb-deec0681d852}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\Components">
-      <UniqueIdentifier>{ad1093e0-5f69-4d27-a3ad-a457af490b91}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\tinyobj">
       <UniqueIdentifier>{ecfa8507-d6b6-426e-9029-4bf533496f7a}</UniqueIdentifier>

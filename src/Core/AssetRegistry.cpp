@@ -28,7 +28,7 @@ namespace Phoenix
 	T* allocAsset(const char* path, AssetCache<T>& cache)
 	{
 		T* asset = new T;
-
+		
 		cache.m_assets.push_back(asset);
 		cache.m_locations.emplace(path, static_cast<int64_t>(cache.m_assets.size() - 1));
 
@@ -64,13 +64,12 @@ namespace Phoenix
 		deleteCache(m_textureCache);
 	}
 
-
 	StaticMesh* AssetRegistry::allocStaticMesh(const char* path)
 	{
 		return allocAsset(path, m_staticMeshCache);
 	}
 	
-	StaticMesh*AssetRegistry::getStaticMesh(const char* path)
+	StaticMesh* AssetRegistry::getStaticMesh(const char* path)
 	{
 		return getAsset(path, m_staticMeshCache);
 	}
@@ -95,7 +94,7 @@ namespace Phoenix
 		return getAsset(path, m_textureCache);
 	}
 
-	void saveTextureCache(WriteArchive& ar, AssetCache<Texture2D>& cache)
+	/*void saveTextureCache(WriteArchive& ar, AssetCache<Texture2D>& cache)
 	{
 		size_t numTex = cache.m_assets.size();
 		serialize(ar, numTex);
@@ -106,7 +105,7 @@ namespace Phoenix
 			saveTexture(*tex, tex->m_name.c_str());
 		}
 	}
-	
+
 	void saveMaterialCache(WriteArchive& ar, AssetCache<Material>& cache)
 	{
 		size_t numMats = cache.m_assets.size();
@@ -157,7 +156,7 @@ namespace Phoenix
 			loadTexture(texName.c_str(), device, context, registry);
 		}
 	}
-	
+
 	void loadMaterialCache(ReadArchive& ar, IRIDevice* device, IRIContext* context, AssetRegistry* registry)
 	{
 		size_t numMats = 0;
@@ -205,5 +204,5 @@ namespace Phoenix
 		destroyArchive(ar);
 
 		return registry;
-	}
+	}*/
 }

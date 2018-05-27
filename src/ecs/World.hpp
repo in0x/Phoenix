@@ -34,7 +34,7 @@ namespace Phoenix
 		}
 
 		template <typename C, typename ...CtorArgs>
-		C* addComponent(EntityHandle handle, CtorArgs&&... ctorArgs)
+		C* addComponent(EntityHandle handle, CtorArgs... ctorArgs)
 		{
 			Entity& entity = m_entities[handle];
 			ComponentTypeId type = getComponentTypeId<C>();

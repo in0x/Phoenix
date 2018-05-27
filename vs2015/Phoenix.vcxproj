@@ -184,13 +184,6 @@
   <ItemGroup>
     <ClInclude Include="..\src\Core\AssetRegistry.hpp" />
     <ClInclude Include="..\src\Core\Camera.hpp" />
-    <ClInclude Include="..\src\Core\Component.hpp" />
-    <ClInclude Include="..\src\Core\Components\CCamera.hpp" />
-    <ClInclude Include="..\src\Core\Components\CDirectionalLight.hpp" />
-    <ClInclude Include="..\src\Core\Components\CPointLight.hpp" />
-    <ClInclude Include="..\src\Core\Components\CStaticMesh.hpp" />
-    <ClInclude Include="..\src\Core\Components\CTransform.hpp" />
-    <ClInclude Include="..\src\Core\EcsTypes.hpp" />
     <ClInclude Include="..\src\Core\Engine.hpp" />
     <ClInclude Include="..\src\Core\FileSystem.hpp" />
     <ClInclude Include="..\src\Core\Material.hpp" />
@@ -207,7 +200,6 @@
     <ClInclude Include="..\src\Core\Logger.hpp" />
     <ClInclude Include="..\src\Core\Windows\PhiWindowsInclude.hpp" />
     <ClInclude Include="..\src\Core\Windows\PlatformWindows.hpp" />
-    <ClInclude Include="..\src\Core\World.hpp" />
     <ClInclude Include="..\src\Math\EulerAngles.hpp" />
     <ClInclude Include="..\src\Math\MathStreamOverloads.hpp" />
     <ClInclude Include="..\src\Math\Matrix3.hpp" />
@@ -220,7 +212,6 @@
     <ClInclude Include="..\src\Math\Vec2.hpp" />
     <ClInclude Include="..\src\Math\Vec3.hpp" />
     <ClInclude Include="..\src\Math\Vec4.hpp" />
-    <ClInclude Include="..\src\Memory\ChunkArray.hpp" />
     <ClInclude Include="..\src\Memory\CircularBuffer.hpp" />
     <ClInclude Include="..\src\Memory\FreeList.hpp" />
     <ClInclude Include="..\src\Memory\MemUtil.hpp" />
@@ -264,6 +255,7 @@
     <ClInclude Include="..\src\ThirdParty\STB\stb_easy_font.h" />
     <ClInclude Include="..\src\ThirdParty\STB\stb_image.h" />
     <ClInclude Include="..\src\ThirdParty\tinyobj\tiny_obj_loader.h" />
+    <ClInclude Include="..\src\UI\Inspector.hpp" />
     <ClInclude Include="..\src\UI\PhiImGui.h" />
   </ItemGroup>
   <ItemGroup>

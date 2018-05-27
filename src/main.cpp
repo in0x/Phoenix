@@ -9,16 +9,12 @@
 #include "Core/Serialize.hpp"
 #include "Core/Camera.hpp"
 #include "Core/ObjImport.hpp"
+#include "Core/Mesh.hpp"
 #include "Core/Texture.hpp"
 #include "Core/Material.hpp"
 #include "Core/Mesh.hpp"
 #include "Core/AssetRegistry.hpp"
 #include "Core/Windows/PlatformWindows.hpp"
-
-#include "Core/Components/CDirectionalLight.hpp"
-#include "Core/Components/CStaticMesh.hpp"
-#include "Core/Components/CTransform.hpp"
-#include "Core/Components/CPointLight.hpp"
 
 #include "Math/PhiMath.hpp"
 
@@ -30,44 +26,101 @@
 
 namespace Phoenix
 {
-	std::vector<EntityHandle> meshEntitiesFromObj(World* world, const char* meshPath, IRIDevice* renderDevice, IRIContext* renderContext, AssetRegistry* assets)
+	struct Transform 
 	{
-		std::vector<EntityHandle> entities;
-		std::vector<StaticMesh> meshes = importObj(meshPath, renderDevice, renderContext, assets);
-
-		for (StaticMesh& mesh : meshes)
+		Transform()
+			: m_translation(0.f, 0.f, 0.f)
+			, m_rotation(0.f, 0.f, 0.f)
+			, m_scale(1.f, 1.f, 1.f)
 		{
-			EntityHandle entity = world->createEntity();
-			world->addComponent<CStaticMesh>(entity, mesh);
-			world->addComponent<CTransform>(entity);
-			entities.push_back(entity);
+			recalculate();
 		}
 
-		return entities;
+		Vec3 m_translation;
+		Vec3 m_scale;
+		Vec3 m_rotation;
+		Matrix4 m_cached;
+
+		const Matrix4& recalculate()
+		{
+			m_cached = Matrix4::translation(m_translation)
+				* Matrix4::rotation(m_rotation)
+				* Matrix4::scale(m_scale);
+
+			return m_cached;
+		}
+	};
+
+	struct StaticMeshEntity
+	{
+		StaticMesh* m_mesh;
+		Transform m_transform;
+	};
+
+	struct DirectionalLight 
+	{
+		DirectionalLight(const Vec3& direction, const Vec3& color)
+			: m_direction(direction)
+			, m_color(color)
+		{}
+
+		Vec3 m_direction;
+		Vec3 m_color;
+	};
+
+	struct PointLight 
+	{
+		Vec3 m_color;
+		float m_radius;
+		float m_intensity;
+	};
+
+
+	struct PointLightEntity
+	{
+		PointLight m_pl;
+		Transform m_transform;
+	};
+
+	struct World
+	{
+		std::vector<StaticMeshEntity> m_sme;
+		std::vector<DirectionalLight> m_dl;
+		std::vector<PointLightEntity> m_pl;
+	};
+
+	void meshEntitiesFromObj(World* world, const char* meshPath, IRIDevice* renderDevice, IRIContext* renderContext, AssetRegistry* assets)
+	{
+		std::vector<StaticMesh*> meshes = importObj(meshPath, renderDevice, renderContext, assets);
+
+		for (StaticMesh* mesh : meshes)
+		{
+			world->m_sme.emplace_back();
+			StaticMeshEntity& sme = world->m_sme.back();
+			sme.m_mesh = mesh;
+		}
 	}
 
-	EntityHandle createMeshEntity(World* world, StaticMesh&& mesh)
+	void createMeshEntity(World* world, StaticMesh* mesh)
 	{
-		EntityHandle entity = world->createEntity();
-		
-		world->addComponent<CStaticMesh>(entity, std::move(mesh));
-		
-		CTransform* tf = world->addComponent<CTransform>(entity);
-		tf->m_scale = 0.1f;
-		tf->recalculate();
+		world->m_sme.emplace_back();
+		StaticMeshEntity& sme = world->m_sme.back();
+		sme.m_mesh = mesh;
 
-		return entity;
+		sme.m_transform.m_scale = 0.1f;
+		sme.m_transform.recalculate();
 	}
 
-	EntityHandle createPointLightEntity(World* world, const Vec3& position, float radius, const Vec3& color, float intensity)
+	void createPointLightEntity(World* world, const Vec3& position, float radius, const Vec3& color, float intensity)
 	{
-		EntityHandle entity = world->createEntity();
+		world->m_pl.emplace_back();
+		PointLightEntity& pl = world->m_pl.back();
 
-		CTransform* tf = world->addComponent<CTransform>(entity);
-		tf->m_translation = position;
-		world->addComponent<CPointLight>(entity, color, radius, intensity);
-
-		return entity;
+		pl.m_pl.m_color = color;
+		pl.m_pl.m_radius = radius;
+		pl.m_pl.m_intensity = intensity;
+		pl.m_transform.m_translation = position;
+		pl.m_transform.recalculate();
 	}
 
 	void moveCamera(Camera* camera, const KbState& kbstate, float dt)
@@ -180,10 +233,6 @@ void run()
 	renderer.setProjectionMatrix(projTf);
 
 	World world;
-	world.registerComponentType<CDirectionalLight>();
-	world.registerComponentType<CStaticMesh>();
-	world.registerComponentType<CTransform>();
-	world.registerComponentType<CPointLight>();
 
 	AssetRegistry assets;
 
@@ -197,7 +246,7 @@ void run()
 
 #if PHI_WRITE
 	{
-		std::vector<EntityHandle> sponza = meshEntitiesFromObj(&world, "Models/sponza/sponza.obj", renderDevice, renderContext, &assets);
+		meshEntitiesFromObj(&world, "Models/sponza/sponza.obj", renderDevice, renderContext, &assets);
 	}
 #endif // PHI_WRITE
 
@@ -260,28 +309,25 @@ void run()
 		renderer.setViewMatrix(viewTf);
 		renderer.setupGBufferPass();
 
-		for (CStaticMesh& mesh : ComponentIterator<CStaticMesh>(&world))
+		for (StaticMeshEntity& entity : world.m_sme)
 		{
-			CTransform* transform = mesh.sibling<CTransform>();
-			renderer.drawStaticMesh(mesh.m_mesh, transform->m_cached);
+			renderer.drawStaticMesh(*entity.m_mesh, entity.m_transform.m_cached);
 		}
 
 		renderer.setupDirectLightingPass();
 		lightBuffer.clear();
 		
-		for (CDirectionalLight& dirLight : ComponentIterator<CDirectionalLight>(&world))
+		for (DirectionalLight& dl : world.m_dl)
 		{
-			lightBuffer.addDirectional(viewTf * dirLight.m_direction, dirLight.m_color);
+			lightBuffer.addDirectional(viewTf * dl.m_direction, dl.m_color);
 		}
 
-		for (CPointLight& pointLight : ComponentIterator<CPointLight>(&world))
+		for (PointLightEntity& entity : world.m_pl)
 		{
-			CTransform* transform = pointLight.sibling<CTransform>();
-
-			Vec4 eyePos(transform->m_translation, 1.0);
+			Vec4 eyePos(entity.m_transform.m_translation, 1.0);
 			eyePos *= viewTf;
 
-			lightBuffer.addPointLight(Vec3(eyePos), pointLight.m_radius, pointLight.m_color, pointLight.m_intensity);
+			lightBuffer.addPointLight(Vec3(eyePos), entity.m_pl.m_radius, entity.m_pl.m_color, entity.m_pl.m_intensity);
 		}
 
 		renderer.runLightsPass(lightBuffer);
@@ -294,7 +340,7 @@ void run()
 		RI::swapBufferToWindow(gameWindow);
 	}
 
-	saveAssetRegistry(assets, "phoenix.assets");
+	//saveAssetRegistry(assets, "phoenix.assets");
 
 	exitImGui();
 	RI::destroyWindow(gameWindow);
