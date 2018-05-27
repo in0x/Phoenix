@@ -57,14 +57,14 @@ namespace Phoenix
 
 		for (const char* seperator : seperators)
 		{
-			location = findLast(path, seperator);
-			if ((location != -1) && (location + 1 < len))
+			int32_t nextlocation = findLast(path, seperator);
+			if ((nextlocation != -1) && (nextlocation + 1 < len) && nextlocation > location)
 			{
-				return location + 1;
+				location = nextlocation + 1;
 			}
 		}
 
-		return 0;
+		return location;
 	}
 
 }

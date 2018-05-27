@@ -43,6 +43,7 @@ namespace Phoenix
 		if (nullptr == outTexture->m_data)
 		{
 			Logger::errorf("Failed to load texture with error: %s", stbi_failure_reason());
+			assert(false);
 			return false;
 		}
 
@@ -241,7 +242,9 @@ namespace Phoenix
 		int32_t nameIdx = fileNameFromPath(path);
 		const char* fileDot = strrchr(path, '.');
 
-		return pathStr.substr(nameIdx, nameIdx + (fileDot - path));
+		std::ptrdiff_t len = (fileDot - (path + nameIdx));
+
+		return pathStr.substr(nameIdx, len);
 	}
 
 	Texture2D* importTexture(const char* imagePath, const TextureCreationHints* hints, IRIDevice* renderDevice, IRIContext* renderContext, AssetRegistry* assets)
@@ -273,6 +276,7 @@ namespace Phoenix
 		if (hints)
 		{
 			setDescFromHints(&desc, hints);
+			texture->m_creationHints = *hints;
 		}
 
 		Texture2DHandle tex2D = renderDevice->createTexture2D(desc);
@@ -282,22 +286,42 @@ namespace Phoenix
 		
 		texture->m_resourceHandle = tex2D;
 		texture->m_desc = desc;
-		texture->m_creationHints = *hints;
 
 		return texture;
 	}
 
-	Texture2D* loadTexture(const char* assetPath, IRIDevice* renderDevice, IRIContext* renderContext, AssetRegistry* assets)
+	static const char* g_assetFileExt = ".tex";
+
+	void saveTexture(const Texture2D& texture, AssetRegistry* assets)
 	{
-		Texture2D* tex = assets->getTexture(assetPath);
+		WriteArchive ar;
+		createWriteArchive(sizeof(TextureAsset), &ar);
+
+		TextureAsset asset(texture);
+		serialize(ar, asset);
+
+		std::string writePath = assets->getAssetsPath() + texture.m_name;
+		writePath += g_assetFileExt;
+
+		EArchiveError err = writeArchiveToDisk(writePath.c_str(), ar);
+		assert(err == EArchiveError::NoError);
+		destroyArchive(ar);
+	}
+
+	Texture2D* loadTexture(const char* path, IRIDevice* renderDevice, IRIContext* renderContext, AssetRegistry* assets)
+	{
+		Texture2D* tex = assets->getTexture(path);
 
 		if (tex)
 		{
 			return tex;
 		}
 
+		std::string readPath = path;
+		readPath = assets->getAssetsPath() + readPath + g_assetFileExt;
+
 		ReadArchive ar;
-		EArchiveError err = createReadArchive(assetPath, &ar);
+		EArchiveError err = createReadArchive(readPath.c_str(), &ar);
 
 		assert(err == EArchiveError::NoError);
 		if (err != EArchiveError::NoError)
@@ -309,18 +333,5 @@ namespace Phoenix
 		serialize(ar, asset);
 
 		return importTexture(asset.m_sourcePath.c_str(), &asset.m_hints, renderDevice, renderContext, assets);
-	}
-
-	void saveTexture(const Texture2D& texture, const char* path)
-	{
-		WriteArchive ar;
-		createWriteArchive(sizeof(TextureAsset), &ar);
-
-		TextureAsset asset(texture);
-		serialize(ar, asset);
-
-		EArchiveError err = writeArchiveToDisk(path, ar);
-		assert(err == EArchiveError::NoError);
-		destroyArchive(ar);
 	}
 }

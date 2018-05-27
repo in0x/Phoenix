@@ -78,10 +78,10 @@ namespace Phoenix
 
 		MaterialResources(const Material& material)
 			: m_name(material.m_name)
-			, m_diffuseTexPath(material.m_diffuseTex->m_sourcePath)
-			, m_roughnessTexPath(material.m_roughnessTex->m_sourcePath)
-			, m_metallicTexPath(material.m_metallicTex->m_sourcePath)
-			, m_normalTexPath(material.m_normalTex->m_sourcePath)
+			, m_diffuseTexPath(material.m_diffuseTex->m_name)
+			, m_roughnessTexPath(material.m_roughnessTex->m_name)
+			, m_metallicTexPath(material.m_metallicTex->m_name)
+			, m_normalTexPath(material.m_normalTex->m_name)
 		{}
 
 		std::string m_name;
@@ -100,7 +100,9 @@ namespace Phoenix
 		serialize(ar, exp.m_normalTexPath);
 	}
 
-	void saveMaterial(Material& material, const char* path)
+	static const char* g_assetFileExt = ".mat";
+
+	void saveMaterial(Material& material, AssetRegistry* assets)
 	{
 		WriteArchive ar;
 		createWriteArchive(sizeof(Material), &ar);
@@ -108,12 +110,13 @@ namespace Phoenix
 		MaterialResources exp(material);
 		serialize(ar, exp);
 
-		EArchiveError err = writeArchiveToDisk(path, ar);
+		std::string writePath = assets->getAssetsPath() + material.m_name;
+		writePath += g_assetFileExt;
+
+		EArchiveError err = writeArchiveToDisk(writePath.c_str(), ar);
 		assert(err == EArchiveError::NoError);
 		destroyArchive(ar);
 	}
-
-	extern Texture2D* loadTexture(const char* assetPath, class IRIDevice* renderDevice, class IRIContext* renderContext, AssetRegistry* assets);
 
 	Material* loadMaterial(const char* path, IRIDevice* renderDevice, IRIContext* renderContext, AssetRegistry* assets)
 	{
@@ -124,8 +127,11 @@ namespace Phoenix
 			return mat;
 		}
 
+		std::string readPath = path;
+		readPath = assets->getAssetsPath() + readPath + g_assetFileExt;
+
 		ReadArchive ar;
-		EArchiveError err = createReadArchive(path, &ar);
+		EArchiveError err = createReadArchive(readPath.c_str(), &ar);
 
 		assert(err == EArchiveError::NoError);
 		if (err != EArchiveError::NoError)

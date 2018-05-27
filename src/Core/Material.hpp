@@ -9,6 +9,8 @@ namespace Phoenix
 	struct Texture2D;
 	class AssetRegistry;
 	struct TextureCreationHints;
+	class IRIDevice;
+	class IRIContext;
 
 	TextureCreationHints* getDiffuseHints();
 	TextureCreationHints* getNonDiffuseHints();
@@ -28,7 +30,7 @@ namespace Phoenix
 
 	void addDefaultMaterial(AssetRegistry* assets);
 
-	Material* loadMaterial(const char* path, class IRIDevice* renderDevice, class IRIContext* renderContext, AssetRegistry* assets);
+	Material* loadMaterial(const char* path, IRIDevice* renderDevice, IRIContext* renderContext, AssetRegistry* assets);
 
-	void saveMaterial(Material& material, const char* path);
+	void saveMaterial(Material& material, AssetRegistry* assets);
 }

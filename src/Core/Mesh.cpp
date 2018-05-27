@@ -84,7 +84,9 @@ namespace Phoenix
 		serialize(ar, mesh.m_numMaterials);
 	}
 
-	void saveStaticMesh(StaticMesh& mesh, const char* path)
+	static const char* g_assetFileExt = ".sm";
+
+	void saveStaticMesh(StaticMesh& mesh, AssetRegistry* assets)
 	{
 		WriteArchive ar;
 		createWriteArchive(sizeof(StaticMesh), &ar);
@@ -97,7 +99,10 @@ namespace Phoenix
 			serialize(ar, exp);
 		}
 		
-		EArchiveError err = writeArchiveToDisk(path, ar);
+		std::string writePath = assets->getAssetsPath() + mesh.m_name;
+		writePath += g_assetFileExt;
+
+		EArchiveError err = writeArchiveToDisk(writePath.c_str(), ar);
 		assert(err == EArchiveError::NoError);
 		destroyArchive(ar);
 	}
@@ -111,8 +116,11 @@ namespace Phoenix
 			return mesh;
 		}
 
+		std::string readPath = path;
+		readPath = assets->getAssetsPath() + readPath + g_assetFileExt;
+
 		ReadArchive ar;
-		EArchiveError err = createReadArchive(path, &ar);
+		EArchiveError err = createReadArchive(readPath.c_str(), &ar);
 
 		assert(err == EArchiveError::NoError);
 		if (err != EArchiveError::NoError)

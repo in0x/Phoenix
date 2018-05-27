@@ -4,5 +4,10 @@
 
 namespace Phoenix
 {
-	std::vector<struct StaticMesh*> importObj(const char* path, class IRIDevice* renderDevice, class IRIContext* renderContext, class AssetRegistry* assets);
+	struct StaticMesh;
+	class IRIDevice;
+	class IRIContext;
+	class AssetRegistry;
+
+	std::vector<StaticMesh*> importObj(const char* path, IRIDevice* renderDevice, IRIContext* renderContext, AssetRegistry* assets);
 }

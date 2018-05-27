@@ -4,9 +4,9 @@
 #include <Render/RIContext.hpp>
 
 #include <Core/Logger.hpp>
-#include <Core/Mesh.hpp>
 #include <Core/Texture.hpp>
 #include <Core/Material.hpp>
+#include <Core/Mesh.hpp>
 #include <Core/AssetRegistry.hpp>
 
 #include <algorithm>
@@ -156,7 +156,7 @@ namespace Phoenix
 	{
 		if (!texLocation.empty())
 		{
-			std::string texPath = (basePath + texPath);
+			std::string texPath = (basePath + texLocation);
 			std::string texName = textureNameFromPath(texPath.c_str());
 			Texture2D* tex = resources.assets->getTexture(texName.c_str());
 
@@ -173,12 +173,12 @@ namespace Phoenix
 		}
 	}
 
-	Material* importMaterial(const MaterialImport& import, const char* mtlPath, InitResources resources)
+	Material* importMtl(const MaterialImport& import, const char* mtlPath, InitResources resources)
 	{
 		AssetRegistry* assets = resources.assets;
 
-		Texture2D* defaultTexWhite = assets->getTexture(g_defaultWhiteTexPath);
-		Texture2D* defaultTexBlack = assets->getTexture(g_defaultBlackTexPath);
+		Texture2D* defaultTexWhite = assets->getTexture(g_defaultWhiteTexName);
+		Texture2D* defaultTexBlack = assets->getTexture(g_defaultBlackTexName);
 
 		Material* material = assets->allocMaterial(import.m_name.c_str());
 
@@ -209,7 +209,7 @@ namespace Phoenix
 			}
 			else
 			{
-				outMesh->m_materials[matIdx] = importMaterial(matImport, mtlPath, resources);
+				outMesh->m_materials[matIdx] = importMtl(matImport, mtlPath, resources);
 			}
 
 			matIdx++;

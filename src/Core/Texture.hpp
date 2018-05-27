@@ -79,7 +79,7 @@ namespace Phoenix
 	// TextureCreationHints may optionally be passed in. Pass nullptr if it should be up to the engine.
 	Texture2D* importTexture(const char* imagePath, const TextureCreationHints* hints, IRIDevice* renderDevice, IRIContext* renderContext, AssetRegistry* assets);
 	
-	Texture2D* loadTexture(const char* assetPath, IRIDevice* renderDevice, IRIContext* renderContext, AssetRegistry* assets);
+	Texture2D* loadTexture(const char* path, IRIDevice* renderDevice, IRIContext* renderContext, AssetRegistry* assets);
 
-	void saveTexture(const Texture2D& texture, const char* path);
+	void saveTexture(const Texture2D& texture, AssetRegistry* assets);
 }

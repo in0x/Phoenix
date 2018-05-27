@@ -1,3 +1,4 @@
 *.exe
 /Models/rungholt
 /SerialTest/*
+/Assets/*

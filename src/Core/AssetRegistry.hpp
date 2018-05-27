@@ -6,10 +6,12 @@
 
 namespace Phoenix
 {	
+	class IRIDevice;
+	class IRIContext;
 	struct StaticMesh;
 	struct Material;
 	struct Texture2D;
-	
+
 	template<typename Asset>
 	struct AssetCache
 	{
@@ -32,14 +34,16 @@ namespace Phoenix
 		Texture2D* allocTexture(const char* path);
 		Texture2D* getTexture(const char* path);
 
+		const char* getAssetsPath();
+
 	private:
 		AssetCache<StaticMesh> m_staticMeshCache;
 		AssetCache<Material> m_materialCache;
 		AssetCache<Texture2D> m_textureCache;
 
-		//friend void saveAssetRegistry(AssetRegistry& registry, const char* path);
+		friend void saveAssetRegistry(AssetRegistry& registry, const char* path);
 	};
 
-	//void saveAssetRegistry(AssetRegistry& registry, const char* path);
-	//AssetRegistry loadAssetRegistry(const char* path, class IRIDevice* renderDevice, class IRIContext* renderContext);
+	void saveAssetRegistry(AssetRegistry& registry, const char* path);
+	void loadAssetRegistry(AssetRegistry* outRegistry, const char* path, IRIDevice* renderDevice, IRIContext* renderContext);
 }

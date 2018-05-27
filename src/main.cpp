@@ -3,22 +3,23 @@
 
 #include "Tests/MathTests.hpp"
 #include "Tests/MemoryTests.hpp"
+#include "Render/RIOpenGL/RIOpenGL.hpp"
+
+#include "Core/Texture.hpp"
+#include "Core/Material.hpp"
+#include "Core/Mesh.hpp"
+#include "Core/ObjImport.hpp"
+#include "Core/AssetRegistry.hpp"
 
 #include "Core/Logger.hpp"
 #include "Core/FileSystem.hpp"
 #include "Core/Serialize.hpp"
 #include "Core/Camera.hpp"
-#include "Core/ObjImport.hpp"
 #include "Core/Mesh.hpp"
-#include "Core/Texture.hpp"
-#include "Core/Material.hpp"
-#include "Core/Mesh.hpp"
-#include "Core/AssetRegistry.hpp"
 #include "Core/Windows/PlatformWindows.hpp"
 
 #include "Math/PhiMath.hpp"
 
-#include "Render/RIOpenGL/RIOpenGL.hpp"
 #include "Render/DeferredRenderer.hpp"
 #include "Render/LightBuffer.hpp"
 
@@ -89,18 +90,6 @@ namespace Phoenix
 		std::vector<PointLightEntity> m_pl;
 	};
 
-	void meshEntitiesFromObj(World* world, const char* meshPath, IRIDevice* renderDevice, IRIContext* renderContext, AssetRegistry* assets)
-	{
-		std::vector<StaticMesh*> meshes = importObj(meshPath, renderDevice, renderContext, assets);
-
-		for (StaticMesh* mesh : meshes)
-		{
-			world->m_sme.emplace_back();
-			StaticMeshEntity& sme = world->m_sme.back();
-			sme.m_mesh = mesh;
-		}
-	}
-
 	void createMeshEntity(World* world, StaticMesh* mesh)
 	{
 		world->m_sme.emplace_back();
@@ -109,6 +98,16 @@ namespace Phoenix
 
 		sme.m_transform.m_scale = 0.1f;
 		sme.m_transform.recalculate();
+	}
+	
+	void meshEntitiesFromObj(World* world, const char* meshPath, IRIDevice* renderDevice, IRIContext* renderContext, AssetRegistry* assets)
+	{
+		std::vector<StaticMesh*> meshes = importObj(meshPath, renderDevice, renderContext, assets);
+
+		for (StaticMesh* mesh : meshes)
+		{
+			createMeshEntity(world, mesh);
+		}
 	}
 
 	void createPointLightEntity(World* world, const Vec3& position, float radius, const Vec3& color, float intensity)
@@ -235,6 +234,8 @@ void run()
 	World world;
 
 	AssetRegistry assets;
+
+	loadAssetRegistry(&assets, "phoenix.assets", renderDevice , renderContext);
 
 	importTexture(g_defaultWhiteTexPath, nullptr, renderDevice, renderContext, &assets);
 	importTexture(g_defaultBlackTexPath, nullptr, renderDevice, renderContext, &assets);

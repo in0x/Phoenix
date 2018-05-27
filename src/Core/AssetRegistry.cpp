@@ -64,6 +64,11 @@ namespace Phoenix
 		deleteCache(m_textureCache);
 	}
 
+	const char* AssetRegistry::getAssetsPath()
+	{
+		return "Assets/";
+	}
+
 	StaticMesh* AssetRegistry::allocStaticMesh(const char* path)
 	{
 		return allocAsset(path, m_staticMeshCache);
@@ -94,19 +99,19 @@ namespace Phoenix
 		return getAsset(path, m_textureCache);
 	}
 
-	/*void saveTextureCache(WriteArchive& ar, AssetCache<Texture2D>& cache)
+	void saveTextureCache(WriteArchive& ar, AssetRegistry* registry, AssetCache<Texture2D>& cache)
 	{
 		size_t numTex = cache.m_assets.size();
 		serialize(ar, numTex);
 
 		for (Texture2D* tex : cache.m_assets)
 		{
-			serialize(ar, tex->m_sourcePath);
-			saveTexture(*tex, tex->m_name.c_str());
+			serialize(ar, tex->m_name);
+			saveTexture(*tex, registry);
 		}
 	}
 
-	void saveMaterialCache(WriteArchive& ar, AssetCache<Material>& cache)
+	void saveMaterialCache(WriteArchive& ar, AssetRegistry* registry, AssetCache<Material>& cache)
 	{
 		size_t numMats = cache.m_assets.size();
 		serialize(ar, numMats);
@@ -114,11 +119,11 @@ namespace Phoenix
 		for (Material* mat : cache.m_assets)
 		{
 			serialize(ar, mat->m_name);
-			saveMaterial(*mat, mat->m_name.c_str());
+			saveMaterial(*mat, registry);
 		}
 	}
 
-	void saveMeshCache(WriteArchive& ar, AssetCache<StaticMesh>& cache)
+	void saveMeshCache(WriteArchive& ar, AssetRegistry* registry, AssetCache<StaticMesh>& cache)
 	{
 		size_t numMeshes = cache.m_assets.size();
 		serialize(ar, numMeshes);
@@ -126,7 +131,7 @@ namespace Phoenix
 		for (StaticMesh* sm : cache.m_assets)
 		{
 			serialize(ar, sm->m_name);
-			saveStaticMesh(*sm, sm->m_name.c_str());
+			saveStaticMesh(*sm, registry);
 		}
 	}
 
@@ -135,11 +140,14 @@ namespace Phoenix
 		WriteArchive ar;
 		createWriteArchive(sizeof(AssetRegistry), &ar);
 
-		saveTextureCache(ar, registry.m_textureCache);
-		saveMaterialCache(ar, registry.m_materialCache);
-		saveMeshCache(ar, registry.m_staticMeshCache);
+		saveTextureCache(ar, &registry, registry.m_textureCache);
+		saveMaterialCache(ar, &registry, registry.m_materialCache);
+		saveMeshCache(ar, &registry, registry.m_staticMeshCache);
 
-		EArchiveError err = writeArchiveToDisk(path, ar);
+		std::string savePath = "Assets/";
+		savePath += path;
+
+		EArchiveError err = writeArchiveToDisk(savePath.c_str(), ar);
 		assert(err == EArchiveError::NoError);
 		destroyArchive(ar);
 	}
@@ -183,26 +191,25 @@ namespace Phoenix
 		}
 	}
 
-	AssetRegistry loadAssetRegistry(const char* path, IRIDevice* renderDevice, IRIContext* renderContext)
+	void loadAssetRegistry(AssetRegistry* outRegistry, const char* path, IRIDevice* renderDevice, IRIContext* renderContext)
 	{
-		AssetRegistry registry;
+		std::string loadPath = outRegistry->getAssetsPath();
+		loadPath += path;
 
 		ReadArchive ar;
-		EArchiveError err = createReadArchive(path, &ar);
+		EArchiveError err = createReadArchive(loadPath.c_str(), &ar);
 
 		assert(err == EArchiveError::NoError);
 		if (err != EArchiveError::NoError)
 		{
 			Logger::errorf("Failure loading AssetRegistry %s", path);
-			return registry;
+			return;
 		}
 
-		loadTextureCache(ar, renderDevice, renderContext, &registry);
-		loadMaterialCache(ar, renderDevice, renderContext, &registry);
-		loadMeshCache(ar, renderDevice, renderContext, &registry);
+		loadTextureCache(ar, renderDevice, renderContext, outRegistry);
+		loadMaterialCache(ar, renderDevice, renderContext, outRegistry);
+		loadMeshCache(ar, renderDevice, renderContext, outRegistry);
 
 		destroyArchive(ar);
-
-		return registry;
-	}*/
+	}
 }

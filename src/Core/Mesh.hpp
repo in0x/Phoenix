@@ -61,5 +61,5 @@ namespace Phoenix
 
 	StaticMesh* loadStaticMesh(const char* path, IRIDevice* renderDevice, IRIContext* renderContext, AssetRegistry* assets);
 
-	void saveStaticMesh(StaticMesh& mesh, const char* path);
+	void saveStaticMesh(StaticMesh& mesh, AssetRegistry* assets);
 }
