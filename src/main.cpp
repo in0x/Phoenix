@@ -76,24 +76,23 @@ namespace Phoenix
 		float m_intensity;
 	};
 
-
 	struct PointLightEntity
 	{
-		PointLight m_pl;
+		PointLight m_pointLight;
 		Transform m_transform;
 	};
 
 	struct World
 	{
-		std::vector<StaticMeshEntity> m_sme;
-		std::vector<DirectionalLight> m_dl;
-		std::vector<PointLightEntity> m_pl;
+		std::vector<StaticMeshEntity> m_staticMeshEntities;
+		std::vector<DirectionalLight> m_dirLights;
+		std::vector<PointLightEntity> m_pointLightEntities;
 	};
 
 	void createMeshEntity(World* world, StaticMesh* mesh)
 	{
-		world->m_sme.emplace_back();
-		StaticMeshEntity& sme = world->m_sme.back();
+		world->m_staticMeshEntities.emplace_back();
+		StaticMeshEntity& sme = world->m_staticMeshEntities.back();
 		sme.m_mesh = mesh;
 
 		sme.m_transform.m_scale = 0.1f;
@@ -112,12 +111,12 @@ namespace Phoenix
 
 	void createPointLightEntity(World* world, const Vec3& position, float radius, const Vec3& color, float intensity)
 	{
-		world->m_pl.emplace_back();
-		PointLightEntity& pl = world->m_pl.back();
+		world->m_pointLightEntities.emplace_back();
+		PointLightEntity& pl = world->m_pointLightEntities.back();
 
-		pl.m_pl.m_color = color;
-		pl.m_pl.m_radius = radius;
-		pl.m_pl.m_intensity = intensity;
+		pl.m_pointLight.m_color = color;
+		pl.m_pointLight.m_radius = radius;
+		pl.m_pointLight.m_intensity = intensity;
 		pl.m_transform.m_translation = position;
 		pl.m_transform.recalculate();
 	}
@@ -310,7 +309,7 @@ void run()
 		renderer.setViewMatrix(viewTf);
 		renderer.setupGBufferPass();
 
-		for (StaticMeshEntity& entity : world.m_sme)
+		for (StaticMeshEntity& entity : world.m_staticMeshEntities)
 		{
 			renderer.drawStaticMesh(*entity.m_mesh, entity.m_transform.m_cached);
 		}
@@ -318,17 +317,17 @@ void run()
 		renderer.setupDirectLightingPass();
 		lightBuffer.clear();
 		
-		for (DirectionalLight& dl : world.m_dl)
+		for (DirectionalLight& dl : world.m_dirLights)
 		{
 			lightBuffer.addDirectional(viewTf * dl.m_direction, dl.m_color);
 		}
 
-		for (PointLightEntity& entity : world.m_pl)
+		for (PointLightEntity& entity : world.m_pointLightEntities)
 		{
 			Vec4 eyePos(entity.m_transform.m_translation, 1.0);
 			eyePos *= viewTf;
 
-			lightBuffer.addPointLight(Vec3(eyePos), entity.m_pl.m_radius, entity.m_pl.m_color, entity.m_pl.m_intensity);
+			lightBuffer.addPointLight(Vec3(eyePos), entity.m_pointLight.m_radius, entity.m_pointLight.m_color, entity.m_pointLight.m_intensity);
 		}
 
 		renderer.runLightsPass(lightBuffer);
