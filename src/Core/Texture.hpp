@@ -8,8 +8,14 @@
 
 namespace Phoenix
 {
+	static const char* g_defaultWhiteTexName = "Default1x1White";
+	static const char* g_defaultBlackTexName = "Default1x1Black";
+	static const char* g_defaultWhiteTexPath = "Textures/Default1x1White.tga";
+	static const char* g_defaultBlackTexPath = "Textures/Default1x1Black.tga";
+
 	class IRIDevice;
 	class IRIContext;
+	class AssetRegistry;
 
 	enum class ETextrueColorSpace
 	{
@@ -60,15 +66,20 @@ namespace Phoenix
 
 	struct Texture2D
 	{
+		std::string m_name;
 		std::string m_sourcePath;
-		Texture2DHandle m_resourceHandle;
 		TextureDesc m_desc;
+		Texture2DHandle m_resourceHandle;
+		TextureCreationHints m_creationHints;
 	};
+
+	std::string textureNameFromPath(const char* path);
 
 	// Creates the GPU resources for texture asset. Used for assets that are loaded in from disk.
 	// TextureCreationHints may optionally be passed in. Pass nullptr if it should be up to the engine.
-	Texture2D initTextureAsset(const char* path, const TextureCreationHints* hints, IRIDevice* renderDevice, IRIContext* renderContext);
+	Texture2D* importTexture(const char* imagePath, const TextureCreationHints* hints, IRIDevice* renderDevice, IRIContext* renderContext, AssetRegistry* assets);
+	
+	Texture2D* loadTexture(const char* assetPath, IRIDevice* renderDevice, IRIContext* renderContext, AssetRegistry* assets);
 
-	struct Archive;
-	void serialize(Archive& ar, Texture2D& texture);
+	void saveTexture(const Texture2D& texture, const char* path);
 }

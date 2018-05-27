@@ -1,52 +1,209 @@
 #include "AssetRegistry.hpp"
 
+#include <Core/Logger.hpp>
+#include <Core/Serialize.hpp>
+#include <Core/SerialUtil.hpp>
 #include <Core/Texture.hpp>
+#include <Core/Material.hpp>
+#include <Core/Mesh.hpp>
 
 namespace Phoenix
 {
-	AssetRegistry::AssetRegistry(IRIDevice* renderDevice, IRIContext* renderContext)
-		: m_renderDevice(renderDevice)
-		, m_renderContext(renderContext)
-	{}
-
-	AssetRegistry::~AssetRegistry()
+	template <typename T>
+	int64_t isAssetCached(const char* path, const AssetCache<T>& cache)
 	{
-		for (Texture2D* tex : m_textures)
-		{
-			delete tex;
-		}
-	}
-	
-	int64_t AssetRegistry::isAssetLoaded(const char* path, EAssetType type)
-	{
-		auto dictEntry = m_assets.find(path);
+		auto dictEntry = cache.m_locations.find(path);
 
-		if (dictEntry != m_assets.end() && dictEntry->second.m_type == type)
+		if (dictEntry != cache.m_locations.end())
 		{
-			return dictEntry->second.m_location;
+			return dictEntry->second;
 		}
 		else
 		{
-			return invalidAsset;
+			return cache.invalidAsset;
+		}
+	}
+
+	template <typename T>
+	T* allocAsset(const char* path, AssetCache<T>& cache)
+	{
+		T* asset = new T;
+
+		cache.m_assets.push_back(asset);
+		cache.m_locations.emplace(path, static_cast<int64_t>(cache.m_assets.size() - 1));
+
+		return asset;
+	}
+
+	template <typename T>
+	T* getAsset(const char* path, AssetCache<T>& cache)
+	{
+		int64_t location = isAssetCached(path, cache);
+
+		if (location != cache.invalidAsset)
+		{
+			return cache.m_assets[location];
+		}
+
+		return nullptr;
+	}
+
+	template <typename T>
+	void deleteCache(AssetCache<T>& cache)
+	{
+		for (T* asset : cache.m_assets)
+		{
+			delete asset;
+		}
+	}
+
+	AssetRegistry::~AssetRegistry()
+	{
+		deleteCache(m_staticMeshCache);
+		deleteCache(m_materialCache);
+		deleteCache(m_textureCache);
+	}
+
+
+	StaticMesh* AssetRegistry::allocStaticMesh(const char* path)
+	{
+		return allocAsset(path, m_staticMeshCache);
+	}
+	
+	StaticMesh*AssetRegistry::getStaticMesh(const char* path)
+	{
+		return getAsset(path, m_staticMeshCache);
+	}
+	
+	Material* AssetRegistry::allocMaterial(const char* path)
+	{
+		return allocAsset(path, m_materialCache);
+	}
+
+	Material* AssetRegistry::getMaterial(const char* path)
+	{
+		return getAsset(path, m_materialCache);
+	}
+
+	Texture2D* AssetRegistry::allocTexture(const char* path)
+	{
+		return allocAsset(path, m_textureCache);
+	}
+
+	Texture2D* AssetRegistry::getTexture(const char* path)
+	{
+		return getAsset(path, m_textureCache);
+	}
+
+	void saveTextureCache(WriteArchive& ar, AssetCache<Texture2D>& cache)
+	{
+		size_t numTex = cache.m_assets.size();
+		serialize(ar, numTex);
+
+		for (Texture2D* tex : cache.m_assets)
+		{
+			serialize(ar, tex->m_sourcePath);
+			saveTexture(*tex, tex->m_name.c_str());
 		}
 	}
 	
-	Texture2D* AssetRegistry::getTexture(const char* path, const TextureCreationHints* hints)
+	void saveMaterialCache(WriteArchive& ar, AssetCache<Material>& cache)
 	{
-		int64_t location = isAssetLoaded(path, EAssetType::Texture);
+		size_t numMats = cache.m_assets.size();
+		serialize(ar, numMats);
 
-		if (location != invalidAsset)
+		for (Material* mat : cache.m_assets)
 		{
-			return m_textures[location];
+			serialize(ar, mat->m_name);
+			saveMaterial(*mat, mat->m_name.c_str());
+		}
+	}
+
+	void saveMeshCache(WriteArchive& ar, AssetCache<StaticMesh>& cache)
+	{
+		size_t numMeshes = cache.m_assets.size();
+		serialize(ar, numMeshes);
+
+		for (StaticMesh* sm : cache.m_assets)
+		{
+			serialize(ar, sm->m_name);
+			saveStaticMesh(*sm, sm->m_name.c_str());
+		}
+	}
+
+	void saveAssetRegistry(AssetRegistry& registry, const char* path)
+	{
+		WriteArchive ar;
+		createWriteArchive(sizeof(AssetRegistry), &ar);
+
+		saveTextureCache(ar, registry.m_textureCache);
+		saveMaterialCache(ar, registry.m_materialCache);
+		saveMeshCache(ar, registry.m_staticMeshCache);
+
+		EArchiveError err = writeArchiveToDisk(path, ar);
+		assert(err == EArchiveError::NoError);
+		destroyArchive(ar);
+	}
+
+	void loadTextureCache(ReadArchive& ar, IRIDevice* device, IRIContext* context, AssetRegistry* registry)
+	{
+		size_t numTex = 0;
+		serialize(ar, numTex);
+
+		std::string texName;
+		for (size_t i = 0; i < numTex; ++i)
+		{
+			serialize(ar, texName);
+			loadTexture(texName.c_str(), device, context, registry);
+		}
+	}
+	
+	void loadMaterialCache(ReadArchive& ar, IRIDevice* device, IRIContext* context, AssetRegistry* registry)
+	{
+		size_t numMats = 0;
+		serialize(ar, numMats);
+
+		std::string matName;
+		for (size_t i = 0; i < numMats; ++i)
+		{
+			serialize(ar, matName);
+			loadMaterial(matName.c_str(), device, context, registry);
+		}
+	}
+
+	void loadMeshCache(ReadArchive& ar, IRIDevice* device, IRIContext* context, AssetRegistry* registry)
+	{
+		size_t numMeshes = 0;
+		serialize(ar, numMeshes);
+
+		std::string meshName;
+		for (size_t i = 0; i < numMeshes; ++i)
+		{
+			serialize(ar, meshName);
+			loadStaticMesh(meshName.c_str(), device, context, registry);
+		}
+	}
+
+	AssetRegistry loadAssetRegistry(const char* path, IRIDevice* renderDevice, IRIContext* renderContext)
+	{
+		AssetRegistry registry;
+
+		ReadArchive ar;
+		EArchiveError err = createReadArchive(path, &ar);
+
+		assert(err == EArchiveError::NoError);
+		if (err != EArchiveError::NoError)
+		{
+			Logger::errorf("Failure loading AssetRegistry %s", path);
+			return registry;
 		}
 
-		Texture2D* tex = new Texture2D();
-		Texture2D other = initTextureAsset(path, hints, m_renderDevice, m_renderContext);
-		*tex = other;
-		
-		m_textures.push_back(tex);
-		m_assets.emplace(path, AssetRef{ EAssetType::Texture, static_cast<int64_t>(m_textures.size() - 1) });
-		
-		return tex;
+		loadTextureCache(ar, renderDevice, renderContext, &registry);
+		loadMaterialCache(ar, renderDevice, renderContext, &registry);
+		loadMeshCache(ar, renderDevice, renderContext, &registry);
+
+		destroyArchive(ar);
+
+		return registry;
 	}
 }

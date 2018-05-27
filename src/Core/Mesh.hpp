@@ -6,25 +6,14 @@
 #include <Math/Vec3.hpp>
 #include <Math/Vec2.hpp>
 
-#include <Core/Texture.hpp>
 #include <vector>
-#include <memory>
 
 namespace Phoenix
 {	
 	class IRIDevice;
 	class IRIContext;
 	class AssetRegistry;
-	
-	struct Material
-	{
-		std::string m_name;
-
-		Texture2D* m_diffuseTex; 
-		Texture2D* m_roughnessTex;
-		Texture2D* m_metallicTex;
-		Texture2D* m_normalTex;
-	};
+	struct Material;
 
 	struct MeshData
 	{
@@ -63,20 +52,14 @@ namespace Phoenix
 		MeshData m_data;
 		VertexBufferHandle m_vertexbuffer;	
 		
-		Material m_materials[MAX_MATERIALS]; 
+		Material* m_materials[MAX_MATERIALS]; 
 		size_t m_vertexFrom[MAX_MATERIALS]; 
 		uint8_t m_numMaterials;
 	};
 
-	// Imports the specified mesh and the associated materials.
-	std::vector<StaticMesh> importObj(const char* path, IRIDevice* renderDevice, AssetRegistry* assets);
+	void createMeshBuffers(StaticMesh* outMesh, IRIDevice* renderDevice);
 
-	// Load a StaticMesh from disk.
-	StaticMesh loadStaticMesh(const char* path, IRIDevice* renderDevice, AssetRegistry* assets);
+	StaticMesh* loadStaticMesh(const char* path, IRIDevice* renderDevice, IRIContext* renderContext, AssetRegistry* assets);
 
-	// Save a StaticMesh to disk.
 	void saveStaticMesh(StaticMesh& mesh, const char* path);
-
-	struct Archive;
-	void serialize(Archive& ar, StaticMesh& mesh);
 }

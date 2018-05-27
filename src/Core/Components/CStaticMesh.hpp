@@ -9,7 +9,7 @@ namespace Phoenix
 	{
 		CStaticMesh() = default;
 
-		CStaticMesh(const StaticMesh& mesh)
+		CStaticMesh(const StaticMesh& mesh) // TODO replace with pointer
 			: m_mesh(mesh)
 		{}
 		

@@ -8,9 +8,17 @@
 #include "Core/FileSystem.hpp"
 #include "Core/Serialize.hpp"
 #include "Core/Camera.hpp"
+#include "Core/ObjImport.hpp"
+#include "Core/Texture.hpp"
+#include "Core/Material.hpp"
+#include "Core/Mesh.hpp"
 #include "Core/AssetRegistry.hpp"
-
 #include "Core/Windows/PlatformWindows.hpp"
+
+#include "Core/Components/CDirectionalLight.hpp"
+#include "Core/Components/CStaticMesh.hpp"
+#include "Core/Components/CTransform.hpp"
+#include "Core/Components/CPointLight.hpp"
 
 #include "Math/PhiMath.hpp"
 
@@ -18,19 +26,14 @@
 #include "Render/DeferredRenderer.hpp"
 #include "Render/LightBuffer.hpp"
 
-#include "Core/Components/CDirectionalLight.hpp"
-#include "Core/Components/CStaticMesh.hpp"
-#include "Core/Components/CTransform.hpp"
-#include "Core/Components/CPointLight.hpp"
-
 #include "UI/PhiImGui.h"
 
 namespace Phoenix
 {
-	std::vector<EntityHandle> meshEntitiesFromObj(World* world, IRIDevice* renderDevice, const char* meshPath, AssetRegistry* assets)
+	std::vector<EntityHandle> meshEntitiesFromObj(World* world, const char* meshPath, IRIDevice* renderDevice, IRIContext* renderContext, AssetRegistry* assets)
 	{
 		std::vector<EntityHandle> entities;
-		std::vector<StaticMesh> meshes = importObj(meshPath, renderDevice, assets);
+		std::vector<StaticMesh> meshes = importObj(meshPath, renderDevice, renderContext, assets);
 
 		for (StaticMesh& mesh : meshes)
 		{
@@ -182,20 +185,19 @@ void run()
 	world.registerComponentType<CTransform>();
 	world.registerComponentType<CPointLight>();
 
-	AssetRegistry assets(renderDevice, renderContext);
+	AssetRegistry assets;
 
-#define PHI_WRITE 0
-#define PHI_LOAD 1
+	importTexture(g_defaultWhiteTexPath, nullptr, renderDevice, renderContext, &assets);
+	importTexture(g_defaultBlackTexPath, nullptr, renderDevice, renderContext, &assets);
+
+	addDefaultMaterial(&assets);
+
+#define PHI_WRITE 1
+#define PHI_LOAD 0
 
 #if PHI_WRITE
 	{
-		std::vector<EntityHandle> sponza = meshEntitiesFromObj(&world, renderDevice, "Models/sponza/sponza.obj", &assets);
-
-		for (CStaticMesh& mesh : ComponentIterator<CStaticMesh>(&world))
-		{
-			std::string savePath = "SerialTest/" + mesh.m_mesh.m_name + ".sm";
-			saveStaticMesh(mesh.m_mesh, savePath.c_str());
-		}
+		std::vector<EntityHandle> sponza = meshEntitiesFromObj(&world, "Models/sponza/sponza.obj", renderDevice, renderContext, &assets);
 	}
 #endif // PHI_WRITE
 
@@ -291,6 +293,8 @@ void run()
 
 		RI::swapBufferToWindow(gameWindow);
 	}
+
+	saveAssetRegistry(assets, "phoenix.assets");
 
 	exitImGui();
 	RI::destroyWindow(gameWindow);

@@ -2,6 +2,8 @@
 
 #include <Core/Shader.hpp>
 #include <Core/Mesh.hpp>
+#include <Core/Texture.hpp>
+#include <Core/Material.hpp>
 #include <Core/Logger.hpp>
 
 #include <Math/Matrix3.hpp>
@@ -9,6 +11,7 @@
 #include <Render/RIDevice.hpp>
 #include <Render/RIContext.hpp>
 #include <Render/LightBuffer.hpp>
+
 namespace Phoenix
 {
 	DeferredRenderer::DeferredRenderer(IRIDevice* renderDevice, IRIContext* renderContext, uint32_t gBufferWidth, uint32_t gBufferHeight)
@@ -122,12 +125,12 @@ namespace Phoenix
 
 		for (; materialIdx < mesh.m_numMaterials - 1; ++materialIdx)
 		{
-			const Material& material = mesh.m_materials[materialIdx];
+			const Material& material = *mesh.m_materials[materialIdx];
 			size_t currVertexIdx = mesh.m_vertexFrom[materialIdx];
 			drawStaticMeshWithMaterial(mesh.m_vertexbuffer, material, mesh.m_vertexFrom[materialIdx + 1] - currVertexIdx, currVertexIdx);
 		}
 
-		const Material& material = mesh.m_materials[materialIdx];
+		const Material& material = *mesh.m_materials[materialIdx];
 		size_t currVertexIdx = mesh.m_vertexFrom[materialIdx];
 		drawStaticMeshWithMaterial(mesh.m_vertexbuffer, material, mesh.m_data.m_numVertices - currVertexIdx, currVertexIdx);
 

@@ -4,6 +4,8 @@
 #include <Core/Logger.hpp>
 #include <Core/Serialize.hpp>
 #include <Core/SerialUtil.hpp>
+#include <Core/FileSystem.hpp>
+#include <Core/AssetRegistry.hpp>
 
 #include <Render/RIDevice.hpp>
 #include <Render/RIContext.hpp>
@@ -185,15 +187,82 @@ namespace Phoenix
 		}
 	}
 
-	Texture2D initTextureAsset(const char* path, const TextureCreationHints* hints, IRIDevice* renderDevice, IRIContext* renderContext)
+	void serialize(Archive& ar, TextureDesc& desc)
 	{
-		Texture2D texture;
-		texture.m_sourcePath = path;
+		ar.serialize(&desc.width, sizeof(uint32_t));
+		ar.serialize(&desc.height, sizeof(uint32_t));
+		ar.serialize(&desc.pixelFormat, sizeof(EPixelFormat));
+		ar.serialize(&desc.minFilter, sizeof(ETextureFilter));
+		ar.serialize(&desc.magFilter, sizeof(ETextureFilter));
+		ar.serialize(&desc.wrapU, sizeof(ETextureWrap));
+		ar.serialize(&desc.wrapV, sizeof(ETextureWrap));
+		ar.serialize(&desc.wrapW, sizeof(ETextureWrap));
+		ar.serialize(&desc.numMips, sizeof(uint8_t));
+	}
 
-		TextureData data;
-		if (!loadTextureData(path, &data))
+	void serialize(Archive& ar, TextureCreationHints& hints)
+	{
+		ar.serialize(&hints.colorSpace, sizeof(ETextrueColorSpace));
+		ar.serialize(&hints.magFilter, sizeof(ETextureFilter));
+		ar.serialize(&hints.minFilter, sizeof(ETextureFilter));
+		ar.serialize(&hints.mipFilter, sizeof(ETextureFilter));
+		ar.serialize(&hints.wrapU, sizeof(ETextureWrap));
+		ar.serialize(&hints.wrapV, sizeof(ETextureWrap));
+		ar.serialize(&hints.wrapW, sizeof(ETextureWrap));
+		ar.serialize(&hints.bGenMipMaps, sizeof(bool));	 
+	}
+
+	struct TextureAsset
+	{
+		TextureAsset() = default;
+
+		TextureAsset(const Texture2D& texture)
+			: m_sourcePath(texture.m_sourcePath)
+			, m_desc(texture.m_desc)
+			, m_hints(texture.m_creationHints)
+		{}
+
+		std::string m_sourcePath;
+		TextureDesc m_desc;
+		TextureCreationHints m_hints;
+	};
+
+	void serialize(Archive& ar, TextureAsset& asset)
+	{
+		serialize(ar, asset.m_sourcePath);
+		serialize(ar, asset.m_desc);
+		serialize(ar, asset.m_hints);
+	}
+
+	std::string textureNameFromPath(const char* path)
+	{
+		std::string pathStr(path);
+
+		int32_t nameIdx = fileNameFromPath(path);
+		const char* fileDot = strrchr(path, '.');
+
+		return pathStr.substr(nameIdx, nameIdx + (fileDot - path));
+	}
+
+	Texture2D* importTexture(const char* imagePath, const TextureCreationHints* hints, IRIDevice* renderDevice, IRIContext* renderContext, AssetRegistry* assets)
+	{
+		std::string name = textureNameFromPath(imagePath);
+
+		Texture2D* texture = assets->getTexture(name.c_str());
+
+		if (texture)
 		{
-			Logger::warningf("Failed to load data for texture %s. Cannot initialize texture further", path);
+			return texture;
+		}
+
+		texture = assets->allocTexture(name.c_str());
+		texture->m_sourcePath = imagePath;
+		texture->m_name = name;
+		
+		TextureData data;
+		if (!loadTextureData(imagePath, &data))
+		{
+			Logger::warningf("Failed to load data for texture %s. Cannot initialize texture further", imagePath);
 			return texture;
 		}
 
@@ -211,27 +280,47 @@ namespace Phoenix
 		
 		renderContext->uploadTextureData(tex2D, data.m_data);
 		
-		texture.m_resourceHandle = tex2D;
-		texture.m_desc = desc;
+		texture->m_resourceHandle = tex2D;
+		texture->m_desc = desc;
+		texture->m_creationHints = *hints;
 
 		return texture;
 	}
 
-	void serialize(Archive& ar, TextureDesc& desc)
+	Texture2D* loadTexture(const char* assetPath, IRIDevice* renderDevice, IRIContext* renderContext, AssetRegistry* assets)
 	{
-		ar.serialize(&desc.width, sizeof(uint32_t));
-		ar.serialize(&desc.height, sizeof(uint32_t));
-		ar.serialize(&desc.pixelFormat, sizeof(EPixelFormat));
-		ar.serialize(&desc.minFilter, sizeof(ETextureFilter));
-		ar.serialize(&desc.magFilter, sizeof(ETextureFilter));
-		ar.serialize(&desc.wrapU, sizeof(ETextureWrap));
-		ar.serialize(&desc.wrapV, sizeof(ETextureWrap));
-		ar.serialize(&desc.wrapW, sizeof(ETextureWrap));
-		ar.serialize(&desc.numMips, sizeof(uint8_t));
+		Texture2D* tex = assets->getTexture(assetPath);
+
+		if (tex)
+		{
+			return tex;
+		}
+
+		ReadArchive ar;
+		EArchiveError err = createReadArchive(assetPath, &ar);
+
+		assert(err == EArchiveError::NoError);
+		if (err != EArchiveError::NoError)
+		{
+			return tex;
+		}
+
+		TextureAsset asset;
+		serialize(ar, asset);
+
+		return importTexture(asset.m_sourcePath.c_str(), &asset.m_hints, renderDevice, renderContext, assets);
 	}
 
-	void serialize(Archive& ar, Texture2D& texture)
+	void saveTexture(const Texture2D& texture, const char* path)
 	{
-		serialize(ar, texture.m_desc);
+		WriteArchive ar;
+		createWriteArchive(sizeof(TextureAsset), &ar);
+
+		TextureAsset asset(texture);
+		serialize(ar, asset);
+
+		EArchiveError err = writeArchiveToDisk(path, ar);
+		assert(err == EArchiveError::NoError);
+		destroyArchive(ar);
 	}
 }

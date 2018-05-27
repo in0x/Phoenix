@@ -193,7 +193,9 @@
     <ClInclude Include="..\src\Core\EcsTypes.hpp" />
     <ClInclude Include="..\src\Core\Engine.hpp" />
     <ClInclude Include="..\src\Core\FileSystem.hpp" />
+    <ClInclude Include="..\src\Core\Material.hpp" />
     <ClInclude Include="..\src\Core\Mesh.hpp" />
+    <ClInclude Include="..\src\Core\ObjImport.hpp" />
     <ClInclude Include="..\src\Core\Serialize.hpp" />
     <ClInclude Include="..\src\Core\SerialUtil.hpp" />
     <ClInclude Include="..\src\Core\Shader.hpp" />
@@ -270,7 +272,9 @@
     <ClCompile Include="..\src\Core\Clock.cpp" />
     <ClCompile Include="..\src\Core\FileSystem.cpp" />
     <ClCompile Include="..\src\Core\Logger.cpp" />
+    <ClCompile Include="..\src\Core\Material.cpp" />
     <ClCompile Include="..\src\Core\Mesh.cpp" />
+    <ClCompile Include="..\src\Core\ObjImport.cpp" />
     <ClCompile Include="..\src\Core\Serialize.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Disabled</Optimization>

@@ -244,6 +244,12 @@
     <ClInclude Include="..\src\UI\PhiImGui.h">
       <Filter>UI</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Core\Material.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\ObjImport.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Core\Clock.cpp">
@@ -363,6 +369,15 @@
     </ClCompile>
     <ClCompile Include="..\src\UI\PhiImGui.cpp">
       <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Core\Material.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Core\ObjImport.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Core\AssetRegistry.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
