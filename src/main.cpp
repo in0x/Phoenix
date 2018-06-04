@@ -14,6 +14,7 @@
 #include "Core/Logger.hpp"
 #include "Core/FileSystem.hpp"
 #include "Core/Serialize.hpp"
+#include "Core/SerialUtil.hpp"
 #include "Core/Camera.hpp"
 #include "Core/Mesh.hpp"
 #include "Core/Windows/PlatformWindows.hpp"
@@ -60,13 +61,14 @@ namespace Phoenix
 
 	struct DirectionalLight 
 	{
-		DirectionalLight(const Vec3& direction, const Vec3& color)
-			: m_direction(direction)
-			, m_color(color)
-		{}
-
 		Vec3 m_direction;
 		Vec3 m_color;
+	};
+
+	struct DirLightEntity
+	{
+		DirectionalLight m_dirLight;
+		Transform m_transform;
 	};
 
 	struct PointLight 
@@ -85,7 +87,7 @@ namespace Phoenix
 	struct World
 	{
 		std::vector<StaticMeshEntity> m_staticMeshEntities;
-		std::vector<DirectionalLight> m_dirLights;
+		std::vector<DirLightEntity>	  m_dirLightEntities;
 		std::vector<PointLightEntity> m_pointLightEntities;
 	};
 
@@ -182,6 +184,185 @@ namespace Phoenix
 			camera->pitch(dy);
 		}
 	}
+
+	struct LoadResources
+	{
+		IRIDevice* device;
+		IRIContext* context;
+		AssetRegistry* assets;
+	};
+
+	void addPointLightToBuffer(const PointLight& pl, const Vec3& pos, LightBuffer* buffer)
+	{
+		buffer->addPointLight(pos, pl.m_radius, pl.m_color, pl.m_intensity);
+	}
+
+	void serialize(Archive& ar, float& f)
+	{
+		ar.serialize(&f, sizeof(float));
+	}
+
+	void serialize(Archive& ar, Vec3& vec3)
+	{
+		ar.serialize(&vec3, sizeof(vec3));
+	}
+
+	void serialize(Archive& ar, Vec4& vec4)
+	{
+		ar.serialize(&vec4, sizeof(vec4));
+	}
+
+	void serialize(Archive& ar, Transform& transform)
+	{
+		serialize(ar, transform.m_translation);
+		serialize(ar, transform.m_scale);
+		serialize(ar, transform.m_rotation);
+	}
+
+	void saveStaticMeshEntity(Archive& ar, StaticMeshEntity& entity)
+	{
+		serialize(ar, entity.m_transform);
+		serialize(ar, entity.m_mesh->m_name);
+	}
+
+	void loadStaticMeshEntity(Archive& ar, StaticMeshEntity& entity, LoadResources* resources)
+	{
+		serialize(ar, entity.m_transform);
+
+		std::string meshName;
+		serialize(ar, meshName);
+
+		entity.m_mesh = loadStaticMesh(meshName.c_str(), resources->device, resources->context, resources->assets);
+		entity.m_transform.recalculate();
+	}
+
+	void serialize(Archive& ar, DirectionalLight& dl)
+	{
+		serialize(ar, dl.m_color);
+		serialize(ar, dl.m_direction);
+	}
+
+	void saveDirLightEntity(Archive& ar, DirLightEntity& entity)
+	{
+		serialize(ar, entity.m_dirLight);
+		serialize(ar, entity.m_transform);
+	}
+
+	void loadDirLightEntity(Archive& ar, DirLightEntity& entity)
+	{
+		serialize(ar, entity.m_dirLight);
+		serialize(ar, entity.m_transform);
+
+		entity.m_transform.recalculate();
+	}
+
+	void serialize(Archive& ar, PointLight& dl)
+	{
+		serialize(ar, dl.m_color);
+		serialize(ar, dl.m_intensity);
+		serialize(ar, dl.m_radius);
+	}
+
+	void savePointLightEntity(Archive& ar, PointLightEntity& entity)
+	{
+		serialize(ar, entity.m_pointLight);
+		serialize(ar, entity.m_transform);
+	}
+
+	void loadPointLightEntity(Archive& ar, PointLightEntity& entity)
+	{
+		serialize(ar, entity.m_pointLight);
+		serialize(ar, entity.m_transform);
+
+		entity.m_transform.recalculate();
+	}
+
+	void saveWorld(World& world, const char* path)
+	{
+		WriteArchive ar;
+		createWriteArchive(sizeof(StaticMesh), &ar);
+
+		{
+			size_t numStaticMeshEnts = world.m_staticMeshEntities.size();
+			serialize(ar, numStaticMeshEnts); 
+
+			for (StaticMeshEntity& e : world.m_staticMeshEntities)
+			{
+				saveStaticMeshEntity(ar, e);
+			}
+		}
+		
+		{
+			size_t numDirLightEnts = world.m_dirLightEntities.size();
+			serialize(ar, numDirLightEnts); 
+
+			for (DirLightEntity& e : world.m_dirLightEntities)
+			{
+				saveDirLightEntity(ar, e);
+			}
+		}
+
+		{
+			size_t numPlEnts = world.m_pointLightEntities.size();
+			serialize(ar, numPlEnts);
+
+			for (PointLightEntity& e : world.m_pointLightEntities)
+			{
+				savePointLightEntity(ar, e);
+			}
+		}
+
+		EArchiveError err = writeArchiveToDisk(path, ar);
+		assert(err == EArchiveError::NoError);
+		destroyArchive(ar);
+	}
+
+	void loadWorld(const char* path, World* outWorld, LoadResources* resources)
+	{
+		ReadArchive ar;
+		EArchiveError err = createReadArchive(path, &ar);
+
+		assert(err == EArchiveError::NoError);
+		if (err != EArchiveError::NoError)
+		{
+			return;
+		}
+
+		{
+			size_t numStaticMeshEnts = 0;
+			serialize(ar, numStaticMeshEnts);
+
+			for (size_t i = 0; i < numStaticMeshEnts; ++i)
+			{
+				outWorld->m_staticMeshEntities.emplace_back();
+				loadStaticMeshEntity(ar, outWorld->m_staticMeshEntities.back(), resources);
+			}
+		}
+
+		{
+			size_t numDirLightEnts = 0;
+			serialize(ar, numDirLightEnts);
+
+			for (size_t i = 0; i < numDirLightEnts; ++i)
+			{
+				outWorld->m_dirLightEntities.emplace_back();
+				loadDirLightEntity(ar, outWorld->m_dirLightEntities.back());
+			}
+		}
+
+		{
+			size_t numPlEnts = 0;
+			serialize(ar, numPlEnts);
+
+			for (size_t i = 0; i < numPlEnts; ++i)
+			{
+				outWorld->m_pointLightEntities.emplace_back();
+				loadPointLightEntity(ar, outWorld->m_pointLightEntities.back());
+			}
+		}
+
+		destroyArchive(ar);
+	}
 }
 
 void run()
@@ -230,8 +411,10 @@ void run()
 	Matrix4 projTf = perspectiveRH(70.f, (float)config.width / (float)config.height, 0.1f, 10000.f);
 	renderer.setProjectionMatrix(projTf);
 
-	World world;
+	const char* worldPath = "Assets/sponza.world";
+	const char* assetsPath = "phoenix.assets";
 
+	World world;
 	AssetRegistry assets;
 
 	loadAssetRegistry(&assets, "phoenix.assets", renderDevice , renderContext);
@@ -241,31 +424,11 @@ void run()
 
 	addDefaultMaterial(&assets);
 
-#define PHI_WRITE 1
-#define PHI_LOAD 0
-
-#if PHI_WRITE
-	{
-		meshEntitiesFromObj(&world, "Models/sponza/sponza.obj", renderDevice, renderContext, &assets);
-	}
-#endif // PHI_WRITE
-
-#if PHI_LOAD 
-	const char* sponzaPath = "SerialTest/";
-
-	std::vector<std::string> sponzaFiles = getFilesInDirectory(sponzaPath);
-
-	for (const std::string& file : sponzaFiles)
-	{
-		if (!hasExtension(file.c_str(), ".sm"))
-		{
-			continue;
-		}
-
-		StaticMesh sm = loadStaticMesh((sponzaPath + file).c_str(), renderDevice, &assets);
-		createMeshEntity(&world, std::move(sm));
-	}
-#endif // PHI_LOAD
+	LoadResources resources;
+	resources.assets = &assets;
+	resources.context = renderContext;
+	resources.device = renderDevice;
+	loadWorld(worldPath, &world, &resources);
 
 	createPointLightEntity(&world, Vec3(0.0, 2.0, -5.0), 1000.0f, Vec3(1.0, 1.0, 1.0), 1000.0f);
 
@@ -317,9 +480,9 @@ void run()
 		renderer.setupDirectLightingPass();
 		lightBuffer.clear();
 		
-		for (DirectionalLight& dl : world.m_dirLights)
+		for (DirLightEntity& dl : world.m_dirLightEntities)
 		{
-			lightBuffer.addDirectional(viewTf * dl.m_direction, dl.m_color);
+			lightBuffer.addDirectional(viewTf * dl.m_dirLight.m_direction, dl.m_dirLight.m_color);
 		}
 
 		for (PointLightEntity& entity : world.m_pointLightEntities)
@@ -327,7 +490,7 @@ void run()
 			Vec4 eyePos(entity.m_transform.m_translation, 1.0);
 			eyePos *= viewTf;
 
-			lightBuffer.addPointLight(Vec3(eyePos), entity.m_pointLight.m_radius, entity.m_pointLight.m_color, entity.m_pointLight.m_intensity);
+			addPointLightToBuffer(entity.m_pointLight, eyePos, &lightBuffer);
 		}
 
 		renderer.runLightsPass(lightBuffer);
@@ -339,8 +502,9 @@ void run()
 
 		RI::swapBufferToWindow(gameWindow);
 	}
-
-	//saveAssetRegistry(assets, "phoenix.assets");
+	
+	saveWorld(world, worldPath);
+	saveAssetRegistry(assets, assetsPath);
 
 	exitImGui();
 	RI::destroyWindow(gameWindow);
