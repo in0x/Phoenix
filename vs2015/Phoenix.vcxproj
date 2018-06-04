@@ -212,6 +212,7 @@
     <ClInclude Include="..\src\Math\Vec2.hpp" />
     <ClInclude Include="..\src\Math\Vec3.hpp" />
     <ClInclude Include="..\src\Math\Vec4.hpp" />
+    <ClInclude Include="..\src\Memory\ChunkArray.hpp" />
     <ClInclude Include="..\src\Memory\CircularBuffer.hpp" />
     <ClInclude Include="..\src\Memory\FreeList.hpp" />
     <ClInclude Include="..\src\Memory\MemUtil.hpp" />
