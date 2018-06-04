@@ -58,12 +58,15 @@ namespace Phoenix
 			for (uint8_t i = 0; i < mesh.m_numMaterials; ++i)
 			{
 				m_materialRefs[i] = mesh.m_materials[i]->m_name;
+				m_matVertexFrom[i] = mesh.m_vertexFrom[i];
 			}
 
 			m_numMaterials = mesh.m_numMaterials;
 		}
 
 		std::string m_materialRefs[StaticMesh::MAX_MATERIALS];
+		size_t m_matVertexFrom[StaticMesh::MAX_MATERIALS];
+
 		uint8_t m_numMaterials;
 	};
 
@@ -74,6 +77,7 @@ namespace Phoenix
 		for (uint8_t i = 0; i < exp.m_numMaterials; ++i)
 		{
 			serialize(ar, exp.m_materialRefs[i]);
+			serialize(ar, exp.m_matVertexFrom[i]);
 		}
 	}
 
@@ -139,6 +143,7 @@ namespace Phoenix
 			serialize(ar, exp);
 
 			mesh->m_materials[i] = loadMaterial(exp.m_materialRefs[i].c_str(), renderDevice, renderContext, assets);
+			mesh->m_vertexFrom[i] = exp.m_matVertexFrom[i];
 		}
 
 		destroyArchive(ar);
