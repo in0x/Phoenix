@@ -5,20 +5,18 @@
 #include "Tests/MemoryTests.hpp"
 #include "Render/RIOpenGL/RIOpenGL.hpp"
 
-#include "Core/Texture.hpp"
-#include "Core/Material.hpp"
-#include "Core/Mesh.hpp"
 #include "Core/ObjImport.hpp"
 #include "Core/AssetRegistry.hpp"
 
 #include "Core/Logger.hpp"
-#include "Core/FileSystem.hpp"
 #include "Core/Serialize.hpp"
 #include "Core/SerialUtil.hpp"
 #include "Core/Camera.hpp"
-#include "Core/Mesh.hpp"
 #include "Core/Windows/PlatformWindows.hpp"
 
+#include "Core/Texture.hpp"
+#include "Core/Material.hpp"
+#include "Core/Mesh.hpp"
 #include "Math/PhiMath.hpp"
 
 #include "Render/DeferredRenderer.hpp"
