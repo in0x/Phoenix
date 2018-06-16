@@ -229,6 +229,9 @@
     <ClInclude Include="..\src\Memory\ChunkArray.hpp">
       <Filter>Memory</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Core\EntityComponent.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Core\Clock.cpp">

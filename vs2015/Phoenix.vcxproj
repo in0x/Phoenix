@@ -185,6 +185,7 @@
     <ClInclude Include="..\src\Core\AssetRegistry.hpp" />
     <ClInclude Include="..\src\Core\Camera.hpp" />
     <ClInclude Include="..\src\Core\Engine.hpp" />
+    <ClInclude Include="..\src\Core\EntityComponent.hpp" />
     <ClInclude Include="..\src\Core\FileSystem.hpp" />
     <ClInclude Include="..\src\Core\Material.hpp" />
     <ClInclude Include="..\src\Core\Mesh.hpp" />
