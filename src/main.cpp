@@ -19,6 +19,8 @@
 #include "Core/Mesh.hpp"
 #include "Math/PhiMath.hpp"
 
+#include "Memory/ChunkArray.hpp"
+
 #include "Render/DeferredRenderer.hpp"
 #include "Render/LightBuffer.hpp"
 
@@ -26,7 +28,7 @@
 
 namespace Phoenix
 {
-	struct Transform 
+	struct Transform
 	{
 		Transform()
 			: m_translation(0.f, 0.f, 0.f)
@@ -57,7 +59,7 @@ namespace Phoenix
 		Transform m_transform;
 	};
 
-	struct DirectionalLight 
+	struct DirectionalLight
 	{
 		Vec3 m_direction;
 		Vec3 m_color;
@@ -69,7 +71,7 @@ namespace Phoenix
 		Transform m_transform;
 	};
 
-	struct PointLight 
+	struct PointLight
 	{
 		Vec3 m_color;
 		float m_radius;
@@ -98,7 +100,7 @@ namespace Phoenix
 		sme.m_transform.m_scale = 0.1f;
 		sme.m_transform.recalculate();
 	}
-	
+
 	void meshEntitiesFromObj(World* world, const char* meshPath, IRIDevice* renderDevice, IRIContext* renderContext, AssetRegistry* assets)
 	{
 		std::vector<StaticMesh*> meshes = importObj(meshPath, renderDevice, renderContext, assets);
@@ -282,17 +284,17 @@ namespace Phoenix
 
 		{
 			size_t numStaticMeshEnts = world.m_staticMeshEntities.size();
-			serialize(ar, numStaticMeshEnts); 
+			serialize(ar, numStaticMeshEnts);
 
 			for (StaticMeshEntity& e : world.m_staticMeshEntities)
 			{
 				saveStaticMeshEntity(ar, e);
 			}
 		}
-		
+
 		{
 			size_t numDirLightEnts = world.m_dirLightEntities.size();
-			serialize(ar, numDirLightEnts); 
+			serialize(ar, numDirLightEnts);
 
 			for (DirLightEntity& e : world.m_dirLightEntities)
 			{
@@ -363,6 +365,200 @@ namespace Phoenix
 	}
 }
 
+namespace Phoenix
+{
+	/*
+	Define EntityType by set of components
+	Entity Types are enum
+	EntityType can be represented as enum bitmask (64 is fine for now)
+	All entities of one EntityType are stored in contiguous storage (like The Machinery)
+	Systems define a set of components they are interested in
+	When updating systems, we run over all types and give system the entity
+	containers that match the components it is interested in
+	*/
+
+	struct EComponent
+	{
+		static const uint64_t Transform = 1 << 0;
+		static const uint64_t Health = 1 << 1;
+	};
+
+	struct TestTransformComponent
+	{
+		static const uint64_t s_type = EComponent::Transform;
+
+		float x;
+		float y;
+		float z;
+	};
+
+	struct TestHealthComponent
+	{
+		static const uint64_t s_type = EComponent::Health;
+
+		float health;
+	};
+
+	struct NewEntity
+	{
+		virtual uint64_t getComponentMask() const = 0;
+		virtual void* getComponent(uint64_t type) = 0;
+
+		template <typename T>
+		T* getComponentT()
+		{
+			return reinterpret_cast<T*>(getComponent(T::s_type)); // Problem with nullptr?
+		}
+	};
+
+	struct GeneratedEntity : public NewEntity
+	{
+		TestTransformComponent m_transform;
+		TestHealthComponent m_health;
+
+		virtual uint64_t getComponentMask() const override
+		{
+			return EComponent::Transform | EComponent::Health;
+		}
+
+		virtual void* getComponent(uint64_t type) override
+		{
+			// Could maybe be faster if we could figure out a way to add a lookup table indexed with type
+			switch (type)
+			{
+			case EComponent::Transform:
+			{
+				return &m_transform;
+			}
+
+			case EComponent::Health:
+			{
+				return &m_health;
+			}
+
+			default:
+			{
+				return nullptr;
+			}
+			}
+		}
+	};
+
+	// Generates ^^^^
+	//IMPL_ENTITY(TransformComponent, m_transform, HealthComponent, m_health) // Do we want/need a typename?
+
+#define IMPL_ENTITY_ONE_COMPONENT(TYPE, NAME) \
+	struct TYPE ## Entity : public NewEntity \
+	{ \
+		TYPE NAME; \
+		\
+		virtual uint64_t getComponentMask() const override \
+		{ \
+			return TYPE ## ::s_type; \
+		} \
+		\
+		virtual void* getComponent(uint64_t type) override \
+		{ \
+			switch (type) \
+			{ \
+				case TYPE ## ::s_type: \
+				{ \
+					return &NAME; \
+				} \
+				default: \
+				{ \
+					return nullptr; \
+				} \
+			} \
+		} \
+	}; 
+
+#define IMPL_COMP_SWITCH(TYPE, NAME) \
+	case TYPE ## ::s_type: \
+	{ \
+		return &NAME; \
+	} \
+
+#define IMPL_ENTITY_TWO_COMPONENTS(TYPE_ONE, NAME_ONE, TYPE_TWO, NAME_TWO) \
+	struct TYPE_ONE ## TYPE_TWO ## Entity : public NewEntity \
+	{ \
+		TYPE_ONE NAME_ONE; \
+		TYPE_TWO NAME_TWO; \
+		\
+		virtual uint64_t getComponentMask() const override \
+		{ \
+			return TYPE_ONE ## ::s_type | TYPE_TWO ## ::s_type; \
+		} \
+		\
+		virtual void* getComponent(uint64_t type) override \
+		{ \
+			switch (type) \
+			{ \
+				IMPL_COMP_SWITCH(TYPE_ONE, NAME_ONE) \
+				IMPL_COMP_SWITCH(TYPE_TWO, NAME_TWO) \
+				default: \
+				{ \
+					return nullptr; \
+				} \
+			} \
+		} \
+	};
+
+	IMPL_ENTITY_ONE_COMPONENT(TestTransformComponent, m_transform);
+	IMPL_ENTITY_ONE_COMPONENT(TestHealthComponent, m_health);
+
+	IMPL_ENTITY_TWO_COMPONENTS(TestTransformComponent, m_transform, TestHealthComponent, m_health);
+
+#define PHI_COMPONENT_1_MEMBER(MEMBER_TYPE, MEMBER_NAME) TYPE ## NAME ; 
+
+#define PHI_COMPONENT_2_MEMBER(MEMBER_TYPE_1, MEMBER_NAME_1, MEMBER_TYPE_2, MEMBER_NAME_2) \
+	S2(PHI_COMPONENT_1_MEMBER(MEMBER_TYPE_1, MEMBER_NAME_1)) \ 
+	S2(PHI_COMPONENT_1_MEMBER(MEMBER_TYPE_2, MEMBER_NAME_2)) \
+
+
+	// Could feasibly generate all possible permutations (without order differences)
+
+	// Easiset way that I know how to do this is like Unreal does its Delegates
+	// Should split repeating snippets in these macros out into resuable expanded macros
+
+
+	/*
+	Big issue: Add/RemoveComponent requires being able to safely
+	copy component data between Entity types. But memory order of components
+	is not always going to be the same.
+
+	Example
+
+	Entity: [Transform, Mesh, Health]
+
+	| RemoveComponent(EComponent::Mesh)
+
+	Entity: [Transform, Health]
+
+	Cant memcpy because there is a gap between Transform and Health in src data
+	*/
+
+	void copyEntity()
+	{
+		// Could probably copy by iterarting all component types,
+		// checking if both entities have it, 
+		// if yes, do e2->GetComponent<C>() = e1->GetComponent<C>()
+		// Only problem is how do I iterate types
+	}
+
+	namespace Tests
+	{
+		void runEcsTests()
+		{
+			TestTransformComponentTestHealthComponentEntity entity;
+
+			TestTransformComponent* tf = entity.getComponentT<TestTransformComponent>();
+
+			return;
+		}
+	}
+}
+
 void run()
 {
 	using namespace Phoenix;
@@ -373,6 +569,7 @@ void run()
 	Tests::runMathTests();
 	Tests::runMemoryTests();
 	Tests::runSerializeTests();
+	Tests::runEcsTests();
 
 	bool bRIstarted = RI::init();
 
@@ -415,7 +612,7 @@ void run()
 	World world;
 	AssetRegistry assets;
 
-	loadAssetRegistry(&assets, "phoenix.assets", renderDevice , renderContext);
+	loadAssetRegistry(&assets, "phoenix.assets", renderDevice, renderContext);
 
 	importTexture(g_defaultWhiteTexPath, nullptr, renderDevice, renderContext, &assets);
 	importTexture(g_defaultBlackTexPath, nullptr, renderDevice, renderContext, &assets);
@@ -432,18 +629,18 @@ void run()
 
 	using Clock = std::chrono::high_resolution_clock;
 	using pointInTime = std::chrono::time_point<std::chrono::high_resolution_clock>;
-	
+
 	pointInTime lastTime = Clock::now();
-	
+
 	Platform::pollEvents();
 
-	Camera camera;	
+	Camera camera;
 	LightBuffer lightBuffer;
 
 	while (!gameWindow->wantsToClose())
 	{
 		Platform::pollEvents();
-		
+
 		UiInputConsume ioConsumed = filterUiConsumedInput();
 
 		if (ioConsumed.m_bConsumedKeyboard)
@@ -455,7 +652,7 @@ void run()
 		{
 			resetMouseState(&gameWindow->m_mouseState);
 		}
-		
+
 		startFrameImGui();
 
 		pointInTime currentTime = Clock::now();
@@ -465,7 +662,7 @@ void run()
 
 		moveCamera(&camera, gameWindow->m_keyStates, dt);
 		lookCamera(&camera, gameWindow->m_mouseState, dt);
-		
+
 		viewTf = camera.getUpdatedViewMatrix();
 		renderer.setViewMatrix(viewTf);
 		renderer.setupGBufferPass();
@@ -477,7 +674,7 @@ void run()
 
 		renderer.setupDirectLightingPass();
 		lightBuffer.clear();
-		
+
 		for (DirLightEntity& dl : world.m_dirLightEntities)
 		{
 			lightBuffer.addDirectional(viewTf * dl.m_dirLight.m_direction, dl.m_dirLight.m_color);
@@ -500,7 +697,7 @@ void run()
 
 		RI::swapBufferToWindow(gameWindow);
 	}
-	
+
 	saveWorld(world, worldPath);
 	saveAssetRegistry(assets, assetsPath);
 
