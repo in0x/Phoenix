@@ -447,31 +447,9 @@ namespace Phoenix
 	// Generates ^^^^
 	//IMPL_ENTITY(TransformComponent, m_transform, HealthComponent, m_health) // Do we want/need a typename?
 
-#define IMPL_ENTITY_ONE_COMPONENT(TYPE, NAME) \
-	struct TYPE ## Entity : public NewEntity \
-	{ \
-		TYPE NAME; \
-		\
-		virtual uint64_t getComponentMask() const override \
-		{ \
-			return TYPE ## ::s_type; \
-		} \
-		\
-		virtual void* getComponent(uint64_t type) override \
-		{ \
-			switch (type) \
-			{ \
-				case TYPE ## ::s_type: \
-				{ \
-					return &NAME; \
-				} \
-				default: \
-				{ \
-					return nullptr; \
-				} \
-			} \
-		} \
-	}; 
+
+#define EXPAND_HELPER(x) #x
+#define EXPAND(x) EXPAND_HELPER(x)
 
 #define IMPL_COMP_SWITCH(TYPE, NAME) \
 	case TYPE ## ::s_type: \
@@ -479,42 +457,56 @@ namespace Phoenix
 		return &NAME; \
 	} \
 
-#define IMPL_ENTITY_TWO_COMPONENTS(TYPE_ONE, NAME_ONE, TYPE_TWO, NAME_TWO) \
-	struct TYPE_ONE ## TYPE_TWO ## Entity : public NewEntity \
+#define PHI_COMPONENT_1_NAME(C_NAME) C_NAME ## Entity
+
+#define PHI_COMPONENT_2_NAME(C_NAME1, C_NAME2) C_NAME1 ## C_NAME2 ## Entity
+
+#define PHI_COMPONENT_1_MEMBER(MEMBER_TYPE, MEMBER_NAME) MEMBER_TYPE MEMBER_NAME ; 
+
+#define PHI_COMPONENT_2_MEMBER(MEMBER_TYPE_1, MEMBER_NAME_1, MEMBER_TYPE_2, MEMBER_NAME_2) \
+	PHI_COMPONENT_1_MEMBER(MEMBER_TYPE_1, MEMBER_NAME_1) \
+	PHI_COMPONENT_1_MEMBER(MEMBER_TYPE_2, MEMBER_NAME_2) \
+
+#define PHI_COMPONENT_1_MASK(C_TYPE) C_TYPE ## ::s_type \
+
+#define PHI_COMPONENT_2_MASK(C_TYPE1, C_TYPE2) C_TYPE1 ## ::s_type | C_TYPE2 ## ::s_type
+
+#define PHI_COMPONENT_1_GET(C_TYPE, C_NAME) \
+	case C_TYPE ## ::s_type: \
 	{ \
-		TYPE_ONE NAME_ONE; \
-		TYPE_TWO NAME_TWO; \
+		return &C_NAME; \
+	} \
+
+#define PHI_COMPONENT_2_GET(C_TYPE1, C_NAME1, C_TYPE2, C_NAME2) \
+	PHI_COMPONENT_1_GET(C_TYPE1, C_NAME1) \
+	PHI_COMPONENT_1_GET(C_TYPE2, C_NAME2) \
+
+#define IMPL_ENTITY(ENTITY_NAME, MEMBER_DECL, MASK_DECL, GET_DECL) \
+	struct ENTITY_NAME : public NewEntity \
+	{ \
+		MEMBER_DECL \
 		\
 		virtual uint64_t getComponentMask() const override \
 		{ \
-			return TYPE_ONE ## ::s_type | TYPE_TWO ## ::s_type; \
+			return MASK_DECL; \
 		} \
-		\
 		virtual void* getComponent(uint64_t type) override \
 		{ \
 			switch (type) \
 			{ \
-				IMPL_COMP_SWITCH(TYPE_ONE, NAME_ONE) \
-				IMPL_COMP_SWITCH(TYPE_TWO, NAME_TWO) \
+				GET_DECL \
 				default: \
 				{ \
 					return nullptr; \
 				} \
 			} \
 		} \
-	};
+	}; \
 
-	IMPL_ENTITY_ONE_COMPONENT(TestTransformComponent, m_transform);
-	IMPL_ENTITY_ONE_COMPONENT(TestHealthComponent, m_health);
-
-	IMPL_ENTITY_TWO_COMPONENTS(TestTransformComponent, m_transform, TestHealthComponent, m_health);
-
-#define PHI_COMPONENT_1_MEMBER(MEMBER_TYPE, MEMBER_NAME) TYPE ## NAME ; 
-
-#define PHI_COMPONENT_2_MEMBER(MEMBER_TYPE_1, MEMBER_NAME_1, MEMBER_TYPE_2, MEMBER_NAME_2) \
-	S2(PHI_COMPONENT_1_MEMBER(MEMBER_TYPE_1, MEMBER_NAME_1)) \ 
-	S2(PHI_COMPONENT_1_MEMBER(MEMBER_TYPE_2, MEMBER_NAME_2)) \
-
+#define PHI_ENTITY_TWO_COMPONENTS(TYPE1, NAME1, TYPE2, NAME2) \
+	IMPL_ENTITY(PHI_COMPONENT_2_NAME(TYPE1, TYPE2), PHI_COMPONENT_2_MEMBER(TYPE1, NAME1, TYPE2, NAME2), PHI_COMPONENT_2_MASK(TYPE1, TYPE2), PHI_COMPONENT_2_GET(TYPE1, NAME1, TYPE2, NAME2)) \
+	
+PHI_ENTITY_TWO_COMPONENTS(TestTransformComponent, m_transform, TestHealthComponent, m_health)
 
 	// Could feasibly generate all possible permutations (without order differences)
 
@@ -550,9 +542,7 @@ namespace Phoenix
 	{
 		void runEcsTests()
 		{
-			TestTransformComponentTestHealthComponentEntity entity;
-
-			TestTransformComponent* tf = entity.getComponentT<TestTransformComponent>();
+			//TestTransformComponentTestHealthComponentEntity e;
 
 			return;
 		}
