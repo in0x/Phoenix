@@ -201,6 +201,12 @@
     <ClInclude Include="..\src\Core\Logger.hpp" />
     <ClInclude Include="..\src\Core\Windows\PhiWindowsInclude.hpp" />
     <ClInclude Include="..\src\Core\Windows\PlatformWindows.hpp" />
+    <ClInclude Include="..\src\ECS\Components\CDirectionalLight.hpp" />
+    <ClInclude Include="..\src\ECS\Components\CPointLight.hpp" />
+    <ClInclude Include="..\src\ECS\Components\CStaticMesh.hpp" />
+    <ClInclude Include="..\src\ECS\Components\CTransform.hpp" />
+    <ClInclude Include="..\src\ECS\ComponentTypes.hpp" />
+    <ClInclude Include="..\src\ECS\Entity.hpp" />
     <ClInclude Include="..\src\Math\EulerAngles.hpp" />
     <ClInclude Include="..\src\Math\MathStreamOverloads.hpp" />
     <ClInclude Include="..\src\Math\Matrix3.hpp" />

@@ -232,6 +232,24 @@
     <ClInclude Include="..\src\Core\EntityComponent.hpp">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\ECS\Components\CDirectionalLight.hpp">
+      <Filter>ECS\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ECS\Components\CPointLight.hpp">
+      <Filter>ECS\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ECS\Components\CStaticMesh.hpp">
+      <Filter>ECS\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ECS\Components\CTransform.hpp">
+      <Filter>ECS\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ECS\ComponentTypes.hpp">
+      <Filter>ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ECS\Entity.hpp">
+      <Filter>ECS</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Core\Clock.cpp">
@@ -410,6 +428,12 @@
     </Filter>
     <Filter Include="UI">
       <UniqueIdentifier>{f40e95dd-5315-4e34-b64a-3153bbc405c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ECS">
+      <UniqueIdentifier>{50e4d7dd-df53-4637-88d9-0bf67ca3eb78}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ECS\Components">
+      <UniqueIdentifier>{1aa7b4bf-f72a-4783-8403-9f06bf33d8eb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

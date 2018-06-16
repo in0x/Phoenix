@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <ECS/Entity.hpp>
 
 namespace Phoenix
 {
@@ -36,19 +37,7 @@ namespace Phoenix
 		float health;
 	};
 
-	struct NewEntity
-	{
-		virtual uint64_t getComponentMask() const = 0;
-		virtual void* getComponent(uint64_t type) = 0;
-
-		template <typename T>
-		T* getComponentT()
-		{
-			return reinterpret_cast<T*>(getComponent(T::s_type)); // Problem with nullptr?
-		}
-	};
-
-	struct GeneratedEntity : public NewEntity
+	struct GeneratedEntity : public Entity
 	{
 		TestTransformComponent m_transform;
 		TestHealthComponent m_health;
@@ -84,7 +73,6 @@ namespace Phoenix
 	// Generates ^^^^
 	//IMPL_ENTITY(TransformComponent, m_transform, HealthComponent, m_health) // Do we want/need a typename?
 
-
 #define EXPAND_HELPER(x) #x
 #define EXPAND(x) EXPAND_HELPER(x)
 
@@ -113,7 +101,7 @@ namespace Phoenix
 	PHI_COMPONENT_1_GET(C_TYPE2, C_NAME2) \
 
 #define IMPL_ENTITY(ENTITY_NAME, MEMBER_DECL, MASK_DECL, GET_DECL) \
-	struct ENTITY_NAME : public NewEntity \
+	struct ENTITY_NAME : public Entity \
 	{ \
 		MEMBER_DECL \
 		\
@@ -137,7 +125,7 @@ namespace Phoenix
 #define PHI_ENTITY_TWO_COMPONENTS(TYPE1, NAME1, TYPE2, NAME2) \
 	IMPL_ENTITY(PHI_COMPONENT_2_NAME(TYPE1, TYPE2), PHI_COMPONENT_2_MEMBER(TYPE1, NAME1, TYPE2, NAME2), PHI_COMPONENT_2_MASK(TYPE1, TYPE2), PHI_COMPONENT_2_GET(TYPE1, NAME1, TYPE2, NAME2)) \
 
-	PHI_ENTITY_TWO_COMPONENTS(TestTransformComponent, m_transform, TestHealthComponent, m_health)
+	//PHI_ENTITY_TWO_COMPONENTS(TestTransformComponent, m_transform, TestHealthComponent, m_health)
 
 		// Could feasibly generate all possible permutations (without order differences)
 
@@ -161,7 +149,7 @@ namespace Phoenix
 		Cant memcpy because there is a gap between Transform and Health in src data
 		*/
 
-		void copyEntity()
+	void copyEntity()
 	{
 		// Could probably copy by iterarting all component types,
 		// checking if both entities have it, 
