@@ -61,14 +61,18 @@ def main():
     for file in os.listdir(componentDirectoy):
         componentNames.append(file.replace(".hpp", ""))     
 
-    # TODO figrue out all unique combinations of entites https://stackoverflow.com/questions/464864/how-to-get-all-possible-combinations-of-a-list-s-elements 
-    # TODO for each combination run genEntity and save the result
-
     entityTypeId = 0
-    codelines = genEntity(componentNames, entityTypeId)
-    entityTypeId += 1
+    generatedEntities = []
 
-    for code in codelines:
-        print(code)
-        
+    # generate powerset of componentTypes
+    for numComponents in range(1, len(componentNames) + 1):
+        permutations = itertools.combinations(componentNames, numComponents)
+        for subset in permutations:
+            generatedEntities.append(genEntity(subset , entityTypeId))
+            entityTypeId += 1
+
+    for entityCode in generatedEntities:
+        for line in entityCode:
+            print(line)
+
 main()
