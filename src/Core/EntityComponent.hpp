@@ -15,117 +15,37 @@ namespace Phoenix
 	containers that match the components it is interested in
 	*/
 
-	struct EComponent
-	{
-		static const uint64_t Transform = 1 << 0;
-		static const uint64_t Health = 1 << 1;
-	};
+	// struct GeneratedEntity : public Entity
+	// {
+	// 	CTransformComponent m_transform;
+	// 	CHealthComponent m_health;
+	//
+	// 	virtual uint64_t getComponentMask() const override
+	// 	{
+	// 		return EComponent::Transform | EComponent::Health;
+	// 	}
+	//
+	// 	virtual void* getComponent(uint64_t type) override
+	// 	{
+	// 		// Could maybe be faster if we could figure out a way to add a lookup table indexed with type
+	// 		switch (type)
+	// 		{
+	// 		case EComponent::Transform:
+	// 		{
+	// 			return &m_transform;
+	// 		}
+	// 		case EComponent::Health:
+	// 		{
+	// 			return &m_health;
+	// 		}
+	// 		default:
+	// 		{
+	// 			return nullptr;
+	// 		}
+	// 		}
+	// 	}
+	// };
 
-	struct TestTransformComponent
-	{
-		static const uint64_t s_type = EComponent::Transform;
-
-		float x;
-		float y;
-		float z;
-	};
-
-	struct TestHealthComponent
-	{
-		static const uint64_t s_type = EComponent::Health;
-
-		float health;
-	};
-
-	struct GeneratedEntity : public Entity
-	{
-		TestTransformComponent m_transform;
-		TestHealthComponent m_health;
-
-		virtual uint64_t getComponentMask() const override
-		{
-			return EComponent::Transform | EComponent::Health;
-		}
-
-		virtual void* getComponent(uint64_t type) override
-		{
-			// Could maybe be faster if we could figure out a way to add a lookup table indexed with type
-			switch (type)
-			{
-			case EComponent::Transform:
-			{
-				return &m_transform;
-			}
-
-			case EComponent::Health:
-			{
-				return &m_health;
-			}
-
-			default:
-			{
-				return nullptr;
-			}
-			}
-		}
-	};
-
-	// Generates ^^^^
-	//IMPL_ENTITY(TransformComponent, m_transform, HealthComponent, m_health) // Do we want/need a typename?
-
-#define EXPAND_HELPER(x) #x
-#define EXPAND(x) EXPAND_HELPER(x)
-
-#define PHI_COMPONENT_1_NAME(C_NAME) C_NAME ## Entity
-
-#define PHI_COMPONENT_2_NAME(C_NAME1, C_NAME2) C_NAME1 ## C_NAME2 ## Entity
-
-#define PHI_COMPONENT_1_MEMBER(MEMBER_TYPE, MEMBER_NAME) MEMBER_TYPE MEMBER_NAME ; 
-
-#define PHI_COMPONENT_2_MEMBER(MEMBER_TYPE_1, MEMBER_NAME_1, MEMBER_TYPE_2, MEMBER_NAME_2) \
-	PHI_COMPONENT_1_MEMBER(MEMBER_TYPE_1, MEMBER_NAME_1) \
-	PHI_COMPONENT_1_MEMBER(MEMBER_TYPE_2, MEMBER_NAME_2) \
-
-#define PHI_COMPONENT_1_MASK(C_TYPE) C_TYPE ## ::s_type \
-
-#define PHI_COMPONENT_2_MASK(C_TYPE1, C_TYPE2) C_TYPE1 ## ::s_type | C_TYPE2 ## ::s_type
-
-#define PHI_COMPONENT_1_GET(C_TYPE, C_NAME) \
-	case C_TYPE ## ::s_type: \
-	{ \
-		return &C_NAME; \
-	} \
-
-#define PHI_COMPONENT_2_GET(C_TYPE1, C_NAME1, C_TYPE2, C_NAME2) \
-	PHI_COMPONENT_1_GET(C_TYPE1, C_NAME1) \
-	PHI_COMPONENT_1_GET(C_TYPE2, C_NAME2) \
-
-#define IMPL_ENTITY(ENTITY_NAME, MEMBER_DECL, MASK_DECL, GET_DECL) \
-	struct ENTITY_NAME : public Entity \
-	{ \
-		MEMBER_DECL \
-		\
-		virtual uint64_t getComponentMask() const override \
-		{ \
-			return MASK_DECL; \
-		} \
-		virtual void* getComponent(uint64_t type) override \
-		{ \
-			switch (type) \
-			{ \
-				GET_DECL \
-				default: \
-				{ \
-					return nullptr; \
-				} \
-			} \
-		} \
-	}; \
-
-#define PHI_ENTITY_TWO_COMPONENTS(TYPE1, NAME1, TYPE2, NAME2) \
-	IMPL_ENTITY(PHI_COMPONENT_2_NAME(TYPE1, TYPE2), PHI_COMPONENT_2_MEMBER(TYPE1, NAME1, TYPE2, NAME2), PHI_COMPONENT_2_MASK(TYPE1, TYPE2), PHI_COMPONENT_2_GET(TYPE1, NAME1, TYPE2, NAME2)) \
-
-	//PHI_ENTITY_TWO_COMPONENTS(TestTransformComponent, m_transform, TestHealthComponent, m_health)
 
 		// Could feasibly generate all possible permutations (without order differences)
 
