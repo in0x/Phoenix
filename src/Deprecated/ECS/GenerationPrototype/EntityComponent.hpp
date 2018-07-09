@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include <ECS/Entity.hpp>
+#include <Memory/PoolAllocator.hpp>
 
 namespace Phoenix
 {
@@ -46,28 +47,21 @@ namespace Phoenix
 	// 	}
 	// };
 
+	/*
+	Big issue: Add/RemoveComponent requires being able to safely
+	copy component data between Entity types. But memory order of components
+	is not always going to be the same.
 
-		// Could feasibly generate all possible permutations (without order differences)
+	Example
 
-		// Easiset way that I know how to do this is like Unreal does its Delegates
-		// Should split repeating snippets in these macros out into resuable expanded macros
+	Entity: [Transform, Mesh, Health]
 
+	| RemoveComponent(EComponent::Mesh)
 
-		/*
-		Big issue: Add/RemoveComponent requires being able to safely
-		copy component data between Entity types. But memory order of components
-		is not always going to be the same.
+	Entity: [Transform, Health]
 
-		Example
-
-		Entity: [Transform, Mesh, Health]
-
-		| RemoveComponent(EComponent::Mesh)
-
-		Entity: [Transform, Health]
-
-		Cant memcpy because there is a gap between Transform and Health in src data
-		*/
+	Cant memcpy because there is a gap between Transform and Health in src data
+	*/
 
 	void copyEntity()
 	{
@@ -85,5 +79,56 @@ namespace Phoenix
 
 			return;
 		}
+	}
+
+	class IEntityContainer
+	{
+	public:
+		virtual Entity* allocateEntity() = 0;	
+		virtual void Entity* freeEntity(Entity* entity) override;	
+	};
+
+	template <typename TEntity>
+	class TEntityContainer : public IEntityContainer
+	{
+	public:
+		TEntityContainer()
+			: m_allocator(sizeof(TEntity), 1024, alignof(TEntity))
+		{}
+
+		virtual Entity* allocateEntity() override
+		{
+			return m_allocator.alloc();
+		}
+
+		virtual void Entity* freeEntity(Entity* entity) override
+		{
+			m_allocator.free(entity);
+		}
+
+	private:
+		PoolAllocator m_allocator;
+	}
+
+	void initEntityInfo(EntityInfo* info)
+	{
+		// Generate code to setup all info here
+	}
+
+	struct EntityInfo
+	{
+		size_t sizeOfEntityPool(uint64_t entityMask)
+		{
+			auto iter = m_poolSizes.find(entityMask);
+
+			if (iter == m_poolSizes.end())
+			{
+				return 0;
+			} 
+
+			return iter->second;
+		}
+
+		std::unordered_map<uint64_t, size_t> m_poolSizes;		
 	}
 }

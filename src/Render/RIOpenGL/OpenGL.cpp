@@ -55,18 +55,23 @@ const char* getGlErrorString(bool& bErrorOccured)
 	}
 }
 
-#define PHI_SLOW_GL_ERROR_CHECK 1
+#define PHI_VALIDATE_GL 0
+#define PHI_SLOW_GL_ERROR_CHECK 0
 
 bool checkGlErrorOccured()
 {
-#if PHI_SLOW_GL_ERROR_CHECK 
-	bool bErrorOccured;
-	getGlErrorString(bErrorOccured);
-	assert(!bErrorOccured);
-	return bErrorOccured;
+#if PHI_VALIDATE_GL
+	#if PHI_SLOW_GL_ERROR_CHECK 
+		bool bErrorOccured;
+		getGlErrorString(bErrorOccured);
+		assert(!bErrorOccured);
+		return bErrorOccured;
+	#else
+		bool bErrorOccured = glGetError() != GL_NO_ERROR;
+		assert(!bErrorOccured);
+		return bErrorOccured;
+	#endif
 #else
-	bool bErrorOccured = glGetError() != GL_NO_ERROR;
-	assert(!bErrorOccured);
-	return bErrorOccured;
+	return false;
 #endif
 }

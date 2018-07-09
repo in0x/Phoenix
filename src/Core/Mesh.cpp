@@ -1,5 +1,7 @@
 #include "Mesh.hpp"
 
+#include <assert.h>
+
 #include <Core/Serialize.hpp>
 #include <Core/SerialUtil.hpp>
 #include <Core/Material.hpp>

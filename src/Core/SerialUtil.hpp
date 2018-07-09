@@ -4,49 +4,23 @@
 
 #include <string>
 #include <vector>
-#include <assert.h>
 
 namespace Phoenix
 {
-	static void serialize(Archive& ar, size_t& sizet)
-	{
-		ar.serialize(&sizet, sizeof(size_t));
-	}
+	class Vec3;
+	class Vec4;
 
-	static void serialize(Archive& ar, uint8_t& sizet)
-	{
-		ar.serialize(&sizet, sizeof(uint8_t));
-	}
+	void serialize(Archive& ar, float& f);
 
-	static void serialize(Archive& ar, std::string& string)
-	{
-		if (ar.isReading())
-		{
-			size_t len = 0;
-			serialize(ar, len);
+	void serialize(Archive& ar, Vec3& vec3);
 
-			char* buf = new char[len];
-			ar.serialize(buf, len);
+	void serialize(Archive& ar, Vec4& vec4);
 
-			string = std::string(buf);	
+	void serialize(Archive& ar, size_t& sizet);
 
-			delete[] buf;
-		}
-		else
-		{
-			assert(!string.empty());
+	void serialize(Archive& ar, uint8_t& u8);
 
-			size_t len = string.size() + 1;
-			serialize(ar, len);
-
-			char* buf = new char[len];
-	
-			strcpy(buf, string.c_str());
-			ar.serialize(buf, len);
-		
-			delete[] buf;
-		}
-	}
+	void serialize(Archive& ar, std::string& string);
 
 	template <class T>
 	static void serialize(Archive& ar, std::vector<T>& vector)

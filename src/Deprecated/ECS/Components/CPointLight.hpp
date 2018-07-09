@@ -1,6 +1,5 @@
 #pragma once
 
-#include <ECS/ComponentTypes.hpp>
 #include <Math/Vec3.hpp>
 
 namespace Phoenix
@@ -12,8 +11,6 @@ namespace Phoenix
 			, m_radius(radius)
 			, m_intensity(intensity)
 		{}
-
-		static const uint64_t s_type = EComponent::PointLight;
 
 		Vec3 m_color;
 		float m_radius;

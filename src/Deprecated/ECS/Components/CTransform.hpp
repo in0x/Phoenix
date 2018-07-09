@@ -1,6 +1,5 @@
 #pragma once
 
-#include <ECS/ComponentTypes.hpp>
 #include <Math/Vec3.hpp>
 #include <Math/Matrix4.hpp>
 
@@ -15,8 +14,6 @@ namespace Phoenix
 		{
 			recalculate();
 		}
-
-		static const uint64_t s_type = EComponent::Transform;
 
 		Vec3 m_translation;
 		Vec3 m_scale;

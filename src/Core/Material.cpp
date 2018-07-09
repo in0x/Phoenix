@@ -1,5 +1,7 @@
 #include "Material.hpp"
 
+#include <assert.h>
+
 #include <Core/Texture.hpp>
 #include <Core/Serialize.hpp>
 #include <Core/SerialUtil.hpp>

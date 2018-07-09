@@ -1,5 +1,7 @@
 #include <assert.h>
 #include <chrono>
+#include <typeindex>
+#include <functional>
 
 #include "Tests/MathTests.hpp"
 #include "Tests/MemoryTests.hpp"
@@ -7,6 +9,7 @@
 
 #include "Core/ObjImport.hpp"
 #include "Core/AssetRegistry.hpp"
+#include "Core/FNVHash.hpp"
 
 #include "Core/Logger.hpp"
 #include "Core/Serialize.hpp"
@@ -53,22 +56,10 @@ namespace Phoenix
 		}
 	};
 
-	struct StaticMeshEntity
-	{
-		StaticMesh* m_mesh;
-		Transform m_transform;
-	};
-
 	struct DirectionalLight
 	{
 		Vec3 m_direction;
 		Vec3 m_color;
-	};
-
-	struct DirLightEntity
-	{
-		DirectionalLight m_dirLight;
-		Transform m_transform;
 	};
 
 	struct PointLight
@@ -78,7 +69,19 @@ namespace Phoenix
 		float m_intensity;
 	};
 
-	struct PointLightEntity
+	struct StaticMeshEntity 
+	{
+		StaticMesh* m_mesh;
+		Transform m_transform;
+	};
+
+	struct DirLightEntity
+	{
+		DirectionalLight m_dirLight;
+		Transform m_transform;
+	};
+
+	struct PointLightEntity 
 	{
 		PointLight m_pointLight;
 		Transform m_transform;
@@ -195,21 +198,6 @@ namespace Phoenix
 	void addPointLightToBuffer(const PointLight& pl, const Vec3& pos, LightBuffer* buffer)
 	{
 		buffer->addPointLight(pos, pl.m_radius, pl.m_color, pl.m_intensity);
-	}
-
-	void serialize(Archive& ar, float& f)
-	{
-		ar.serialize(&f, sizeof(float));
-	}
-
-	void serialize(Archive& ar, Vec3& vec3)
-	{
-		ar.serialize(&vec3, sizeof(vec3));
-	}
-
-	void serialize(Archive& ar, Vec4& vec4)
-	{
-		ar.serialize(&vec4, sizeof(vec4));
 	}
 
 	void serialize(Archive& ar, Transform& transform)
@@ -363,52 +351,436 @@ namespace Phoenix
 
 		destroyArchive(ar);
 	}
-
-	void render(const World& world, Camera* camera, DeferredRenderer* renderer, LightBuffer* lightBuffer)
-	{
-		Matrix4 viewTf;
-
-		viewTf = camera->getUpdatedViewMatrix();
-		renderer->setViewMatrix(viewTf);
-		renderer->setupGBufferPass();
-
-		for (const StaticMeshEntity& entity : world.m_staticMeshEntities)
-		{
-			renderer->drawStaticMesh(*entity.m_mesh, entity.m_transform.m_cached);
-		}
-
-		renderer->setupDirectLightingPass();
-		lightBuffer->clear();
-
-		for (const DirLightEntity& dl : world.m_dirLightEntities)
-		{
-			lightBuffer->addDirectional(viewTf * dl.m_dirLight.m_direction, dl.m_dirLight.m_color);
-		}
-
-		for (const PointLightEntity& entity : world.m_pointLightEntities)
-		{
-			Vec4 eyePos(entity.m_transform.m_translation, 1.0);
-			eyePos *= viewTf;
-
-			addPointLightToBuffer(entity.m_pointLight, eyePos, lightBuffer);
-		}
-
-		renderer->runLightsPass(*lightBuffer);
-		renderer->copyFinalColorToBackBuffer();
-	}
 }
 
 namespace Phoenix
 {
-	//class Component
-	//{
+	typedef FNVHash EcTypeId;
+	#define EC_TYPE_HASH(x) HashFNV<const char*>()(x);
+	
+	// TODO(phil): We can make this compile-time. 
+	#define IMPL_EC_TYPE_ID(x) \
+	static EcTypeId staticTypeId() \
+	{ \
+		return EC_TYPE_HASH(x); \
+	} \
+	\
+	virtual EcTypeId typeId() const override \
+	{ \
+		return EC_TYPE_HASH(x); \
+	} \
 
-	//};
-	//
-	//class Entity
-	//{
+	typedef int32_t EntityHandle;
 
-	//};
+	class Component
+	{
+	public:
+		Component() : m_owner(0) {}
+
+		virtual EcTypeId typeId() const = 0;
+		EntityHandle m_owner;
+	};
+
+	class Entity
+	{
+	public:
+		Component* getComponent(EcTypeId type);
+		void addComponent(Component* component);
+	
+	private:
+		typedef std::unordered_map<EcTypeId, Component*> ComponentTable;
+		ComponentTable m_components;
+	};
+
+	Component* Entity::getComponent(EcTypeId type)
+	{
+		auto& entry = m_components.find(type);
+		
+		if (entry != m_components.end())
+		{
+			return entry->second;
+		}
+		else
+		{
+			return nullptr;
+		}
+	}
+
+	void Entity::addComponent(Component* component)
+	{
+		EcTypeId type = component->typeId();
+
+		if (!getComponent(type))
+		{
+			m_components.emplace(type, component);
+		}
+	}
+
+	typedef std::function<Component*(void)> ComponentFactory;
+
+	typedef std::unordered_map<EcTypeId, ComponentFactory> CFactoryTable;
+
+	class NewWorld
+	{
+	public:
+		NewWorld()
+			: m_usedEntities(1) {}
+
+		EntityHandle createEntity();
+		bool handleIsValid(EntityHandle handle);
+
+		void addComponentFactory(EcTypeId type, const ComponentFactory& factory);
+
+		Component* addComponent(EntityHandle handle, EcTypeId type);
+		Component* getComponent(EntityHandle handle, EcTypeId type);
+
+		template<typename C>
+		C* addComponent(EntityHandle handle)
+		{
+			return static_cast<C*>(addComponent(handle, C::staticTypeId()));
+		}
+
+		template<typename C>
+		C* getComponent(EntityHandle handle)
+		{
+			return static_cast<C*>(getComponent(handle, C::staticTypeId()));
+		}
+
+	private:
+		enum { MAX_ENTITIES = 1024, INVALID_ENTITY = 0 };
+
+		ComponentFactory* getCFactory(EcTypeId type)
+		{
+			auto& entry = m_factories.find(type);
+
+			if (entry != m_factories.end())
+			{
+				return &(entry->second);
+			}
+			else
+			{
+				return nullptr;
+			}
+		}
+
+		Entity m_entites[MAX_ENTITIES];
+		CFactoryTable m_factories;
+		size_t m_usedEntities;
+	};
+
+	void NewWorld::addComponentFactory(EcTypeId type, const ComponentFactory& factory)
+	{
+		auto& entry = m_factories.find(type);
+
+		if (entry != m_factories.end())
+		{
+			assert(false);
+			return;
+		}
+
+		m_factories.emplace(type, factory);
+	}
+
+	EntityHandle NewWorld::createEntity()
+	{
+		assert(m_usedEntities < MAX_ENTITIES);
+		return ++m_usedEntities;
+	}
+
+	bool NewWorld::handleIsValid(EntityHandle handle)
+	{
+		return (handle != INVALID_ENTITY && m_usedEntities < MAX_ENTITIES);
+	}
+
+	Component* NewWorld::addComponent(EntityHandle handle, EcTypeId type)
+	{
+		assert(handleIsValid(handle));
+		Entity& entity = m_entites[handle];
+
+		ComponentFactory* factory = getCFactory(type);
+		assert(factory != nullptr);
+
+		Component* component = (*factory)();
+		component->m_owner = handle;
+		entity.addComponent(component);
+		return component;
+	}
+
+	Component* NewWorld::getComponent(EntityHandle handle, EcTypeId type)
+	{
+		assert(handleIsValid(handle));
+		return m_entites[handle].getComponent(type);
+	}
+
+	template <typename C, size_t maxComponents>
+	struct ComponentArray
+	{
+		ComponentArray() : m_active(0) {}
+
+		C m_components[maxComponents];
+		size_t m_active;
+
+		C* alloc()
+		{
+			assert(m_active < maxComponents);
+			if (m_active >= maxComponents)
+			{
+				return nullptr;
+			}
+
+			return &m_components[m_active++];
+		}
+
+		C& operator[](size_t index)
+		{
+			return m_components[index];
+		}
+	};
+	
+	class CTransform : public Component
+	{
+		Vec3 m_translation;
+		Vec3 m_rotation;
+		Vec3 m_scale;
+
+	public:
+		void setTranslation(const Vec3& t)
+		{
+			m_translation = t;
+			m_bDirty = true;
+		}
+
+		const Vec3& getTranslation()
+		{
+			return m_translation;
+		}
+
+		void setRotation(const Vec3& r)
+		{
+			m_rotation = r;
+			m_bDirty = true;
+		}
+
+		const Vec3& getRotation()
+		{
+			return m_rotation;
+		}
+
+		void setScale(const Vec3& s)
+		{
+			m_scale = s;
+			m_bDirty = true;
+		}
+
+		const Vec3& getScale()
+		{
+			return m_scale;
+		}
+
+		Matrix4* m_transform;
+
+		bool m_bDirty;
+
+		IMPL_EC_TYPE_ID("Transform");
+	};
+
+	class TransformSystem
+	{
+	public:
+		TransformSystem()
+		{
+			CTransform* const components = m_components.m_components;
+			for (size_t i = 0; i < MAX_COMPONENTS; ++i)
+			{
+				components[i].m_transform = &m_transforms[i];
+			}
+		}
+
+		void updateTransforms();
+
+		Component* allocComponent();
+
+	private:
+		enum { MAX_COMPONENTS = 1024 };
+
+		ComponentArray<CTransform, MAX_COMPONENTS> m_components;
+		Matrix4 m_transforms[MAX_COMPONENTS];
+	};
+
+	Component* TransformSystem::allocComponent()
+	{
+		return m_components.alloc();
+	}
+
+	void TransformSystem::updateTransforms()
+	{
+		const size_t active = m_components.m_active;
+		
+		for (size_t i = 0; i < active; ++i)
+		{
+			CTransform& c = m_components[i];
+
+			if (c.m_bDirty)
+			{
+				m_transforms[i] = Matrix4::translation(c.getTranslation())
+					* Matrix4::rotation(c.getRotation())
+					* Matrix4::scale(c.getScale());
+
+				c.m_bDirty = false;
+			}
+		}
+	}
+
+	class CStaticMesh : public Component
+	{
+	public:
+		CStaticMesh() : m_mesh(nullptr) {}
+
+		StaticMesh* m_mesh;
+
+		IMPL_EC_TYPE_ID("StaticMesh");
+	};
+
+	class StaticMeshSystem
+	{
+	public:
+		Component* allocComponent();
+		void renderMeshes(NewWorld* world, DeferredRenderer* renderer);
+
+	private:
+		enum { MAX_COMPONENTS = 1024 };
+		ComponentArray<CStaticMesh, MAX_COMPONENTS> m_components;
+	};
+
+	Component* StaticMeshSystem::allocComponent()
+	{
+		return m_components.alloc();
+	}
+	
+	void StaticMeshSystem::renderMeshes(NewWorld* world, DeferredRenderer* renderer)
+	{
+		const size_t active = m_components.m_active;
+		
+		for (size_t i = 0; i < active; ++i)
+		{
+			CStaticMesh& sm = m_components[i];
+			CTransform* tf = world->getComponent<CTransform>(sm.m_owner);
+
+			renderer->drawStaticMesh(*sm.m_mesh, *tf->m_transform);
+		}
+	}
+
+	struct CDirectionalLight : public Component
+	{
+		Vec3 m_direction;
+		Vec3 m_color;
+
+		IMPL_EC_TYPE_ID("DirectionalLight")
+	};
+
+	struct CPointLight : public Component
+	{
+		Vec3 m_color;
+		float m_radius;
+		float m_intensity;
+
+		IMPL_EC_TYPE_ID("PointLight")
+	};
+
+	class LightSystem
+	{
+	public:
+
+		Component* allocDirLight();	
+		Component* allocPointLight();
+
+		void renderLights(NewWorld* world, DeferredRenderer* renderer, const Matrix4& viewTf);
+
+	private:
+		enum { MAX_COMPONENTS = 256 };
+
+		ComponentArray<CDirectionalLight, MAX_COMPONENTS> m_dirLights;
+		ComponentArray<CPointLight, MAX_COMPONENTS> m_pointLights;
+		LightBuffer m_lightBuffer;
+	};
+
+	Component* LightSystem::allocDirLight()
+	{
+		return m_dirLights.alloc();
+	}
+	
+	Component* LightSystem::allocPointLight()
+	{
+		return m_pointLights.alloc();
+	}
+
+	void LightSystem::renderLights(NewWorld* world, DeferredRenderer* renderer, const Matrix4& viewTf)
+	{
+		renderer->setupDirectLightingPass();
+		m_lightBuffer.clear();
+
+		for (size_t i = 0; i < m_dirLights.m_active; ++i)
+		{
+			CDirectionalLight& dl = m_dirLights[i];
+			m_lightBuffer.addDirectional(viewTf * dl.m_direction, dl.m_color);
+		}
+
+		for (size_t i = 0; i < m_pointLights.m_active; ++i)
+		{
+			CPointLight& pl = m_pointLights[i];
+			CTransform* tf = world->getComponent<CTransform>(pl.m_owner);
+
+			Vec4 eyePos(tf->getTranslation(), 1.0);
+			eyePos *= viewTf;
+
+			m_lightBuffer.addPointLight(eyePos, pl.m_radius, pl.m_color, pl.m_intensity);
+		}
+
+		renderer->runLightsPass(m_lightBuffer);
+	}
+
+	void coverTransformOldToNew(const Transform& oldTf, CTransform* newTf)
+	{
+		newTf->setTranslation(oldTf.m_translation);
+		newTf->setRotation(oldTf.m_rotation);
+		newTf->setScale(oldTf.m_scale);
+	}
+
+	void convertWorldOldToNew(World* oldWorld, NewWorld* newWorld)
+	{
+		for (const StaticMeshEntity& entity : oldWorld->m_staticMeshEntities)
+		{
+			EntityHandle e = newWorld->createEntity();
+			
+			CStaticMesh* sm = newWorld->addComponent<CStaticMesh>(e);
+			sm->m_mesh = entity.m_mesh;
+
+			CTransform* tf = newWorld->addComponent<CTransform>(e);
+			coverTransformOldToNew(entity.m_transform, tf);
+		}
+
+		for (const DirLightEntity& entity : oldWorld->m_dirLightEntities)
+		{
+			EntityHandle e = newWorld->createEntity();
+
+			CDirectionalLight* dl = newWorld->addComponent<CDirectionalLight>(e);
+			dl->m_color = entity.m_dirLight.m_color;
+			dl->m_direction = entity.m_dirLight.m_direction;
+		}
+	
+		for (const PointLightEntity& entity : oldWorld->m_pointLightEntities)
+		{
+			EntityHandle e = newWorld->createEntity();
+		
+			CPointLight* pl = newWorld->addComponent<CPointLight>(e);
+			pl->m_color = entity.m_pointLight.m_color;
+			pl->m_intensity = entity.m_pointLight.m_intensity;
+			pl->m_radius = entity.m_pointLight.m_radius;
+
+			CTransform* tf = newWorld->addComponent<CTransform>(e);
+			coverTransformOldToNew(entity.m_transform, tf);
+		}	
+	}
 }
 
 void run()
@@ -421,7 +793,7 @@ void run()
 	Tests::runMathTests();
 	Tests::runMemoryTests();
 	Tests::runSerializeTests();
-	
+
 	bool bRIstarted = RI::init();
 
 	if (!bRIstarted)
@@ -488,6 +860,47 @@ void run()
 	Camera camera;
 	LightBuffer lightBuffer;
 
+	///// NEW ECS INIT - START /////
+
+	TransformSystem tfSystem;
+	StaticMeshSystem smSystem;
+	LightSystem lightSystem;
+
+	NewWorld newWorld;
+
+	auto transformFactory = [system = &tfSystem]() -> Component*
+	{
+		return system->allocComponent();
+	};
+	newWorld.addComponentFactory(CTransform::staticTypeId(), transformFactory);
+
+	auto smFactory = [system = &smSystem]() -> Component*
+	{
+		return system->allocComponent();
+	};
+	newWorld.addComponentFactory(CStaticMesh::staticTypeId(), smFactory);
+
+	auto dlFactory = [system = &lightSystem]() -> Component*
+	{
+		return system->allocDirLight();
+	};
+	newWorld.addComponentFactory(CDirectionalLight::staticTypeId(), dlFactory);
+
+	auto plFactory = [system = &lightSystem]() -> Component*
+	{
+		return system->allocPointLight();
+	};
+	newWorld.addComponentFactory(CPointLight::staticTypeId(), plFactory);
+
+	EntityHandle e = newWorld.createEntity();
+	newWorld.addComponent(e, CTransform::staticTypeId());
+
+	///// NEW ECS INIT - END /////
+
+	convertWorldOldToNew(&world, &newWorld);
+
+	///// NEW ECS UPDATE - START /////
+
 	while (!gameWindow->wantsToClose())
 	{
 		Platform::pollEvents();
@@ -514,7 +927,16 @@ void run()
 		moveCamera(&camera, gameWindow->m_keyStates, dt);
 		lookCamera(&camera, gameWindow->m_mouseState, dt);
 
-		render(world, &camera, &renderer, &lightBuffer);
+		tfSystem.updateTransforms();
+
+		Matrix4 viewTf = camera.getUpdatedViewMatrix();
+		renderer.setViewMatrix(viewTf);
+		renderer.setupGBufferPass();
+
+		smSystem.renderMeshes(&newWorld, &renderer);
+		lightSystem.renderLights(&newWorld, &renderer, viewTf);
+	
+		renderer.copyFinalColorToBackBuffer();
 
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 
@@ -523,8 +945,10 @@ void run()
 		RI::swapBufferToWindow(gameWindow);
 	}
 
-	saveWorld(world, worldPath);
-	saveAssetRegistry(assets, assetsPath);
+	///// NEW ECS UPDATE - END /////
+
+	//saveWorld(world, worldPath);
+	//saveAssetRegistry(assets, assetsPath);
 
 	exitImGui();
 	RI::destroyWindow(gameWindow);

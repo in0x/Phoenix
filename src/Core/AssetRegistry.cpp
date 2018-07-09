@@ -1,5 +1,7 @@
 #include "AssetRegistry.hpp"
 
+#include <assert.h>
+
 #include <Core/Logger.hpp>
 #include <Core/Serialize.hpp>
 #include <Core/SerialUtil.hpp>

@@ -201,12 +201,6 @@
     <ClInclude Include="..\src\Core\Logger.hpp" />
     <ClInclude Include="..\src\Core\Windows\PhiWindowsInclude.hpp" />
     <ClInclude Include="..\src\Core\Windows\PlatformWindows.hpp" />
-    <ClInclude Include="..\src\ECS\Components\CDirectionalLight.hpp" />
-    <ClInclude Include="..\src\ECS\Components\CPointLight.hpp" />
-    <ClInclude Include="..\src\ECS\Components\CStaticMesh.hpp" />
-    <ClInclude Include="..\src\ECS\Components\CTransform.hpp" />
-    <ClInclude Include="..\src\ECS\ComponentTypes.hpp" />
-    <ClInclude Include="..\src\ECS\Entity.hpp" />
     <ClInclude Include="..\src\Math\EulerAngles.hpp" />
     <ClInclude Include="..\src\Math\MathStreamOverloads.hpp" />
     <ClInclude Include="..\src\Math\Matrix3.hpp" />
@@ -279,6 +273,7 @@
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Disabled</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Disabled</Optimization>
     </ClCompile>
+    <ClCompile Include="..\src\Core\SerialUtil.cpp" />
     <ClCompile Include="..\src\Core\Shader.cpp" />
     <ClCompile Include="..\src\Core\StringTokenizer.cpp" />
     <ClCompile Include="..\src\Core\Texture.cpp" />
