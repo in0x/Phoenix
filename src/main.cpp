@@ -369,6 +369,11 @@ namespace Phoenix
 	{ \
 		return EC_TYPE_HASH(x); \
 	} \
+	\
+	virtual const char* typeName() const override \
+	{ \
+		return x; \
+	} \
 
 	typedef int32_t EntityHandle;
 
@@ -378,6 +383,7 @@ namespace Phoenix
 		Component() : m_owner(0) {}
 
 		virtual EcTypeId typeId() const = 0;
+		virtual const char* typeName() const = 0;
 		EntityHandle m_owner;
 	};
 
@@ -422,6 +428,13 @@ namespace Phoenix
 
 	class NewWorld
 	{
+		enum
+		{
+			MAX_ENTITIES = 1024,
+			INVALID_ENTITY = 0,
+			FIRST_VALID_ENTITY = 1
+		};
+
 	public:
 		NewWorld()
 			: m_usedEntities(1) {}
@@ -446,9 +459,10 @@ namespace Phoenix
 			return static_cast<C*>(getComponent(handle, C::staticTypeId()));
 		}
 
-	private:
-		enum { MAX_ENTITIES = 1024, INVALID_ENTITY = 0 };
+		Entity m_entites[MAX_ENTITIES];
+		size_t m_usedEntities;
 
+	private:
 		ComponentFactory* getCFactory(EcTypeId type)
 		{
 			auto& entry = m_factories.find(type);
@@ -463,9 +477,7 @@ namespace Phoenix
 			}
 		}
 
-		Entity m_entites[MAX_ENTITIES];
 		CFactoryTable m_factories;
-		size_t m_usedEntities;
 	};
 
 	void NewWorld::addComponentFactory(EcTypeId type, const ComponentFactory& factory)
@@ -587,14 +599,7 @@ namespace Phoenix
 	class TransformSystem
 	{
 	public:
-		TransformSystem()
-		{
-			CTransform* const components = m_components.m_components;
-			for (size_t i = 0; i < MAX_COMPONENTS; ++i)
-			{
-				components[i].m_transform = &m_transforms[i];
-			}
-		}
+		TransformSystem();
 
 		void updateTransforms();
 
@@ -606,6 +611,14 @@ namespace Phoenix
 		ComponentArray<CTransform, MAX_COMPONENTS> m_components;
 		Matrix4 m_transforms[MAX_COMPONENTS];
 	};
+
+	TransformSystem::TransformSystem()
+	{
+		for (size_t i = 0; i < MAX_COMPONENTS; ++i)
+		{
+			m_components[i].m_transform = &m_transforms[i];
+		}
+	}
 
 	Component* TransformSystem::allocComponent()
 	{
@@ -623,8 +636,8 @@ namespace Phoenix
 			if (c.m_bDirty)
 			{
 				m_transforms[i] = Matrix4::translation(c.getTranslation())
-					* Matrix4::rotation(c.getRotation())
-					* Matrix4::scale(c.getScale());
+								* Matrix4::rotation(c.getRotation())
+								* Matrix4::scale(c.getScale());
 
 				c.m_bDirty = false;
 			}
@@ -739,7 +752,7 @@ namespace Phoenix
 		renderer->runLightsPass(m_lightBuffer);
 	}
 
-	void coverTransformOldToNew(const Transform& oldTf, CTransform* newTf)
+	void convertTransformOldToNew(const Transform& oldTf, CTransform* newTf)
 	{
 		newTf->setTranslation(oldTf.m_translation);
 		newTf->setRotation(oldTf.m_rotation);
@@ -756,7 +769,7 @@ namespace Phoenix
 			sm->m_mesh = entity.m_mesh;
 
 			CTransform* tf = newWorld->addComponent<CTransform>(e);
-			coverTransformOldToNew(entity.m_transform, tf);
+			convertTransformOldToNew(entity.m_transform, tf);
 		}
 
 		for (const DirLightEntity& entity : oldWorld->m_dirLightEntities)
@@ -778,9 +791,55 @@ namespace Phoenix
 			pl->m_radius = entity.m_pointLight.m_radius;
 
 			CTransform* tf = newWorld->addComponent<CTransform>(e);
-			coverTransformOldToNew(entity.m_transform, tf);
+			convertTransformOldToNew(entity.m_transform, tf);
 		}	
 	}
+}
+
+namespace Phoenix
+{
+	class Inspector
+	{
+	public:
+		void drawWorld(NewWorld* world)
+		{			
+			static bool checkBox = false;
+
+			//ImGui::Text("Hello, world!");
+			//ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
+			//ImGui::ColorEdit3("clear color", (float*)&editColor);
+
+			ImGui::Checkbox("Demo Window", &checkBox);
+
+			//if (ImGui::Button("Button"))
+			//{
+			//	counter++;
+			//}
+
+			//ImGui::SameLine();
+			//ImGui::Text("counter = %d", counter);
+
+			//ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+
+			if (checkBox)
+			{
+				ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiCond_FirstUseEver); 
+				ImGui::ShowDemoWindow(&checkBox);
+			}		
+
+			ImGui::Begin("Inspector");
+
+			const size_t numEntities = world->m_usedEntities;
+
+			for (size_t i = 0; i < numEntities; ++i)
+			{
+				ImGui::MenuItem("Entity", NULL, false, false);
+				ImGui::Text("Entity %d", i);
+			}
+
+			ImGui::End();
+		}
+	};
 }
 
 void run()
@@ -899,6 +958,8 @@ void run()
 
 	convertWorldOldToNew(&world, &newWorld);
 
+	Inspector inspector;
+
 	///// NEW ECS UPDATE - START /////
 
 	while (!gameWindow->wantsToClose())
@@ -939,6 +1000,8 @@ void run()
 		renderer.copyFinalColorToBackBuffer();
 
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+
+		inspector.drawWorld(&newWorld);
 
 		renderImGui();
 

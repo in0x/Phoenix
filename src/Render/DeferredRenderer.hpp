@@ -34,7 +34,7 @@ namespace Phoenix
 
 		void runLightsPass(const LightBuffer& lightBuffer);
 
-		// Applies gamma correction to the final color values and copies them into the default framebuffer. 
+		// Applies gamma correction and simple tonemapping to the final color values and copies them into the default framebuffer. 
 		void copyFinalColorToBackBuffer();
 
 	private:
