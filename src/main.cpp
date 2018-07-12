@@ -683,16 +683,18 @@ namespace Phoenix
 		}
 	}
 
-	struct CDirectionalLight : public Component
+	class CDirectionalLight : public Component
 	{
+	public:
 		Vec3 m_direction;
 		Vec3 m_color;
 
 		IMPL_EC_TYPE_ID("DirectionalLight")
 	};
 
-	struct CPointLight : public Component
+	class CPointLight : public Component
 	{
+	public:
 		Vec3 m_color;
 		float m_radius;
 		float m_intensity;
