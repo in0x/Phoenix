@@ -188,29 +188,29 @@ namespace Phoenix
 		}
 	}
 
-	void serialize(Archive& ar, TextureDesc& desc)
+	void serialize(Archive* ar, TextureDesc& desc)
 	{
-		ar.serialize(&desc.width, sizeof(uint32_t));
-		ar.serialize(&desc.height, sizeof(uint32_t));
-		ar.serialize(&desc.pixelFormat, sizeof(EPixelFormat));
-		ar.serialize(&desc.minFilter, sizeof(ETextureFilter));
-		ar.serialize(&desc.magFilter, sizeof(ETextureFilter));
-		ar.serialize(&desc.wrapU, sizeof(ETextureWrap));
-		ar.serialize(&desc.wrapV, sizeof(ETextureWrap));
-		ar.serialize(&desc.wrapW, sizeof(ETextureWrap));
-		ar.serialize(&desc.numMips, sizeof(uint8_t));
+		ar->serialize(&desc.width, sizeof(uint32_t));
+		ar->serialize(&desc.height, sizeof(uint32_t));
+		ar->serialize(&desc.pixelFormat, sizeof(EPixelFormat));
+		ar->serialize(&desc.minFilter, sizeof(ETextureFilter));
+		ar->serialize(&desc.magFilter, sizeof(ETextureFilter));
+		ar->serialize(&desc.wrapU, sizeof(ETextureWrap));
+		ar->serialize(&desc.wrapV, sizeof(ETextureWrap));
+		ar->serialize(&desc.wrapW, sizeof(ETextureWrap));
+		ar->serialize(&desc.numMips, sizeof(uint8_t));
 	}
 
-	void serialize(Archive& ar, TextureCreationHints& hints)
+	void serialize(Archive* ar, TextureCreationHints& hints)
 	{
-		ar.serialize(&hints.colorSpace, sizeof(ETextrueColorSpace));
-		ar.serialize(&hints.magFilter, sizeof(ETextureFilter));
-		ar.serialize(&hints.minFilter, sizeof(ETextureFilter));
-		ar.serialize(&hints.mipFilter, sizeof(ETextureFilter));
-		ar.serialize(&hints.wrapU, sizeof(ETextureWrap));
-		ar.serialize(&hints.wrapV, sizeof(ETextureWrap));
-		ar.serialize(&hints.wrapW, sizeof(ETextureWrap));
-		ar.serialize(&hints.bGenMipMaps, sizeof(bool));	 
+		ar->serialize(&hints.colorSpace, sizeof(ETextrueColorSpace));
+		ar->serialize(&hints.magFilter, sizeof(ETextureFilter));
+		ar->serialize(&hints.minFilter, sizeof(ETextureFilter));
+		ar->serialize(&hints.mipFilter, sizeof(ETextureFilter));
+		ar->serialize(&hints.wrapU, sizeof(ETextureWrap));
+		ar->serialize(&hints.wrapV, sizeof(ETextureWrap));
+		ar->serialize(&hints.wrapW, sizeof(ETextureWrap));
+		ar->serialize(&hints.bGenMipMaps, sizeof(bool));
 	}
 
 	struct TextureAsset
@@ -228,7 +228,7 @@ namespace Phoenix
 		TextureCreationHints m_hints;
 	};
 
-	void serialize(Archive& ar, TextureAsset& asset)
+	void serialize(Archive* ar, TextureAsset& asset)
 	{
 		serialize(ar, asset.m_sourcePath);
 		serialize(ar, asset.m_desc);
@@ -298,7 +298,7 @@ namespace Phoenix
 		createWriteArchive(sizeof(TextureAsset), &ar);
 
 		TextureAsset asset(texture);
-		serialize(ar, asset);
+		serialize(&ar, asset);
 
 		std::string writePath = assets->getAssetsPath() + texture.m_name;
 		writePath += g_assetFileExt;
@@ -330,7 +330,7 @@ namespace Phoenix
 		}
 
 		TextureAsset asset;
-		serialize(ar, asset);
+		serialize(&ar, asset);
 
 		return importTexture(asset.m_sourcePath.c_str(), &asset.m_hints, renderDevice, renderContext, assets);
 	}

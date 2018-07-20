@@ -31,101 +31,6 @@
 
 namespace Phoenix
 {
-	struct Transform
-	{
-		Transform()
-			: m_translation(0.f, 0.f, 0.f)
-			, m_rotation(0.f, 0.f, 0.f)
-			, m_scale(1.f, 1.f, 1.f)
-		{
-			recalculate();
-		}
-
-		Vec3 m_translation;
-		Vec3 m_scale;
-		Vec3 m_rotation;
-		Matrix4 m_cached;
-
-		const Matrix4& recalculate()
-		{
-			m_cached = Matrix4::translation(m_translation)
-				* Matrix4::rotation(m_rotation)
-				* Matrix4::scale(m_scale);
-
-			return m_cached;
-		}
-	};
-
-	struct DirectionalLight
-	{
-		Vec3 m_direction;
-		Vec3 m_color;
-	};
-
-	struct PointLight
-	{
-		Vec3 m_color;
-		float m_radius;
-		float m_intensity;
-	};
-
-	struct StaticMeshEntity 
-	{
-		StaticMesh* m_mesh;
-		Transform m_transform;
-	};
-
-	struct DirLightEntity
-	{
-		DirectionalLight m_dirLight;
-		Transform m_transform;
-	};
-
-	struct PointLightEntity 
-	{
-		PointLight m_pointLight;
-		Transform m_transform;
-	};
-
-	struct World
-	{
-		std::vector<StaticMeshEntity> m_staticMeshEntities;
-		std::vector<DirLightEntity>	  m_dirLightEntities;
-		std::vector<PointLightEntity> m_pointLightEntities;
-	};
-
-	void createMeshEntity(World* world, StaticMesh* mesh)
-	{
-		world->m_staticMeshEntities.emplace_back();
-		StaticMeshEntity& sme = world->m_staticMeshEntities.back();
-		sme.m_mesh = mesh;
-
-		sme.m_transform.m_scale = 0.1f;
-		sme.m_transform.recalculate();
-	}
-
-	void meshEntitiesFromObj(World* world, const char* meshPath, IRIDevice* renderDevice, IRIContext* renderContext, AssetRegistry* assets)
-	{
-		std::vector<StaticMesh*> meshes = importObj(meshPath, renderDevice, renderContext, assets);
-
-		for (StaticMesh* mesh : meshes)
-		{
-			createMeshEntity(world, mesh);
-		}
-	}
-
-	void createPointLightEntity(World* world, const Vec3& position, float radius, const Vec3& color, float intensity)
-	{
-		world->m_pointLightEntities.emplace_back();
-		PointLightEntity& pl = world->m_pointLightEntities.back();
-
-		pl.m_pointLight.m_color = color;
-		pl.m_pointLight.m_radius = radius;
-		pl.m_pointLight.m_intensity = intensity;
-		pl.m_transform.m_translation = position;
-		pl.m_transform.recalculate();
-	}
-
 	void moveCamera(Camera* camera, const KbState& kbstate, float dt)
 	{
 		static Vec2 cameraVelocity;
@@ -194,163 +99,6 @@ namespace Phoenix
 		IRIContext* context;
 		AssetRegistry* assets;
 	};
-
-	void addPointLightToBuffer(const PointLight& pl, const Vec3& pos, LightBuffer* buffer)
-	{
-		buffer->addPointLight(pos, pl.m_radius, pl.m_color, pl.m_intensity);
-	}
-
-	void serialize(Archive& ar, Transform& transform)
-	{
-		serialize(ar, transform.m_translation);
-		serialize(ar, transform.m_scale);
-		serialize(ar, transform.m_rotation);
-	}
-
-	void saveStaticMeshEntity(Archive& ar, StaticMeshEntity& entity)
-	{
-		serialize(ar, entity.m_transform);
-		serialize(ar, entity.m_mesh->m_name);
-	}
-
-	void loadStaticMeshEntity(Archive& ar, StaticMeshEntity& entity, LoadResources* resources)
-	{
-		serialize(ar, entity.m_transform);
-
-		std::string meshName;
-		serialize(ar, meshName);
-
-		entity.m_mesh = loadStaticMesh(meshName.c_str(), resources->device, resources->context, resources->assets);
-		entity.m_transform.recalculate();
-	}
-
-	void serialize(Archive& ar, DirectionalLight& dl)
-	{
-		serialize(ar, dl.m_color);
-		serialize(ar, dl.m_direction);
-	}
-
-	void saveDirLightEntity(Archive& ar, DirLightEntity& entity)
-	{
-		serialize(ar, entity.m_dirLight);
-		serialize(ar, entity.m_transform);
-	}
-
-	void loadDirLightEntity(Archive& ar, DirLightEntity& entity)
-	{
-		serialize(ar, entity.m_dirLight);
-		serialize(ar, entity.m_transform);
-
-		entity.m_transform.recalculate();
-	}
-
-	void serialize(Archive& ar, PointLight& dl)
-	{
-		serialize(ar, dl.m_color);
-		serialize(ar, dl.m_intensity);
-		serialize(ar, dl.m_radius);
-	}
-
-	void savePointLightEntity(Archive& ar, PointLightEntity& entity)
-	{
-		serialize(ar, entity.m_pointLight);
-		serialize(ar, entity.m_transform);
-	}
-
-	void loadPointLightEntity(Archive& ar, PointLightEntity& entity)
-	{
-		serialize(ar, entity.m_pointLight);
-		serialize(ar, entity.m_transform);
-
-		entity.m_transform.recalculate();
-	}
-
-	void saveWorld(World& world, const char* path)
-	{
-		WriteArchive ar;
-		createWriteArchive(sizeof(StaticMesh), &ar);
-
-		{
-			size_t numStaticMeshEnts = world.m_staticMeshEntities.size();
-			serialize(ar, numStaticMeshEnts);
-
-			for (StaticMeshEntity& e : world.m_staticMeshEntities)
-			{
-				saveStaticMeshEntity(ar, e);
-			}
-		}
-
-		{
-			size_t numDirLightEnts = world.m_dirLightEntities.size();
-			serialize(ar, numDirLightEnts);
-
-			for (DirLightEntity& e : world.m_dirLightEntities)
-			{
-				saveDirLightEntity(ar, e);
-			}
-		}
-
-		{
-			size_t numPlEnts = world.m_pointLightEntities.size();
-			serialize(ar, numPlEnts);
-
-			for (PointLightEntity& e : world.m_pointLightEntities)
-			{
-				savePointLightEntity(ar, e);
-			}
-		}
-
-		EArchiveError err = writeArchiveToDisk(path, ar);
-		assert(err == EArchiveError::NoError);
-		destroyArchive(ar);
-	}
-
-	void loadWorld(const char* path, World* outWorld, LoadResources* resources)
-	{
-		ReadArchive ar;
-		EArchiveError err = createReadArchive(path, &ar);
-
-		assert(err == EArchiveError::NoError);
-		if (err != EArchiveError::NoError)
-		{
-			return;
-		}
-
-		{
-			size_t numStaticMeshEnts = 0;
-			serialize(ar, numStaticMeshEnts);
-
-			for (size_t i = 0; i < numStaticMeshEnts; ++i)
-			{
-				outWorld->m_staticMeshEntities.emplace_back();
-				loadStaticMeshEntity(ar, outWorld->m_staticMeshEntities.back(), resources);
-			}
-		}
-
-		{
-			size_t numDirLightEnts = 0;
-			serialize(ar, numDirLightEnts);
-
-			for (size_t i = 0; i < numDirLightEnts; ++i)
-			{
-				outWorld->m_dirLightEntities.emplace_back();
-				loadDirLightEntity(ar, outWorld->m_dirLightEntities.back());
-			}
-		}
-
-		{
-			size_t numPlEnts = 0;
-			serialize(ar, numPlEnts);
-
-			for (size_t i = 0; i < numPlEnts; ++i)
-			{
-				outWorld->m_pointLightEntities.emplace_back();
-				loadPointLightEntity(ar, outWorld->m_pointLightEntities.back());
-			}
-		}
-
-		destroyArchive(ar);
-	}
 }
 
 namespace Phoenix
@@ -384,16 +132,18 @@ namespace Phoenix
 
 		virtual EcTypeId typeId() const = 0;
 		virtual const char* typeName() const = 0;
+		
+		virtual void save(Archive* ar) = 0;
+		virtual void load(Archive* ar, LoadResources* resources) = 0;
+
 		EntityHandle m_owner;
 	};
 
-	class Entity
+	struct Entity
 	{
-	public:
 		Component* getComponent(EcTypeId type);
 		void addComponent(Component* component);
-	
-	private:
+
 		typedef std::unordered_map<EcTypeId, Component*> ComponentTable;
 		ComponentTable m_components;
 	};
@@ -426,8 +176,9 @@ namespace Phoenix
 
 	typedef std::unordered_map<EcTypeId, ComponentFactory> CFactoryTable;
 
-	class NewWorld
+	class World
 	{
+	public:
 		enum
 		{
 			MAX_ENTITIES = 1024,
@@ -435,13 +186,13 @@ namespace Phoenix
 			FIRST_VALID_ENTITY = 1
 		};
 
-	public:
-		NewWorld()
-			: m_usedEntities(1) {}
+		World()
+			: m_lastEntityIdx(1) {}
 
 		EntityHandle createEntity();
-		bool handleIsValid(EntityHandle handle);
-
+		bool handleIsValid(EntityHandle handle) const;
+		Entity* getEntity(EntityHandle handle);
+		
 		void addComponentFactory(EcTypeId type, const ComponentFactory& factory);
 
 		Component* addComponent(EntityHandle handle, EcTypeId type);
@@ -460,7 +211,7 @@ namespace Phoenix
 		}
 
 		Entity m_entites[MAX_ENTITIES];
-		size_t m_usedEntities;
+		size_t m_lastEntityIdx;
 
 	private:
 		ComponentFactory* getCFactory(EcTypeId type)
@@ -480,7 +231,7 @@ namespace Phoenix
 		CFactoryTable m_factories;
 	};
 
-	void NewWorld::addComponentFactory(EcTypeId type, const ComponentFactory& factory)
+	void World::addComponentFactory(EcTypeId type, const ComponentFactory& factory)
 	{
 		auto& entry = m_factories.find(type);
 
@@ -493,18 +244,24 @@ namespace Phoenix
 		m_factories.emplace(type, factory);
 	}
 
-	EntityHandle NewWorld::createEntity()
+	EntityHandle World::createEntity()
 	{
-		assert(m_usedEntities < MAX_ENTITIES);
-		return ++m_usedEntities;
+		assert(m_lastEntityIdx < MAX_ENTITIES);
+		return ++m_lastEntityIdx;
 	}
 
-	bool NewWorld::handleIsValid(EntityHandle handle)
+	bool World::handleIsValid(EntityHandle handle) const
 	{
-		return (handle != INVALID_ENTITY && m_usedEntities < MAX_ENTITIES);
+		return (handle != INVALID_ENTITY && m_lastEntityIdx < MAX_ENTITIES);
 	}
 
-	Component* NewWorld::addComponent(EntityHandle handle, EcTypeId type)
+	Entity* World::getEntity(EntityHandle handle)
+	{
+		assert(handleIsValid(handle));
+		return &m_entites[handle];
+	}
+
+	Component* World::addComponent(EntityHandle handle, EcTypeId type)
 	{
 		assert(handleIsValid(handle));
 		Entity& entity = m_entites[handle];
@@ -518,7 +275,7 @@ namespace Phoenix
 		return component;
 	}
 
-	Component* NewWorld::getComponent(EntityHandle handle, EcTypeId type)
+	Component* World::getComponent(EntityHandle handle, EcTypeId type)
 	{
 		assert(handleIsValid(handle));
 		return m_entites[handle].getComponent(type);
@@ -555,6 +312,13 @@ namespace Phoenix
 		Vec3 m_rotation;
 		Vec3 m_scale;
 
+		void serial(Archive* ar)
+		{
+			serialize(ar, m_translation);
+			serialize(ar, m_rotation);
+			serialize(ar, m_scale);
+		}
+
 	public:
 		void setTranslation(const Vec3& t)
 		{
@@ -587,6 +351,17 @@ namespace Phoenix
 		const Vec3& getScale()
 		{
 			return m_scale;
+		}
+
+		virtual void save(Archive* ar) override
+		{
+			serial(ar);
+		}
+
+		virtual void load(Archive* ar, LoadResources* resources) override
+		{
+			serial(ar);
+			m_bDirty = true;
 		}
 
 		Matrix4* m_transform;
@@ -651,6 +426,18 @@ namespace Phoenix
 
 		StaticMesh* m_mesh;
 
+		virtual void save(Archive* ar) override
+		{
+			serialize(ar, m_mesh->m_name);
+		}
+
+		virtual void load(Archive* ar, LoadResources* resources) override
+		{
+			std::string meshName;
+			serialize(ar, meshName);
+			m_mesh = loadStaticMesh(meshName.c_str(), resources->device, resources->context, resources->assets);
+		}
+
 		IMPL_EC_TYPE_ID("StaticMesh");
 	};
 
@@ -658,7 +445,7 @@ namespace Phoenix
 	{
 	public:
 		Component* allocComponent();
-		void renderMeshes(NewWorld* world, DeferredRenderer* renderer);
+		void renderMeshes(World* world, DeferredRenderer* renderer);
 
 	private:
 		enum { MAX_COMPONENTS = 1024 };
@@ -670,7 +457,7 @@ namespace Phoenix
 		return m_components.alloc();
 	}
 	
-	void StaticMeshSystem::renderMeshes(NewWorld* world, DeferredRenderer* renderer)
+	void StaticMeshSystem::renderMeshes(World* world, DeferredRenderer* renderer)
 	{
 		const size_t active = m_components.m_active;
 		
@@ -689,6 +476,18 @@ namespace Phoenix
 		Vec3 m_direction;
 		Vec3 m_color;
 
+		virtual void save(Archive* ar) override
+		{
+			serialize(ar, m_direction);
+			serialize(ar, m_color);
+		}
+
+		virtual void load(Archive* ar, LoadResources* resources) override
+		{
+			serialize(ar, m_direction);
+			serialize(ar, m_color);
+		}
+
 		IMPL_EC_TYPE_ID("DirectionalLight")
 	};
 
@@ -698,6 +497,21 @@ namespace Phoenix
 		Vec3 m_color;
 		float m_radius;
 		float m_intensity;
+
+
+		virtual void save(Archive* ar) override
+		{
+			serialize(ar, m_color);
+			serialize(ar, m_radius);
+			serialize(ar, m_intensity);
+		}
+
+		virtual void load(Archive* ar, LoadResources* resources) override
+		{
+			serialize(ar, m_color);
+			serialize(ar, m_radius);
+			serialize(ar, m_intensity);
+		}
 
 		IMPL_EC_TYPE_ID("PointLight")
 	};
@@ -709,7 +523,7 @@ namespace Phoenix
 		Component* allocDirLight();	
 		Component* allocPointLight();
 
-		void renderLights(NewWorld* world, DeferredRenderer* renderer, const Matrix4& viewTf);
+		void renderLights(World* world, DeferredRenderer* renderer, const Matrix4& viewTf);
 
 	private:
 		enum { MAX_COMPONENTS = 256 };
@@ -729,7 +543,7 @@ namespace Phoenix
 		return m_pointLights.alloc();
 	}
 
-	void LightSystem::renderLights(NewWorld* world, DeferredRenderer* renderer, const Matrix4& viewTf)
+	void LightSystem::renderLights(World* world, DeferredRenderer* renderer, const Matrix4& viewTf)
 	{
 		renderer->setupDirectLightingPass();
 		m_lightBuffer.clear();
@@ -754,56 +568,139 @@ namespace Phoenix
 		renderer->runLightsPass(m_lightBuffer);
 	}
 
-	void convertTransformOldToNew(const Transform& oldTf, CTransform* newTf)
+	void saveEntityHeader(Entity* entity, WriteArchive* ar)
 	{
-		newTf->setTranslation(oldTf.m_translation);
-		newTf->setRotation(oldTf.m_rotation);
-		newTf->setScale(oldTf.m_scale);
+		size_t numComponents = entity->m_components.size();
+		serialize(ar, numComponents);
+
+		for (auto& kvp : entity->m_components)
+		{
+			Component* component = kvp.second;
+			EcTypeId type = component->typeId();
+			serialize(ar, type);
+		}
 	}
 
-	void convertWorldOldToNew(World* oldWorld, NewWorld* newWorld)
+	void saveComponentData(Entity* entity, WriteArchive* ar)
 	{
-		for (const StaticMeshEntity& entity : oldWorld->m_staticMeshEntities)
+		for (auto& kvp : entity->m_components)
 		{
-			EntityHandle e = newWorld->createEntity();
+			Component* component = kvp.second;
+			component->save(ar);
+		}
+	}
+
+	void saveWorld(World* world, const char* path)
+	{
+		WriteArchive ar;
+		createWriteArchive(0, &ar);
+
+		size_t numEntities = world->m_lastEntityIdx - 1;
+		serialize(&ar, numEntities);
+
+		for (size_t i = World::FIRST_VALID_ENTITY; i < world->m_lastEntityIdx; ++i)
+		{
+			saveEntityHeader(&world->m_entites[i], &ar);
+			saveComponentData(&world->m_entites[i], &ar);
+		}
+
+		EArchiveError err = writeArchiveToDisk(path, ar);
+		assert(err == EArchiveError::NoError);
+		destroyArchive(ar);
+	}
+
+	void addComponentsFromEntityHeader(ReadArchive* ar, EntityHandle eHandle, World* world)
+	{
+		size_t numComponents = 0;	
+		serialize(ar, numComponents);
+
+		for (size_t i = 0; i < numComponents; ++i)
+		{
+			EcTypeId type;
+			serialize(ar, type);
+
+			world->addComponent(eHandle, type);
+		}
+	}
+
+	void loadComponentData(ReadArchive* ar, Entity* entity, LoadResources* resources)
+	{
+		for (auto& kvp : entity->m_components)
+		{
+			Component* component = kvp.second;
+			component->load(ar, resources);
+		}
+	}
+
+	void loadWorld(const char* path, World* outWorld, LoadResources* resources)
+	{
+		ReadArchive ar;
+		EArchiveError err = createReadArchive(path, &ar);
+
+		assert(err == EArchiveError::NoError);
+		if (err != EArchiveError::NoError)
+		{
+			return;
+		}
+
+		size_t numEntitiesToLoad = 0;
+
+		serialize(&ar, numEntitiesToLoad);
+
+		for (size_t i = 0; i < numEntitiesToLoad; ++i)
+		{
+			EntityHandle eHandle = outWorld->createEntity();
+			Entity* entity = &outWorld->m_entites[eHandle];
 			
-			CStaticMesh* sm = newWorld->addComponent<CStaticMesh>(e);
-			sm->m_mesh = entity.m_mesh;
-
-			CTransform* tf = newWorld->addComponent<CTransform>(e);
-			convertTransformOldToNew(entity.m_transform, tf);
+			addComponentsFromEntityHeader(&ar, eHandle, outWorld);
+			loadComponentData(&ar, entity, resources);
 		}
 
-		for (const DirLightEntity& entity : oldWorld->m_dirLightEntities)
-		{
-			EntityHandle e = newWorld->createEntity();
-
-			CDirectionalLight* dl = newWorld->addComponent<CDirectionalLight>(e);
-			dl->m_color = entity.m_dirLight.m_color;
-			dl->m_direction = entity.m_dirLight.m_direction;
-		}
-	
-		for (const PointLightEntity& entity : oldWorld->m_pointLightEntities)
-		{
-			EntityHandle e = newWorld->createEntity();
-		
-			CPointLight* pl = newWorld->addComponent<CPointLight>(e);
-			pl->m_color = entity.m_pointLight.m_color;
-			pl->m_intensity = entity.m_pointLight.m_intensity;
-			pl->m_radius = entity.m_pointLight.m_radius;
-
-			CTransform* tf = newWorld->addComponent<CTransform>(e);
-			convertTransformOldToNew(entity.m_transform, tf);
-		}	
+		destroyArchive(ar);
 	}
 }
 
 namespace Phoenix
 {
+	//class EntityProxy
+	//{
+	//	EntityHandle m_actualEntity;
+
+	//public:
+	//	void applyUpdates();
+	//	void rename(const char*);
+	//	void destroy();
+	//};
+
+	//class ComponentProxy
+	//{
+	//public:
+	//	void remove();
+	//	virtual void applyUpdates();
+	//};
+
+	//class CPTransform : public ComponentProxy
+	//{
+	//	void updateTransform(const Vec3&, const Vec3&, const Vec3&);
+	//};
+
+	//void processProcessProxyUpdates(EntityProxy* entities, size_t numEntities, ComponentProxy* components, size_t numComponents)
+	//{
+	//	for (size_t i = 0; i < numEntities; ++i)
+	//	{
+	//		entities[i].applyUpdates();
+	//	}
+
+	//	for (size_t i = 0; i < numEntities; ++i)
+	//	{
+	//		components[i].applyUpdates();
+	//	}
+	//}
+
 	class Inspector
 	{
 	public:
-		void drawWorld(NewWorld* world)
+		void drawWorld(World* world)
 		{			
 			static bool checkBox = false;
 
@@ -831,9 +728,7 @@ namespace Phoenix
 
 			ImGui::Begin("Inspector");
 
-			const size_t numEntities = world->m_usedEntities;
-
-			for (size_t i = 0; i < numEntities; ++i)
+			for (size_t i = World::FIRST_VALID_ENTITY; i < world->m_lastEntityIdx; ++i)
 			{
 				ImGui::MenuItem("Entity", NULL, false, false);
 				ImGui::Text("Entity %d", i);
@@ -891,9 +786,9 @@ void run()
 	renderer.setProjectionMatrix(projTf);
 
 	const char* worldPath = "Assets/sponza.world";
+	const char* newWorldPath = "Assets/sponzanew.world";
 	const char* assetsPath = "phoenix.assets";
 
-	World world;
 	AssetRegistry assets;
 
 	loadAssetRegistry(&assets, "phoenix.assets", renderDevice, renderContext);
@@ -907,10 +802,7 @@ void run()
 	resources.assets = &assets;
 	resources.context = renderContext;
 	resources.device = renderDevice;
-	loadWorld(worldPath, &world, &resources);
-
-	createPointLightEntity(&world, Vec3(0.0, 2.0, -5.0), 1000.0f, Vec3(1.0, 1.0, 1.0), 1000.0f);
-
+	
 	using Clock = std::chrono::high_resolution_clock;
 	using pointInTime = std::chrono::time_point<std::chrono::high_resolution_clock>;
 
@@ -927,7 +819,7 @@ void run()
 	StaticMeshSystem smSystem;
 	LightSystem lightSystem;
 
-	NewWorld newWorld;
+	World newWorld;
 
 	auto transformFactory = [system = &tfSystem]() -> Component*
 	{
@@ -953,13 +845,9 @@ void run()
 	};
 	newWorld.addComponentFactory(CPointLight::staticTypeId(), plFactory);
 
-	EntityHandle e = newWorld.createEntity();
-	newWorld.addComponent(e, CTransform::staticTypeId());
-
 	///// NEW ECS INIT - END /////
 
-	convertWorldOldToNew(&world, &newWorld);
-
+	loadWorld(newWorldPath, &newWorld, &resources);
 	Inspector inspector;
 
 	///// NEW ECS UPDATE - START /////
@@ -1012,8 +900,7 @@ void run()
 
 	///// NEW ECS UPDATE - END /////
 
-	//saveWorld(world, worldPath);
-	//saveAssetRegistry(assets, assetsPath);
+	saveWorld(&newWorld, newWorldPath);
 
 	exitImGui();
 	RI::destroyWindow(gameWindow);

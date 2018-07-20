@@ -42,7 +42,7 @@ namespace Phoenix
 		assert(outMesh->m_vertexbuffer.isValid());
 	}
 
-	void serialize(Archive& ar, MeshData& data)
+	void serialize(Archive* ar, MeshData& data)
 	{
 		serialize(ar, data.m_numVertices);
 		serialize(ar, data.m_vertices);
@@ -72,7 +72,7 @@ namespace Phoenix
 		uint8_t m_numMaterials;
 	};
 
-	void serialize(Archive& ar, MeshMaterialExport& exp)
+	void serialize(Archive* ar, MeshMaterialExport& exp)
 	{
 		serialize(ar, exp.m_numMaterials);
 
@@ -83,7 +83,7 @@ namespace Phoenix
 		}
 	}
 
-	void serialize(Archive& ar, StaticMesh& mesh)
+	void serialize(Archive* ar, StaticMesh& mesh)
 	{
 		serialize(ar, mesh.m_data);
 		serialize(ar, mesh.m_name);
@@ -97,12 +97,12 @@ namespace Phoenix
 		WriteArchive ar;
 		createWriteArchive(sizeof(StaticMesh), &ar);
 
-		serialize(ar, mesh);
+		serialize(&ar, mesh);
 
 		for (uint8_t i = 0; i < mesh.m_numMaterials; ++i)
 		{
 			MeshMaterialExport exp(mesh);
-			serialize(ar, exp);
+			serialize(&ar, exp);
 		}
 		
 		std::string writePath = assets->getAssetsPath() + mesh.m_name;
@@ -136,13 +136,13 @@ namespace Phoenix
 
 		mesh = assets->allocStaticMesh(path);
 
-		serialize(ar, *mesh);
+		serialize(&ar, *mesh);
 		createMeshBuffers(mesh, renderDevice);
 
 		for (uint8_t i = 0; i < mesh->m_numMaterials; ++i)
 		{
 			MeshMaterialExport exp;
-			serialize(ar, exp);
+			serialize(&ar, exp);
 
 			mesh->m_materials[i] = loadMaterial(exp.m_materialRefs[i].c_str(), renderDevice, renderContext, assets);
 			mesh->m_vertexFrom[i] = exp.m_matVertexFrom[i];

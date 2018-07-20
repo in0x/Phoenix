@@ -93,7 +93,7 @@ namespace Phoenix
 		std::string m_normalTexPath;
 	};
 
-	void serialize(Archive& ar, MaterialResources& exp)
+	void serialize(Archive* ar, MaterialResources& exp)
 	{
 		serialize(ar, exp.m_name);
 		serialize(ar, exp.m_diffuseTexPath);
@@ -110,7 +110,7 @@ namespace Phoenix
 		createWriteArchive(sizeof(Material), &ar);
 
 		MaterialResources exp(material);
-		serialize(ar, exp);
+		serialize(&ar, exp);
 
 		std::string writePath = assets->getAssetsPath() + material.m_name;
 		writePath += g_assetFileExt;
@@ -142,7 +142,7 @@ namespace Phoenix
 		}
 
 		MaterialResources exp;
-		serialize(ar, exp);
+		serialize(&ar, exp);
 
 		mat = assets->allocMaterial(path);
 		mat->m_name = exp.m_name;

@@ -101,7 +101,7 @@ namespace Phoenix
 		return getAsset(path, m_textureCache);
 	}
 
-	void saveTextureCache(WriteArchive& ar, AssetRegistry* registry, AssetCache<Texture2D>& cache)
+	void saveTextureCache(WriteArchive* ar, AssetRegistry* registry, AssetCache<Texture2D>& cache)
 	{
 		size_t numTex = cache.m_assets.size();
 		serialize(ar, numTex);
@@ -113,7 +113,7 @@ namespace Phoenix
 		}
 	}
 
-	void saveMaterialCache(WriteArchive& ar, AssetRegistry* registry, AssetCache<Material>& cache)
+	void saveMaterialCache(WriteArchive* ar, AssetRegistry* registry, AssetCache<Material>& cache)
 	{
 		size_t numMats = cache.m_assets.size();
 		serialize(ar, numMats);
@@ -125,7 +125,7 @@ namespace Phoenix
 		}
 	}
 
-	void saveMeshCache(WriteArchive& ar, AssetRegistry* registry, AssetCache<StaticMesh>& cache)
+	void saveMeshCache(WriteArchive* ar, AssetRegistry* registry, AssetCache<StaticMesh>& cache)
 	{
 		size_t numMeshes = cache.m_assets.size();
 		serialize(ar, numMeshes);
@@ -142,9 +142,9 @@ namespace Phoenix
 		WriteArchive ar;
 		createWriteArchive(sizeof(AssetRegistry), &ar);
 
-		saveTextureCache(ar, &registry, registry.m_textureCache);
-		saveMaterialCache(ar, &registry, registry.m_materialCache);
-		saveMeshCache(ar, &registry, registry.m_staticMeshCache);
+		saveTextureCache(&ar, &registry, registry.m_textureCache);
+		saveMaterialCache(&ar, &registry, registry.m_materialCache);
+		saveMeshCache(&ar, &registry, registry.m_staticMeshCache);
 
 		std::string savePath = registry.getAssetsPath();
 		savePath += path;
@@ -154,7 +154,7 @@ namespace Phoenix
 		destroyArchive(ar);
 	}
 
-	void loadTextureCache(ReadArchive& ar, IRIDevice* device, IRIContext* context, AssetRegistry* registry)
+	void loadTextureCache(ReadArchive* ar, IRIDevice* device, IRIContext* context, AssetRegistry* registry)
 	{
 		size_t numTex = 0;
 		serialize(ar, numTex);
@@ -167,7 +167,7 @@ namespace Phoenix
 		}
 	}
 
-	void loadMaterialCache(ReadArchive& ar, IRIDevice* device, IRIContext* context, AssetRegistry* registry)
+	void loadMaterialCache(ReadArchive* ar, IRIDevice* device, IRIContext* context, AssetRegistry* registry)
 	{
 		size_t numMats = 0;
 		serialize(ar, numMats);
@@ -180,7 +180,7 @@ namespace Phoenix
 		}
 	}
 
-	void loadMeshCache(ReadArchive& ar, IRIDevice* device, IRIContext* context, AssetRegistry* registry)
+	void loadMeshCache(ReadArchive* ar, IRIDevice* device, IRIContext* context, AssetRegistry* registry)
 	{
 		size_t numMeshes = 0;
 		serialize(ar, numMeshes);
@@ -208,9 +208,9 @@ namespace Phoenix
 			return;
 		}
 
-		loadTextureCache(ar, renderDevice, renderContext, outRegistry);
-		loadMaterialCache(ar, renderDevice, renderContext, outRegistry);
-		loadMeshCache(ar, renderDevice, renderContext, outRegistry);
+		loadTextureCache(&ar, renderDevice, renderContext, outRegistry);
+		loadMaterialCache(&ar, renderDevice, renderContext, outRegistry);
+		loadMeshCache(&ar, renderDevice, renderContext, outRegistry);
 
 		destroyArchive(ar);
 	}
