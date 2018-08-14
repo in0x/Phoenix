@@ -22,7 +22,7 @@
 #include "Core/Mesh.hpp"
 #include "Math/PhiMath.hpp"
 
-#include "Memory/ChunkArray.hpp"
+#include "Memory/StackAllocator.hpp"
 
 #include "Render/DeferredRenderer.hpp"
 #include "Render/LightBuffer.hpp"
@@ -670,44 +670,65 @@ namespace Phoenix
 
 namespace Phoenix
 {
-	//class EntityProxy
-	//{
-	//	EntityHandle m_actualEntity;
+	typedef void DrawFunc(void*);
+	typedef void ApplyFunc(void*);
 
-	//public:
-	//	void applyUpdates();
-	//	void rename(const char*);
-	//	void destroy();
-	//};
+	struct EditorCmd
+	{
+		void* nextCmd;
+		void* payload;
+		DrawFunc* drawFunc;
+		ApplyFunc* applyFunc;
+	}; 
 
-	//class ComponentProxy
-	//{
-	//public:
-	//	void remove();
-	//	virtual void applyUpdates();
-	//};
+	struct CmdPayloadCTransform
+	{
+		CTransform* transform;
+		float data[9];
+	};
 
-	//class CPTransform : public ComponentProxy
-	//{
-	//	void updateTransform(const Vec3&, const Vec3&, const Vec3&);
-	//};
+	void applyEditorCmdCTransform(void* cmd)
+	{
+		EditorCmd* command = (EditorCmd*)cmd;
+		CmdPayloadCTransform* payload = (CmdPayloadCTransform*)command->payload;
+		float* data = payload->data;
 
-	//void processProcessProxyUpdates(EntityProxy* entities, size_t numEntities, ComponentProxy* components, size_t numComponents)
-	//{
-	//	for (size_t i = 0; i < numEntities; ++i)
-	//	{
-	//		entities[i].applyUpdates();
-	//	}
+		payload->transform->setTranslation({ data[0], data[1], data[2] });
+		payload->transform->setRotation({ data[3], data[4], data[5] });
+		payload->transform->setScale({ data[6], data[7], data[8] });
+	}
 
-	//	for (size_t i = 0; i < numEntities; ++i)
-	//	{
-	//		components[i].applyUpdates();
-	//	}
-	//}
+	void drawEditorCmdCTransform(void* cmd)
+	{
+		EditorCmd* command = (EditorCmd*)cmd;
+		CmdPayloadCTransform* payload = (CmdPayloadCTransform*)command->payload;
+		float* data = payload->data;
+
+		ImGui::InputFloat3("Translation", &data[0], 1);
+		ImGui::InputFloat3("Rotation", &data[3], 1);
+		ImGui::InputFloat3("Scale", &data[6], 1);
+	}
+
+	void allocEditorCmd(EditorCmd* prev, StackAllocator& allocator, CTransform* transform)
+	{
+		EditorCmd* cmd = alloc<EditorCmd>(allocator);
+		cmd->payload = alloc<CmdPayloadCTransform>(allocator);
+		cmd->applyFunc = applyEditorCmdCTransform;
+		cmd->drawFunc = drawEditorCmdCTransform;
+		prev->nextCmd = cmd;
+	}
 
 	class Inspector
 	{
 	public:
+		StackAllocator m_allocator;
+		EditorCmd* m_cmdhead;
+
+		Inspector(size_t cmdMemoryBytes)
+			: m_allocator(cmdMemoryBytes)
+			, m_cmdhead(nullptr)
+		{}	
+
 		void drawWorld(World* world)
 		{			
 			static bool checkBox = false;
@@ -736,10 +757,20 @@ namespace Phoenix
 
 			ImGui::Begin("Inspector");
 
+			ImGui::MenuItem("VectorTest");
+	
 			for (size_t i = World::FIRST_VALID_ENTITY; i < world->m_lastEntityIdx; ++i)
 			{
-				ImGui::MenuItem("Entity", NULL, false, false);
+				Entity* entity = world->getEntity(i);
+
+				ImGui::MenuItem("Entity", nullptr, false, false);
 				ImGui::Text("Entity %d", i);
+
+				for (auto& kvp : entity->m_components)
+				{
+					Component* component = kvp.second;
+					ImGui::Text(component->typeName());
+				}
 			}
 
 			ImGui::End();
@@ -856,7 +887,9 @@ void run()
 	///// NEW ECS INIT - END /////
 
 	loadWorld(newWorldPath, &newWorld, &resources);
-	Inspector inspector;
+	
+	const size_t editorCmdMemoryBytes = 2048;
+	Inspector inspector(editorCmdMemoryBytes);
 
 	///// NEW ECS UPDATE - START /////
 
