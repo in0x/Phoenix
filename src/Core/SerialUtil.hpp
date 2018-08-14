@@ -20,6 +20,8 @@ namespace Phoenix
 
 	void serialize(Archive* ar, uint8_t& u8);
 
+	void serialize(Archive* ar, int32_t& i32);
+
 	void serialize(Archive* ar, std::string& string);
 
 	template <class T>

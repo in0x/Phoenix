@@ -103,24 +103,28 @@ namespace Phoenix
 
 namespace Phoenix
 {
-	typedef FNVHash EcTypeId;
-	#define EC_TYPE_HASH(x) HashFNV<const char*>()(x);
-	
-	// TODO(phil): We can make this compile-time. 
-	#define IMPL_EC_TYPE_ID(x) \
-	static EcTypeId staticTypeId() \
+	enum ECType
+	{
+		CT_Transform,
+		CT_StaticMesh,
+		CT_PointLight,
+		CT_DirectionalLight
+	};
+
+	#define IMPL_EC_TYPE_ID(typeEnum, typeNamePretty) \
+	static ECType staticType() \
 	{ \
-		return EC_TYPE_HASH(x); \
+		return typeEnum; \
 	} \
 	\
-	virtual EcTypeId typeId() const override \
+	virtual ECType type() const override \
 	{ \
-		return EC_TYPE_HASH(x); \
+		return typeEnum; \
 	} \
 	\
 	virtual const char* typeName() const override \
 	{ \
-		return x; \
+		return typeNamePretty; \
 	} \
 
 	typedef int32_t EntityHandle;
@@ -130,7 +134,7 @@ namespace Phoenix
 	public:
 		Component() : m_owner(0) {}
 
-		virtual EcTypeId typeId() const = 0;
+		virtual ECType type() const = 0;
 		virtual const char* typeName() const = 0;
 		
 		virtual void save(Archive* ar) = 0;
@@ -141,14 +145,14 @@ namespace Phoenix
 
 	struct Entity
 	{
-		Component* getComponent(EcTypeId type);
+		Component* getComponent(ECType type);
 		void addComponent(Component* component);
 
-		typedef std::unordered_map<EcTypeId, Component*> ComponentTable;
+		typedef std::unordered_map<ECType, Component*> ComponentTable;
 		ComponentTable m_components;
 	};
 
-	Component* Entity::getComponent(EcTypeId type)
+	Component* Entity::getComponent(ECType type)
 	{
 		auto& entry = m_components.find(type);
 		
@@ -164,7 +168,7 @@ namespace Phoenix
 
 	void Entity::addComponent(Component* component)
 	{
-		EcTypeId type = component->typeId();
+		ECType type = component->type();
 
 		if (!getComponent(type))
 		{
@@ -174,7 +178,7 @@ namespace Phoenix
 
 	typedef std::function<Component*(void)> ComponentFactory;
 
-	typedef std::unordered_map<EcTypeId, ComponentFactory> CFactoryTable;
+	typedef std::unordered_map<ECType, ComponentFactory> CFactoryTable;
 
 	class World
 	{
@@ -193,28 +197,28 @@ namespace Phoenix
 		bool handleIsValid(EntityHandle handle) const;
 		Entity* getEntity(EntityHandle handle);
 		
-		void addComponentFactory(EcTypeId type, const ComponentFactory& factory);
+		void addComponentFactory(ECType type, const ComponentFactory& factory);
 
-		Component* addComponent(EntityHandle handle, EcTypeId type);
-		Component* getComponent(EntityHandle handle, EcTypeId type);
+		Component* addComponent(EntityHandle handle, ECType type);
+		Component* getComponent(EntityHandle handle, ECType type);
 
 		template<typename C>
 		C* addComponent(EntityHandle handle)
 		{
-			return static_cast<C*>(addComponent(handle, C::staticTypeId()));
+			return static_cast<C*>(addComponent(handle, C::staticType()));
 		}
 
 		template<typename C>
 		C* getComponent(EntityHandle handle)
 		{
-			return static_cast<C*>(getComponent(handle, C::staticTypeId()));
+			return static_cast<C*>(getComponent(handle, C::staticType()));
 		}
 
 		Entity m_entites[MAX_ENTITIES];
 		size_t m_lastEntityIdx;
 
 	private:
-		ComponentFactory* getCFactory(EcTypeId type)
+		ComponentFactory* getCFactory(ECType type)
 		{
 			auto& entry = m_factories.find(type);
 
@@ -231,7 +235,7 @@ namespace Phoenix
 		CFactoryTable m_factories;
 	};
 
-	void World::addComponentFactory(EcTypeId type, const ComponentFactory& factory)
+	void World::addComponentFactory(ECType type, const ComponentFactory& factory)
 	{
 		auto& entry = m_factories.find(type);
 
@@ -261,7 +265,7 @@ namespace Phoenix
 		return &m_entites[handle];
 	}
 
-	Component* World::addComponent(EntityHandle handle, EcTypeId type)
+	Component* World::addComponent(EntityHandle handle, ECType type)
 	{
 		assert(handleIsValid(handle));
 		Entity& entity = m_entites[handle];
@@ -275,7 +279,7 @@ namespace Phoenix
 		return component;
 	}
 
-	Component* World::getComponent(EntityHandle handle, EcTypeId type)
+	Component* World::getComponent(EntityHandle handle, ECType type)
 	{
 		assert(handleIsValid(handle));
 		return m_entites[handle].getComponent(type);
@@ -368,7 +372,7 @@ namespace Phoenix
 
 		bool m_bDirty;
 
-		IMPL_EC_TYPE_ID("Transform");
+		IMPL_EC_TYPE_ID(ECType::CT_Transform, "Transform");
 	};
 
 	class TransformSystem
@@ -438,7 +442,7 @@ namespace Phoenix
 			m_mesh = loadStaticMesh(meshName.c_str(), resources->device, resources->context, resources->assets);
 		}
 
-		IMPL_EC_TYPE_ID("StaticMesh");
+		IMPL_EC_TYPE_ID(ECType::CT_StaticMesh, "StaticMesh");
 	};
 
 	class StaticMeshSystem
@@ -488,7 +492,7 @@ namespace Phoenix
 			serialize(ar, m_color);
 		}
 
-		IMPL_EC_TYPE_ID("DirectionalLight")
+		IMPL_EC_TYPE_ID(ECType::CT_DirectionalLight, "DirectionalLight")
 	};
 
 	class CPointLight : public Component
@@ -513,7 +517,7 @@ namespace Phoenix
 			serialize(ar, m_intensity);
 		}
 
-		IMPL_EC_TYPE_ID("PointLight")
+		IMPL_EC_TYPE_ID(ECType::CT_PointLight, "PointLight")
 	};
 
 	class LightSystem
@@ -568,6 +572,11 @@ namespace Phoenix
 		renderer->runLightsPass(m_lightBuffer);
 	}
 
+	void serialize(Archive* ar, ECType& ectype)
+	{
+		ar->serialize(&ectype, sizeof(ECType));
+	}
+
 	void saveEntityHeader(Entity* entity, WriteArchive* ar)
 	{
 		size_t numComponents = entity->m_components.size();
@@ -576,7 +585,7 @@ namespace Phoenix
 		for (auto& kvp : entity->m_components)
 		{
 			Component* component = kvp.second;
-			EcTypeId type = component->typeId();
+			ECType type = component->type();
 			serialize(ar, type);
 		}
 	}
@@ -616,9 +625,8 @@ namespace Phoenix
 
 		for (size_t i = 0; i < numComponents; ++i)
 		{
-			EcTypeId type;
+			ECType type;
 			serialize(ar, type);
-
 			world->addComponent(eHandle, type);
 		}
 	}
@@ -825,25 +833,25 @@ void run()
 	{
 		return system->allocComponent();
 	};
-	newWorld.addComponentFactory(CTransform::staticTypeId(), transformFactory);
+	newWorld.addComponentFactory(CTransform::staticType(), transformFactory);
 
 	auto smFactory = [system = &smSystem]() -> Component*
 	{
 		return system->allocComponent();
 	};
-	newWorld.addComponentFactory(CStaticMesh::staticTypeId(), smFactory);
+	newWorld.addComponentFactory(CStaticMesh::staticType(), smFactory);
 
 	auto dlFactory = [system = &lightSystem]() -> Component*
 	{
 		return system->allocDirLight();
 	};
-	newWorld.addComponentFactory(CDirectionalLight::staticTypeId(), dlFactory);
+	newWorld.addComponentFactory(CDirectionalLight::staticType(), dlFactory);
 
 	auto plFactory = [system = &lightSystem]() -> Component*
 	{
 		return system->allocPointLight();
 	};
-	newWorld.addComponentFactory(CPointLight::staticTypeId(), plFactory);
+	newWorld.addComponentFactory(CPointLight::staticType(), plFactory);
 
 	///// NEW ECS INIT - END /////
 

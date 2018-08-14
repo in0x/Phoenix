@@ -31,7 +31,12 @@ namespace Phoenix
 	{
 		ar->serialize(&u8, sizeof(uint8_t));
 	}
-	
+
+	void serialize(Archive* ar, int32_t& i32)
+	{
+		ar->serialize(&i32, sizeof(int32_t));
+	}
+
 	void serialize(Archive* ar, std::string& string)
 	{
 		if (ar->isReading())
