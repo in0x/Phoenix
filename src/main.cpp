@@ -1,6 +1,5 @@
 #include <assert.h>
 #include <chrono>
-#include <typeindex>
 #include <functional>
 
 #include "Tests/MathTests.hpp"
@@ -9,7 +8,6 @@
 
 #include "Core/ObjImport.hpp"
 #include "Core/AssetRegistry.hpp"
-#include "Core/FNVHash.hpp"
 
 #include "Core/Logger.hpp"
 #include "Core/Serialize.hpp"
@@ -31,6 +29,13 @@
 
 namespace Phoenix
 {
+	struct LoadResources
+	{
+		IRIDevice* device;
+		IRIContext* context;
+		AssetRegistry* assets;
+	};
+
 	void moveCamera(Camera* camera, const KbState& kbstate, float dt)
 	{
 		static Vec2 cameraVelocity;
@@ -92,13 +97,6 @@ namespace Phoenix
 			camera->pitch(dy);
 		}
 	}
-
-	struct LoadResources
-	{
-		IRIDevice* device;
-		IRIContext* context;
-		AssetRegistry* assets;
-	};
 }
 
 namespace Phoenix
@@ -502,7 +500,6 @@ namespace Phoenix
 		float m_radius;
 		float m_intensity;
 
-
 		virtual void save(Archive* ar) override
 		{
 			serialize(ar, m_color);
@@ -604,10 +601,10 @@ namespace Phoenix
 		WriteArchive ar;
 		createWriteArchive(0, &ar);
 
-		size_t numEntities = world->m_lastEntityIdx - 1;
+		size_t numEntities = world->m_lastEntityIdx;
 		serialize(&ar, numEntities);
 
-		for (size_t i = World::FIRST_VALID_ENTITY; i < world->m_lastEntityIdx; ++i)
+		for (size_t i = World::FIRST_VALID_ENTITY; i <= world->m_lastEntityIdx; ++i)
 		{
 			saveEntityHeader(&world->m_entites[i], &ar);
 			saveComponentData(&world->m_entites[i], &ar);
@@ -665,6 +662,21 @@ namespace Phoenix
 		}
 
 		destroyArchive(ar);
+	}
+
+	void objImportToWorld(const char* objPath, World* outworld, LoadResources* resources)
+	{
+		std::vector<StaticMesh*> import = importObj(objPath, resources->device, resources->context, resources->assets);
+
+		for (StaticMesh* mesh : import)
+		{
+			EntityHandle entity = outworld->createEntity();
+			CStaticMesh* sm = outworld->addComponent<CStaticMesh>(entity);
+			CTransform* tf = outworld->addComponent<CTransform>(entity);
+
+			sm->m_mesh = mesh;
+			tf->setScale({ 0.1f, 0.1f, 0.1f });
+		}
 	}
 }
 
@@ -887,8 +899,14 @@ void run()
 	///// NEW ECS INIT - END /////
 
 	loadWorld(newWorldPath, &newWorld, &resources);
-	
-	const size_t editorCmdMemoryBytes = 2048;
+					  
+	//objImportToWorld("Models/sponza/sponza.obj", &newWorld, &resources);
+	//EntityHandle dirLightEntity = newWorld.createEntity();
+	//CDirectionalLight* light = newWorld.addComponent<CDirectionalLight>(dirLightEntity);
+	//light->m_color = Vec3(0.3f, 0.3f, 0.3f);
+	//light->m_direction = Vec3(-0.5f, -0.5f, 0.f);
+
+	const size_t editorCmdMemoryBytes = MEGABYTE(2);
 	Inspector inspector(editorCmdMemoryBytes);
 
 	///// NEW ECS UPDATE - START /////
