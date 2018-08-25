@@ -6,6 +6,7 @@
 #include <Core/SerialUtil.hpp>
 #include <Core/Material.hpp>
 #include <Core/AssetRegistry.hpp>
+#include <Core/LoadResources.hpp>
 
 #include <Render/RIDevice.hpp>
 
@@ -113,8 +114,12 @@ namespace Phoenix
 		destroyArchive(ar);
 	}
 
-	StaticMesh* loadStaticMesh(const char* path, IRIDevice* renderDevice, IRIContext* renderContext, AssetRegistry* assets)
+	StaticMesh* loadStaticMesh(const char* path, LoadResources* resources)
 	{	
+		IRIDevice* renderDevice = resources->device; 
+		IRIContext* renderContext = resources->context;
+		AssetRegistry* assets = resources->assets;
+
 		StaticMesh* mesh = assets->getStaticMesh(path);
 
 		if (mesh)

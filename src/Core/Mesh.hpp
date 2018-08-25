@@ -14,6 +14,7 @@ namespace Phoenix
 	class IRIContext;
 	class AssetRegistry;
 	struct Material;
+	struct LoadResources;
 
 	struct MeshData
 	{
@@ -59,7 +60,7 @@ namespace Phoenix
 
 	void createMeshBuffers(StaticMesh* outMesh, IRIDevice* renderDevice);
 
-	StaticMesh* loadStaticMesh(const char* path, IRIDevice* renderDevice, IRIContext* renderContext, AssetRegistry* assets);
+	StaticMesh* loadStaticMesh(const char* path, LoadResources* resources);
 
 	void saveStaticMesh(StaticMesh& mesh, AssetRegistry* assets);
 }

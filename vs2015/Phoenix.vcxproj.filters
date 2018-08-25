@@ -232,6 +232,30 @@
     <ClInclude Include="..\src\Core\EntityComponent.hpp">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Core\Components\CTransform.hpp">
+      <Filter>Core\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Component.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\World.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Entity.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\EntityHandle.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\ECType.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\Components\CStaticMesh.hpp">
+      <Filter>Core\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core\LoadResources.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Core\Clock.cpp">
@@ -361,6 +385,18 @@
     <ClCompile Include="..\src\Core\SerialUtil.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Core\Components\CTransform.cpp">
+      <Filter>Core\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Core\Entity.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Core\World.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Core\Components\CStaticMesh.cpp">
+      <Filter>Core\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Math">
@@ -413,6 +449,9 @@
     </Filter>
     <Filter Include="UI">
       <UniqueIdentifier>{f40e95dd-5315-4e34-b64a-3153bbc405c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Components">
+      <UniqueIdentifier>{3bb73ea5-3f73-4612-a86a-3480beb7112e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -8,6 +8,7 @@
 #include <Core/Texture.hpp>
 #include <Core/Material.hpp>
 #include <Core/Mesh.hpp>
+#include <Core/LoadResources.hpp>
 
 namespace Phoenix
 {
@@ -189,7 +190,8 @@ namespace Phoenix
 		for (size_t i = 0; i < numMeshes; ++i)
 		{
 			serialize(ar, meshName);
-			loadStaticMesh(meshName.c_str(), device, context, registry);
+			LoadResources resources{ device, context, registry };
+			loadStaticMesh(meshName.c_str(), &resources);
 		}
 	}
 

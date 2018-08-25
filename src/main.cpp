@@ -1,6 +1,4 @@
-#include <assert.h>
 #include <chrono>
-#include <functional>
 
 #include "Tests/MathTests.hpp"
 #include "Tests/MemoryTests.hpp"
@@ -14,10 +12,16 @@
 #include "Core/SerialUtil.hpp"
 #include "Core/Camera.hpp"
 #include "Core/Windows/PlatformWindows.hpp"
+#include "Core/LoadResources.hpp"
 
 #include "Core/Texture.hpp"
 #include "Core/Material.hpp"
-#include "Core/Mesh.hpp"
+
+#include "Core/World.hpp"
+#include "Core/Component.hpp"
+#include "Core/Components/CTransform.hpp"
+#include "Core/Components/CStaticMesh.hpp"
+
 #include "Math/PhiMath.hpp"
 
 #include "Memory/StackAllocator.hpp"
@@ -29,12 +33,6 @@
 
 namespace Phoenix
 {
-	struct LoadResources
-	{
-		IRIDevice* device;
-		IRIContext* context;
-		AssetRegistry* assets;
-	};
 
 	void moveCamera(Camera* camera, const KbState& kbstate, float dt)
 	{
@@ -101,189 +99,6 @@ namespace Phoenix
 
 namespace Phoenix
 {
-	enum ECType
-	{
-		CT_Transform,
-		CT_StaticMesh,
-		CT_PointLight,
-		CT_DirectionalLight,
-		CT_Max
-	};
-
-	#define IMPL_EC_TYPE_ID(typeEnum, typeNamePretty) \
-	static ECType staticType() \
-	{ \
-		return typeEnum; \
-	} \
-	\
-	virtual ECType type() const override \
-	{ \
-		return typeEnum; \
-	} \
-	\
-	virtual const char* typeName() const override \
-	{ \
-		return typeNamePretty; \
-	} \
-
-	typedef int32_t EntityHandle;
-
-	class Component
-	{
-	public:
-		Component() : m_owner(0) {}
-
-		virtual ECType type() const = 0;
-		virtual const char* typeName() const = 0;
-		
-		virtual void save(Archive* ar) = 0;
-		virtual void load(Archive* ar, LoadResources* resources) = 0;
-
-		EntityHandle m_owner;
-	};
-
-	struct Entity
-	{
-		Component* getComponent(ECType type);
-		void addComponent(Component* component);
-
-		typedef std::unordered_map<ECType, Component*> ComponentTable;
-		ComponentTable m_components;
-	};
-
-	Component* Entity::getComponent(ECType type)
-	{
-		auto& entry = m_components.find(type);
-		
-		if (entry != m_components.end())
-		{
-			return entry->second;
-		}
-		else
-		{
-			return nullptr;
-		}
-	}
-
-	void Entity::addComponent(Component* component)
-	{
-		ECType type = component->type();
-
-		if (!getComponent(type))
-		{
-			m_components.emplace(type, component);
-		}
-	}
-
-	typedef std::function<Component*(void)> ComponentFactory;
-
-	typedef std::unordered_map<ECType, ComponentFactory> CFactoryTable;
-
-	class World
-	{
-	public:
-		enum
-		{
-			MAX_ENTITIES = 1024,
-			INVALID_ENTITY = 0,
-			FIRST_VALID_ENTITY = 1
-		};
-
-		World()
-			: m_lastEntityIdx(1) {}
-
-		EntityHandle createEntity();
-		bool handleIsValid(EntityHandle handle) const;
-		Entity* getEntity(EntityHandle handle);
-		
-		void addComponentFactory(ECType type, const ComponentFactory& factory);
-
-		Component* addComponent(EntityHandle handle, ECType type);
-		Component* getComponent(EntityHandle handle, ECType type);
-
-		template<typename C>
-		C* addComponent(EntityHandle handle)
-		{
-			return static_cast<C*>(addComponent(handle, C::staticType()));
-		}
-
-		template<typename C>
-		C* getComponent(EntityHandle handle)
-		{
-			return static_cast<C*>(getComponent(handle, C::staticType()));
-		}
-
-		Entity m_entites[MAX_ENTITIES];
-		size_t m_lastEntityIdx;
-
-	private:
-		ComponentFactory* getCFactory(ECType type)
-		{
-			auto& entry = m_factories.find(type);
-
-			if (entry != m_factories.end())
-			{
-				return &(entry->second);
-			}
-			else
-			{
-				return nullptr;
-			}
-		}
-
-		CFactoryTable m_factories;
-	};
-
-	void World::addComponentFactory(ECType type, const ComponentFactory& factory)
-	{
-		auto& entry = m_factories.find(type);
-
-		if (entry != m_factories.end())
-		{
-			assert(false);
-			return;
-		}
-
-		m_factories.emplace(type, factory);
-	}
-
-	EntityHandle World::createEntity()
-	{
-		assert(m_lastEntityIdx < MAX_ENTITIES);
-		return ++m_lastEntityIdx;
-	}
-
-	bool World::handleIsValid(EntityHandle handle) const
-	{
-		return (handle != INVALID_ENTITY && m_lastEntityIdx < MAX_ENTITIES);
-	}
-
-	Entity* World::getEntity(EntityHandle handle)
-	{
-		assert(handleIsValid(handle));
-		return &m_entites[handle];
-	}
-
-	Component* World::addComponent(EntityHandle handle, ECType type)
-	{
-		assert(handleIsValid(handle));
-		Entity& entity = m_entites[handle];
-
-		ComponentFactory* factory = getCFactory(type);
-		assert(factory != nullptr);
-
-		Component* component = (*factory)();
-		component->m_owner = handle;
-		entity.addComponent(component);
-		return component;
-	}
-
-	Component* World::getComponent(EntityHandle handle, ECType type)
-	{
-		assert(handleIsValid(handle));
-		return m_entites[handle].getComponent(type);
-	}
-
 	template <typename C, size_t maxComponents>
 	struct ComponentArray
 	{
@@ -307,71 +122,6 @@ namespace Phoenix
 		{
 			return m_components[index];
 		}
-	};
-	
-	class CTransform : public Component
-	{
-		Vec3 m_translation;
-		Vec3 m_rotation;
-		Vec3 m_scale;
-
-		void serial(Archive* ar)
-		{
-			serialize(ar, m_translation);
-			serialize(ar, m_rotation);
-			serialize(ar, m_scale);
-		}
-
-	public:
-		void setTranslation(const Vec3& t)
-		{
-			m_translation = t;
-			m_bDirty = true;
-		}
-
-		const Vec3& getTranslation()
-		{
-			return m_translation;
-		}
-
-		void setRotation(const Vec3& r)
-		{
-			m_rotation = r;
-			m_bDirty = true;
-		}
-
-		const Vec3& getRotation()
-		{
-			return m_rotation;
-		}
-
-		void setScale(const Vec3& s)
-		{
-			m_scale = s;
-			m_bDirty = true;
-		}
-
-		const Vec3& getScale()
-		{
-			return m_scale;
-		}
-
-		virtual void save(Archive* ar) override
-		{
-			serial(ar);
-		}
-
-		virtual void load(Archive* ar, LoadResources* resources) override
-		{
-			serial(ar);
-			m_bDirty = true;
-		}
-
-		Matrix4* m_transform;
-
-		bool m_bDirty;
-
-		IMPL_EC_TYPE_ID(ECType::CT_Transform, "Transform");
 	};
 
 	class TransformSystem
@@ -421,28 +171,6 @@ namespace Phoenix
 			}
 		}
 	}
-
-	class CStaticMesh : public Component
-	{
-	public:
-		CStaticMesh() : m_mesh(nullptr) {}
-
-		StaticMesh* m_mesh;
-
-		virtual void save(Archive* ar) override
-		{
-			serialize(ar, m_mesh->m_name);
-		}
-
-		virtual void load(Archive* ar, LoadResources* resources) override
-		{
-			std::string meshName;
-			serialize(ar, meshName);
-			m_mesh = loadStaticMesh(meshName.c_str(), resources->device, resources->context, resources->assets);
-		}
-
-		IMPL_EC_TYPE_ID(ECType::CT_StaticMesh, "StaticMesh");
-	};
 
 	class StaticMeshSystem
 	{
@@ -570,100 +298,6 @@ namespace Phoenix
 		renderer->runLightsPass(m_lightBuffer);
 	}
 
-	void serialize(Archive* ar, ECType& ectype)
-	{
-		ar->serialize(&ectype, sizeof(ECType));
-	}
-
-	void saveEntityHeader(Entity* entity, WriteArchive* ar)
-	{
-		size_t numComponents = entity->m_components.size();
-		serialize(ar, numComponents);
-
-		for (auto& kvp : entity->m_components)
-		{
-			Component* component = kvp.second;
-			ECType type = component->type();
-			serialize(ar, type);
-		}
-	}
-
-	void saveComponentData(Entity* entity, WriteArchive* ar)
-	{
-		for (auto& kvp : entity->m_components)
-		{
-			Component* component = kvp.second;
-			component->save(ar);
-		}
-	}
-
-	void saveWorld(World* world, const char* path)
-	{
-		WriteArchive ar;
-		createWriteArchive(0, &ar);
-
-		size_t numEntities = world->m_lastEntityIdx;
-		serialize(&ar, numEntities);
-
-		for (size_t i = World::FIRST_VALID_ENTITY; i <= world->m_lastEntityIdx; ++i)
-		{
-			saveEntityHeader(&world->m_entites[i], &ar);
-			saveComponentData(&world->m_entites[i], &ar);
-		}
-
-		EArchiveError err = writeArchiveToDisk(path, ar);
-		assert(err == EArchiveError::NoError);
-		destroyArchive(ar);
-	}
-
-	void addComponentsFromEntityHeader(ReadArchive* ar, EntityHandle eHandle, World* world)
-	{
-		size_t numComponents = 0;	
-		serialize(ar, numComponents);
-
-		for (size_t i = 0; i < numComponents; ++i)
-		{
-			ECType type;
-			serialize(ar, type);
-			world->addComponent(eHandle, type);
-		}
-	}
-
-	void loadComponentData(ReadArchive* ar, Entity* entity, LoadResources* resources)
-	{
-		for (auto& kvp : entity->m_components)
-		{
-			Component* component = kvp.second;
-			component->load(ar, resources);
-		}
-	}
-
-	void loadWorld(const char* path, World* outWorld, LoadResources* resources)
-	{
-		ReadArchive ar;
-		EArchiveError err = createReadArchive(path, &ar);
-
-		assert(err == EArchiveError::NoError);
-		if (err != EArchiveError::NoError)
-		{
-			return;
-		}
-
-		size_t numEntitiesToLoad = 0;
-
-		serialize(&ar, numEntitiesToLoad);
-
-		for (size_t i = 0; i < numEntitiesToLoad; ++i)
-		{
-			EntityHandle eHandle = outWorld->createEntity();
-			Entity* entity = &outWorld->m_entites[eHandle];
-			
-			addComponentsFromEntityHeader(&ar, eHandle, outWorld);
-			loadComponentData(&ar, entity, resources);
-		}
-
-		destroyArchive(ar);
-	}
 
 	void objImportToWorld(const char* objPath, World* outworld, LoadResources* resources)
 	{
@@ -693,6 +327,8 @@ namespace Phoenix
 		DrawFunc* drawFunc;
 		ApplyFunc* applyFunc;
 	}; 
+
+	typedef EditorCmd* AllocCmdFunc(StackAllocator& allocator, void* observedObj);
 
 	struct CmdPayloadCTransform
 	{
@@ -725,16 +361,12 @@ namespace Phoenix
 		float* data = payload->data;
 		bool bWritten = false;
 
-		ImGui::Text(payload->transform->typeName());
-
-		bWritten |= ImGui::InputFloat3("Translation", &data[0]);
-		bWritten |= ImGui::InputFloat3("Rotation", &data[3]);
-		bWritten |= ImGui::InputFloat3("Scale", &data[6]);
+		bWritten |= ImGui::InputFloat3("Translation", &data[0], ImGuiInputTextFlags_EnterReturnsTrue);
+		bWritten |= ImGui::InputFloat3("Rotation", &data[3], ImGuiInputTextFlags_EnterReturnsTrue);
+		bWritten |= ImGui::InputFloat3("Scale", &data[6], ImGuiInputTextFlags_EnterReturnsTrue);
 
 		payload->bWritten = bWritten;
 	}
-
-	typedef EditorCmd* AllocCmdFunc(StackAllocator& allocator, void* observedObj);
 
 	EditorCmd* allocEditorCmdTransform(StackAllocator& allocator, void* observedObj)
 	{
@@ -745,30 +377,22 @@ namespace Phoenix
 		CTransform* transform = (CTransform*)observedObj;
 		CmdPayloadCTransform* payload = alloc<CmdPayloadCTransform>(allocator);
 		payload->transform = transform;
+		
+		auto setDataFromVec = [](float* data, const Vec3& vec) {
+			data[0] = vec.x;
+			data[1] = vec.y;
+			data[2] = vec.z;
+		};
+
+		setDataFromVec(payload->data, transform->getTranslation());
+		setDataFromVec(&payload->data[3], transform->getRotation());
+		setDataFromVec(&payload->data[6], transform->getScale());
+
 		cmd->payload = payload;
 
 		return cmd;
 	}
 
-	void drawEditorCmdEntity(void* cmd)
-	{
-		EditorCmd* command = (EditorCmd*)cmd;
-		ImGui::MenuItem("Entity");
-	}
-
-	void applyEditorCmdNull(void* cmd)
-	{
-	}
-
-	EditorCmd* allocEditorCmdEntity(StackAllocator& allocator, void* observedObj)
-	{
-		EditorCmd* cmd = alloc<EditorCmd>(allocator);
-		cmd->drawFunc = drawEditorCmdEntity;
-		cmd->applyFunc = applyEditorCmdNull;
-		cmd->payload = observedObj; // Just store inline because we only want the entity*
-		return cmd;
-	}
-	
 	AllocCmdFunc* AllocCmdFuncTbl[ECType::CT_Max] =
 	{
 		&allocEditorCmdTransform,
@@ -777,19 +401,16 @@ namespace Phoenix
 		nullptr,
 	};
 
-	// TODO: seperate UI and edits. UI should write commands, no need for written flag.
-
 	class Inspector
 	{
 	public:
 		StackAllocator m_allocator;
-		EditorCmd* m_cmdhead;
-		EditorCmd* m_cmdtail;
+		EditorCmd* m_cmdHead;
+		EntityHandle m_selectedEntity;
 
 		Inspector(size_t cmdMemoryBytes)
 			: m_allocator(cmdMemoryBytes)
-			, m_cmdhead(nullptr)
-			, m_cmdtail(nullptr)
+			, m_selectedEntity(0)
 		{}	
 
 		void drawDemoReference()
@@ -804,76 +425,78 @@ namespace Phoenix
 			}
 		}
 
-		void insertCommand(EditorCmd* cmd)
-		{
-			if (!m_cmdhead)
-			{
-				m_cmdhead = cmd;
-				m_cmdtail = cmd;
-			}
-
-			m_cmdtail->nextCmd = cmd;
-			m_cmdtail = cmd;
-			cmd->nextCmd = nullptr;
-		}
-
-		void createCommands(World* world)
-		{
-			// TODO
-			// Create entity commands
-			// Create tf commands
-
-			// Probably lookup entityhandle -> entity command -> component commands. Should make for easy adding and removing.
-
-			EditorCmd* cmd;
-
+		void drawEntityList(World* world)
+		{	
+			ImGui::Begin("World");
+	
 			for (size_t i = World::FIRST_VALID_ENTITY; i <= world->m_lastEntityIdx; ++i)
 			{
-				Entity* entity = world->getEntity(i);
+				bool bSelected = ImGui::MenuItem("Entity"); 
+				ImGui::SameLine();
+				ImGui::Text("%lld", i);
 
-				cmd = allocEditorCmdEntity(m_allocator, entity);
-				insertCommand(cmd);
-	
-				for (auto& kvp : entity->m_components)
+				if (bSelected)
 				{
-					Component* component = kvp.second;
-					AllocCmdFunc* allocCmd = AllocCmdFuncTbl[component->type()];
-
-					if (!allocCmd)
-					{
-						continue;
-					}
-
-					cmd = allocCmd(m_allocator, component);
-					insertCommand(cmd);
+					m_selectedEntity = i;
 				}
+
 			}
+
+			ImGui::End();
 		}
 
-		void applyPreviousCmds()
+		void applyEditorCommands()
 		{
-			while (m_cmdhead != nullptr)
+			while (m_cmdHead)
 			{
-				m_cmdhead->applyFunc(m_cmdhead);
-				m_cmdhead = m_cmdhead->nextCmd;
+				m_cmdHead->applyFunc(m_cmdHead);
+				m_cmdHead = m_cmdHead->nextCmd;
 			}
 		}
 
-		void drawUI(bool bDrawDemo)
-		{			
-			if (bDrawDemo)
-			{
-				drawDemoReference();
-			}
-	
-			ImGui::Begin("Inspector");
-	
-			EditorCmd* currentCmd = m_cmdhead;
+		void clearEditorCommands()
+		{
+			m_allocator.clear();
+			m_cmdHead = nullptr;
+		}
 
-			while (currentCmd != nullptr)
+		void drawEntityEditor(World* world)
+		{
+			applyEditorCommands();
+			clearEditorCommands();
+
+			if (!world->handleIsValid(m_selectedEntity))
 			{
-				currentCmd->drawFunc(currentCmd);
-				currentCmd = currentCmd->nextCmd;
+				return;
+			}
+
+			Entity* entity = world->getEntity(m_selectedEntity);
+
+			ImGui::Begin("Inspector");
+			ImGui::Text("Entity %lld", m_selectedEntity);
+
+			for (auto& kvp : entity->m_components)
+			{
+				Component* component = kvp.second;
+				AllocCmdFunc* allocCmd = AllocCmdFuncTbl[component->type()];
+
+				if (!allocCmd)
+				{
+					continue;
+				}
+
+				ImGui::BeginChild(component->typeName(), ImVec2(0, 0), true);
+				ImGui::Text(component->typeName());
+
+				EditorCmd* cmd = allocCmd(m_allocator, component);
+				cmd->drawFunc(cmd);
+
+				if (!m_cmdHead)
+				{
+					m_cmdHead = cmd;
+				}
+
+				ImGui::EndChild();
 			}
 
 			ImGui::End();
@@ -985,7 +608,7 @@ void run()
 	};
 	newWorld.addComponentFactory(CPointLight::staticType(), plFactory);
 
-	loadWorld(newWorldPath, &newWorld, &resources);
+ 	loadWorld(newWorldPath, &newWorld, &resources);
 					  
 	//objImportToWorld("Models/sponza/sponza.obj", &newWorld, &resources);
 	//EntityHandle dirLightEntity = newWorld.createEntity();
@@ -995,8 +618,7 @@ void run()
 
 	const size_t editorCmdMemoryBytes = MEGABYTE(2);
 	Inspector inspector(editorCmdMemoryBytes);
-	inspector.createCommands(&newWorld);
-
+	
 	while (!gameWindow->wantsToClose())
 	{
 		Platform::pollEvents();
@@ -1036,9 +658,29 @@ void run()
 
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 
-		//inspector.applyPreviousCmds();
-		//inspector.clearCmds();
-		inspector.drawUI(false);
+		inspector.drawEntityList(&newWorld);
+		inspector.drawEntityEditor(&newWorld);
+
+		inspector.drawDemoReference();
+
+		static float data1[3];
+		static float data2[3];
+
+		ImGui::Begin("EditTest");
+		
+		if (ImGui::TreeNode("First"))
+		{
+			ImGui::InputFloat3("Translation", &data1[0]);
+			ImGui::TreePop();
+		}
+
+		if (ImGui::TreeNode("Second"))
+		{
+			ImGui::InputFloat3("Translation", &data2[0]);
+			ImGui::TreePop();
+		}
+		
+		ImGui::End();
 
 		renderImGui();
 
