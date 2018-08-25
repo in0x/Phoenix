@@ -106,7 +106,8 @@ namespace Phoenix
 		CT_Transform,
 		CT_StaticMesh,
 		CT_PointLight,
-		CT_DirectionalLight
+		CT_DirectionalLight,
+		CT_Max
 	};
 
 	#define IMPL_EC_TYPE_ID(typeEnum, typeNamePretty) \
@@ -682,12 +683,12 @@ namespace Phoenix
 
 namespace Phoenix
 {
-	typedef void DrawFunc(void*);
-	typedef void ApplyFunc(void*);
+	typedef void DrawFunc(void* cmd);
+	typedef void ApplyFunc(void* cmd);
 
 	struct EditorCmd
 	{
-		void* nextCmd;
+		EditorCmd* nextCmd;
 		void* payload;
 		DrawFunc* drawFunc;
 		ApplyFunc* applyFunc;
@@ -697,12 +698,19 @@ namespace Phoenix
 	{
 		CTransform* transform;
 		float data[9];
+		bool bWritten;
 	};
 
 	void applyEditorCmdCTransform(void* cmd)
 	{
 		EditorCmd* command = (EditorCmd*)cmd;
 		CmdPayloadCTransform* payload = (CmdPayloadCTransform*)command->payload;
+
+		if (!payload->bWritten)
+		{
+			return;
+		}
+		
 		float* data = payload->data;
 
 		payload->transform->setTranslation({ data[0], data[1], data[2] });
@@ -715,74 +723,157 @@ namespace Phoenix
 		EditorCmd* command = (EditorCmd*)cmd;
 		CmdPayloadCTransform* payload = (CmdPayloadCTransform*)command->payload;
 		float* data = payload->data;
+		bool bWritten = false;
 
-		ImGui::InputFloat3("Translation", &data[0], 1);
-		ImGui::InputFloat3("Rotation", &data[3], 1);
-		ImGui::InputFloat3("Scale", &data[6], 1);
+		ImGui::Text(payload->transform->typeName());
+
+		bWritten |= ImGui::InputFloat3("Translation", &data[0]);
+		bWritten |= ImGui::InputFloat3("Rotation", &data[3]);
+		bWritten |= ImGui::InputFloat3("Scale", &data[6]);
+
+		payload->bWritten = bWritten;
 	}
 
-	void allocEditorCmd(EditorCmd* prev, StackAllocator& allocator, CTransform* transform)
+	typedef EditorCmd* AllocCmdFunc(StackAllocator& allocator, void* observedObj);
+
+	EditorCmd* allocEditorCmdTransform(StackAllocator& allocator, void* observedObj)
 	{
 		EditorCmd* cmd = alloc<EditorCmd>(allocator);
-		cmd->payload = alloc<CmdPayloadCTransform>(allocator);
 		cmd->applyFunc = applyEditorCmdCTransform;
 		cmd->drawFunc = drawEditorCmdCTransform;
-		prev->nextCmd = cmd;
+
+		CTransform* transform = (CTransform*)observedObj;
+		CmdPayloadCTransform* payload = alloc<CmdPayloadCTransform>(allocator);
+		payload->transform = transform;
+		cmd->payload = payload;
+
+		return cmd;
 	}
+
+	void drawEditorCmdEntity(void* cmd)
+	{
+		EditorCmd* command = (EditorCmd*)cmd;
+		ImGui::MenuItem("Entity");
+	}
+
+	void applyEditorCmdNull(void* cmd)
+	{
+	}
+
+	EditorCmd* allocEditorCmdEntity(StackAllocator& allocator, void* observedObj)
+	{
+		EditorCmd* cmd = alloc<EditorCmd>(allocator);
+		cmd->drawFunc = drawEditorCmdEntity;
+		cmd->applyFunc = applyEditorCmdNull;
+		cmd->payload = observedObj; // Just store inline because we only want the entity*
+		return cmd;
+	}
+	
+	AllocCmdFunc* AllocCmdFuncTbl[ECType::CT_Max] =
+	{
+		&allocEditorCmdTransform,
+		nullptr,
+		nullptr,
+		nullptr,
+	};
+
+	// TODO: seperate UI and edits. UI should write commands, no need for written flag.
 
 	class Inspector
 	{
 	public:
 		StackAllocator m_allocator;
 		EditorCmd* m_cmdhead;
+		EditorCmd* m_cmdtail;
 
 		Inspector(size_t cmdMemoryBytes)
 			: m_allocator(cmdMemoryBytes)
 			, m_cmdhead(nullptr)
+			, m_cmdtail(nullptr)
 		{}	
 
-		void drawWorld(World* world)
-		{			
+		void drawDemoReference()
+		{
 			static bool checkBox = false;
-
-			//ImGui::Text("Hello, world!");
-			//ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
-			//ImGui::ColorEdit3("clear color", (float*)&editColor);
-
 			ImGui::Checkbox("Demo Window", &checkBox);
-
-			//if (ImGui::Button("Button"))
-			//{
-			//	counter++;
-			//}
-
-			//ImGui::SameLine();
-			//ImGui::Text("counter = %d", counter);
-
-			//ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 
 			if (checkBox)
 			{
-				ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiCond_FirstUseEver); 
+				ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiCond_FirstUseEver);
 				ImGui::ShowDemoWindow(&checkBox);
-			}		
+			}
+		}
 
-			ImGui::Begin("Inspector");
+		void insertCommand(EditorCmd* cmd)
+		{
+			if (!m_cmdhead)
+			{
+				m_cmdhead = cmd;
+				m_cmdtail = cmd;
+			}
 
-			ImGui::MenuItem("VectorTest");
-	
-			for (size_t i = World::FIRST_VALID_ENTITY; i < world->m_lastEntityIdx; ++i)
+			m_cmdtail->nextCmd = cmd;
+			m_cmdtail = cmd;
+			cmd->nextCmd = nullptr;
+		}
+
+		void createCommands(World* world)
+		{
+			// TODO
+			// Create entity commands
+			// Create tf commands
+
+			// Probably lookup entityhandle -> entity command -> component commands. Should make for easy adding and removing.
+
+			EditorCmd* cmd;
+
+			for (size_t i = World::FIRST_VALID_ENTITY; i <= world->m_lastEntityIdx; ++i)
 			{
 				Entity* entity = world->getEntity(i);
 
-				ImGui::MenuItem("Entity", nullptr, false, false);
-				ImGui::Text("Entity %d", i);
-
+				cmd = allocEditorCmdEntity(m_allocator, entity);
+				insertCommand(cmd);
+	
 				for (auto& kvp : entity->m_components)
 				{
 					Component* component = kvp.second;
-					ImGui::Text(component->typeName());
+					AllocCmdFunc* allocCmd = AllocCmdFuncTbl[component->type()];
+
+					if (!allocCmd)
+					{
+						continue;
+					}
+
+					cmd = allocCmd(m_allocator, component);
+					insertCommand(cmd);
 				}
+			}
+		}
+
+		void applyPreviousCmds()
+		{
+			while (m_cmdhead != nullptr)
+			{
+				m_cmdhead->applyFunc(m_cmdhead);
+				m_cmdhead = m_cmdhead->nextCmd;
+			}
+		}
+
+		void drawUI(bool bDrawDemo)
+		{			
+			if (bDrawDemo)
+			{
+				drawDemoReference();
+			}
+	
+			ImGui::Begin("Inspector");
+	
+			EditorCmd* currentCmd = m_cmdhead;
+
+			while (currentCmd != nullptr)
+			{
+				currentCmd->drawFunc(currentCmd);
+				currentCmd = currentCmd->nextCmd;
 			}
 
 			ImGui::End();
@@ -864,8 +955,6 @@ void run()
 	Camera camera;
 	LightBuffer lightBuffer;
 
-	///// NEW ECS INIT - START /////
-
 	TransformSystem tfSystem;
 	StaticMeshSystem smSystem;
 	LightSystem lightSystem;
@@ -896,8 +985,6 @@ void run()
 	};
 	newWorld.addComponentFactory(CPointLight::staticType(), plFactory);
 
-	///// NEW ECS INIT - END /////
-
 	loadWorld(newWorldPath, &newWorld, &resources);
 					  
 	//objImportToWorld("Models/sponza/sponza.obj", &newWorld, &resources);
@@ -908,8 +995,7 @@ void run()
 
 	const size_t editorCmdMemoryBytes = MEGABYTE(2);
 	Inspector inspector(editorCmdMemoryBytes);
-
-	///// NEW ECS UPDATE - START /////
+	inspector.createCommands(&newWorld);
 
 	while (!gameWindow->wantsToClose())
 	{
@@ -950,14 +1036,14 @@ void run()
 
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 
-		inspector.drawWorld(&newWorld);
+		//inspector.applyPreviousCmds();
+		//inspector.clearCmds();
+		inspector.drawUI(false);
 
 		renderImGui();
 
 		RI::swapBufferToWindow(gameWindow);
 	}
-
-	///// NEW ECS UPDATE - END /////
 
 	saveWorld(&newWorld, newWorldPath);
 
