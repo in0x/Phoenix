@@ -29,7 +29,7 @@ namespace Phoenix
 
 	bool World::handleIsValid(EntityHandle handle) const
 	{
-		return (handle != INVALID_ENTITY && m_lastEntityIdx < MAX_ENTITIES);
+		return (handle != INVALID_ENTITY && m_lastEntityIdx < MAX_ENTITIES && handle <= m_lastEntityIdx);
 	}
 
 	Entity* World::getEntity(EntityHandle handle)
