@@ -317,18 +317,17 @@ namespace Phoenix
 
 namespace Phoenix
 {
-	typedef void DrawFunc(void* cmd);
-	typedef void ApplyFunc(void* cmd);
+	typedef void CmdDrawFunc(void* cmd);
+	typedef void CmdApplyFunc(void* cmd);
 
 	struct EditorCmd
 	{
 		EditorCmd* nextCmd;
 		void* payload;
-		DrawFunc* drawFunc;
-		ApplyFunc* applyFunc;
+		CmdApplyFunc* applyFunc;
 	}; 
 
-	typedef EditorCmd* AllocCmdFunc(StackAllocator& allocator, void* observedObj);
+	typedef EditorCmd* CmdAllocFunc(StackAllocator& allocator, void* observedObj);
 
 	struct CmdPayloadCTransform
 	{
@@ -372,8 +371,7 @@ namespace Phoenix
 	{
 		EditorCmd* cmd = alloc<EditorCmd>(allocator);
 		cmd->applyFunc = applyEditorCmdCTransform;
-		cmd->drawFunc = drawEditorCmdCTransform;
-
+		
 		CTransform* transform = (CTransform*)observedObj;
 		CmdPayloadCTransform* payload = alloc<CmdPayloadCTransform>(allocator);
 		payload->transform = transform;
@@ -393,19 +391,32 @@ namespace Phoenix
 		return cmd;
 	}
 
-	AllocCmdFunc* AllocCmdFuncTbl[ECType::CT_Max] =
+	void drawEditorCmdNull(void* cmd) {}
+
+	CmdDrawFunc* DrawCmdFuncTbl[ECType::CT_Max] =
+	{
+		&drawEditorCmdCTransform,
+		&drawEditorCmdNull,
+		&drawEditorCmdNull,
+		&drawEditorCmdNull,
+	};
+
+	EditorCmd* allocEditorCmdNull(StackAllocator& allocator, void* observedObj) { return nullptr; }
+
+	CmdAllocFunc* AllocCmdFuncTbl[ECType::CT_Max] =
 	{
 		&allocEditorCmdTransform,
-		nullptr,
-		nullptr,
-		nullptr,
+		&allocEditorCmdNull,
+		&allocEditorCmdNull,
+		&allocEditorCmdNull,
 	};
 
 	class Inspector
 	{
 	public:
 		StackAllocator m_allocator;
-		EditorCmd* m_cmdHead;
+		EditorCmd* m_cmdhead;
+		EditorCmd* m_cmdtail;
 		EntityHandle m_selectedEntity;
 
 		Inspector(size_t cmdMemoryBytes)
@@ -429,17 +440,40 @@ namespace Phoenix
 		{	
 			ImGui::Begin("World");
 	
+			const bool bCreatedEntity = ImGui::Button("Create Entity");
+			if (bCreatedEntity)
+			{
+				world->createEntity();
+			}
+
 			for (size_t i = World::FIRST_VALID_ENTITY; i <= world->m_lastEntityIdx; ++i)
 			{
-				bool bSelected = ImGui::MenuItem("Entity"); 
+				bool bSelected = ImGui::MenuItem("Entity");
+				
 				ImGui::SameLine();
 				ImGui::Text("%lld", i);
 
-				if (bSelected)
+				char bufCtx[32];
+				sprintf(bufCtx, "Ctx%d", i);
+
+				if (ImGui::BeginPopupContextWindow(bufCtx))
+				{
+					if (ImGui::Button("Destroy"))
+					{
+						//world->destroyEntity(m_selectedEntity);
+					}
+
+					ImGui::EndPopup();
+				}
+				else if (bSelected)
 				{
 					m_selectedEntity = i;
 				}
+			}
 
+			if (bCreatedEntity)
+			{
+				m_selectedEntity = world->m_lastEntityIdx;
 			}
 
 			ImGui::End();
@@ -447,17 +481,35 @@ namespace Phoenix
 
 		void applyEditorCommands()
 		{
-			while (m_cmdHead)
+			while (m_cmdhead)
 			{
-				m_cmdHead->applyFunc(m_cmdHead);
-				m_cmdHead = m_cmdHead->nextCmd;
+				m_cmdhead->applyFunc(m_cmdhead);
+				m_cmdhead = m_cmdhead->nextCmd;
 			}
 		}
 
 		void clearEditorCommands()
 		{
 			m_allocator.clear();
-			m_cmdHead = nullptr;
+			m_cmdhead = nullptr;
+		}
+
+		void insertCommand(EditorCmd* cmd)
+		{
+			if (!cmd)
+			{
+				return;
+			}
+
+			if (!m_cmdhead)
+			{
+				m_cmdhead = cmd;
+				m_cmdtail = cmd;
+			}
+
+			m_cmdtail->nextCmd = cmd;
+			m_cmdtail = cmd;
+			cmd->nextCmd = nullptr;
 		}
 
 		void drawEntityEditor(World* world)
@@ -478,25 +530,20 @@ namespace Phoenix
 			for (auto& kvp : entity->m_components)
 			{
 				Component* component = kvp.second;
-				AllocCmdFunc* allocCmd = AllocCmdFuncTbl[component->type()];
-
-				if (!allocCmd)
-				{
-					continue;
-				}
-
-				ImGui::BeginChild(component->typeName(), ImVec2(0, 0), true);
+				
+				ImGui::BeginGroup();		
 				ImGui::Text(component->typeName());
 
+				CmdAllocFunc* allocCmd = AllocCmdFuncTbl[component->type()];
 				EditorCmd* cmd = allocCmd(m_allocator, component);
-				cmd->drawFunc(cmd);
+				
+				CmdDrawFunc* drawFunc = DrawCmdFuncTbl[component->type()];
+				drawFunc(cmd);
 
-				if (!m_cmdHead)
-				{
-					m_cmdHead = cmd;
-				}
-
-				ImGui::EndChild();
+				insertCommand(cmd);
+				
+				ImGui::EndGroup();
+				ImGui::GetWindowDrawList()->AddRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), IM_COL32(255, 255, 255, 255));
 			}
 
 			ImGui::End();
@@ -662,25 +709,6 @@ void run()
 		inspector.drawEntityEditor(&newWorld);
 
 		inspector.drawDemoReference();
-
-		static float data1[3];
-		static float data2[3];
-
-		ImGui::Begin("EditTest");
-		
-		if (ImGui::TreeNode("First"))
-		{
-			ImGui::InputFloat3("Translation", &data1[0]);
-			ImGui::TreePop();
-		}
-
-		if (ImGui::TreeNode("Second"))
-		{
-			ImGui::InputFloat3("Translation", &data2[0]);
-			ImGui::TreePop();
-		}
-		
-		ImGui::End();
 
 		renderImGui();
 
