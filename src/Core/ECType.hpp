@@ -10,4 +10,12 @@ namespace Phoenix
 		CT_DirectionalLight,
 		CT_Max
 	};
+
+	static const char* g_ecTypeNames[ECType::CT_Max] = 
+	{
+		"Transform",
+		"StaticMesh",
+		"PointLight",
+		"DirectionalLight"
+	};
 }

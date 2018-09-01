@@ -397,6 +397,9 @@
     <ClCompile Include="..\src\Core\Components\CStaticMesh.cpp">
       <Filter>Core\Components</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\UI\Inspector.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Math">

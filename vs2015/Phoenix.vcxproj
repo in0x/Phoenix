@@ -318,6 +318,7 @@
     <ClCompile Include="..\src\ThirdParty\imgui\imgui.cpp" />
     <ClCompile Include="..\src\ThirdParty\imgui\imgui_demo.cpp" />
     <ClCompile Include="..\src\ThirdParty\imgui\imgui_draw.cpp" />
+    <ClCompile Include="..\src\UI\Inspector.cpp" />
     <ClCompile Include="..\src\UI\PhiImGui.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

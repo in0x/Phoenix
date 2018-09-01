@@ -24,12 +24,11 @@
 
 #include "Math/PhiMath.hpp"
 
-#include "Memory/StackAllocator.hpp"
-
 #include "Render/DeferredRenderer.hpp"
 #include "Render/LightBuffer.hpp"
 
 #include "UI/PhiImGui.h"
+#include "UI/Inspector.hpp"
 
 namespace Phoenix
 {
@@ -315,242 +314,6 @@ namespace Phoenix
 	}
 }
 
-namespace Phoenix
-{
-	typedef void CmdDrawFunc(void* cmd);
-	typedef void CmdApplyFunc(void* cmd);
-
-	struct EditorCmd
-	{
-		EditorCmd* nextCmd;
-		void* payload;
-		CmdApplyFunc* applyFunc;
-	}; 
-
-	typedef EditorCmd* CmdAllocFunc(StackAllocator& allocator, void* observedObj);
-
-	struct CmdPayloadCTransform
-	{
-		CTransform* transform;
-		float data[9];
-		bool bWritten;
-	};
-
-	void applyEditorCmdCTransform(void* cmd)
-	{
-		EditorCmd* command = (EditorCmd*)cmd;
-		CmdPayloadCTransform* payload = (CmdPayloadCTransform*)command->payload;
-
-		if (!payload->bWritten)
-		{
-			return;
-		}
-		
-		float* data = payload->data;
-
-		payload->transform->setTranslation({ data[0], data[1], data[2] });
-		payload->transform->setRotation({ data[3], data[4], data[5] });
-		payload->transform->setScale({ data[6], data[7], data[8] });
-	}
-
-	void drawEditorCmdCTransform(void* cmd)
-	{
-		EditorCmd* command = (EditorCmd*)cmd;
-		CmdPayloadCTransform* payload = (CmdPayloadCTransform*)command->payload;
-		float* data = payload->data;
-		bool bWritten = false;
-
-		bWritten |= ImGui::InputFloat3("Translation", &data[0], ImGuiInputTextFlags_EnterReturnsTrue);
-		bWritten |= ImGui::InputFloat3("Rotation", &data[3], ImGuiInputTextFlags_EnterReturnsTrue);
-		bWritten |= ImGui::InputFloat3("Scale", &data[6], ImGuiInputTextFlags_EnterReturnsTrue);
-
-		payload->bWritten = bWritten;
-	}
-
-	EditorCmd* allocEditorCmdTransform(StackAllocator& allocator, void* observedObj)
-	{
-		EditorCmd* cmd = alloc<EditorCmd>(allocator);
-		cmd->applyFunc = applyEditorCmdCTransform;
-		
-		CTransform* transform = (CTransform*)observedObj;
-		CmdPayloadCTransform* payload = alloc<CmdPayloadCTransform>(allocator);
-		payload->transform = transform;
-		
-		auto setDataFromVec = [](float* data, const Vec3& vec) {
-			data[0] = vec.x;
-			data[1] = vec.y;
-			data[2] = vec.z;
-		};
-
-		setDataFromVec(payload->data, transform->getTranslation());
-		setDataFromVec(&payload->data[3], transform->getRotation());
-		setDataFromVec(&payload->data[6], transform->getScale());
-
-		cmd->payload = payload;
-
-		return cmd;
-	}
-
-	void drawEditorCmdNull(void* cmd) {}
-
-	CmdDrawFunc* DrawCmdFuncTbl[ECType::CT_Max] =
-	{
-		&drawEditorCmdCTransform,
-		&drawEditorCmdNull,
-		&drawEditorCmdNull,
-		&drawEditorCmdNull,
-	};
-
-	EditorCmd* allocEditorCmdNull(StackAllocator& allocator, void* observedObj) { return nullptr; }
-
-	CmdAllocFunc* AllocCmdFuncTbl[ECType::CT_Max] =
-	{
-		&allocEditorCmdTransform,
-		&allocEditorCmdNull,
-		&allocEditorCmdNull,
-		&allocEditorCmdNull,
-	};
-
-	class Inspector
-	{
-	public:
-		StackAllocator m_allocator;
-		EditorCmd* m_cmdhead;
-		EditorCmd* m_cmdtail;
-		EntityHandle m_selectedEntity;
-
-		Inspector(size_t cmdMemoryBytes)
-			: m_allocator(cmdMemoryBytes)
-			, m_selectedEntity(0)
-		{}	
-
-		void drawDemoReference()
-		{
-			static bool checkBox = false;
-			ImGui::Checkbox("Demo Window", &checkBox);
-
-			if (checkBox)
-			{
-				ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiCond_FirstUseEver);
-				ImGui::ShowDemoWindow(&checkBox);
-			}
-		}
-
-		void drawEntityList(World* world)
-		{	
-			ImGui::Begin("World");
-	
-			const bool bCreatedEntity = ImGui::Button("Create Entity");
-			if (bCreatedEntity)
-			{
-				world->createEntity();
-			}
-
-			for (size_t i = World::FIRST_VALID_ENTITY; i <= world->m_lastEntityIdx; ++i)
-			{
-				bool bSelected = ImGui::MenuItem("Entity");
-				
-				ImGui::SameLine();
-				ImGui::Text("%lld", i);
-
-				char bufCtx[32];
-				sprintf(bufCtx, "Ctx%d", i);
-
-				if (ImGui::BeginPopupContextWindow(bufCtx))
-				{
-					if (ImGui::Button("Destroy"))
-					{
-						//world->destroyEntity(m_selectedEntity);
-					}
-
-					ImGui::EndPopup();
-				}
-				else if (bSelected)
-				{
-					m_selectedEntity = i;
-				}
-			}
-
-			if (bCreatedEntity)
-			{
-				m_selectedEntity = world->m_lastEntityIdx;
-			}
-
-			ImGui::End();
-		}
-
-		void applyEditorCommands()
-		{
-			while (m_cmdhead)
-			{
-				m_cmdhead->applyFunc(m_cmdhead);
-				m_cmdhead = m_cmdhead->nextCmd;
-			}
-		}
-
-		void clearEditorCommands()
-		{
-			m_allocator.clear();
-			m_cmdhead = nullptr;
-		}
-
-		void insertCommand(EditorCmd* cmd)
-		{
-			if (!cmd)
-			{
-				return;
-			}
-
-			if (!m_cmdhead)
-			{
-				m_cmdhead = cmd;
-				m_cmdtail = cmd;
-			}
-
-			m_cmdtail->nextCmd = cmd;
-			m_cmdtail = cmd;
-			cmd->nextCmd = nullptr;
-		}
-
-		void drawEntityEditor(World* world)
-		{
-			applyEditorCommands();
-			clearEditorCommands();
-
-			if (!world->handleIsValid(m_selectedEntity))
-			{
-				return;
-			}
-
-			Entity* entity = world->getEntity(m_selectedEntity);
-
-			ImGui::Begin("Inspector");
-			ImGui::Text("Entity %lld", m_selectedEntity);
-
-			for (auto& kvp : entity->m_components)
-			{
-				Component* component = kvp.second;
-				
-				ImGui::BeginGroup();		
-				ImGui::Text(component->typeName());
-
-				CmdAllocFunc* allocCmd = AllocCmdFuncTbl[component->type()];
-				EditorCmd* cmd = allocCmd(m_allocator, component);
-				
-				CmdDrawFunc* drawFunc = DrawCmdFuncTbl[component->type()];
-				drawFunc(cmd);
-
-				insertCommand(cmd);
-				
-				ImGui::EndGroup();
-				ImGui::GetWindowDrawList()->AddRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), IM_COL32(255, 255, 255, 255));
-			}
-
-			ImGui::End();
-		}
-	};
-}
-
 void run()
 {
 	using namespace Phoenix;
@@ -663,7 +426,7 @@ void run()
 	//light->m_color = Vec3(0.3f, 0.3f, 0.3f);
 	//light->m_direction = Vec3(-0.5f, -0.5f, 0.f);
 
-	const size_t editorCmdMemoryBytes = MEGABYTE(2);
+	const size_t editorCmdMemoryBytes = 2048;
 	Inspector inspector(editorCmdMemoryBytes);
 	
 	while (!gameWindow->wantsToClose())

@@ -1,34 +1,62 @@
 #pragma once
 
+#include <Memory/StackAllocator.hpp>
+#include <Core/ECType.hpp>
+#include <Core/EntityHandle.hpp>
+
 namespace Phoenix
 {
-	//class Inspector
-	//{
-	//	void drawWorld(World* world)
-	//	{
-	//	/*
-	//		ImGui::Text("Hello, world!");
-	//		ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
-	//		ImGui::ColorEdit3("clear color", (float*)&editColor);
+	class CTransform;
+	class World;
 
-	//		ImGui::Checkbox("Demo Window", &checkBox);
+	typedef void CmdDrawFunc(void* cmd);
+	typedef void CmdApplyFunc(void* cmd);
 
-	//		if (ImGui::Button("Button"))
-	//		{
-	//			counter++;
-	//		}
+	struct EditorCmd
+	{
+		EditorCmd* nextCmd;
+		void* payload;
+		CmdApplyFunc* applyFunc;
+	};
 
-	//		ImGui::SameLine();
-	//		ImGui::Text("counter = %d", counter);
+	typedef EditorCmd* CmdAllocFunc(StackAllocator& allocator, void* observedObj);
 
-	//		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+	struct CmdPayloadCTransform
+	{
+		CTransform* transform;
+		float data[9];
+		bool bWritten;
+	};
 
-	//		if (checkBox)
-	//		{
-	//			ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiCond_FirstUseEver); // Normally user code doesn't need/want to call this because positions are saved in .ini file anyway. Here we just want to make the demo initial state a bit more friendly!
-	//			ImGui::ShowDemoWindow(&checkBox);
-	//		}
-	//	*/
-	//	}
-	//};
+	void applyEditorCmdCTransform(void* cmd);
+	void drawEditorCmdCTransform(void* cmd);
+	EditorCmd* allocEditorCmdTransform(StackAllocator& allocator, void* observedObj);
+
+	void drawEditorCmdNull(void* cmd);
+	EditorCmd* allocEditorCmdNull(StackAllocator& allocator, void* observedObj);
+
+	class Inspector
+	{
+		StackAllocator m_allocator;
+		EditorCmd* m_cmdhead;
+		EditorCmd* m_cmdtail;
+		EntityHandle m_selectedEntity;
+
+		void applyEditorCommands();
+		void clearEditorCommands();
+		void insertCommand(EditorCmd* cmd);
+		void drawEntityFilter();
+
+		bool m_componentFilters[ECType::CT_Max];
+
+	public:
+		Inspector(size_t cmdMemoryBytes)
+			: m_allocator(cmdMemoryBytes)
+			, m_selectedEntity(0)
+		{}
+
+		void drawDemoReference();
+		void drawEntityList(World* world);
+		void drawEntityEditor(World* world);
+	};
 }
